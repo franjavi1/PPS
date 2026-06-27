@@ -1,0 +1,21 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+instance/
+
+# Variables de entorno
+.env
+
+# Node / React
+node_modules/
+dist/
+build/
+
+# VS Code
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
