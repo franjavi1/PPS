@@ -23,25 +23,6 @@ Git
 GitHub
 Docker / Docker Compose
 Visual Studio Code
-Estructura del proyecto
-PPS/
-│
-├── backend/
-│   ├── app/
-│   ├── models/
-│   ├── routes/
-│   ├── schemas/
-│   ├── services/
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── package.json
-│
-├── .gitignore
-└── README.md
-
 
 Descripción general
 
