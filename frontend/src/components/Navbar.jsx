@@ -12,11 +12,7 @@ function Navbar() {
     <header className="bg-red-700 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <img
-            src="/logo.jpeg"
-            alt="Logo bomberos"
-            className="w-16 h-16 object-contain"
-          />
+          
 
           <div>
             <h1 className="text-2xl font-bold leading-tight">
@@ -72,7 +68,7 @@ function Navbar() {
           </NavLink>
 
           <NavLink
-            to="/tipos-documentos"
+            to="/config-documentos"
             className={({ isActive }) =>
               `flex items-center gap-2 pb-2 font-medium ${
                 isActive
