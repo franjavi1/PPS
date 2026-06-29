@@ -1,49 +1,63 @@
 from datetime import datetime
-
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, String, DateTime, ForeignKey, func
+from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, func
 
-class Persona(db.Model):
+class Planes(db.Model):
     # Nombre de la tabla asociada en la base de datos.
-    __tablename__="personas"
+    __tablename__ = "planes"
 
-    # Identificador principal de la persona.
+    # Identificador principal del plan
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Tipo de documento asociado a la persona.
-    td_id: Mapped[int] = mapped_column(
-        "tdId",
+    # Tipo de plan asociado
+    tipo_planes_id_tipo_planes: Mapped[int] = mapped_column(
+        "tipoPlanesIdTipoPlanes",
         Integer,
-        ForeignKey("tipos_documento.id"),
+        ForeignKey("tipos_planes.idTipoPlanes"),
         nullable=False
     )
 
-    # Nombre de la persona.
+    # Numero de resolucion ministerial del plan.
+    resolucion_ministerial: Mapped[int] = mapped_column(
+        "ResolucionMinisterial",
+        Integer,
+        nullable=False
+
+    )
+
+    # Nombre del plan
     nombre: Mapped[str] = mapped_column(
         String(100),
         nullable=False
     )
 
-    # Apellido de la persona.
-    apellido: Mapped[str] = mapped_column(
-        String(100),
+    # Descripcion general del plan
+    descrip: Mapped[str] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    # Fecha de inicio de vigencia
+    vigencia_dde: Mapped[datetime] = mapped_column(
+        "vigenciaDde",
+        DateTime,
         nullable=False
     )
 
-    # Numero de documento registrado.
-    numero_doc: Mapped[int] = mapped_column(
-        "numeroDoc",
-        Integer,
+    
+    # Fecha de fin de vigencia
+    vigencia_hta: Mapped[datetime] = mapped_column(
+        "vigenciaHta",
+        DateTime,
         nullable=False
     )
 
-    # Estado del registro dentro del sistema.
+    # Estado del registro dentro del sistema
     estado: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
@@ -55,8 +69,10 @@ class Persona(db.Model):
         "usuarioAccion",
         Integer,
         nullable=False
+
     )
 
+    
     # Fecha y hora de creacion del registro.
     ts_creacion: Mapped[datetime] = mapped_column(
         "tsCreacion",
@@ -74,5 +90,6 @@ class Persona(db.Model):
         nullable=False
     )
 
-    # Relacion con el modelo de tipo de documento.
-    tipo_documento = relationship("TipoDocumento")
+    # Relacion con el modelo de tipo de plan
+    tipo_plan = relationship("TipoPlanes")
+

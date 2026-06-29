@@ -1,24 +1,24 @@
 from datetime import datetime
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, DateTime, func
 
 
-class TipoDocumento(db.Model):
+class TipoPlanes(db.Model):
     # Nombre de la tabla asociada en la base de datos.
-    __tablename__ = "tipos_documento"
+    __tablename__ = "tipos_planes"
 
-    # Identificador principal del tipo de documento.
-    id: Mapped[int] = mapped_column(
+    # Identificador principal del tipo de plan.
+    id_tipo_planes: Mapped[int] = mapped_column(
+        "idTipoPlanes",
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del tipo de documento.
-    descripcion: Mapped[str] = mapped_column(
-        String(45),
+    # Nombre descriptivo del plan.
+    nombre: Mapped[str] = mapped_column(
+        String(100),
         nullable=False
     )
 
@@ -44,5 +44,4 @@ class TipoDocumento(db.Model):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
-
     )
