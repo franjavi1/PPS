@@ -4,21 +4,33 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, DateTime, func
 
 
-class TipoPlanes(db.Model):
+class Asignaturas(db.Model):
     # Nombre de la tabla asociada en la base de datos.
-    __tablename__ = "tipos_planes"
+    __tablename__ = "asignaturas"
 
-    # Identificador principal del tipo de plan.
-    id_tipo_planes: Mapped[int] = mapped_column(
-        "idTipoPlanes",
+    # Identificador principal de la asignatura.
+    id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del tipo de plan.
-    descripcion: Mapped[str] = mapped_column(
-        String(100),
+    # Nombre de la asignatura.
+    nombre: Mapped[str] = mapped_column(
+        String(105),
+        nullable=False
+    )
+
+    # Estado del registro dentro del sistema.
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
+    # Formato en el que se dicta la asignatura.
+    formato: Mapped[str] = mapped_column(
+        String(45),
         nullable=False
     )
 

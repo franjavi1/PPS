@@ -1,24 +1,24 @@
 from datetime import datetime
+
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, DateTime, func
 
 
-class TipoPlanes(db.Model):
+class TipoSede(db.Model):
     # Nombre de la tabla asociada en la base de datos.
-    __tablename__ = "tipos_planes"
+    __tablename__ = "tipos_sedes"
 
-    # Identificador principal del tipo de plan.
-    id_tipo_planes: Mapped[int] = mapped_column(
-        "idTipoPlanes",
+    # Identificador principal del tipo de sede.
+    id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del tipo de plan.
+    # Descripcion del tipo de sede.
     descripcion: Mapped[str] = mapped_column(
-        String(100),
+        String(45),
         nullable=False
     )
 

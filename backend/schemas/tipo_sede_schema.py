@@ -1,4 +1,4 @@
-from models.tipo_planes import TipoPlanes
+from models.tipo_sede import TipoSede
 
 from db import ma
 
@@ -6,24 +6,24 @@ from marshmallow import ValidationError, validates_schema, pre_load, post_dump
 from marshmallow.validate import Length, Regexp
 
 
-REGEX_SOLO_LETRAS = r"^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$"
+REGEX_SOLO_LETRAS = r"^[A-Za-zÃÃ‰ÃÃ“ÃšÃ¡Ã©Ã­Ã³ÃºÃ±Ã‘\s]+$"
 
 
-class TipoPlanesSchema(ma.SQLAlchemySchema):
+class TipoSedeSchema(ma.SQLAlchemySchema):
     # Configuracion del schema asociado al modelo.
     class Meta:
-        model = TipoPlanes
+        model = TipoSede
         load_instance = True
 
     # Campo de solo lectura para las respuestas.
-    id_tipo_planes = ma.auto_field(dump_only=True)
+    id = ma.auto_field(dump_only=True)
 
-    # Descripcion del tipo de plan.
+    # Descripcion del tipo de sede.
     descripcion = ma.auto_field(
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=100, error="La descripcion debe tener entre 1 y 100 caracteres"),
+            Length(min=1, max=45, error="La descripcion debe tener entre 1 y 45 caracteres"),
             Regexp(REGEX_SOLO_LETRAS, error="La descripcion solo puede contener letras")
         ],
         error_messages={
@@ -48,7 +48,7 @@ class TipoPlanesSchema(ma.SQLAlchemySchema):
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
 
-    # Evita cargar tipos de plan con descripciones repetidas.
+    # Evita cargar tipos de sede con descripciones repetidas.
     @validates_schema
     def validar_descripcion_unica(self, data, **kwargs):
         descripcion = data.get("descripcion")
@@ -56,15 +56,15 @@ class TipoPlanesSchema(ma.SQLAlchemySchema):
         if not descripcion:
             return
 
-        existente = TipoPlanes.query.filter_by(
+        existente = TipoSede.query.filter_by(
             descripcion=descripcion
         ).first()
 
-        tipo_planes_id = getattr(self, "context", {}).get("tipo_planes_id")
+        tipo_sede_id = getattr(self, "context", {}).get("tipo_sede_id")
 
-        if existente and existente.id_tipo_planes != tipo_planes_id:
+        if existente and existente.id != tipo_sede_id:
             raise ValidationError({
-                "descripcion": ["Ya existe un tipo de plan con esa descripcion"]
+                "descripcion": ["Ya existe un tipo de sede con esa descripcion"]
             })
 
     # Limpia el texto recibido antes de validar y guardar.
@@ -85,5 +85,5 @@ class TipoPlanesSchema(ma.SQLAlchemySchema):
 
 
 # Instancias usadas por las rutas y servicios.
-tipo_planes_schema = TipoPlanesSchema()
-tipos_planes_schema = TipoPlanesSchema(many=True)
+tipo_sede_schema = TipoSedeSchema()
+tipos_sedes_schema = TipoSedeSchema(many=True)

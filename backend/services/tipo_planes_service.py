@@ -28,7 +28,7 @@ def actualizar(tipo_plan, datos):
 
     schema = TipoPlanesSchema(partial=True)
 
-    # Evita que la validacion de nombre unico tome como duplicado
+    # Evita que la validacion de descripcion unica tome como duplicado
     # al mismo tipo de plan que estamos editando.
     schema.context = {"tipo_planes_id": tipo_plan.id_tipo_planes}
 
