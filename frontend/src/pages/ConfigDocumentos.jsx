@@ -47,7 +47,7 @@ function ConfigDocumentos() {
   useEffect(() => {
     async function cargarDatos() {
       try {
-        const [tDocs, pers, rgs, sds, als, asig, coms] = await Promise.all([
+        const [resTDocs, resPers, resRgs, resSds, resAls, resAsig, resComs] = await Promise.all([
           tipoDocumentoService.obtenerTodos(),
           personaService.obtenerTodas(),
           rangoService.obtenerTodos(),
@@ -56,13 +56,38 @@ function ConfigDocumentos() {
           asignaturaService.obtenerTodas(),
           comisionService.obtenerTodas(),
         ]);
-        setTiposDocumento(tDocs);
-        setPersonas(pers);
-        setRangos(rgs);
-        setSedes(sds);
-        setAulas(als);
-        setAsignaturas(asig);
-        setComisiones(coms);
+
+        setTiposDocumento(resTDocs.data || []);
+
+        const personasMapeadas = (resPers.data || []).map((p) => ({
+          ...p,
+          tipoDocumentoId: p.tipo_documento_id,
+        }));
+        setPersonas(personasMapeadas);
+
+        const rangosMapeados = (resRgs.data || []).map((r) => ({
+          ...r,
+          nivelPrioridad: r.nivel_prioridad,
+        }));
+        setRangos(rangosMapeados);
+
+        setSedes(resSds.data || []);
+
+        const aulasMapeadas = (resAls.data || []).map((a) => ({
+          ...a,
+          sedeId: a.sede_id,
+        }));
+        setAulas(aulasMapeadas);
+
+        setAsignaturas(resAsig.data || []);
+
+        const comisionesMapeadas = (resComs.data || []).map((c) => ({
+          ...c,
+          asignaturaId: c.asignatura_id,
+          aulaId: c.aula_id,
+          cupoMaximo: c.cupo_maximo,
+        }));
+        setComisiones(comisionesMapeadas);
       } catch (error) {
         console.error("Error al cargar datos de configuración desde los servicios:", error);
       }
@@ -168,19 +193,27 @@ function ConfigDocumentos() {
     if (!validarTipoDoc()) return;
 
     try {
+      let response;
+      const payload = {
+        nombre: formTipoDoc.nombre,
+        descripcion: formTipoDoc.descripcion,
+      };
+
       if (modoEdicionTipoDoc) {
-        await tipoDocumentoService.actualizar(formTipoDoc.id, {
-          nombre: formTipoDoc.nombre,
-          descripcion: formTipoDoc.descripcion,
-        });
+        response = await tipoDocumentoService.actualizar(formTipoDoc.id, payload);
       } else {
-        await tipoDocumentoService.crear({
-          nombre: formTipoDoc.nombre,
-          descripcion: formTipoDoc.descripcion,
-        });
+        response = await tipoDocumentoService.crear(payload);
       }
+
+      if (response.status === "error") {
+        setErrorTipoDoc(response.errors || {});
+        alert(response.message || "Error al procesar tipo de documento.");
+        return;
+      }
+
+      alert(response.message || "Tipo de documento guardado con éxito.");
       const actualizados = await tipoDocumentoService.obtenerTodos();
-      setTiposDocumento(actualizados);
+      setTiposDocumento(actualizados.data || []);
       limpiarFormTipoDoc();
       setMostrarModalTipoDoc(false);
     } catch (err) {
@@ -216,9 +249,14 @@ function ConfigDocumentos() {
 
     if (confirm("¿Confirma la eliminación de este registro de tipo de documento?")) {
       try {
-        await tipoDocumentoService.eliminar(id);
+        const response = await tipoDocumentoService.eliminar(id);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+        alert(response.message || "Tipo de documento eliminado con éxito.");
         const actualizados = await tipoDocumentoService.obtenerTodos();
-        setTiposDocumento(actualizados);
+        setTiposDocumento(actualizados.data || []);
         if (formTipoDoc.id === id) limpiarFormTipoDoc();
       } catch (err) {
         console.error("Error al eliminar tipo de documento:", err);
@@ -295,25 +333,34 @@ function ConfigDocumentos() {
     if (!validarPersona()) return;
 
     try {
+      let response;
+      const payload = {
+        nombre: formPersona.nombre,
+        apellido: formPersona.apellido,
+        tipo_documento_id: formPersona.tipoDocumentoId,
+        documento: formPersona.documento,
+        email: formPersona.email,
+      };
+
       if (modoEdicionPersona) {
-        await personaService.actualizar(formPersona.id, {
-          nombre: formPersona.nombre,
-          apellido: formPersona.apellido,
-          tipoDocumentoId: formPersona.tipoDocumentoId,
-          documento: formPersona.documento,
-          email: formPersona.email,
-        });
+        response = await personaService.actualizar(formPersona.id, payload);
       } else {
-        await personaService.crear({
-          nombre: formPersona.nombre,
-          apellido: formPersona.apellido,
-          tipoDocumentoId: formPersona.tipoDocumentoId,
-          documento: formPersona.documento,
-          email: formPersona.email,
-        });
+        response = await personaService.crear(payload);
       }
+
+      if (response.status === "error") {
+        setErrorPersona(response.errors || {});
+        alert(response.message || "Error al procesar persona.");
+        return;
+      }
+
+      alert(response.message || "Persona guardada con éxito.");
       const actualizadas = await personaService.obtenerTodas();
-      setPersonas(actualizadas);
+      const personasMapeadas = (actualizadas.data || []).map((p) => ({
+        ...p,
+        tipoDocumentoId: p.tipo_documento_id,
+      }));
+      setPersonas(personasMapeadas);
       limpiarFormPersona();
       setMostrarModalPersona(false);
     } catch (err) {
@@ -340,9 +387,18 @@ function ConfigDocumentos() {
   async function eliminarPersona(id) {
     if (confirm("¿Confirma la eliminación de este registro de persona?")) {
       try {
-        await personaService.eliminar(id);
+        const response = await personaService.eliminar(id);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+        alert(response.message || "Persona eliminada con éxito.");
         const actualizadas = await personaService.obtenerTodas();
-        setPersonas(actualizadas);
+        const personasMapeadas = (actualizadas.data || []).map((p) => ({
+          ...p,
+          tipoDocumentoId: p.tipo_documento_id,
+        }));
+        setPersonas(personasMapeadas);
         if (formPersona.id === id) limpiarFormPersona();
       } catch (err) {
         console.error("Error al eliminar persona:", err);
@@ -411,19 +467,31 @@ function ConfigDocumentos() {
     if (!validarRango()) return;
 
     try {
+      let response;
+      const payload = {
+        descripcion: formRango.descripcion,
+        nivel_prioridad: formRango.nivelPrioridad,
+      };
+
       if (modoEdicionRango) {
-        await rangoService.actualizar(formRango.id, {
-          descripcion: formRango.descripcion,
-          nivelPrioridad: formRango.nivelPrioridad,
-        });
+        response = await rangoService.actualizar(formRango.id, payload);
       } else {
-        await rangoService.crear({
-          descripcion: formRango.descripcion,
-          nivelPrioridad: formRango.nivelPrioridad,
-        });
+        response = await rangoService.crear(payload);
       }
+
+      if (response.status === "error") {
+        setErrorRango(response.errors || {});
+        alert(response.message || "Error al procesar rango.");
+        return;
+      }
+
+      alert(response.message || "Rango guardado con éxito.");
       const actualizados = await rangoService.obtenerTodos();
-      setRangos(actualizados);
+      const rangosMapeados = (actualizados.data || []).map((r) => ({
+        ...r,
+        nivelPrioridad: r.nivel_prioridad,
+      }));
+      setRangos(rangosMapeados);
       limpiarFormRango();
       setMostrarModalRango(false);
     } catch (err) {
@@ -450,9 +518,18 @@ function ConfigDocumentos() {
   async function eliminarRango(id) {
     if (confirm("¿Confirma la eliminación de este rango institucional?")) {
       try {
-        await rangoService.eliminar(id);
+        const response = await rangoService.eliminar(id);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+        alert(response.message || "Rango eliminado con éxito.");
         const actualizados = await rangoService.obtenerTodos();
-        setRangos(actualizados);
+        const rangosMapeados = (actualizados.data || []).map((r) => ({
+          ...r,
+          nivelPrioridad: r.nivel_prioridad,
+        }));
+        setRangos(rangosMapeados);
         if (formRango.id === id) limpiarFormRango();
       } catch (err) {
         console.error("Error al eliminar rango:", err);
@@ -522,19 +599,27 @@ function ConfigDocumentos() {
     if (!validarSede()) return;
 
     try {
+      let response;
+      const payload = {
+        nombre: formSede.nombre,
+        direccion: formSede.direccion,
+      };
+
       if (modoEdicionSede) {
-        await sedeService.actualizar(formSede.id, {
-          nombre: formSede.nombre,
-          direccion: formSede.direccion,
-        });
+        response = await sedeService.actualizar(formSede.id, payload);
       } else {
-        await sedeService.crear({
-          nombre: formSede.nombre,
-          direccion: formSede.direccion,
-        });
+        response = await sedeService.crear(payload);
       }
+
+      if (response.status === "error") {
+        setErrorSede(response.errors || {});
+        alert(response.message || "Error al procesar sede.");
+        return;
+      }
+
+      alert(response.message || "Sede guardada con éxito.");
       const actualizadas = await sedeService.obtenerTodas();
-      setSedes(actualizadas);
+      setSedes(actualizadas.data || []);
       limpiarFormSede();
       setMostrarModalSede(false);
     } catch (err) {
@@ -562,9 +647,14 @@ function ConfigDocumentos() {
 
     if (confirm("¿Confirma la eliminación de este registro de sede?")) {
       try {
-        await sedeService.eliminar(id);
+        const response = await sedeService.eliminar(id);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+        alert(response.message || "Sede eliminada con éxito.");
         const actualizadas = await sedeService.obtenerTodas();
-        setSedes(actualizadas);
+        setSedes(actualizadas.data || []);
         if (formSede.id === id) limpiarFormSede();
       } catch (err) {
         console.error("Error al eliminar sede:", err);
@@ -612,21 +702,32 @@ function ConfigDocumentos() {
     if (!validarAula()) return;
 
     try {
+      let response;
+      const payload = {
+        nombre: formAula.nombre,
+        sede_id: formAula.sedeId,
+        capacidad: formAula.capacidad,
+      };
+
       if (modoEdicionAula) {
-        await aulaService.actualizar(formAula.id, {
-          nombre: formAula.nombre,
-          sedeId: formAula.sedeId,
-          capacidad: formAula.capacidad,
-        });
+        response = await aulaService.actualizar(formAula.id, payload);
       } else {
-        await aulaService.crear({
-          nombre: formAula.nombre,
-          sedeId: formAula.sedeId,
-          capacidad: formAula.capacidad,
-        });
+        response = await aulaService.crear(payload);
       }
+
+      if (response.status === "error") {
+        setErrorAula(response.errors || {});
+        alert(response.message || "Error al procesar aula.");
+        return;
+      }
+
+      alert(response.message || "Aula guardada con éxito.");
       const actualizadas = await aulaService.obtenerTodas();
-      setAulas(actualizadas);
+      const aulasMapeadas = (actualizadas.data || []).map((a) => ({
+        ...a,
+        sedeId: a.sede_id,
+      }));
+      setAulas(aulasMapeadas);
       limpiarFormAula();
       setMostrarModalAula(false);
     } catch (err) {
@@ -654,9 +755,18 @@ function ConfigDocumentos() {
 
     if (confirm("¿Confirma la eliminación de este registro de aula?")) {
       try {
-        await aulaService.eliminar(id);
+        const response = await aulaService.eliminar(id);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+        alert(response.message || "Aula eliminada con éxito.");
         const actualizadas = await aulaService.obtenerTodas();
-        setAulas(actualizadas);
+        const aulasMapeadas = (actualizadas.data || []).map((a) => ({
+          ...a,
+          sedeId: a.sede_id,
+        }));
+        setAulas(aulasMapeadas);
         if (formAula.id === id) limpiarFormAula();
       } catch (err) {
         console.error("Error al eliminar aula:", err);
@@ -724,25 +834,36 @@ function ConfigDocumentos() {
     if (!validarComision()) return;
 
     try {
+      let response;
+      const payload = {
+        nombre: formComision.nombre,
+        asignatura_id: formComision.asignaturaId,
+        aula_id: formComision.aulaId,
+        cupo_maximo: formComision.cupoMaximo,
+        inscritos: formComision.inscritos,
+      };
+
       if (modoEdicionComision) {
-        await comisionService.actualizar(formComision.id, {
-          nombre: formComision.nombre,
-          asignaturaId: formComision.asignaturaId,
-          aulaId: formComision.aulaId,
-          cupoMaximo: formComision.cupoMaximo,
-          inscritos: formComision.inscritos,
-        });
+        response = await comisionService.actualizar(formComision.id, payload);
       } else {
-        await comisionService.crear({
-          nombre: formComision.nombre,
-          asignaturaId: formComision.asignaturaId,
-          aulaId: formComision.aulaId,
-          cupoMaximo: formComision.cupoMaximo,
-          inscritos: formComision.inscritos,
-        });
+        response = await comisionService.crear(payload);
       }
+
+      if (response.status === "error") {
+        setErrorComision(response.errors || {});
+        alert(response.message || "Error al procesar comisión.");
+        return;
+      }
+
+      alert(response.message || "Comisión guardada con éxito.");
       const actualizadas = await comisionService.obtenerTodas();
-      setComisiones(actualizadas);
+      const comisionesMapeadas = (actualizadas.data || []).map((c) => ({
+        ...c,
+        asignaturaId: c.asignatura_id,
+        aulaId: c.aula_id,
+        cupoMaximo: c.cupo_maximo,
+      }));
+      setComisiones(comisionesMapeadas);
       limpiarFormComision();
       setMostrarModalComision(false);
     } catch (err) {
@@ -764,9 +885,20 @@ function ConfigDocumentos() {
   async function eliminarComision(id) {
     if (confirm("¿Confirma la eliminación de este registro de comisión?")) {
       try {
-        await comisionService.eliminar(id);
+        const response = await comisionService.eliminar(id);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+        alert(response.message || "Comisión eliminada con éxito.");
         const actualizadas = await comisionService.obtenerTodas();
-        setComisiones(actualizadas);
+        const comisionesMapeadas = (actualizadas.data || []).map((c) => ({
+          ...c,
+          asignaturaId: c.asignatura_id,
+          aulaId: c.aula_id,
+          cupoMaximo: c.cupo_maximo,
+        }));
+        setComisiones(comisionesMapeadas);
         if (formComision.id === id) limpiarFormComision();
       } catch (err) {
         console.error("Error al eliminar comisión:", err);

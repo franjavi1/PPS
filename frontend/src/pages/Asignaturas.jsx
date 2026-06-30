@@ -31,8 +31,12 @@ function Asignaturas() {
 
   async function cargarAsignaturas() {
     try {
-      const datos = await asignaturaService.obtenerTodas();
-      setAsignaturas(datos);
+      const response = await asignaturaService.obtenerTodas();
+      if (response.status === "error") {
+        console.error(response.message);
+        return;
+      }
+      setAsignaturas(response.data || []);
     } catch (error) {
       console.error("Error al cargar asignaturas:", error);
     }
@@ -86,25 +90,27 @@ function Asignaturas() {
     if (!validarFormulario()) return;
 
     try {
+      let response;
+      const payload = {
+        nombre: form.nombre,
+        codigo: form.codigo,
+        departamento: form.departamento,
+        estado: form.estado,
+      };
+
       if (modoEdicion) {
-        // Simulación PUT a /api/v1/asignaturas/:id
-        // Flask procesará el JSON, validará los campos e impactará en Postgres con un UPDATE
-        await asignaturaService.actualizar(form.id, {
-          nombre: form.nombre,
-          codigo: form.codigo,
-          departamento: form.departamento,
-          estado: form.estado,
-        });
+        response = await asignaturaService.actualizar(form.id, payload);
       } else {
-        // Simulación POST a /api/v1/asignaturas
-        // Flask procesará el payload e insertará un nuevo registro (INSERT INTO asignaturas...)
-        await asignaturaService.crear({
-          nombre: form.nombre,
-          codigo: form.codigo,
-          departamento: form.departamento,
-          estado: form.estado,
-        });
+        response = await asignaturaService.crear(payload);
       }
+
+      if (response.status === "error") {
+        setErrores(response.errors || {});
+        alert(response.message || "Error al procesar la solicitud.");
+        return;
+      }
+
+      alert(response.message || "Operación realizada con éxito.");
       cargarAsignaturas();
       cerrarModal();
     } catch (error) {
@@ -122,9 +128,12 @@ function Asignaturas() {
 
     if (confirmacion) {
       try {
-        // Simulación PATCH a /api/v1/asignaturas/:id/estado
-        // Flask actualizará el campo BOOLEAN 'estado' en PostgreSQL (UPDATE asignaturas SET estado = ... WHERE id = ...)
-        await asignaturaService.cambiarEstado(id, nuevoEstado);
+        const response = await asignaturaService.cambiarEstado(id, nuevoEstado);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+        alert(response.message);
         cargarAsignaturas();
       } catch (error) {
         console.error("Error al cambiar el estado de la asignatura:", error);

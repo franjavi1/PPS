@@ -15,46 +15,77 @@ let mockSedes = [
 export const sedeService = {
   /**
    * Obtiene todos los registros de Sedes.
-   * Representa un GET a /api/v1/sedes
    */
   async obtenerTodas() {
     await new Promise((resolve) => setTimeout(resolve, 200));
-    return [...mockSedes];
+    return {
+      status: "success",
+      data: [...mockSedes],
+      message: "Colección de sedes recuperada con éxito",
+      total: mockSedes.length,
+    };
   },
 
   /**
    * Crea un nuevo registro de Sede.
-   * Representa un POST a /api/v1/sedes
-   * Payload esperado por Flask: { nombre, direccion }
    */
   async crear(sede) {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    if (!sede.nombre || !sede.direccion) {
+      return {
+        status: "error",
+        message: "Error al crear sede. Faltan campos requeridos.",
+        errors: {
+          nombre: !sede.nombre ? "El nombre de la sede es requerido." : null,
+          direccion: !sede.direccion ? "La dirección es requerida." : null,
+        },
+      };
+    }
     const nuevo = {
       ...sede,
       id: mockSedes.length > 0 ? Math.max(...mockSedes.map((s) => s.id)) + 1 : 1,
     };
     mockSedes.push(nuevo);
-    return nuevo;
+    return {
+      status: "success",
+      data: nuevo,
+      message: "Sede creada exitosamente.",
+    };
   },
 
   /**
    * Actualiza una Sede existente.
-   * Representa un PUT a /api/v1/sedes/:id
-   * Payload esperado por Flask: { nombre, direccion }
    */
   async actualizar(id, sede) {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    if (!sede.nombre || !sede.direccion) {
+      return {
+        status: "error",
+        message: "Error al actualizar sede. Faltan campos requeridos.",
+        errors: {
+          nombre: !sede.nombre ? "El nombre de la sede es requerido." : null,
+          direccion: !sede.direccion ? "La dirección es requerida." : null,
+        },
+      };
+    }
     mockSedes = mockSedes.map((s) => (s.id === id ? { ...s, ...sede } : s));
-    return { id, ...sede };
+    return {
+      status: "success",
+      data: { id, ...sede },
+      message: "Sede actualizada exitosamente.",
+    };
   },
 
   /**
    * Elimina una Sede por su ID.
-   * Representa un DELETE a /api/v1/sedes/:id
    */
   async eliminar(id) {
     await new Promise((resolve) => setTimeout(resolve, 200));
     mockSedes = mockSedes.filter((s) => s.id !== id);
-    return { success: true };
+    return {
+      status: "success",
+      data: { id },
+      message: "Sede eliminada exitosamente.",
+    };
   },
 };

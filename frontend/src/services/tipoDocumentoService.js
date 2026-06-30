@@ -18,47 +18,77 @@ let mockTipos = [
 export const tipoDocumentoService = {
   /**
    * Obtiene todos los registros de Tipos de Documento.
-   * Representa un GET a /api/v1/tipos-documentos
    */
   async obtenerTodos() {
-    // Simulación de retraso de red de llamada asincrónica
     await new Promise((resolve) => setTimeout(resolve, 200));
-    return [...mockTipos];
+    return {
+      status: "success",
+      data: [...mockTipos],
+      message: "Colección de tipos de documento recuperada con éxito",
+      total: mockTipos.length,
+    };
   },
 
   /**
    * Crea un nuevo Tipo de Documento.
-   * Representa un POST a /api/v1/tipos-documentos
-   * Payload esperado por Flask: { nombre, descripcion }
    */
   async crear(tipo) {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    if (!tipo.nombre || !tipo.descripcion) {
+      return {
+        status: "error",
+        message: "Error al crear tipo de documento. Faltan campos requeridos.",
+        errors: {
+          nombre: !tipo.nombre ? "El nombre es requerido." : null,
+          descripcion: !tipo.descripcion ? "La descripción es requerida." : null,
+        },
+      };
+    }
     const nuevo = {
       ...tipo,
       id: mockTipos.length > 0 ? Math.max(...mockTipos.map((t) => t.id)) + 1 : 1,
     };
     mockTipos.push(nuevo);
-    return nuevo;
+    return {
+      status: "success",
+      data: nuevo,
+      message: "Tipo de documento creado exitosamente.",
+    };
   },
 
   /**
    * Actualiza un Tipo de Documento existente.
-   * Representa un PUT a /api/v1/tipos-documentos/:id
-   * Payload esperado por Flask: { nombre, descripcion }
    */
   async actualizar(id, tipo) {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    if (!tipo.nombre || !tipo.descripcion) {
+      return {
+        status: "error",
+        message: "Error al actualizar tipo de documento. Faltan campos requeridos.",
+        errors: {
+          nombre: !tipo.nombre ? "El nombre es requerido." : null,
+          descripcion: !tipo.descripcion ? "La descripción es requerida." : null,
+        },
+      };
+    }
     mockTipos = mockTipos.map((t) => (t.id === id ? { ...t, ...tipo } : t));
-    return { id, ...tipo };
+    return {
+      status: "success",
+      data: { id, ...tipo },
+      message: "Tipo de documento actualizado exitosamente.",
+    };
   },
 
   /**
    * Elimina un Tipo de Documento por su ID.
-   * Representa un DELETE a /api/v1/tipos-documentos/:id
    */
   async eliminar(id) {
     await new Promise((resolve) => setTimeout(resolve, 200));
     mockTipos = mockTipos.filter((t) => t.id !== id);
-    return { success: true };
+    return {
+      status: "success",
+      data: { id },
+      message: "Tipo de documento eliminado exitosamente.",
+    };
   },
 };

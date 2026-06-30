@@ -17,48 +17,79 @@ let mockAsignaturas = [
 export const asignaturaService = {
   /**
    * Obtiene todos los registros de Asignaturas.
-   * Representa un GET a /api/v1/asignaturas
    */
   async obtenerTodas() {
-    // Simula una petición asíncrona a través del gateway
     await new Promise((resolve) => setTimeout(resolve, 250));
-    return [...mockAsignaturas];
+    return {
+      status: "success",
+      data: [...mockAsignaturas],
+      message: "Colección de asignaturas recuperada con éxito",
+      total: mockAsignaturas.length,
+    };
   },
 
   /**
    * Crea una nueva Asignatura en la base de datos.
-   * Representa un POST a /api/v1/asignaturas
-   * Payload esperado por Flask: { nombre, codigo, departamento, estado }
    */
   async crear(asignatura) {
     await new Promise((resolve) => setTimeout(resolve, 250));
+    if (!asignatura.nombre || !asignatura.codigo || !asignatura.departamento) {
+      return {
+        status: "error",
+        message: "Error al crear asignatura. Faltan campos requeridos.",
+        errors: {
+          nombre: !asignatura.nombre ? "El nombre de la asignatura es requerido." : null,
+          codigo: !asignatura.codigo ? "El código es requerido." : null,
+          departamento: !asignatura.departamento ? "El formato de asignatura es requerido." : null,
+        },
+      };
+    }
     const nuevo = {
       ...asignatura,
       id: mockAsignaturas.length > 0 ? Math.max(...mockAsignaturas.map((a) => a.id)) + 1 : 1,
     };
     mockAsignaturas.push(nuevo);
-    return nuevo;
+    return {
+      status: "success",
+      data: nuevo,
+      message: "Asignatura creada exitosamente.",
+    };
   },
 
   /**
    * Actualiza los datos de una Asignatura en PostgreSQL.
-   * Representa un PUT a /api/v1/asignaturas/:id
-   * Payload esperado por Flask: { nombre, codigo, departamento, estado }
    */
   async actualizar(id, asignatura) {
     await new Promise((resolve) => setTimeout(resolve, 250));
+    if (!asignatura.nombre || !asignatura.codigo || !asignatura.departamento) {
+      return {
+        status: "error",
+        message: "Error al actualizar asignatura. Faltan campos requeridos.",
+        errors: {
+          nombre: !asignatura.nombre ? "El nombre de la asignatura es requerido." : null,
+          codigo: !asignatura.codigo ? "El código es requerido." : null,
+          departamento: !asignatura.departamento ? "El formato de asignatura es requerido." : null,
+        },
+      };
+    }
     mockAsignaturas = mockAsignaturas.map((a) => (a.id === id ? { ...a, ...asignatura } : a));
-    return { id, ...asignatura };
+    return {
+      status: "success",
+      data: { id, ...asignatura },
+      message: "Asignatura actualizada exitosamente.",
+    };
   },
 
   /**
    * Realiza la baja lógica (cambio de estado booleano) de una Asignatura.
-   * Representa un PATCH a /api/v1/asignaturas/:id/estado
-   * Payload esperado por Flask: { estado: boolean }
    */
   async cambiarEstado(id, nuevoEstado) {
     await new Promise((resolve) => setTimeout(resolve, 200));
     mockAsignaturas = mockAsignaturas.map((a) => (a.id === id ? { ...a, estado: nuevoEstado } : a));
-    return { id, estado: nuevoEstado };
+    return {
+      status: "success",
+      data: { id, estado: nuevoEstado },
+      message: "Estado de la asignatura actualizado exitosamente.",
+    };
   },
 };

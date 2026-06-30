@@ -11,17 +11,17 @@ let mockComisiones = [
   {
     id: 1,
     nombre: "Comisión A - Turno Noche",
-    asignaturaId: 1,
-    aulaId: 1,
-    cupoMaximo: 30,
+    asignatura_id: 1,
+    aula_id: 1,
+    cupo_maximo: 30,
     inscritos: 18,
   },
   {
     id: 2,
     nombre: "Comisión B - Sábados",
-    asignaturaId: 2,
-    aulaId: 2,
-    cupoMaximo: 15,
+    asignatura_id: 2,
+    aula_id: 2,
+    cupo_maximo: 15,
     inscritos: 12,
   },
 ];
@@ -29,46 +29,81 @@ let mockComisiones = [
 export const comisionService = {
   /**
    * Obtiene todos los registros de Comisiones.
-   * Representa un GET a /api/v1/comisiones
    */
   async obtenerTodas() {
     await new Promise((resolve) => setTimeout(resolve, 200));
-    return [...mockComisiones];
+    return {
+      status: "success",
+      data: [...mockComisiones],
+      message: "Colección de comisiones recuperada con éxito",
+      total: mockComisiones.length,
+    };
   },
 
   /**
    * Crea un nuevo registro de Comisión.
-   * Representa un POST a /api/v1/comisiones
-   * Payload esperado por Flask: { nombre, asignaturaId, aulaId, cupoMaximo, inscritos }
    */
   async crear(comision) {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    if (!comision.nombre || !comision.asignatura_id || !comision.aula_id || !comision.cupo_maximo) {
+      return {
+        status: "error",
+        message: "Error al crear comisión. Faltan campos requeridos.",
+        errors: {
+          nombre: !comision.nombre ? "El nombre de la comisión es requerido." : null,
+          asignatura_id: !comision.asignatura_id ? "La asignatura es requerida." : null,
+          aula_id: !comision.aula_id ? "El aula es requerida." : null,
+          cupo_maximo: !comision.cupo_maximo ? "El cupo máximo es requerido." : null,
+        },
+      };
+    }
     const nuevo = {
       ...comision,
       id: mockComisiones.length > 0 ? Math.max(...mockComisiones.map((c) => c.id)) + 1 : 1,
     };
     mockComisiones.push(nuevo);
-    return nuevo;
+    return {
+      status: "success",
+      data: nuevo,
+      message: "Comisión creada exitosamente.",
+    };
   },
 
   /**
    * Actualiza una Comisión existente.
-   * Representa un PUT a /api/v1/comisiones/:id
-   * Payload esperado por Flask: { nombre, asignaturaId, aulaId, cupoMaximo, inscritos }
    */
   async actualizar(id, comision) {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    if (!comision.nombre || !comision.asignatura_id || !comision.aula_id || !comision.cupo_maximo) {
+      return {
+        status: "error",
+        message: "Error al actualizar comisión. Faltan campos requeridos.",
+        errors: {
+          nombre: !comision.nombre ? "El nombre de la comisión es requerido." : null,
+          asignatura_id: !comision.asignatura_id ? "La asignatura es requerida." : null,
+          aula_id: !comision.aula_id ? "El aula es requerida." : null,
+          cupo_maximo: !comision.cupo_maximo ? "El cupo máximo es requerido." : null,
+        },
+      };
+    }
     mockComisiones = mockComisiones.map((c) => (c.id === id ? { ...c, ...comision } : c));
-    return { id, ...comision };
+    return {
+      status: "success",
+      data: { id, ...comision },
+      message: "Comisión actualizada exitosamente.",
+    };
   },
 
   /**
    * Elimina una Comisión por su ID.
-   * Representa un DELETE a /api/v1/comisiones/:id
    */
   async eliminar(id) {
     await new Promise((resolve) => setTimeout(resolve, 200));
     mockComisiones = mockComisiones.filter((c) => c.id !== id);
-    return { success: true };
+    return {
+      status: "success",
+      data: { id },
+      message: "Comisión eliminada exitosamente.",
+    };
   },
 };

@@ -12,7 +12,7 @@ let mockPersonas = [
     id: 1,
     nombre: "Juan Pablo",
     apellido: "González",
-    tipoDocumentoId: 1,
+    tipo_documento_id: 1,
     documento: "32456789",
     email: "jpgonzalez@bomberos.org",
   },
@@ -20,7 +20,7 @@ let mockPersonas = [
     id: 2,
     nombre: "María Belén",
     apellido: "López",
-    tipoDocumentoId: 1,
+    tipo_documento_id: 1,
     documento: "28765432",
     email: "mblopez@bomberos.org",
   },
@@ -28,7 +28,7 @@ let mockPersonas = [
     id: 3,
     nombre: "Carlos Alberto",
     apellido: "Ramírez",
-    tipoDocumentoId: 2,
+    tipo_documento_id: 2,
     documento: "31112223",
     email: "caramirez@bomberos.org",
   },
@@ -37,46 +37,81 @@ let mockPersonas = [
 export const personaService = {
   /**
    * Obtiene todos los registros de Personas.
-   * Representa un GET a /api/v1/personas
    */
   async obtenerTodas() {
     await new Promise((resolve) => setTimeout(resolve, 200));
-    return [...mockPersonas];
+    return {
+      status: "success",
+      data: [...mockPersonas],
+      message: "Colección de personas recuperada con éxito",
+      total: mockPersonas.length,
+    };
   },
 
   /**
    * Crea un nuevo registro de Persona.
-   * Representa un POST a /api/v1/personas
-   * Payload esperado por Flask: { nombre, apellido, tipoDocumentoId, documento, email }
    */
   async crear(persona) {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    if (!persona.nombre || !persona.apellido || !persona.documento || !persona.tipo_documento_id) {
+      return {
+        status: "error",
+        message: "Error al crear persona. Faltan campos requeridos.",
+        errors: {
+          nombre: !persona.nombre ? "El nombre es requerido." : null,
+          apellido: !persona.apellido ? "El apellido es requerido." : null,
+          documento: !persona.documento ? "El documento es requerido." : null,
+          tipo_documento_id: !persona.tipo_documento_id ? "El tipo de documento es requerido." : null,
+        },
+      };
+    }
     const nuevo = {
       ...persona,
       id: mockPersonas.length > 0 ? Math.max(...mockPersonas.map((p) => p.id)) + 1 : 1,
     };
     mockPersonas.push(nuevo);
-    return nuevo;
+    return {
+      status: "success",
+      data: nuevo,
+      message: "Persona creada exitosamente.",
+    };
   },
 
   /**
    * Actualiza una Persona existente.
-   * Representa un PUT a /api/v1/personas/:id
-   * Payload esperado por Flask: { nombre, apellido, tipoDocumentoId, documento, email }
    */
   async actualizar(id, persona) {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    if (!persona.nombre || !persona.apellido || !persona.documento || !persona.tipo_documento_id) {
+      return {
+        status: "error",
+        message: "Error al actualizar persona. Faltan campos requeridos.",
+        errors: {
+          nombre: !persona.nombre ? "El nombre es requerido." : null,
+          apellido: !persona.apellido ? "El apellido es requerido." : null,
+          documento: !persona.documento ? "El documento es requerido." : null,
+          tipo_documento_id: !persona.tipo_documento_id ? "El tipo de documento es requerido." : null,
+        },
+      };
+    }
     mockPersonas = mockPersonas.map((p) => (p.id === id ? { ...p, ...persona } : p));
-    return { id, ...persona };
+    return {
+      status: "success",
+      data: { id, ...persona },
+      message: "Persona actualizada exitosamente.",
+    };
   },
 
   /**
    * Elimina una Persona por su ID.
-   * Representa un DELETE a /api/v1/personas/:id
    */
   async eliminar(id) {
     await new Promise((resolve) => setTimeout(resolve, 200));
     mockPersonas = mockPersonas.filter((p) => p.id !== id);
-    return { success: true };
+    return {
+      status: "success",
+      data: { id },
+      message: "Persona eliminada exitosamente.",
+    };
   },
 };
