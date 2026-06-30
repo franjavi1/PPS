@@ -8,10 +8,10 @@ const BASE_URL = "/api/v1/asignaturas";
 
 // Mock data inicial alineado con el esquema de base de datos
 let mockAsignaturas = [
-  { id: 1, nombre: "Combate de Incendios I", codigo: "INC-101", departamento: "Operaciones", estado: true },
-  { id: 2, nombre: "Primeros Auxilios y RCP", codigo: "PAU-102", departamento: "Sanidad", estado: true },
-  { id: 3, nombre: "Rescate Vehicular", codigo: "RES-201", departamento: "Operaciones", estado: true },
-  { id: 4, nombre: "Materiales Peligrosos", codigo: "MAT-301", departamento: "Especialidades", estado: false },
+  { id: 1, nombre: "Combate de Incendios I", codigo: "INC-101", departamento: "Teórica", estado: true },
+  { id: 2, nombre: "Primeros Auxilios y RCP", codigo: "PAU-102", departamento: "Práctica", estado: true },
+  { id: 3, nombre: "Rescate Vehicular", codigo: "RES-201", departamento: "Taller", estado: true },
+  { id: 4, nombre: "Materiales Peligrosos", codigo: "MAT-301", departamento: "Teórica", estado: false },
 ];
 
 export const asignaturaService = {

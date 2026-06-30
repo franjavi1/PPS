@@ -1593,24 +1593,18 @@ function ConfigDocumentos() {
                             </label>
                             <div className="relative">
                               <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                              <select
+                              <input
+                                type="text"
                                 name="nombre"
                                 value={formSede.nombre}
                                 onChange={manejarCambioSede}
-                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                placeholder="Ej: Cuartel Central"
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
                                   errorSede.nombre
                                     ? "border-red-500 focus:ring-red-500"
                                     : "border-slate-300 focus:ring-red-500"
                                 }`}
-                              >
-                                <option value="">Seleccione una Sede</option>
-                                <option value="Cuartel Central">Cuartel Central</option>
-                                <option value="Destacamento N° 1">Destacamento N° 1</option>
-                                <option value="Destacamento N° 2">Destacamento N° 2</option>
-                                <option value="Destacamento N° 3">Destacamento N° 3</option>
-                                <option value="Anexo Administrativo">Anexo Administrativo</option>
-                                <option value="Campo de Entrenamiento">Campo de Entrenamiento</option>
-                              </select>
+                              />
                             </div>
                             {errorSede.nombre && (
                               <p className="text-red-600 text-xs mt-1">{errorSede.nombre}</p>
@@ -1765,25 +1759,18 @@ function ConfigDocumentos() {
                             </label>
                             <div className="relative">
                               <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                              <select
+                              <input
+                                type="text"
                                 name="nombre"
                                 value={formAula.nombre}
                                 onChange={manejarCambioAula}
-                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                placeholder="Ej: Aula 302"
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
                                   errorAula.nombre
                                     ? "border-red-500 focus:ring-red-500"
                                     : "border-slate-300 focus:ring-red-500"
                                 }`}
-                              >
-                                <option value="">Seleccione un Aula</option>
-                                <option value="Aula Magna">Aula Magna</option>
-                                <option value="Laboratorio de Simulación">Laboratorio de Simulación</option>
-                                <option value="Aula Técnica">Aula Técnica</option>
-                                <option value="Aula de Prácticas">Aula de Prácticas</option>
-                                <option value="Gimnasio de Entrenamiento">Gimnasio de Entrenamiento</option>
-                                <option value="Aula Teórica 1">Aula Teórica 1</option>
-                                <option value="Aula Teórica 2">Aula Teórica 2</option>
-                              </select>
+                              />
                             </div>
                             {errorAula.nombre && (
                               <p className="text-red-600 text-xs mt-1">{errorAula.nombre}</p>
@@ -1975,23 +1962,18 @@ function ConfigDocumentos() {
                             </label>
                             <div className="relative">
                               <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                              <select
+                              <input
+                                type="text"
                                 name="nombre"
                                 value={formComision.nombre}
                                 onChange={manejarCambioComision}
-                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                placeholder="Ej: Comisión A"
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
                                   errorComision.nombre
                                     ? "border-red-500 focus:ring-red-500"
                                     : "border-slate-300 focus:ring-red-500"
                                 }`}
-                              >
-                                <option value="">Seleccione una Comisión</option>
-                                <option value="Comisión A - Turno Noche">Comisión A - Turno Noche</option>
-                                <option value="Comisión B - Sábados">Comisión B - Sábados</option>
-                                <option value="Comisión C - Turno Tarde">Comisión C - Turno Tarde</option>
-                                <option value="Comisión D - Intensivo">Comisión D - Intensivo</option>
-                                <option value="Comisión E - Virtual">Comisión E - Virtual</option>
-                              </select>
+                              />
                             </div>
                             {errorComision.nombre && (
                               <p className="text-red-600 text-xs mt-1">{errorComision.nombre}</p>

@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="relative min-h-screen">
       {/* Contenedor flexible para centrar la marca de agua de forma 100% responsiva */}
-      <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center p-4">
+      <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center p-4">
         <div
           className="w-11/12 max-w-[500px] aspect-square bg-center bg-no-repeat bg-contain opacity-[0.04]"
           style={{ backgroundImage: "url('/logo.jpeg')" }}

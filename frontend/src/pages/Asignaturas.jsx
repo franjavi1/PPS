@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PlusCircle, Pencil, ToggleLeft, ToggleRight, X, BookOpen, Sliders } from "lucide-react";
+import { PlusCircle, Pencil, ToggleLeft, ToggleRight, X, BookOpen } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
 
@@ -73,7 +73,7 @@ function Asignaturas() {
     }
 
     if (!form.departamento) {
-      errs.departamento = "Debe seleccionar un departamento académico.";
+      errs.departamento = "Debe seleccionar un formato de asignatura.";
     }
 
     setErrores(errs);
@@ -184,7 +184,7 @@ function Asignaturas() {
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="py-4 px-6 text-sm font-bold text-slate-700">Código</th>
                   <th className="py-4 px-6 text-sm font-bold text-slate-700">Nombre / Cátedra</th>
-                  <th className="py-4 px-6 text-sm font-bold text-slate-700">Departamento</th>
+                  <th className="py-4 px-6 text-sm font-bold text-slate-700">Formato</th>
                   <th className="py-4 px-6 text-sm font-bold text-slate-700 text-center">Estado</th>
                   <th className="py-4 px-6 text-sm font-bold text-slate-700 text-right">Acciones</th>
                 </tr>
@@ -322,7 +322,7 @@ function Asignaturas() {
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Departamento Académico *
+                  Formato *
                 </label>
                 <select
                   name="departamento"
@@ -332,11 +332,10 @@ function Asignaturas() {
                     errores.departamento ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-red-500"
                   }`}
                 >
-                  <option value="">Seleccione un Departamento</option>
-                  <option value="Operaciones">Operaciones</option>
-                  <option value="Sanidad">Sanidad</option>
-                  <option value="Especialidades">Especialidades</option>
-                  <option value="Administración">Administración</option>
+                  <option value="">Seleccione un Formato</option>
+                  <option value="Teórica">Teórica</option>
+                  <option value="Práctica">Práctica</option>
+                  <option value="Taller">Taller</option>
                 </select>
                 {errores.departamento && (
                   <p className="text-red-600 text-xs mt-1">{errores.departamento}</p>
