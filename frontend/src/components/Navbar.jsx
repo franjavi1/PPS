@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router";
-import { Home, FolderOpen, FilePlus, FileText, LogOut } from "lucide-react";
+import { Home, FolderOpen, FilePlus, FileText, LogOut, BookOpen } from "lucide-react";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -79,6 +79,20 @@ function Navbar() {
           >
             <FileText size={20} />
             Documentos
+          </NavLink>
+
+          <NavLink
+            to="/asignaturas"
+            className={({ isActive }) =>
+              `flex items-center gap-2 pb-2 font-medium ${
+                isActive
+                  ? "border-b-2 border-white text-white"
+                  : "text-red-100 hover:text-white"
+              }`
+            }
+          >
+            <BookOpen size={20} />
+            Asignaturas
           </NavLink>
 
           <button

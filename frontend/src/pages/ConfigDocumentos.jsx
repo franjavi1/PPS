@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   PlusCircle,
   Pencil,
@@ -14,6 +14,15 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 
+// Importación de la capa de servicios para la integración asíncrona con el Backend (Flask + PostgreSQL)
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
+import { personaService } from "../services/personaService";
+import { rangoService } from "../services/rangoService";
+import { sedeService } from "../services/sedeService";
+import { aulaService } from "../services/aulaService";
+import { comisionService } from "../services/comisionService";
+import { asignaturaService } from "../services/asignaturaService";
+
 /**
  * Componente principal para la configuración y gestión de parámetros institucionales.
  * Administra las entidades de tipo_documento, persona y rango_institucional.
@@ -25,46 +34,41 @@ function ConfigDocumentos() {
   // Estado para la sub-pestaña de infraestructura ('sedes', 'aulas', 'comisiones')
   const [subPestanaActiva, setSubPestanaActiva] = useState("sedes");
 
-  // Estado para almacenar el listado de sedes
-  const [sedes, setSedes] = useState([
-    { id: 1, nombre: "Cuartel Central", direccion: "Av. Corrientes 1234" },
-    { id: 2, nombre: "Destacamento N° 1", direccion: "Calle Belgrano 567" },
-  ]);
+  // Estados para almacenar los listados recuperados asíncronamente de los servicios
+  const [sedes, setSedes] = useState([]);
+  const [aulas, setAulas] = useState([]);
+  const [asignaturas, setAsignaturas] = useState([]);
+  const [comisiones, setComisiones] = useState([]);
+  const [tiposDocumento, setTiposDocumento] = useState([]);
+  const [personas, setPersonas] = useState([]);
+  const [rangos, setRangos] = useState([]);
 
-  // Estado para almacenar el listado de aulas
-  const [aulas, setAulas] = useState([
-    { id: 1, nombre: "Aula Magna", sedeId: 1, capacidad: 40 },
-    { id: 2, nombre: "Laboratorio de Simulación", sedeId: 1, capacidad: 15 },
-    { id: 3, nombre: "Aula Técnica", sedeId: 2, capacidad: 25 },
-  ]);
-
-  // Estado estático de asignaturas para comisiones (mock data)
-  const [asignaturas, setAsignaturas] = useState([
-    { id: 1, nombre: "Combate de Incendios I" },
-    { id: 2, nombre: "Primeros Auxilios y RCP" },
-    { id: 3, nombre: "Rescate Vehicular" },
-    { id: 4, nombre: "Materiales Peligrosos" },
-  ]);
-
-  // Estado para almacenar el listado de comisiones
-  const [comisiones, setComisiones] = useState([
-    {
-      id: 1,
-      nombre: "Comisión A - Turno Noche",
-      asignaturaId: 1,
-      aulaId: 1,
-      cupoMaximo: 30,
-      inscritos: 18,
-    },
-    {
-      id: 2,
-      nombre: "Comisión B - Sábados",
-      asignaturaId: 2,
-      aulaId: 2,
-      cupoMaximo: 15,
-      inscritos: 12,
-    },
-  ]);
+  // Carga asíncrona inicial de todas las entidades mediante Promise.all para optimizar rendimiento
+  useEffect(() => {
+    async function cargarDatos() {
+      try {
+        const [tDocs, pers, rgs, sds, als, asig, coms] = await Promise.all([
+          tipoDocumentoService.obtenerTodos(),
+          personaService.obtenerTodas(),
+          rangoService.obtenerTodos(),
+          sedeService.obtenerTodas(),
+          aulaService.obtenerTodas(),
+          asignaturaService.obtenerTodas(),
+          comisionService.obtenerTodas(),
+        ]);
+        setTiposDocumento(tDocs);
+        setPersonas(pers);
+        setRangos(rgs);
+        setSedes(sds);
+        setAulas(als);
+        setAsignaturas(asig);
+        setComisiones(coms);
+      } catch (error) {
+        console.error("Error al cargar datos de configuración desde los servicios:", error);
+      }
+    }
+    cargarDatos();
+  }, []);
 
   // Estado para el control del formulario de Sede
   const [formSede, setFormSede] = useState({ id: null, nombre: "", direccion: "" });
@@ -87,51 +91,6 @@ function ConfigDocumentos() {
   });
   const [errorComision, setErrorComision] = useState({});
   const [modoEdicionComision, setModoEdicionComision] = useState(false);
-
-  // Estado para almacenar el listado de tipos de documento
-  const [tiposDocumento, setTiposDocumento] = useState([
-    { id: 1, nombre: "DNI", descripcion: "Documento Nacional de Identidad" },
-    { id: 2, nombre: "PAS", descripcion: "Pasaporte Internacional" },
-    { id: 3, nombre: "LE", descripcion: "Libreta de Enrolamiento" },
-  ]);
-
-  // Estado para almacenar el listado de personas
-  const [personas, setPersonas] = useState([
-    {
-      id: 1,
-      nombre: "Juan Pablo",
-      apellido: "González",
-      tipoDocumentoId: 1,
-      documento: "32456789",
-      email: "jpgonzalez@bomberos.org",
-    },
-    {
-      id: 2,
-      nombre: "María Belén",
-      apellido: "López",
-      tipoDocumentoId: 1,
-      documento: "28765432",
-      email: "mblopez@bomberos.org",
-    },
-    {
-      id: 3,
-      nombre: "Carlos Alberto",
-      apellido: "Ramírez",
-      tipoDocumentoId: 2,
-      documento: "31112223",
-      email: "caramirez@bomberos.org",
-    },
-  ]);
-
-  // Estado para almacenar el listado de rangos institucionales
-  const [rangos, setRangos] = useState([
-    { id: 1, descripcion: "Aspirante", nivelPrioridad: 1 },
-    { id: 2, descripcion: "Bombero", nivelPrioridad: 2 },
-    { id: 3, descripcion: "Cabo", nivelPrioridad: 3 },
-    { id: 4, descripcion: "Sargento Primero", nivelPrioridad: 4 },
-    { id: 5, descripcion: "Suboficial Mayor", nivelPrioridad: 5 },
-    { id: 6, descripcion: "Oficial Inspector", nivelPrioridad: 6 },
-  ]);
 
   // Estado para el control del formulario de Tipo de Documento (creación y edición)
   const [formTipoDoc, setFormTipoDoc] = useState({ id: null, nombre: "", descripcion: "" });
@@ -201,24 +160,33 @@ function ConfigDocumentos() {
   }
 
   /**
-   * Guarda o actualiza un tipo de documento en el estado local.
+   * Guarda o actualiza un tipo de documento utilizando el servicio asíncrono.
+   * Se comunica con POST/PUT en /api/v1/tipos-documentos.
    */
-  function guardarTipoDoc(e) {
+  async function guardarTipoDoc(e) {
     e.preventDefault();
     if (!validarTipoDoc()) return;
 
-    if (modoEdicionTipoDoc) {
-      setTiposDocumento(
-        tiposDocumento.map((td) => (td.id === formTipoDoc.id ? { ...formTipoDoc } : td))
-      );
-      setModoEdicionTipoDoc(false);
-    } else {
-      const nuevoId = tiposDocumento.length > 0 ? Math.max(...tiposDocumento.map((t) => t.id)) + 1 : 1;
-      setTiposDocumento([...tiposDocumento, { ...formTipoDoc, id: nuevoId }]);
+    try {
+      if (modoEdicionTipoDoc) {
+        await tipoDocumentoService.actualizar(formTipoDoc.id, {
+          nombre: formTipoDoc.nombre,
+          descripcion: formTipoDoc.descripcion,
+        });
+      } else {
+        await tipoDocumentoService.crear({
+          nombre: formTipoDoc.nombre,
+          descripcion: formTipoDoc.descripcion,
+        });
+      }
+      const actualizados = await tipoDocumentoService.obtenerTodos();
+      setTiposDocumento(actualizados);
+      limpiarFormTipoDoc();
+      setMostrarModalTipoDoc(false);
+    } catch (err) {
+      console.error("Error al guardar tipo de documento:", err);
+      alert("Error al procesar la solicitud en el servidor.");
     }
-    limpiarFormTipoDoc();
-    // Se cierra el modal de Tipo de Documento tras guardar exitosamente
-    setMostrarModalTipoDoc(false);
   }
 
   /**
@@ -234,8 +202,9 @@ function ConfigDocumentos() {
 
   /**
    * Elimina un tipo de documento, validando previamente que no se vulnere la integridad referencial.
+   * Se comunica con DELETE en /api/v1/tipos-documentos/:id.
    */
-  function eliminarTipoDoc(id) {
+  async function eliminarTipoDoc(id) {
     // Validación de clave foránea en la lista de personas
     const enUso = personas.some((p) => p.tipoDocumentoId === id);
     if (enUso) {
@@ -246,8 +215,15 @@ function ConfigDocumentos() {
     }
 
     if (confirm("¿Confirma la eliminación de este registro de tipo de documento?")) {
-      setTiposDocumento(tiposDocumento.filter((td) => td.id !== id));
-      if (formTipoDoc.id === id) limpiarFormTipoDoc();
+      try {
+        await tipoDocumentoService.eliminar(id);
+        const actualizados = await tipoDocumentoService.obtenerTodos();
+        setTiposDocumento(actualizados);
+        if (formTipoDoc.id === id) limpiarFormTipoDoc();
+      } catch (err) {
+        console.error("Error al eliminar tipo de documento:", err);
+        alert("Error al intentar eliminar el registro.");
+      }
     }
   }
 
@@ -311,24 +287,39 @@ function ConfigDocumentos() {
   }
 
   /**
-   * Guarda o actualiza una persona en el estado local.
+   * Guarda o actualiza una persona utilizando el servicio asíncrono.
+   * Se comunica con POST/PUT en /api/v1/personas.
    */
-  function guardarPersona(e) {
+  async function guardarPersona(e) {
     e.preventDefault();
     if (!validarPersona()) return;
 
-    if (modoEdicionPersona) {
-      setPersonas(
-        personas.map((p) => (p.id === formPersona.id ? { ...formPersona } : p))
-      );
-      setModoEdicionPersona(false);
-    } else {
-      const nuevoId = personas.length > 0 ? Math.max(...personas.map((p) => p.id)) + 1 : 1;
-      setPersonas([...personas, { ...formPersona, id: nuevoId }]);
+    try {
+      if (modoEdicionPersona) {
+        await personaService.actualizar(formPersona.id, {
+          nombre: formPersona.nombre,
+          apellido: formPersona.apellido,
+          tipoDocumentoId: formPersona.tipoDocumentoId,
+          documento: formPersona.documento,
+          email: formPersona.email,
+        });
+      } else {
+        await personaService.crear({
+          nombre: formPersona.nombre,
+          apellido: formPersona.apellido,
+          tipoDocumentoId: formPersona.tipoDocumentoId,
+          documento: formPersona.documento,
+          email: formPersona.email,
+        });
+      }
+      const actualizadas = await personaService.obtenerTodas();
+      setPersonas(actualizadas);
+      limpiarFormPersona();
+      setMostrarModalPersona(false);
+    } catch (err) {
+      console.error("Error al guardar persona:", err);
+      alert("Error al procesar la solicitud en el servidor.");
     }
-    limpiarFormPersona();
-    // Se cierra el modal de Persona tras guardar exitosamente
-    setMostrarModalPersona(false);
   }
 
   /**
@@ -343,12 +334,20 @@ function ConfigDocumentos() {
   }
 
   /**
-   * Elimina un registro de persona en el estado local.
+   * Elimina un registro de persona utilizando el servicio asíncrono.
+   * Se comunica con DELETE en /api/v1/personas/:id.
    */
-  function eliminarPersona(id) {
+  async function eliminarPersona(id) {
     if (confirm("¿Confirma la eliminación de este registro de persona?")) {
-      setPersonas(personas.filter((p) => p.id !== id));
-      if (formPersona.id === id) limpiarFormPersona();
+      try {
+        await personaService.eliminar(id);
+        const actualizadas = await personaService.obtenerTodas();
+        setPersonas(actualizadas);
+        if (formPersona.id === id) limpiarFormPersona();
+      } catch (err) {
+        console.error("Error al eliminar persona:", err);
+        alert("Error al intentar eliminar el registro.");
+      }
     }
   }
 
@@ -404,24 +403,33 @@ function ConfigDocumentos() {
   }
 
   /**
-   * Guarda o actualiza un rango institucional en el estado local.
+   * Guarda o actualiza un rango utilizando el servicio asíncrono.
+   * Se comunica con POST/PUT en /api/v1/rangos.
    */
-  function guardarRango(e) {
+  async function guardarRango(e) {
     e.preventDefault();
     if (!validarRango()) return;
 
-    if (modoEdicionRango) {
-      setRangos(
-        rangos.map((r) => (r.id === formRango.id ? { ...formRango } : r))
-      );
-      setModoEdicionRango(false);
-    } else {
-      const nuevoId = rangos.length > 0 ? Math.max(...rangos.map((r) => r.id)) + 1 : 1;
-      setRangos([...rangos, { ...formRango, id: nuevoId }]);
+    try {
+      if (modoEdicionRango) {
+        await rangoService.actualizar(formRango.id, {
+          descripcion: formRango.descripcion,
+          nivelPrioridad: formRango.nivelPrioridad,
+        });
+      } else {
+        await rangoService.crear({
+          descripcion: formRango.descripcion,
+          nivelPrioridad: formRango.nivelPrioridad,
+        });
+      }
+      const actualizados = await rangoService.obtenerTodos();
+      setRangos(actualizados);
+      limpiarFormRango();
+      setMostrarModalRango(false);
+    } catch (err) {
+      console.error("Error al guardar rango:", err);
+      alert("Error al procesar la solicitud en el servidor.");
     }
-    limpiarFormRango();
-    // Se cierra el modal de Rango tras guardar exitosamente
-    setMostrarModalRango(false);
   }
 
   /**
@@ -436,12 +444,20 @@ function ConfigDocumentos() {
   }
 
   /**
-   * Elimina un rango institucional en el estado local.
+   * Elimina un rango utilizando el servicio asíncrono.
+   * Se comunica con DELETE en /api/v1/rangos/:id.
    */
-  function eliminarRango(id) {
+  async function eliminarRango(id) {
     if (confirm("¿Confirma la eliminación de este rango institucional?")) {
-      setRangos(rangos.filter((r) => r.id !== id));
-      if (formRango.id === id) limpiarFormRango();
+      try {
+        await rangoService.eliminar(id);
+        const actualizados = await rangoService.obtenerTodos();
+        setRangos(actualizados);
+        if (formRango.id === id) limpiarFormRango();
+      } catch (err) {
+        console.error("Error al eliminar rango:", err);
+        alert("Error al intentar eliminar el registro.");
+      }
     }
   }
 
@@ -499,21 +515,32 @@ function ConfigDocumentos() {
     return Object.keys(errores).length === 0;
   }
 
-  // Guarda la nueva sede o actualiza el registro existente en el estado local.
-  function guardarSede(e) {
+  // Guarda la nueva sede o actualiza el registro existente utilizando el servicio asíncrono.
+  // Se comunica con POST/PUT en /api/v1/sedes.
+  async function guardarSede(e) {
     e.preventDefault();
     if (!validarSede()) return;
 
-    if (modoEdicionSede) {
-      setSedes(sedes.map((s) => (s.id === formSede.id ? { ...formSede } : s)));
-      setModoEdicionSede(false);
-    } else {
-      const nuevoId = sedes.length > 0 ? Math.max(...sedes.map((s) => s.id)) + 1 : 1;
-      setSedes([...sedes, { ...formSede, id: nuevoId }]);
+    try {
+      if (modoEdicionSede) {
+        await sedeService.actualizar(formSede.id, {
+          nombre: formSede.nombre,
+          direccion: formSede.direccion,
+        });
+      } else {
+        await sedeService.crear({
+          nombre: formSede.nombre,
+          direccion: formSede.direccion,
+        });
+      }
+      const actualizadas = await sedeService.obtenerTodas();
+      setSedes(actualizadas);
+      limpiarFormSede();
+      setMostrarModalSede(false);
+    } catch (err) {
+      console.error("Error al guardar sede:", err);
+      alert("Error al procesar la solicitud en el servidor.");
     }
-    limpiarFormSede();
-    // Se cierra el modal de Sede tras guardar exitosamente
-    setMostrarModalSede(false);
   }
 
   // Carga los datos de la sede seleccionada en el formulario para proceder a su edición.
@@ -521,12 +548,12 @@ function ConfigDocumentos() {
     setFormSede(sede);
     setModoEdicionSede(true);
     setErrorSede({});
-    // Se abre el modal de Sede al iniciar la edicion
     setMostrarModalSede(true);
   }
 
   // Elimina el registro de la sede validando previamente la inexistencia de aulas asociadas.
-  function eliminarSede(id) {
+  // Se comunica con DELETE en /api/v1/sedes/:id.
+  async function eliminarSede(id) {
     const enUso = aulas.some((a) => a.sedeId === id);
     if (enUso) {
       alert("No es posible eliminar la sede. Existen aulas registradas asociadas a la misma.");
@@ -534,8 +561,15 @@ function ConfigDocumentos() {
     }
 
     if (confirm("¿Confirma la eliminación de este registro de sede?")) {
-      setSedes(sedes.filter((s) => s.id !== id));
-      if (formSede.id === id) limpiarFormSede();
+      try {
+        await sedeService.eliminar(id);
+        const actualizadas = await sedeService.obtenerTodas();
+        setSedes(actualizadas);
+        if (formSede.id === id) limpiarFormSede();
+      } catch (err) {
+        console.error("Error al eliminar sede:", err);
+        alert("Error al intentar eliminar el registro.");
+      }
     }
   }
 
@@ -545,8 +579,6 @@ function ConfigDocumentos() {
     setErrorSede({});
     setModoEdicionSede(false);
   }
-
-  
 
   // Procesa los cambios en los campos de entrada del formulario de aulas.
   function manejarCambioAula(e) {
@@ -573,21 +605,34 @@ function ConfigDocumentos() {
     return Object.keys(errores).length === 0;
   }
 
-  // Guarda la nueva aula o actualiza el registro existente en el estado local.
-  function guardarAula(e) {
+  // Guarda la nueva aula o actualiza el registro existente utilizando el servicio asíncrono.
+  // Se comunica con POST/PUT en /api/v1/aulas.
+  async function guardarAula(e) {
     e.preventDefault();
     if (!validarAula()) return;
 
-    if (modoEdicionAula) {
-      setAulas(aulas.map((a) => (a.id === formAula.id ? { ...formAula } : a)));
-      setModoEdicionAula(false);
-    } else {
-      const nuevoId = aulas.length > 0 ? Math.max(...aulas.map((a) => a.id)) + 1 : 1;
-      setAulas([...aulas, { ...formAula, id: nuevoId }]);
+    try {
+      if (modoEdicionAula) {
+        await aulaService.actualizar(formAula.id, {
+          nombre: formAula.nombre,
+          sedeId: formAula.sedeId,
+          capacidad: formAula.capacidad,
+        });
+      } else {
+        await aulaService.crear({
+          nombre: formAula.nombre,
+          sedeId: formAula.sedeId,
+          capacidad: formAula.capacidad,
+        });
+      }
+      const actualizadas = await aulaService.obtenerTodas();
+      setAulas(actualizadas);
+      limpiarFormAula();
+      setMostrarModalAula(false);
+    } catch (err) {
+      console.error("Error al guardar aula:", err);
+      alert("Error al procesar la solicitud en el servidor.");
     }
-    limpiarFormAula();
-    // Se cierra el modal de Aula tras guardar exitosamente
-    setMostrarModalAula(false);
   }
 
   // Carga los datos del aula seleccionada en el formulario para proceder a su edición.
@@ -595,12 +640,12 @@ function ConfigDocumentos() {
     setFormAula(aula);
     setModoEdicionAula(true);
     setErrorAula({});
-    // Se abre el modal de Aula al iniciar la edicion
     setMostrarModalAula(true);
   }
 
   // Elimina el registro del aula verificando previamente que no se encuentre asignada a ninguna comisión activa.
-  function eliminarAula(id) {
+  // Se comunica con DELETE en /api/v1/aulas/:id.
+  async function eliminarAula(id) {
     const enUso = comisiones.some((c) => c.aulaId === id);
     if (enUso) {
       alert("No es posible eliminar el aula. Existen comisiones registradas asociadas a la misma.");
@@ -608,8 +653,15 @@ function ConfigDocumentos() {
     }
 
     if (confirm("¿Confirma la eliminación de este registro de aula?")) {
-      setAulas(aulas.filter((a) => a.id !== id));
-      if (formAula.id === id) limpiarFormAula();
+      try {
+        await aulaService.eliminar(id);
+        const actualizadas = await aulaService.obtenerTodas();
+        setAulas(actualizadas);
+        if (formAula.id === id) limpiarFormAula();
+      } catch (err) {
+        console.error("Error al eliminar aula:", err);
+        alert("Error al intentar eliminar el registro.");
+      }
     }
   }
 
@@ -619,8 +671,6 @@ function ConfigDocumentos() {
     setErrorAula({});
     setModoEdicionAula(false);
   }
-
-  
 
   // Procesa los cambios en los campos de entrada del formulario de comisiones.
   function manejarCambioComision(e) {
@@ -650,7 +700,6 @@ function ConfigDocumentos() {
     if (isNaN(cupo) || cupo <= 0) {
       errores.cupoMaximo = "Debe ingresar un cupo máximo válido (entero positivo).";
     } else if (formComision.aulaId) {
-      // Validación de cupo máximo contra la capacidad física del aula asignada
       const aulaAsignada = aulas.find((a) => a.id === formComision.aulaId);
       if (aulaAsignada && cupo > aulaAsignada.capacidad) {
         errores.cupoMaximo = `El cupo máximo de la comisión (${cupo}) supera la capacidad física del aula seleccionada (${aulaAsignada.capacidad} alumnos).`;
@@ -668,21 +717,38 @@ function ConfigDocumentos() {
     return Object.keys(errores).length === 0;
   }
 
-  // Guarda la nueva comisión o actualiza el registro existente en el estado local.
-  function guardarComision(e) {
+  // Guarda la nueva comisión o actualiza el registro existente utilizando el servicio asíncrono.
+  // Se comunica con POST/PUT en /api/v1/comisiones.
+  async function guardarComision(e) {
     e.preventDefault();
     if (!validarComision()) return;
 
-    if (modoEdicionComision) {
-      setComisiones(comisiones.map((c) => (c.id === formComision.id ? { ...formComision } : c)));
-      setModoEdicionComision(false);
-    } else {
-      const nuevoId = comisiones.length > 0 ? Math.max(...comisiones.map((c) => c.id)) + 1 : 1;
-      setComisiones([...comisiones, { ...formComision, id: nuevoId }]);
+    try {
+      if (modoEdicionComision) {
+        await comisionService.actualizar(formComision.id, {
+          nombre: formComision.nombre,
+          asignaturaId: formComision.asignaturaId,
+          aulaId: formComision.aulaId,
+          cupoMaximo: formComision.cupoMaximo,
+          inscritos: formComision.inscritos,
+        });
+      } else {
+        await comisionService.crear({
+          nombre: formComision.nombre,
+          asignaturaId: formComision.asignaturaId,
+          aulaId: formComision.aulaId,
+          cupoMaximo: formComision.cupoMaximo,
+          inscritos: formComision.inscritos,
+        });
+      }
+      const actualizadas = await comisionService.obtenerTodas();
+      setComisiones(actualizadas);
+      limpiarFormComision();
+      setMostrarModalComision(false);
+    } catch (err) {
+      console.error("Error al guardar comisión:", err);
+      alert("Error al procesar la solicitud en el servidor.");
     }
-    limpiarFormComision();
-    // Se cierra el modal de Comisión tras guardar exitosamente
-    setMostrarModalComision(false);
   }
 
   // Carga los datos de la comisión seleccionada en el formulario para proceder a su edición.
@@ -690,15 +756,22 @@ function ConfigDocumentos() {
     setFormComision(comision);
     setModoEdicionComision(true);
     setErrorComision({});
-    // Se abre el modal de Comisión al iniciar la edicion
     setMostrarModalComision(true);
   }
 
-  // Elimina el registro de la comisión seleccionada del estado local.
-  function eliminarComision(id) {
+  // Elimina el registro de la comisión utilizando el servicio asíncrono.
+  // Se comunica con DELETE en /api/v1/comisiones/:id.
+  async function eliminarComision(id) {
     if (confirm("¿Confirma la eliminación de este registro de comisión?")) {
-      setComisiones(comisiones.filter((c) => c.id !== id));
-      if (formComision.id === id) limpiarFormComision();
+      try {
+        await comisionService.eliminar(id);
+        const actualizadas = await comisionService.obtenerTodas();
+        setComisiones(actualizadas);
+        if (formComision.id === id) limpiarFormComision();
+      } catch (err) {
+        console.error("Error al eliminar comisión:", err);
+        alert("Error al intentar eliminar el registro.");
+      }
     }
   }
 
