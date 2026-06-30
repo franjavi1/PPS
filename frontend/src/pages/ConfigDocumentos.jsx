@@ -155,9 +155,15 @@ function ConfigDocumentos() {
   const [errorRango, setErrorRango] = useState({});
   const [modoEdicionRango, setModoEdicionRango] = useState(false);
 
-  // ==========================================
-  // MANEJADORES DE EVENTOS - TIPO DOCUMENTO
-  // ==========================================
+  // Estados para controlar la visibilidad de los modales de creación y edición (mejorando accesibilidad y control de permisos)
+  const [mostrarModalTipoDoc, setMostrarModalTipoDoc] = useState(false);
+  const [mostrarModalPersona, setMostrarModalPersona] = useState(false);
+  const [mostrarModalRango, setMostrarModalRango] = useState(false);
+  const [mostrarModalSede, setMostrarModalSede] = useState(false);
+  const [mostrarModalAula, setMostrarModalAula] = useState(false);
+  const [mostrarModalComision, setMostrarModalComision] = useState(false);
+
+  
 
   /**
    * Procesa los cambios en los campos de entrada del formulario de tipo de documento.
@@ -211,6 +217,8 @@ function ConfigDocumentos() {
       setTiposDocumento([...tiposDocumento, { ...formTipoDoc, id: nuevoId }]);
     }
     limpiarFormTipoDoc();
+    // Se cierra el modal de Tipo de Documento tras guardar exitosamente
+    setMostrarModalTipoDoc(false);
   }
 
   /**
@@ -220,6 +228,8 @@ function ConfigDocumentos() {
     setFormTipoDoc(doc);
     setModoEdicionTipoDoc(true);
     setErrorTipoDoc({});
+    // Se abre el modal de Tipo de Documento al iniciar la edicion
+    setMostrarModalTipoDoc(true);
   }
 
   /**
@@ -250,9 +260,7 @@ function ConfigDocumentos() {
     setModoEdicionTipoDoc(false);
   }
 
-  // ==========================================
-  // MANEJADORES DE EVENTOS - PERSONA
-  // ==========================================
+  
 
   /**
    * Procesa los cambios en los campos de entrada del formulario de persona.
@@ -319,6 +327,8 @@ function ConfigDocumentos() {
       setPersonas([...personas, { ...formPersona, id: nuevoId }]);
     }
     limpiarFormPersona();
+    // Se cierra el modal de Persona tras guardar exitosamente
+    setMostrarModalPersona(false);
   }
 
   /**
@@ -328,6 +338,8 @@ function ConfigDocumentos() {
     setFormPersona(pers);
     setModoEdicionPersona(true);
     setErrorPersona({});
+    // Se abre el modal de Persona al iniciar la edicion
+    setMostrarModalPersona(true);
   }
 
   /**
@@ -356,9 +368,7 @@ function ConfigDocumentos() {
     setModoEdicionPersona(false);
   }
 
-  // ==========================================
-  // MANEJADORES DE EVENTOS - RANGO INSTITUCIONAL
-  // ==========================================
+  
 
   /**
    * Procesa los cambios en los campos de entrada del formulario de rango.
@@ -410,6 +420,8 @@ function ConfigDocumentos() {
       setRangos([...rangos, { ...formRango, id: nuevoId }]);
     }
     limpiarFormRango();
+    // Se cierra el modal de Rango tras guardar exitosamente
+    setMostrarModalRango(false);
   }
 
   /**
@@ -419,6 +431,8 @@ function ConfigDocumentos() {
     setFormRango(rg);
     setModoEdicionRango(true);
     setErrorRango({});
+    // Se abre el modal de Rango al iniciar la edicion
+    setMostrarModalRango(true);
   }
 
   /**
@@ -464,9 +478,7 @@ function ConfigDocumentos() {
     return encontrada ? encontrada.nombre : "Asignatura no definida";
   }
 
-  // ==========================================
-  // MANEJADORES DE EVENTOS - SEDES
-  // ==========================================
+  
 
   // Procesa los cambios en los campos de entrada del formulario de sedes.
   function manejarCambioSede(e) {
@@ -500,6 +512,8 @@ function ConfigDocumentos() {
       setSedes([...sedes, { ...formSede, id: nuevoId }]);
     }
     limpiarFormSede();
+    // Se cierra el modal de Sede tras guardar exitosamente
+    setMostrarModalSede(false);
   }
 
   // Carga los datos de la sede seleccionada en el formulario para proceder a su edición.
@@ -507,6 +521,8 @@ function ConfigDocumentos() {
     setFormSede(sede);
     setModoEdicionSede(true);
     setErrorSede({});
+    // Se abre el modal de Sede al iniciar la edicion
+    setMostrarModalSede(true);
   }
 
   // Elimina el registro de la sede validando previamente la inexistencia de aulas asociadas.
@@ -530,9 +546,7 @@ function ConfigDocumentos() {
     setModoEdicionSede(false);
   }
 
-  // ==========================================
-  // MANEJADORES DE EVENTOS - AULAS
-  // ==========================================
+  
 
   // Procesa los cambios en los campos de entrada del formulario de aulas.
   function manejarCambioAula(e) {
@@ -572,6 +586,8 @@ function ConfigDocumentos() {
       setAulas([...aulas, { ...formAula, id: nuevoId }]);
     }
     limpiarFormAula();
+    // Se cierra el modal de Aula tras guardar exitosamente
+    setMostrarModalAula(false);
   }
 
   // Carga los datos del aula seleccionada en el formulario para proceder a su edición.
@@ -579,6 +595,8 @@ function ConfigDocumentos() {
     setFormAula(aula);
     setModoEdicionAula(true);
     setErrorAula({});
+    // Se abre el modal de Aula al iniciar la edicion
+    setMostrarModalAula(true);
   }
 
   // Elimina el registro del aula verificando previamente que no se encuentre asignada a ninguna comisión activa.
@@ -602,9 +620,7 @@ function ConfigDocumentos() {
     setModoEdicionAula(false);
   }
 
-  // ==========================================
-  // MANEJADORES DE EVENTOS - COMISIONES
-  // ==========================================
+  
 
   // Procesa los cambios en los campos de entrada del formulario de comisiones.
   function manejarCambioComision(e) {
@@ -665,6 +681,8 @@ function ConfigDocumentos() {
       setComisiones([...comisiones, { ...formComision, id: nuevoId }]);
     }
     limpiarFormComision();
+    // Se cierra el modal de Comisión tras guardar exitosamente
+    setMostrarModalComision(false);
   }
 
   // Carga los datos de la comisión seleccionada en el formulario para proceder a su edición.
@@ -672,6 +690,8 @@ function ConfigDocumentos() {
     setFormComision(comision);
     setModoEdicionComision(true);
     setErrorComision({});
+    // Se abre el modal de Comisión al iniciar la edicion
+    setMostrarModalComision(true);
   }
 
   // Elimina el registro de la comisión seleccionada del estado local.
@@ -696,9 +716,7 @@ function ConfigDocumentos() {
     setModoEdicionComision(false);
   }
 
-  // ==========================================
-  // RENDERIZADO DEL COMPONENTE
-  // ==========================================
+  
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -771,11 +789,24 @@ function ConfigDocumentos() {
           {/* TAB: TIPO DOCUMENTO */}
           {pestanaActiva === "tipo_documento" && (
             <>
-              {/* Tabla de Registros */}
-              <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-slate-800 mb-4">
-                  Registros de Tipos de Documento
-                </h2>
+              {/* Tabla de Registros (ahora ocupa todo el ancho) */}
+              <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                  <h2 className="text-xl font-bold text-slate-800">
+                    Registros de Tipos de Documento
+                  </h2>
+                  {/* Botón para abrir la pantalla/modal de agregar */}
+                  <button
+                    onClick={() => {
+                      limpiarFormTipoDoc();
+                      setMostrarModalTipoDoc(true);
+                    }}
+                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                  >
+                    <PlusCircle size={16} />
+                    Agregar Tipo de Doc.
+                  </button>
+                </div>
                 <div className="overflow-x-auto border border-slate-200 rounded-xl">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-50">
@@ -823,101 +854,125 @@ function ConfigDocumentos() {
                 </div>
               </div>
 
-              {/* Formulario Lateral */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-fit">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold text-slate-800">
-                    {modoEdicionTipoDoc ? "Editar Tipo de Doc." : "Nuevo Tipo de Doc."}
-                  </h2>
-                  {modoEdicionTipoDoc && (
+              {/* Formulario en Modal Emergente */}
+              {mostrarModalTipoDoc && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
                     <button
-                      onClick={limpiarFormTipoDoc}
-                      className="text-slate-400 hover:text-slate-600"
-                      title="Cancelar edición"
+                      onClick={() => {
+                        limpiarFormTipoDoc();
+                        setMostrarModalTipoDoc(false);
+                      }}
+                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                      title="Cerrar modal"
                     >
                       <X size={20} />
                     </button>
-                  )}
-                </div>
-
-                <form onSubmit={guardarTipoDoc} className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      Sigla / Nombre *
-                    </label>
-                    <div className="relative">
-                      <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="text"
-                        name="nombre"
-                        value={formTipoDoc.nombre}
-                        onChange={manejarCambioTipoDoc}
-                        placeholder="Ej: DNI, Pasaporte"
-                        className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                          errorTipoDoc.nombre
-                            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                            : "border-slate-300 focus:ring-red-500 focus:border-red-500"
-                        }`}
-                      />
+                    
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold text-slate-800">
+                        {modoEdicionTipoDoc ? "Editar Tipo de Doc." : "Nuevo Tipo de Doc."}
+                      </h2>
                     </div>
-                    {errorTipoDoc.nombre && (
-                      <p className="text-red-600 text-xs mt-1">{errorTipoDoc.nombre}</p>
-                    )}
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      Descripción *
-                    </label>
-                    <textarea
-                      name="descripcion"
-                      value={formTipoDoc.descripcion}
-                      onChange={manejarCambioTipoDoc}
-                      placeholder="Ingrese el detalle formal del tipo de documento..."
-                      className={`w-full h-24 p-3 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                        errorTipoDoc.descripcion
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-slate-300 focus:ring-red-500"
-                      }`}
-                    />
-                    {errorTipoDoc.descripcion && (
-                      <p className="text-red-600 text-xs mt-1">{errorTipoDoc.descripcion}</p>
-                    )}
-                  </div>
+                    <form onSubmit={guardarTipoDoc} className="space-y-5">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          Sigla / Nombre *
+                        </label>
+                        <div className="relative">
+                          <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <select
+                            name="nombre"
+                            value={formTipoDoc.nombre}
+                            onChange={manejarCambioTipoDoc}
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorTipoDoc.nombre
+                                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                                : "border-slate-300 focus:ring-red-500 focus:border-red-500"
+                            }`}
+                          >
+                            <option value="">Seleccione una Sigla / Nombre</option>
+                            <option value="DNI">DNI - Documento Nacional de Identidad</option>
+                            <option value="PASAPORTE">PASAPORTE - Pasaporte Internacional</option>
+                            <option value="LC">LC - Libreta Cívica</option>
+                            <option value="LE">LE - Libreta de Enrolamiento</option>
+                            <option value="CI">CI - Cédula de Identidad</option>
+                            <option value="OTRO">OTRO - Otro Documento / Extranjero</option>
+                          </select>
+                        </div>
+                        {errorTipoDoc.nombre && (
+                          <p className="text-red-600 text-xs mt-1">{errorTipoDoc.nombre}</p>
+                        )}
+                      </div>
 
-                  <div className="flex gap-3">
-                    {modoEdicionTipoDoc && (
-                      <button
-                        type="button"
-                        onClick={limpiarFormTipoDoc}
-                        className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
-                      >
-                        Cancelar
-                      </button>
-                    )}
-                    <button
-                      type="submit"
-                      className={`h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 ${
-                        modoEdicionTipoDoc ? "w-1/2" : "w-full"
-                      }`}
-                    >
-                      <PlusCircle size={18} />
-                      {modoEdicionTipoDoc ? "Guardar" : "Agregar"}
-                    </button>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          Descripción *
+                        </label>
+                        <textarea
+                          name="descripcion"
+                          value={formTipoDoc.descripcion}
+                          onChange={manejarCambioTipoDoc}
+                          placeholder="Ingrese el detalle formal del tipo de documento..."
+                          className={`w-full h-24 p-3 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                            errorTipoDoc.descripcion
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-slate-300 focus:ring-red-500"
+                          }`}
+                        />
+                        {errorTipoDoc.descripcion && (
+                          <p className="text-red-600 text-xs mt-1">{errorTipoDoc.descripcion}</p>
+                        )}
+                      </div>
+
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            limpiarFormTipoDoc();
+                            setMostrarModalTipoDoc(false);
+                          }}
+                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                        >
+                          <PlusCircle size={18} />
+                          {modoEdicionTipoDoc ? "Guardar" : "Agregar"}
+                        </button>
+                      </div>
+                    </form>
                   </div>
-                </form>
-              </div>
+                </div>
+              )}
             </>
           )}
 
           {/* TAB: PERSONA */}
           {pestanaActiva === "persona" && (
             <>
-              {/* Tabla de Registros */}
-              <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-slate-800 mb-4">
-                  Registros de Personas
-                </h2>
+              {/* Tabla de Registros (ahora ocupa todo el ancho) */}
+              <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                  <h2 className="text-xl font-bold text-slate-800">
+                    Registros de Personas
+                  </h2>
+                  {/* Botón para abrir la pantalla/modal de agregar */}
+                  <button
+                    onClick={() => {
+                      limpiarFormPersona();
+                      setMostrarModalPersona(true);
+                    }}
+                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                  >
+                    <PlusCircle size={16} />
+                    Agregar Persona
+                  </button>
+                </div>
                 <div className="overflow-x-auto border border-slate-200 rounded-xl">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-50">
@@ -975,178 +1030,196 @@ function ConfigDocumentos() {
                 </div>
               </div>
 
-              {/* Formulario Lateral */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-fit">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold text-slate-800">
-                    {modoEdicionPersona ? "Editar Persona" : "Nueva Persona"}
-                  </h2>
-                  {modoEdicionPersona && (
+              {/* Formulario en Modal Emergente */}
+              {mostrarModalPersona && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
                     <button
-                      onClick={limpiarFormPersona}
-                      className="text-slate-400 hover:text-slate-600"
-                      title="Cancelar edición"
+                      onClick={() => {
+                        limpiarFormPersona();
+                        setMostrarModalPersona(false);
+                      }}
+                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                      title="Cerrar modal"
                     >
                       <X size={20} />
                     </button>
-                  )}
+                    
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold text-slate-800">
+                        {modoEdicionPersona ? "Editar Persona" : "Nueva Persona"}
+                      </h2>
+                    </div>
+
+                    <form onSubmit={guardarPersona} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Nombre *</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <input
+                            type="text"
+                            name="nombre"
+                            value={formPersona.nombre}
+                            onChange={manejarCambioPersona}
+                            placeholder="Ej: Juan Pablo"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.nombre
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorPersona.nombre && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.nombre}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Apellido *</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <input
+                            type="text"
+                            name="apellido"
+                            value={formPersona.apellido}
+                            onChange={manejarCambioPersona}
+                            placeholder="Ej: González"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.apellido
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorPersona.apellido && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.apellido}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          Tipo de Documento *
+                        </label>
+                        <div className="relative">
+                          <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <select
+                            name="tipoDocumentoId"
+                            value={formPersona.tipoDocumentoId}
+                            onChange={manejarCambioPersona}
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.tipoDocumentoId
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          >
+                            <option value="">Seleccionar tipo</option>
+                            {tiposDocumento.map((td) => (
+                              <option key={td.id} value={td.id}>
+                                {td.nombre} - {td.descripcion}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {errorPersona.tipoDocumentoId && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.tipoDocumentoId}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          N° Documento *
+                        </label>
+                        <div className="relative">
+                          <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <input
+                            type="text"
+                            name="documento"
+                            value={formPersona.documento}
+                            onChange={manejarCambioPersona}
+                            placeholder="Ej: 32456789"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.documento
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorPersona.documento && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.documento}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          Email Institucional/Personal *
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <input
+                            type="email"
+                            name="email"
+                            value={formPersona.email}
+                            onChange={manejarCambioPersona}
+                            placeholder="Ej: correo@bomberos.org"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.email
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorPersona.email && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.email}</p>
+                        )}
+                      </div>
+
+                      <div className="flex gap-3 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            limpiarFormPersona();
+                            setMostrarModalPersona(false);
+                          }}
+                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                        >
+                          <PlusCircle size={18} />
+                          {modoEdicionPersona ? "Guardar" : "Agregar"}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
-
-                <form onSubmit={guardarPersona} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">Nombre *</label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="text"
-                        name="nombre"
-                        value={formPersona.nombre}
-                        onChange={manejarCambioPersona}
-                        placeholder="Ej: Juan Pablo"
-                        className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                          errorPersona.nombre
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-slate-300 focus:ring-red-500"
-                        }`}
-                      />
-                    </div>
-                    {errorPersona.nombre && (
-                      <p className="text-red-600 text-xs mt-1">{errorPersona.nombre}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">Apellido *</label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="text"
-                        name="apellido"
-                        value={formPersona.apellido}
-                        onChange={manejarCambioPersona}
-                        placeholder="Ej: González"
-                        className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                          errorPersona.apellido
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-slate-300 focus:ring-red-500"
-                        }`}
-                      />
-                    </div>
-                    {errorPersona.apellido && (
-                      <p className="text-red-600 text-xs mt-1">{errorPersona.apellido}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      Tipo de Documento *
-                    </label>
-                    <div className="relative">
-                      <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <select
-                        name="tipoDocumentoId"
-                        value={formPersona.tipoDocumentoId}
-                        onChange={manejarCambioPersona}
-                        className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
-                          errorPersona.tipoDocumentoId
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-slate-300 focus:ring-red-500"
-                        }`}
-                      >
-                        <option value="">Seleccionar tipo</option>
-                        {tiposDocumento.map((td) => (
-                          <option key={td.id} value={td.id}>
-                            {td.nombre} - {td.descripcion}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    {errorPersona.tipoDocumentoId && (
-                      <p className="text-red-600 text-xs mt-1">{errorPersona.tipoDocumentoId}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      N° Documento *
-                    </label>
-                    <div className="relative">
-                      <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="text"
-                        name="documento"
-                        value={formPersona.documento}
-                        onChange={manejarCambioPersona}
-                        placeholder="Ej: 32456789"
-                        className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                          errorPersona.documento
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-slate-300 focus:ring-red-500"
-                        }`}
-                      />
-                    </div>
-                    {errorPersona.documento && (
-                      <p className="text-red-600 text-xs mt-1">{errorPersona.documento}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      Email Institucional/Personal *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="email"
-                        name="email"
-                        value={formPersona.email}
-                        onChange={manejarCambioPersona}
-                        placeholder="Ej: correo@bomberos.org"
-                        className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                          errorPersona.email
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-slate-300 focus:ring-red-500"
-                        }`}
-                      />
-                    </div>
-                    {errorPersona.email && (
-                      <p className="text-red-600 text-xs mt-1">{errorPersona.email}</p>
-                    )}
-                  </div>
-
-                  <div className="flex gap-3 pt-2">
-                    {modoEdicionPersona && (
-                      <button
-                        type="button"
-                        onClick={limpiarFormPersona}
-                        className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
-                      >
-                        Cancelar
-                      </button>
-                    )}
-                    <button
-                      type="submit"
-                      className={`h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 ${
-                        modoEdicionPersona ? "w-1/2" : "w-full"
-                      }`}
-                    >
-                      <PlusCircle size={18} />
-                      {modoEdicionPersona ? "Guardar" : "Agregar"}
-                    </button>
-                  </div>
-                </form>
-              </div>
+              )}
             </>
           )}
 
           {/* TAB: RANGO INSTITUCIONAL */}
           {pestanaActiva === "rango_institucional" && (
             <>
-              {/* Tabla de Registros */}
-              <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-slate-800 mb-4">
-                  Registros de Rangos Jerárquicos
-                </h2>
+              {/* Tabla de Registros (ahora ocupa todo el ancho) */}
+              <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                  <h2 className="text-xl font-bold text-slate-800">
+                    Registros de Rangos Jerárquicos
+                  </h2>
+                  {/* Botón para abrir la pantalla/modal de agregar */}
+                  <button
+                    onClick={() => {
+                      limpiarFormRango();
+                      setMostrarModalRango(true);
+                    }}
+                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                  >
+                    <PlusCircle size={16} />
+                    Agregar Rango
+                  </button>
+                </div>
                 <div className="overflow-x-auto border border-slate-200 rounded-xl">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-50">
@@ -1200,96 +1273,112 @@ function ConfigDocumentos() {
                 </div>
               </div>
 
-              {/* Formulario Lateral */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-fit">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold text-slate-800">
-                    {modoEdicionRango ? "Editar Rango" : "Nuevo Rango"}
-                  </h2>
-                  {modoEdicionRango && (
+              {/* Formulario en Modal Emergente */}
+              {mostrarModalRango && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
                     <button
-                      onClick={limpiarFormRango}
-                      className="text-slate-400 hover:text-slate-600"
-                      title="Cancelar edición"
+                      onClick={() => {
+                        limpiarFormRango();
+                        setMostrarModalRango(false);
+                      }}
+                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                      title="Cerrar modal"
                     >
                       <X size={20} />
                     </button>
-                  )}
+                    
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold text-slate-800">
+                        {modoEdicionRango ? "Editar Rango" : "Nuevo Rango"}
+                      </h2>
+                    </div>
+
+                    <form onSubmit={guardarRango} className="space-y-5">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          Denominación Oficial *
+                        </label>
+                        <div className="relative">
+                          <Shield className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <select
+                            name="descripcion"
+                            value={formRango.descripcion}
+                            onChange={manejarCambioRango}
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorRango.descripcion
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          >
+                            <option value="">Seleccione una Denominación</option>
+                            <option value="Aspirante">Aspirante</option>
+                            <option value="Bombero">Bombero</option>
+                            <option value="Cabo">Cabo</option>
+                            <option value="Cabo Primero">Cabo Primero</option>
+                            <option value="Sargento">Sargento</option>
+                            <option value="Sargento Primero">Sargento Primero</option>
+                            <option value="Suboficial Principal">Suboficial Principal</option>
+                            <option value="Suboficial Mayor">Suboficial Mayor</option>
+                            <option value="Oficial Inspector">Oficial Inspector</option>
+                            <option value="Oficial Principal">Oficial Principal</option>
+                            <option value="Comandante">Comandante</option>
+                          </select>
+                        </div>
+                        {errorRango.descripcion && (
+                          <p className="text-red-600 text-xs mt-1">{errorRango.descripcion}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          Nivel de Prioridad *
+                        </label>
+                        <div className="relative">
+                          <Sliders className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <input
+                            type="number"
+                            name="nivelPrioridad"
+                            value={formRango.nivelPrioridad}
+                            onChange={manejarCambioRango}
+                            placeholder="Ej: 1"
+                            min="1"
+                            step="1"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorRango.nivelPrioridad
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorRango.nivelPrioridad && (
+                          <p className="text-red-600 text-xs mt-1">{errorRango.nivelPrioridad}</p>
+                        )}
+                      </div>
+
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            limpiarFormRango();
+                            setMostrarModalRango(false);
+                          }}
+                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                        >
+                          <PlusCircle size={18} />
+                          {modoEdicionRango ? "Guardar" : "Agregar"}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
-
-                <form onSubmit={guardarRango} className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      Denominación Oficial *
-                    </label>
-                    <div className="relative">
-                      <Shield className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="text"
-                        name="descripcion"
-                        value={formRango.descripcion}
-                        onChange={manejarCambioRango}
-                        placeholder="Ej: Oficial Inspector"
-                        className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                          errorRango.descripcion
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-slate-300 focus:ring-red-500"
-                        }`}
-                      />
-                    </div>
-                    {errorRango.descripcion && (
-                      <p className="text-red-600 text-xs mt-1">{errorRango.descripcion}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      Nivel de Prioridad *
-                    </label>
-                    <div className="relative">
-                      <Sliders className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="number"
-                        name="nivelPrioridad"
-                        value={formRango.nivelPrioridad}
-                        onChange={manejarCambioRango}
-                        placeholder="Ej: 1"
-                        min="1"
-                        step="1"
-                        className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                          errorRango.nivelPrioridad
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-slate-300 focus:ring-red-500"
-                        }`}
-                      />
-                    </div>
-                    {errorRango.nivelPrioridad && (
-                      <p className="text-red-600 text-xs mt-1">{errorRango.nivelPrioridad}</p>
-                    )}
-                  </div>
-
-                  <div className="flex gap-3">
-                    {modoEdicionRango && (
-                      <button
-                        type="button"
-                        onClick={limpiarFormRango}
-                        className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
-                      >
-                        Cancelar
-                      </button>
-                    )}
-                    <button
-                      type="submit"
-                      className={`h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 ${
-                        modoEdicionRango ? "w-1/2" : "w-full"
-                      }`}
-                    >
-                      <PlusCircle size={18} />
-                      {modoEdicionRango ? "Guardar" : "Agregar"}
-                    </button>
-                  </div>
-                </form>
-              </div>
+              )}
             </>
           )}
 
@@ -1338,11 +1427,24 @@ function ConfigDocumentos() {
               {/* VISTA INTERNA: SEDES */}
               {subPestanaActiva === "sedes" && (
                 <>
-                  {/* Tabla de Registros de Sedes */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-slate-800 mb-4 font-bold">
-                      Registros de Sedes
-                    </h2>
+                  {/* Tabla de Registros de Sedes (ahora ocupa todo el ancho) */}
+                  <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                      <h2 className="text-xl font-bold text-slate-800 font-bold">
+                        Registros de Sedes
+                      </h2>
+                      {/* Botón para abrir la pantalla/modal de agregar */}
+                      <button
+                        onClick={() => {
+                          limpiarFormSede();
+                          setMostrarModalSede(true);
+                        }}
+                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                      >
+                        <PlusCircle size={16} />
+                        Agregar Sede
+                      </button>
+                    </div>
                     <div className="overflow-x-auto border border-slate-200 rounded-xl">
                       <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50">
@@ -1390,101 +1492,125 @@ function ConfigDocumentos() {
                     </div>
                   </div>
 
-                  {/* Formulario de Sedes */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-fit">
-                    <div className="flex justify-between items-center mb-6">
-                      <h2 className="text-xl font-bold text-slate-800">
-                        {modoEdicionSede ? "Editar Sede" : "Nueva Sede"}
-                      </h2>
-                      {modoEdicionSede && (
+                  {/* Formulario de Sedes en Modal Emergente */}
+                  {mostrarModalSede && (
+                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
                         <button
-                          onClick={limpiarFormSede}
-                          className="text-slate-400 hover:text-slate-600"
-                          title="Cancelar edición"
+                          onClick={() => {
+                            limpiarFormSede();
+                            setMostrarModalSede(false);
+                          }}
+                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                          title="Cerrar modal"
                         >
                           <X size={20} />
                         </button>
-                      )}
-                    </div>
-
-                    <form onSubmit={guardarSede} className="space-y-5">
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Nombre de la Sede *
-                        </label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input
-                            type="text"
-                            name="nombre"
-                            value={formSede.nombre}
-                            onChange={manejarCambioSede}
-                            placeholder="Ej: Cuartel Central"
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorSede.nombre
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          />
+                        
+                        <div className="flex justify-between items-center mb-6">
+                          <h2 className="text-xl font-bold text-slate-800">
+                            {modoEdicionSede ? "Editar Sede" : "Nueva Sede"}
+                          </h2>
                         </div>
-                        {errorSede.nombre && (
-                          <p className="text-red-600 text-xs mt-1">{errorSede.nombre}</p>
-                        )}
-                      </div>
 
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Dirección *
-                        </label>
-                        <textarea
-                          name="direccion"
-                          value={formSede.direccion}
-                          onChange={manejarCambioSede}
-                          placeholder="Ej: Av. Corrientes 1234..."
-                          className={`w-full h-24 p-3 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                            errorSede.direccion
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-slate-300 focus:ring-red-500"
-                          }`}
-                        />
-                        {errorSede.direccion && (
-                          <p className="text-red-600 text-xs mt-1">{errorSede.direccion}</p>
-                        )}
-                      </div>
+                        <form onSubmit={guardarSede} className="space-y-5">
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Nombre de la Sede *
+                            </label>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <select
+                                name="nombre"
+                                value={formSede.nombre}
+                                onChange={manejarCambioSede}
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorSede.nombre
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              >
+                                <option value="">Seleccione una Sede</option>
+                                <option value="Cuartel Central">Cuartel Central</option>
+                                <option value="Destacamento N° 1">Destacamento N° 1</option>
+                                <option value="Destacamento N° 2">Destacamento N° 2</option>
+                                <option value="Destacamento N° 3">Destacamento N° 3</option>
+                                <option value="Anexo Administrativo">Anexo Administrativo</option>
+                                <option value="Campo de Entrenamiento">Campo de Entrenamiento</option>
+                              </select>
+                            </div>
+                            {errorSede.nombre && (
+                              <p className="text-red-600 text-xs mt-1">{errorSede.nombre}</p>
+                            )}
+                          </div>
 
-                      <div className="flex gap-3">
-                        {modoEdicionSede && (
-                          <button
-                            type="button"
-                            onClick={limpiarFormSede}
-                            className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
-                          >
-                            Cancelar
-                          </button>
-                        )}
-                        <button
-                          type="submit"
-                          className={`h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 ${
-                            modoEdicionSede ? "w-1/2" : "w-full"
-                          }`}
-                        >
-                          <PlusCircle size={18} />
-                          {modoEdicionSede ? "Guardar" : "Agregar"}
-                        </button>
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Dirección *
+                            </label>
+                            <textarea
+                              name="direccion"
+                              value={formSede.direccion}
+                              onChange={manejarCambioSede}
+                              placeholder="Ej: Av. Corrientes 1234..."
+                              className={`w-full h-24 p-3 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                                errorSede.direccion
+                                  ? "border-red-500 focus:ring-red-500"
+                                  : "border-slate-300 focus:ring-red-500"
+                              }`}
+                            />
+                            {errorSede.direccion && (
+                              <p className="text-red-600 text-xs mt-1">{errorSede.direccion}</p>
+                            )}
+                          </div>
+
+                          <div className="flex gap-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                limpiarFormSede();
+                                setMostrarModalSede(false);
+                              }}
+                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="submit"
+                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                            >
+                              <PlusCircle size={18} />
+                              {modoEdicionSede ? "Guardar" : "Agregar"}
+                            </button>
+                          </div>
+                        </form>
                       </div>
-                    </form>
-                  </div>
+                    </div>
+                  )}
                 </>
               )}
 
               {/* VISTA INTERNA: AULAS */}
               {subPestanaActiva === "aulas" && (
                 <>
-                  {/* Tabla de Registros de Aulas */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-slate-800 mb-4 font-bold">
-                      Registros de Aulas
-                    </h2>
+                  {/* Tabla de Registros de Aulas (ahora ocupa todo el ancho) */}
+                  <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                      <h2 className="text-xl font-bold text-slate-800 font-bold">
+                        Registros de Aulas
+                      </h2>
+                      {/* Botón para abrir la pantalla/modal de agregar */}
+                      <button
+                        onClick={() => {
+                          limpiarFormAula();
+                          setMostrarModalAula(true);
+                        }}
+                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                      >
+                        <PlusCircle size={16} />
+                        Agregar Aula
+                      </button>
+                    </div>
                     <div className="overflow-x-auto border border-slate-200 rounded-xl">
                       <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50">
@@ -1538,136 +1664,161 @@ function ConfigDocumentos() {
                     </div>
                   </div>
 
-                  {/* Formulario de Aulas */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-fit">
-                    <div className="flex justify-between items-center mb-6">
-                      <h2 className="text-xl font-bold text-slate-800">
-                        {modoEdicionAula ? "Editar Aula" : "Nueva Aula"}
-                      </h2>
-                      {modoEdicionAula && (
+                  {/* Formulario de Aulas en Modal Emergente */}
+                  {mostrarModalAula && (
+                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
                         <button
-                          onClick={limpiarFormAula}
-                          className="text-slate-400 hover:text-slate-600"
-                          title="Cancelar edición"
+                          onClick={() => {
+                            limpiarFormAula();
+                            setMostrarModalAula(false);
+                          }}
+                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                          title="Cerrar modal"
                         >
                           <X size={20} />
                         </button>
-                      )}
+                        
+                        <div className="flex justify-between items-center mb-6">
+                          <h2 className="text-xl font-bold text-slate-800">
+                            {modoEdicionAula ? "Editar Aula" : "Nueva Aula"}
+                          </h2>
+                        </div>
+
+                        <form onSubmit={guardarAula} className="space-y-5">
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Nombre / Identificación del Aula *
+                            </label>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <select
+                                name="nombre"
+                                value={formAula.nombre}
+                                onChange={manejarCambioAula}
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorAula.nombre
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              >
+                                <option value="">Seleccione un Aula</option>
+                                <option value="Aula Magna">Aula Magna</option>
+                                <option value="Laboratorio de Simulación">Laboratorio de Simulación</option>
+                                <option value="Aula Técnica">Aula Técnica</option>
+                                <option value="Aula de Prácticas">Aula de Prácticas</option>
+                                <option value="Gimnasio de Entrenamiento">Gimnasio de Entrenamiento</option>
+                                <option value="Aula Teórica 1">Aula Teórica 1</option>
+                                <option value="Aula Teórica 2">Aula Teórica 2</option>
+                              </select>
+                            </div>
+                            {errorAula.nombre && (
+                              <p className="text-red-600 text-xs mt-1">{errorAula.nombre}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Sede de Ubicación *
+                            </label>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <select
+                                name="sedeId"
+                                value={formAula.sedeId}
+                                onChange={manejarCambioAula}
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorAula.sedeId
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              >
+                                <option value="">Seleccione una Sede</option>
+                                {sedes.map((s) => (
+                                  <option key={s.id} value={s.id}>
+                                    {s.nombre}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            {errorAula.sedeId && (
+                              <p className="text-red-600 text-xs mt-1">{errorAula.sedeId}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Capacidad (Alumnos Sentados) *
+                            </label>
+                            <div className="relative">
+                              <Sliders className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <input
+                                type="number"
+                                name="capacidad"
+                                value={formAula.capacidad}
+                                onChange={manejarCambioAula}
+                                placeholder="Ej: 30"
+                                min="1"
+                                step="1"
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorAula.capacidad
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              />
+                            </div>
+                            {errorAula.capacidad && (
+                              <p className="text-red-600 text-xs mt-1">{errorAula.capacidad}</p>
+                            )}
+                          </div>
+
+                          <div className="flex gap-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                limpiarFormAula();
+                                setMostrarModalAula(false);
+                              }}
+                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="submit"
+                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                            >
+                              <PlusCircle size={18} />
+                              {modoEdicionAula ? "Guardar" : "Agregar"}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
                     </div>
-
-                    <form onSubmit={guardarAula} className="space-y-5">
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Nombre / Identificación del Aula *
-                        </label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input
-                            type="text"
-                            name="nombre"
-                            value={formAula.nombre}
-                            onChange={manejarCambioAula}
-                            placeholder="Ej: Aula Magna"
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorAula.nombre
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          />
-                        </div>
-                        {errorAula.nombre && (
-                          <p className="text-red-600 text-xs mt-1">{errorAula.nombre}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Sede de Ubicación *
-                        </label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select
-                            name="sedeId"
-                            value={formAula.sedeId}
-                            onChange={manejarCambioAula}
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorAula.sedeId
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          >
-                            <option value="">Seleccione una Sede</option>
-                            {sedes.map((s) => (
-                              <option key={s.id} value={s.id}>
-                                {s.nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {errorAula.sedeId && (
-                          <p className="text-red-600 text-xs mt-1">{errorAula.sedeId}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Capacidad (Alumnos Sentados) *
-                        </label>
-                        <div className="relative">
-                          <Sliders className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input
-                            type="number"
-                            name="capacidad"
-                            value={formAula.capacidad}
-                            onChange={manejarCambioAula}
-                            placeholder="Ej: 30"
-                            min="1"
-                            step="1"
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorAula.capacidad
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          />
-                        </div>
-                        {errorAula.capacidad && (
-                          <p className="text-red-600 text-xs mt-1">{errorAula.capacidad}</p>
-                        )}
-                      </div>
-
-                      <div className="flex gap-3">
-                        {modoEdicionAula && (
-                          <button
-                            type="button"
-                            onClick={limpiarFormAula}
-                            className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
-                          >
-                            Cancelar
-                          </button>
-                        )}
-                        <button
-                          type="submit"
-                          className={`h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 ${
-                            modoEdicionAula ? "w-1/2" : "w-full"
-                          }`}
-                        >
-                          <PlusCircle size={18} />
-                          {modoEdicionAula ? "Guardar" : "Agregar"}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                  )}
                 </>
               )}
 
               {/* VISTA INTERNA: COMISIONES */}
               {subPestanaActiva === "comisiones" && (
                 <>
-                  {/* Tabla de Registros de Comisiones */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-slate-800 mb-4 font-bold">
-                      Registros de Comisiones
-                    </h2>
+                  {/* Tabla de Registros de Comisiones (ahora ocupa todo el ancho) */}
+                  <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                      <h2 className="text-xl font-bold text-slate-800 font-bold">
+                        Registros de Comisiones
+                      </h2>
+                      {/* Botón para abrir la pantalla/modal de agregar */}
+                      <button
+                        onClick={() => {
+                          limpiarFormComision();
+                          setMostrarModalComision(true);
+                        }}
+                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                      >
+                        <PlusCircle size={16} />
+                        Agregar Comisión
+                      </button>
+                    </div>
                     <div className="overflow-x-auto border border-slate-200 rounded-xl">
                       <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50">
@@ -1723,180 +1874,190 @@ function ConfigDocumentos() {
                     </div>
                   </div>
 
-                  {/* Formulario de Comisiones */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-fit">
-                    <div className="flex justify-between items-center mb-6">
-                      <h2 className="text-xl font-bold text-slate-800">
-                        {modoEdicionComision ? "Editar Comisión" : "Nueva Comisión"}
-                      </h2>
-                      {modoEdicionComision && (
+                  {/* Formulario de Comisiones en Modal Emergente */}
+                  {mostrarModalComision && (
+                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
                         <button
-                          onClick={limpiarFormComision}
-                          className="text-slate-400 hover:text-slate-600"
-                          title="Cancelar edición"
+                          onClick={() => {
+                            limpiarFormComision();
+                            setMostrarModalComision(false);
+                          }}
+                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                          title="Cerrar modal"
                         >
                           <X size={20} />
                         </button>
-                      )}
+                        
+                        <div className="flex justify-between items-center mb-6">
+                          <h2 className="text-xl font-bold text-slate-800">
+                            {modoEdicionComision ? "Editar Comisión" : "Nueva Comisión"}
+                          </h2>
+                        </div>
+
+                        <form onSubmit={guardarComision} className="space-y-5">
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Identificador de la Comisión *
+                            </label>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <select
+                                name="nombre"
+                                value={formComision.nombre}
+                                onChange={manejarCambioComision}
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorComision.nombre
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              >
+                                <option value="">Seleccione una Comisión</option>
+                                <option value="Comisión A - Turno Noche">Comisión A - Turno Noche</option>
+                                <option value="Comisión B - Sábados">Comisión B - Sábados</option>
+                                <option value="Comisión C - Turno Tarde">Comisión C - Turno Tarde</option>
+                                <option value="Comisión D - Intensivo">Comisión D - Intensivo</option>
+                                <option value="Comisión E - Virtual">Comisión E - Virtual</option>
+                              </select>
+                            </div>
+                            {errorComision.nombre && (
+                              <p className="text-red-600 text-xs mt-1">{errorComision.nombre}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Asignatura Relacionada *
+                            </label>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <select
+                                name="asignaturaId"
+                                value={formComision.asignaturaId}
+                                onChange={manejarCambioComision}
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorComision.asignaturaId
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              >
+                                <option value="">Seleccione una Asignatura</option>
+                                {asignaturas.map((asig) => (
+                                  <option key={asig.id} value={asig.id}>
+                                    {asig.nombre}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            {errorComision.asignaturaId && (
+                              <p className="text-red-600 text-xs mt-1">{errorComision.asignaturaId}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Aula de Cursada *
+                            </label>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <select
+                                name="aulaId"
+                                value={formComision.aulaId}
+                                onChange={manejarCambioComision}
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorComision.aulaId
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              >
+                                <option value="">Seleccione un Aula</option>
+                                {aulas.map((a) => (
+                                  <option key={a.id} value={a.id}>
+                                    {a.nombre} (Capacidad: {a.capacidad} alumnos)
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            {errorComision.aulaId && (
+                              <p className="text-red-600 text-xs mt-1">{errorComision.aulaId}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Cupo Máximo Operativo *
+                            </label>
+                            <div className="relative">
+                              <Sliders className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <input
+                                type="number"
+                                name="cupoMaximo"
+                                value={formComision.cupoMaximo}
+                                onChange={manejarCambioComision}
+                                placeholder="Ej: 25"
+                                min="1"
+                                step="1"
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorComision.cupoMaximo
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              />
+                            </div>
+                            {errorComision.cupoMaximo && (
+                              <p className="text-red-600 text-xs mt-1">{errorComision.cupoMaximo}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Alumnos Inscriptos
+                            </label>
+                            <div className="relative">
+                              <Sliders className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <input
+                                type="number"
+                                name="inscritos"
+                                value={formComision.inscritos}
+                                onChange={manejarCambioComision}
+                                placeholder="Ej: 0"
+                                min="0"
+                                step="1"
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorComision.inscritos
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              />
+                            </div>
+                            {errorComision.inscritos && (
+                              <p className="text-red-600 text-xs mt-1">{errorComision.inscritos}</p>
+                            )}
+                          </div>
+
+                          <div className="flex gap-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                limpiarFormComision();
+                                setMostrarModalComision(false);
+                              }}
+                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="submit"
+                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                            >
+                              <PlusCircle size={18} />
+                              {modoEdicionComision ? "Guardar" : "Agregar"}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
                     </div>
-
-                    <form onSubmit={guardarComision} className="space-y-5">
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Identificador de la Comisión *
-                        </label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input
-                            type="text"
-                            name="nombre"
-                            value={formComision.nombre}
-                            onChange={manejarCambioComision}
-                            placeholder="Ej: Comisión A - Turno Noche"
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorComision.nombre
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          />
-                        </div>
-                        {errorComision.nombre && (
-                          <p className="text-red-600 text-xs mt-1">{errorComision.nombre}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Asignatura Relacionada *
-                        </label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select
-                            name="asignaturaId"
-                            value={formComision.asignaturaId}
-                            onChange={manejarCambioComision}
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorComision.asignaturaId
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          >
-                            <option value="">Seleccione una Asignatura</option>
-                            {asignaturas.map((asig) => (
-                              <option key={asig.id} value={asig.id}>
-                                {asig.nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {errorComision.asignaturaId && (
-                          <p className="text-red-600 text-xs mt-1">{errorComision.asignaturaId}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Aula de Cursada *
-                        </label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select
-                            name="aulaId"
-                            value={formComision.aulaId}
-                            onChange={manejarCambioComision}
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorComision.aulaId
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          >
-                            <option value="">Seleccione un Aula</option>
-                            {aulas.map((a) => (
-                              <option key={a.id} value={a.id}>
-                                {a.nombre} (Capacidad: {a.capacidad} alumnos)
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {errorComision.aulaId && (
-                          <p className="text-red-600 text-xs mt-1">{errorComision.aulaId}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Cupo Máximo Operativo *
-                        </label>
-                        <div className="relative">
-                          <Sliders className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input
-                            type="number"
-                            name="cupoMaximo"
-                            value={formComision.cupoMaximo}
-                            onChange={manejarCambioComision}
-                            placeholder="Ej: 25"
-                            min="1"
-                            step="1"
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorComision.cupoMaximo
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          />
-                        </div>
-                        {errorComision.cupoMaximo && (
-                          <p className="text-red-600 text-xs mt-1">{errorComision.cupoMaximo}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Alumnos Inscriptos
-                        </label>
-                        <div className="relative">
-                          <Sliders className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <input
-                            type="number"
-                            name="inscritos"
-                            value={formComision.inscritos}
-                            onChange={manejarCambioComision}
-                            placeholder="Ej: 0"
-                            min="0"
-                            step="1"
-                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                              errorComision.inscritos
-                                ? "border-red-500 focus:ring-red-500"
-                                : "border-slate-300 focus:ring-red-500"
-                            }`}
-                          />
-                        </div>
-                        {errorComision.inscritos && (
-                          <p className="text-red-600 text-xs mt-1">{errorComision.inscritos}</p>
-                        )}
-                      </div>
-
-                      <div className="flex gap-3">
-                        {modoEdicionComision && (
-                          <button
-                            type="button"
-                            onClick={limpiarFormComision}
-                            className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
-                          >
-                            Cancelar
-                          </button>
-                        )}
-                        <button
-                          type="submit"
-                          className={`h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 ${
-                            modoEdicionComision ? "w-1/2" : "w-full"
-                          }`}
-                        >
-                          <PlusCircle size={18} />
-                          {modoEdicionComision ? "Guardar" : "Agregar"}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                  )}
                 </>
               )}
             </>
