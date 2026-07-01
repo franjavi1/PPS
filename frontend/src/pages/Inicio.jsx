@@ -17,7 +17,7 @@ import { apiRequest } from "../api";
 function Inicio() {
   const navigate = useNavigate();
   const [resumen, setResumen] = useState({
-    personas: 0,
+    legajos: 0,
     activas: 0,
     tiposDocumento: 0,
   });
@@ -28,22 +28,22 @@ function Inicio() {
 
   async function cargarResumen() {
     try {
-      const [personas, tipos] = await Promise.all([
-        apiRequest("/personas"),
+      const [legajos, tipos] = await Promise.all([
+        apiRequest("/legajos"),
         apiRequest("/tipos-documentos"),
       ]);
 
-      const listaPersonas = personas.data || [];
+      const listaLegajos = legajos.data || [];
       const listaTipos = tipos.data || [];
 
       setResumen({
-        personas: listaPersonas.length,
-        activas: listaPersonas.filter((persona) => persona.estado === 1).length,
+        legajos: listaLegajos.length,
+        activas: listaLegajos.filter((legajo) => legajo.estado === 1).length,
         tiposDocumento: listaTipos.length,
       });
     } catch {
       setResumen({
-        personas: 0,
+        legajos: 0,
         activas: 0,
         tiposDocumento: 0,
       });
@@ -68,8 +68,8 @@ function Inicio() {
         <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
           <TarjetaResumen
             icono={<Users size={36} />}
-            titulo="Total de personas"
-            valor={resumen.personas}
+            titulo="Total de legajos"
+            valor={resumen.legajos}
             color="red"
           />
 
@@ -83,7 +83,7 @@ function Inicio() {
           <TarjetaResumen
             icono={<UserX size={36} />}
             titulo="Inactivas"
-            valor={resumen.personas - resumen.activas}
+            valor={resumen.legajos - resumen.activas}
             color="yellow"
           />
 
@@ -103,21 +103,21 @@ function Inicio() {
 
             <div className="border-t border-slate-200 pt-6">
               <p className="text-slate-500 mb-6">
-                Gestiona la informacion de personas y documentos de manera rapida.
+                Gestiona la informacion de legajos y documentos de manera rapida.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <AccesoRapido
                   icono={<FolderOpen size={38} />}
-                  titulo="Ver personas"
-                  descripcion="Consulta y gestiona personas existentes."
+                  titulo="Ver legajos"
+                  descripcion="Consulta y gestiona legajos existentes."
                   onClick={() => navigate("/legajos")}
                 />
 
                 <AccesoRapido
                   icono={<PlusCircle size={38} />}
-                  titulo="Nueva persona"
-                  descripcion="Crea un nuevo registro de persona."
+                  titulo="Nuevo legajo"
+                  descripcion="Crea un nuevo registro de legajo."
                   onClick={() => navigate("/crearLegajo")}
                 />
 
@@ -145,15 +145,15 @@ function Inicio() {
               />
 
               <Aviso
-                titulo="Personas activas"
-                descripcion={`${resumen.activas} registros activos disponibles.`}
+                titulo="Legajos activos"
+                descripcion={`${resumen.activas} legajos activos disponibles.`}
                 fecha="Ahora"
                 color="yellow"
               />
 
               <Aviso
                 titulo="Tipos de documento"
-                descripcion={`${resumen.tiposDocumento} tipos cargados para crear personas.`}
+                descripcion={`${resumen.tiposDocumento} tipos cargados para los legajos.`}
                 fecha="Ahora"
                 color="blue"
               />

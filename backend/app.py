@@ -11,6 +11,8 @@ from models.tipo_planes import TipoPlanes
 from models.asignaturas import Asignaturas
 from models.tipo_sede import TipoSede
 from models.sedes import Sedes
+from models.legajo import Legajo
+from models.rangos_institucionales import RangosInstitucionales
 
 from routes.personas import personas_bp
 from routes.tipos_documentos import tipos_documentos_bp
@@ -19,6 +21,8 @@ from routes.tipos_planes import tipos_planes_bp
 from routes.asignaturas import asignaturas_bp
 from routes.tipos_sedes import tipos_sedes_bp
 from routes.sedes import sedes_bp
+from routes.legajos import legajos_bp
+from routes.rangos_institucionales import rangos_institucionales_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -44,6 +48,8 @@ app.register_blueprint(tipos_planes_bp)
 app.register_blueprint(asignaturas_bp)
 app.register_blueprint(tipos_sedes_bp)
 app.register_blueprint(sedes_bp)
+app.register_blueprint(legajos_bp)
+app.register_blueprint(rangos_institucionales_bp)
 
 with app.app_context():
     db.create_all()
