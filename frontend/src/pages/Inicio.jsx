@@ -96,7 +96,7 @@ function Inicio() {
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-7">
+          <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
             <h2 className="text-2xl font-bold text-slate-800 mb-4">
               Accesos rapidos
             </h2>
@@ -106,7 +106,7 @@ function Inicio() {
                 Gestiona la informacion de personas y documentos de manera rapida.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
                 <AccesoRapido
                   icono={<FolderOpen size={38} />}
                   titulo="Ver personas"
@@ -179,11 +179,11 @@ function Inicio() {
 }
 
 function TarjetaResumen({ icono, titulo, valor, color }) {
-  const colores = {
-    red: "bg-red-100 text-red-700",
-    green: "bg-green-100 text-green-700",
-    yellow: "bg-yellow-100 text-yellow-600",
-    blue: "bg-blue-100 text-blue-700",
+  const coloresIcono = {
+    red: "text-red-700",
+    green: "text-green-700",
+    yellow: "text-yellow-600",
+    blue: "text-blue-700",
   };
 
   const coloresValor = {
@@ -194,8 +194,8 @@ function TarjetaResumen({ icono, titulo, valor, color }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex items-center gap-5">
-      <div className={`w-20 h-20 rounded-full flex items-center justify-center ${colores[color]}`}>
+    <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex items-center gap-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+      <div className={`flex items-center justify-center ${coloresIcono[color]}`}>
         {icono}
       </div>
 
@@ -213,10 +213,10 @@ function AccesoRapido({ icono, titulo, descripcion, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="border border-slate-200 rounded-xl p-6 text-left hover:bg-slate-50 hover:shadow transition flex items-center justify-between gap-4"
+      className="border border-slate-200 rounded-xl p-6 text-left hover:bg-slate-50 hover:shadow-md transition-all duration-200 active:scale-95 flex items-center justify-between gap-4"
     >
       <div className="flex items-center gap-5">
-        <div className="w-20 h-20 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
+        <div className="text-red-700 flex items-center justify-center">
           {icono}
         </div>
 
@@ -235,18 +235,12 @@ function AccesoRapido({ icono, titulo, descripcion, onClick }) {
   );
 }
 
-function Aviso({ titulo, descripcion, fecha, color }) {
-  const colores = {
-    red: "bg-red-100 text-red-700",
-    yellow: "bg-yellow-100 text-yellow-600",
-    blue: "bg-blue-100 text-blue-700",
-  };
-
+function Aviso({ titulo, descripcion, fecha }) {
   return (
-    <div className="flex items-center justify-between border-b border-slate-200 py-5">
+    <div className="flex items-center justify-between border-b border-slate-200 py-5 transition-colors duration-200 hover:bg-slate-50 px-2 rounded-lg">
       <div className="flex items-center gap-4">
-        <div className={`w-14 h-14 rounded-full flex items-center justify-center ${colores[color]}`}>
-          <Bell size={24} />
+        <div className="text-amber-500 flex items-center justify-center">
+          <Bell size={26} />
         </div>
 
         <div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
-import { Home, FolderOpen, FilePlus, FileText, LogOut, BookOpen, Menu, X } from "lucide-react";
+import { Home, FolderOpen, FilePlus, FileText, LogOut, BookOpen, Menu, X, ClipboardList } from "lucide-react";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -11,11 +11,11 @@ function Navbar() {
   }
 
   const linkClass = ({ isActive }) =>
-    `flex items-center gap-2 pb-1 font-medium border-b-2 transition-colors ${
-      isActive
-        ? "border-white text-white"
-        : "border-transparent text-red-100 hover:text-white"
-    }`;
+  `flex items-center gap-2 pb-1 font-medium border-b-2 transition-all duration-200 hover:-translate-y-0.5 ${
+    isActive
+      ? "border-white text-white"
+      : "border-transparent text-red-100 hover:text-white"
+  }`;
 
   const mobileLinkClass = ({ isActive }) =>
     `flex items-center gap-3 py-3 px-4 rounded-lg font-medium transition-colors ${
@@ -27,11 +27,14 @@ function Navbar() {
   return (
     <header className="bg-red-700 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div onClick={() => navigate("/inicio")}
+             className="flex items-center gap-3"
+             title="Ir al inicio"
+           >
           <img
             src="/logo.jpeg"
             alt="Logo"
-            className="h-10 w-10 rounded-full object-cover border border-red-500 shadow-sm"
+            className="h-14 w-14 rounded-full object-cover border border-red-500 shadow-sm transition-transform duration-200 hover:scale-105"
           />
           <div>
             <h1 className="text-xl md:text-2xl font-bold leading-tight">
@@ -65,6 +68,11 @@ function Navbar() {
             Documentos
           </NavLink>
 
+          <NavLink to="/planes" className={linkClass}>
+            <ClipboardList size={20} />
+            Planes
+          </NavLink>
+
           <NavLink to="/asignaturas" className={linkClass}>
             <BookOpen size={20} />
             Asignaturas
@@ -83,7 +91,7 @@ function Navbar() {
         <div className="lg:hidden">
           <button
             onClick={() => setMenuAbierto(!menuAbierto)}
-            className="p-2 text-red-100 hover:text-white focus:outline-none cursor-pointer"
+            className="p-2 text-red-100 hover:text-white focus:outline-none cursor-pointer transition-transform duration-200 active:scale-90"
             aria-label="Abrir menú"
           >
             {menuAbierto ? <X size={26} /> : <Menu size={26} />}
@@ -92,8 +100,13 @@ function Navbar() {
       </div>
 
       {/* Menú móvil desplegable */}
-      {menuAbierto && (
-        <nav className="lg:hidden bg-red-700 border-t border-red-600 px-6 py-4 flex flex-col gap-2 shadow-inner animate-in slide-in-from-top duration-200">
+        <nav
+          className={`lg:hidden bg-red-700 border-t border-red-600 px-6 flex flex-col gap-2 shadow-inner overflow-hidden transition-all duration-300 ${
+            menuAbierto
+            ? "max-h-[500px] opacity-100 py-4"
+            : "max-h-0 opacity-0 py-0"
+          }`}
+          >
           <NavLink
             to="/inicio"
             onClick={() => setMenuAbierto(false)}
@@ -131,6 +144,15 @@ function Navbar() {
           </NavLink>
 
           <NavLink
+            to="/planes"
+            onClick={() => setMenuAbierto(false)}
+            className={mobileLinkClass}
+          >
+            <ClipboardList size={20} />
+            Planes
+          </NavLink>
+
+          <NavLink
             to="/asignaturas"
             onClick={() => setMenuAbierto(false)}
             className={mobileLinkClass}
@@ -138,7 +160,7 @@ function Navbar() {
             <BookOpen size={20} />
             Asignaturas
           </NavLink>
-
+           
           <button
             onClick={() => {
               setMenuAbierto(false);
@@ -150,7 +172,6 @@ function Navbar() {
             Cerrar sesion
           </button>
         </nav>
-      )}
     </header>
   );
 }
