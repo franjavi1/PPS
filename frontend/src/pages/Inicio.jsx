@@ -125,7 +125,7 @@ function Inicio() {
                   icono={<FileText size={38} />}
                   titulo="Documentos"
                   descripcion="Administra los tipos de documento."
-                  onClick={() => navigate("/tipos-documentos")}
+                  onClick={() => navigate("/config-documentos")}
                 />
               </div>
             </div>
