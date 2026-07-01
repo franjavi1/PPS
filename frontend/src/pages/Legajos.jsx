@@ -11,48 +11,61 @@ import {
   RefreshCcw,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { personaService } from "../services/personaService";
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
 
 function Legajos() {
   const navigate = useNavigate();
 
   const [busqueda, setBusqueda] = useState("");
   const [personas, setPersonas] = useState([]);
+  const [tiposDocumento, setTiposDocumento] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    cargarPersonas();
+    cargarDatos();
   }, []);
 
-  async function cargarPersonas() {
+  async function cargarDatos() {
     try {
       setCargando(true);
       setError("");
-      const respuesta = await apiRequest("/personas");
-      setPersonas(respuesta.data || []);
+      const [resPersonas, resTipos] = await Promise.all([
+        personaService.obtenerTodas(),
+        tipoDocumentoService.obtenerTodos(),
+      ]);
+      setPersonas(resPersonas.data || []);
+      setTiposDocumento(resTipos.data || []);
     } catch (err) {
-      setError(err.message || "No se pudieron obtener las personas");
+      setError(err.message || "No se pudieron obtener los datos");
     } finally {
       setCargando(false);
     }
   }
 
   async function eliminarPersona(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta persona?");
+    const confirmar = confirm("¿Seguro que querés eliminar esta persona?");
 
     if (!confirmar) {
       return;
     }
 
     try {
-      await apiRequest(`/personas/${id}`, {
-        method: "DELETE",
-      });
-      await cargarPersonas();
+      const response = await personaService.eliminar(id);
+      if (response.status === "error") {
+        alert(response.message);
+        return;
+      }
+      await cargarDatos();
     } catch (err) {
       alert(err.message || "No se pudo eliminar la persona");
     }
+  }
+
+  function obtenerNombreTipoDocumento(id) {
+    const encontrado = tiposDocumento.find((td) => td.id === id);
+    return encontrado ? encontrado.nombre : `ID: ${id}`;
   }
 
   const personasFiltradas = personas.filter((persona) => {
@@ -76,17 +89,17 @@ function Legajos() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div>
               <h1 className="text-4xl font-extrabold text-slate-800">
-                Personas
+                Legajos de Personas
               </h1>
 
               <p className="text-slate-500 mt-2">
-                Consulta, busca y gestiona las personas cargadas.
+                Consulta, busca y gestiona las personas cargadas en el sistema.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={cargarPersonas}
+                onClick={cargarDatos}
                 className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
               >
                 <RefreshCcw size={22} />
@@ -155,7 +168,11 @@ function Legajos() {
                       <td className="px-5 py-5 text-slate-700">{persona.nombre}</td>
                       <td className="px-5 py-5 text-slate-700">{persona.apellido}</td>
                       <td className="px-5 py-5 text-slate-700">{persona.numero_doc}</td>
-                      <td className="px-5 py-5 text-slate-700">{persona.td_id}</td>
+                      <td className="px-5 py-5 text-slate-700">
+                        <span className="bg-slate-100 border border-slate-300 text-slate-700 text-xs px-2 py-1 rounded font-bold">
+                          {obtenerNombreTipoDocumento(persona.td_id)}
+                        </span>
+                      </td>
                       <td className="px-5 py-5">
                         <EstadoBadge estado={persona.estado} />
                       </td>

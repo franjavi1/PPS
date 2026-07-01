@@ -12,25 +12,28 @@ let mockPersonas = [
     id: 1,
     nombre: "Juan Pablo",
     apellido: "González",
-    tipo_documento_id: 1,
-    documento: "32456789",
-    email: "jpgonzalez@bomberos.org",
+    td_id: 1,
+    numero_doc: 32456789,
+    estado: 1,
+    usuario_accion: 1,
   },
   {
     id: 2,
     nombre: "María Belén",
     apellido: "López",
-    tipo_documento_id: 1,
-    documento: "28765432",
-    email: "mblopez@bomberos.org",
+    td_id: 1,
+    numero_doc: 28765432,
+    estado: 1,
+    usuario_accion: 1,
   },
   {
     id: 3,
     nombre: "Carlos Alberto",
     apellido: "Ramírez",
-    tipo_documento_id: 2,
-    documento: "31112223",
-    email: "caramirez@bomberos.org",
+    td_id: 2,
+    numero_doc: 31112223,
+    estado: 1,
+    usuario_accion: 1,
   },
 ];
 
@@ -49,25 +52,45 @@ export const personaService = {
   },
 
   /**
+   * Obtiene una persona específica por su ID.
+   */
+  async obtenerPorId(id) {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const persona = mockPersonas.find((p) => p.id === parseInt(id, 10));
+    if (!persona) {
+      return {
+        status: "error",
+        message: "Persona no encontrada.",
+      };
+    }
+    return {
+      status: "success",
+      data: persona,
+      message: "Persona recuperada con éxito",
+    };
+  },
+
+  /**
    * Crea un nuevo registro de Persona.
    */
   async crear(persona) {
     await new Promise((resolve) => setTimeout(resolve, 200));
-    if (!persona.nombre || !persona.apellido || !persona.documento || !persona.tipo_documento_id) {
+    if (!persona.nombre || !persona.apellido || !persona.numero_doc || !persona.td_id) {
       return {
         status: "error",
         message: "Error al crear persona. Faltan campos requeridos.",
         errors: {
           nombre: !persona.nombre ? "El nombre es requerido." : null,
           apellido: !persona.apellido ? "El apellido es requerido." : null,
-          documento: !persona.documento ? "El documento es requerido." : null,
-          tipo_documento_id: !persona.tipo_documento_id ? "El tipo de documento es requerido." : null,
+          numero_doc: !persona.numero_doc ? "El documento es requerido." : null,
+          td_id: !persona.td_id ? "El tipo de documento es requerido." : null,
         },
       };
     }
     const nuevo = {
       ...persona,
       id: mockPersonas.length > 0 ? Math.max(...mockPersonas.map((p) => p.id)) + 1 : 1,
+      estado: 1,
     };
     mockPersonas.push(nuevo);
     return {
@@ -82,19 +105,19 @@ export const personaService = {
    */
   async actualizar(id, persona) {
     await new Promise((resolve) => setTimeout(resolve, 200));
-    if (!persona.nombre || !persona.apellido || !persona.documento || !persona.tipo_documento_id) {
+    if (!persona.nombre || !persona.apellido || !persona.numero_doc || !persona.td_id) {
       return {
         status: "error",
         message: "Error al actualizar persona. Faltan campos requeridos.",
         errors: {
           nombre: !persona.nombre ? "El nombre es requerido." : null,
           apellido: !persona.apellido ? "El apellido es requerido." : null,
-          documento: !persona.documento ? "El documento es requerido." : null,
-          tipo_documento_id: !persona.tipo_documento_id ? "El tipo de documento es requerido." : null,
+          numero_doc: !persona.numero_doc ? "El documento es requerido." : null,
+          td_id: !persona.td_id ? "El tipo de documento es requerido." : null,
         },
       };
     }
-    mockPersonas = mockPersonas.map((p) => (p.id === id ? { ...p, ...persona } : p));
+    mockPersonas = mockPersonas.map((p) => (p.id === parseInt(id, 10) ? { ...p, ...persona } : p));
     return {
       status: "success",
       data: { id, ...persona },
@@ -107,7 +130,7 @@ export const personaService = {
    */
   async eliminar(id) {
     await new Promise((resolve) => setTimeout(resolve, 200));
-    mockPersonas = mockPersonas.filter((p) => p.id !== id);
+    mockPersonas = mockPersonas.filter((p) => p.id !== parseInt(id, 10));
     return {
       status: "success",
       data: { id },
