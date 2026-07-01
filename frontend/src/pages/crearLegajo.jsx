@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import {
   ArrowLeft,
   Save,
@@ -8,12 +8,15 @@ import {
   Shield,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { personaService } from "../services/personaService";
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
 
 function NuevoLegajo() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
   const editando = Boolean(id);
+  const esVer = editando && !location.pathname.endsWith("/editar");
 
   const [tiposDocumento, setTiposDocumento] = useState([]);
   const [guardando, setGuardando] = useState(false);
@@ -36,17 +39,21 @@ function NuevoLegajo() {
     try {
       setErrorGeneral("");
 
-      const tipos = await apiRequest("/tipos-documentos");
+      const tipos = await tipoDocumentoService.obtenerTodos();
       setTiposDocumento(tipos.data || []);
 
       if (editando) {
-        const persona = await apiRequest(`/personas/${id}`);
+        const response = await personaService.obtenerPorId(id);
+        if (response.status === "error") {
+          setErrorGeneral(response.message || "No se pudo cargar la persona");
+          return;
+        }
         setFormulario({
-          td_id: persona.data.td_id || "",
-          nombre: persona.data.nombre || "",
-          apellido: persona.data.apellido || "",
-          numero_doc: persona.data.numero_doc || "",
-          usuario_accion: persona.data.usuario_accion || 1,
+          td_id: response.data.td_id || "",
+          nombre: response.data.nombre || "",
+          apellido: response.data.apellido || "",
+          numero_doc: response.data.numero_doc || "",
+          usuario_accion: response.data.usuario_accion || 1,
         });
       }
     } catch (err) {
@@ -123,24 +130,23 @@ function NuevoLegajo() {
       setGuardando(true);
       setErrorGeneral("");
 
+      let response;
       if (editando) {
-        await apiRequest(`/personas/${id}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
+        response = await personaService.actualizar(id, payload);
       } else {
-        await apiRequest("/personas", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        response = await personaService.crear(payload);
+      }
+
+      if (response.status === "error") {
+        if (response.errors) {
+          mostrarErroresBackend(response.errors);
+        }
+        setErrorGeneral(response.message || "No se pudo guardar la persona");
+        return;
       }
 
       navigate("/legajos");
     } catch (err) {
-      if (err.errors) {
-        mostrarErroresBackend(err.errors);
-      }
-
       setErrorGeneral(err.message || "No se pudo guardar la persona");
     } finally {
       setGuardando(false);
@@ -162,11 +168,11 @@ function NuevoLegajo() {
           </button>
 
           <h1 className="text-4xl font-extrabold text-slate-800">
-            {editando ? "Editar persona" : "Nueva persona"}
+            {esVer ? "Ver persona" : editando ? "Editar persona" : "Nueva persona"}
           </h1>
 
           <p className="text-slate-500 mt-2">
-            Carga los datos principales para el registro.
+            {esVer ? "Detalles del registro de la persona." : "Carga los datos principales para el registro."}
           </p>
         </div>
 
@@ -194,10 +200,11 @@ function NuevoLegajo() {
                 error={errores.td_id}
                 icono={<Shield size={22} />}
                 opciones={tiposDocumento}
+                disabled={esVer}
               />
 
               <CampoTexto
-                label="Numero de documento"
+                label="Número de documento"
                 name="numero_doc"
                 value={formulario.numero_doc}
                 onChange={manejarCambio}
@@ -205,6 +212,7 @@ function NuevoLegajo() {
                 placeholder="Ej: 32456789"
                 icono={<CreditCard size={22} />}
                 type="number"
+                disabled={esVer}
               />
 
               <CampoTexto
@@ -215,6 +223,7 @@ function NuevoLegajo() {
                 error={errores.nombre}
                 placeholder="Ej: Juan"
                 icono={<User size={22} />}
+                disabled={esVer}
               />
 
               <CampoTexto
@@ -225,6 +234,7 @@ function NuevoLegajo() {
                 error={errores.apellido}
                 placeholder="Ej: Perez"
                 icono={<User size={22} />}
+                disabled={esVer}
               />
             </div>
           </section>
@@ -235,17 +245,19 @@ function NuevoLegajo() {
               onClick={() => navigate("/legajos")}
               className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
             >
-              Cancelar
+              {esVer ? "Volver" : "Cancelar"}
             </button>
 
-            <button
-              type="submit"
-              disabled={guardando}
-              className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-60"
-            >
-              <Save size={22} />
-              {guardando ? "Guardando..." : "Guardar persona"}
-            </button>
+            {!esVer && (
+              <button
+                type="submit"
+                disabled={guardando}
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-60"
+              >
+                <Save size={22} />
+                {guardando ? "Guardando..." : "Guardar persona"}
+              </button>
+            )}
           </div>
         </form>
       </main>
@@ -262,6 +274,7 @@ function CampoTexto({
   placeholder,
   icono,
   type = "text",
+  disabled = false,
 }) {
   return (
     <div>
@@ -280,6 +293,7 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          disabled={disabled}
           className={`w-full h-14 pl-12 pr-4 border rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
             error
               ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -293,7 +307,7 @@ function CampoTexto({
   );
 }
 
-function CampoSelect({ label, name, value, onChange, error, icono, opciones }) {
+function CampoSelect({ label, name, value, onChange, error, icono, opciones, disabled = false }) {
   return (
     <div>
       <label className="block text-sm font-bold text-slate-700 mb-2">
@@ -309,6 +323,7 @@ function CampoSelect({ label, name, value, onChange, error, icono, opciones }) {
           name={name}
           value={value}
           onChange={onChange}
+          disabled={disabled}
           className={`w-full h-14 pl-12 pr-4 border rounded-xl text-slate-700 bg-white focus:outline-none focus:ring-2 ${
             error
               ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -319,7 +334,7 @@ function CampoSelect({ label, name, value, onChange, error, icono, opciones }) {
 
           {opciones.map((opcion) => (
             <option key={opcion.id} value={opcion.id}>
-              {opcion.descripcion}
+              {opcion.nombre || opcion.descripcion}
             </option>
           ))}
         </select>
