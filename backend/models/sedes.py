@@ -1,45 +1,38 @@
 from datetime import datetime
 
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, DateTime, ForeignKey, func
 
-class Persona(db.Model):
-    # Nombre de la tabla asociada en la base de datos.
-    __tablename__="personas"
 
-    # Identificador principal de la persona.
+class Sedes(db.Model):
+    # Nombre de la tabla asociada en la base de datos.
+    __tablename__ = "sedes"
+
+    # Identificador principal de la sede.
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Tipo de documento asociado a la persona.
-    td_id: Mapped[int] = mapped_column(
-        "tdId",
+    # Tipo de sede asociado.
+    tipo_sede_id: Mapped[int] = mapped_column(
+        "tipoSedeId",
         Integer,
-        ForeignKey("tipos_documento.id"),
+        ForeignKey("tipos_sedes.id"),
         nullable=False
     )
 
-    # Nombre de la persona.
+    # Nombre de la sede.
     nombre: Mapped[str] = mapped_column(
         String(100),
         nullable=False
     )
 
-    # Apellido de la persona.
-    apellido: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
-    )
-
-    # Numero de documento registrado.
-    numero_doc: Mapped[int] = mapped_column(
-        "numeroDoc",
-        Integer,
+    # Direccion de la sede.
+    direccion: Mapped[str] = mapped_column(
+        String(200),
         nullable=False
     )
 
@@ -74,5 +67,5 @@ class Persona(db.Model):
         nullable=False
     )
 
-    # Relacion con el modelo de tipo de documento.
-    tipo_documento = relationship("TipoDocumento")
+    # Relacion con el modelo de tipo de sede.
+    tipo_sede = relationship("TipoSede")
