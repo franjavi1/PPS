@@ -31,7 +31,7 @@ function Navbar() {
           <img
             src="/logo.jpeg"
             alt="Logo"
-            className="h-10 w-10 rounded-full object-cover border border-red-500 shadow-sm"
+            className="h-24 w-24 shrink-0 rounded-full object-cover border border-red-500 shadow-sm"
           />
           <div>
             <h1 className="text-xl md:text-2xl font-bold leading-tight">
