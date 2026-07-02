@@ -1,4 +1,4 @@
-from models.tipo_documento import TipoDocumento
+from models.tipo_sede import TipoSede
 
 from db import ma
 
@@ -6,30 +6,30 @@ from marshmallow import ValidationError, validates_schema, pre_load, post_dump
 from marshmallow.validate import Length, Regexp
 
 
-REGEX_SOLO_LETRAS = r"^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$"
+REGEX_SOLO_LETRAS = r"^[A-Za-zÃÃ‰ÃÃ“ÃšÃ¡Ã©Ã­Ã³ÃºÃ±Ã‘\s]+$"
 
 
-class TipoDocumentoSchema(ma.SQLAlchemySchema):
+class TipoSedeSchema(ma.SQLAlchemySchema):
     # Configuracion del schema asociado al modelo.
     class Meta:
-        model = TipoDocumento
+        model = TipoSede
         load_instance = True
 
     # Campo de solo lectura para las respuestas.
     id = ma.auto_field(dump_only=True)
 
-    # Descripcion del tipo de documento.
+    # Descripcion del tipo de sede.
     descripcion = ma.auto_field(
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=45, error="La descripción debe tener entre 1 y 45 caracteres"),
-            Regexp(REGEX_SOLO_LETRAS, error="La descripción solo puede contener letras")
+            Length(min=1, max=45, error="La descripcion debe tener entre 1 y 45 caracteres"),
+            Regexp(REGEX_SOLO_LETRAS, error="La descripcion solo puede contener letras")
         ],
         error_messages={
-            "required": "La descripción es obligatoria",
-            "null": "La descripción no puede ser null",
-            "invalid": "La descripción debe ser un texto válido"
+            "required": "La descripcion es obligatoria",
+            "null": "La descripcion no puede ser null",
+            "invalid": "La descripcion debe ser un texto valido"
         }
     )
 
@@ -38,9 +38,9 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
         required=True,
         allow_none=False,
         error_messages={
-            "required": "El usuario de acción es obligatorio",
-            "null": "El usuario de acción no puede ser null",
-            "invalid": "El usuario de acción debe ser un número entero"
+            "required": "El usuario de accion es obligatorio",
+            "null": "El usuario de accion no puede ser null",
+            "invalid": "El usuario de accion debe ser un numero entero"
         }
     )
 
@@ -48,7 +48,7 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
 
-    # Evita cargar tipos de documento con descripciones repetidas.
+    # Evita cargar tipos de sede con descripciones repetidas.
     @validates_schema
     def validar_descripcion_unica(self, data, **kwargs):
         descripcion = data.get("descripcion")
@@ -56,15 +56,15 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
         if not descripcion:
             return
 
-        existente = TipoDocumento.query.filter_by(
+        existente = TipoSede.query.filter_by(
             descripcion=descripcion
         ).first()
 
-        tipo_documento_id = getattr(self, "context", {}).get("tipo_documento_id")
+        tipo_sede_id = getattr(self, "context", {}).get("tipo_sede_id")
 
-        if existente and existente.id != tipo_documento_id:
+        if existente and existente.id != tipo_sede_id:
             raise ValidationError({
-                "descripcion": ["Ya existe un tipo de documento con esa descripción"]
+                "descripcion": ["Ya existe un tipo de sede con esa descripcion"]
             })
 
     # Limpia el texto recibido antes de validar y guardar.
@@ -85,5 +85,5 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
 
 
 # Instancias usadas por las rutas y servicios.
-tipo_documento_schema = TipoDocumentoSchema()
-tipos_documento_schema = TipoDocumentoSchema(many=True)
+tipo_sede_schema = TipoSedeSchema()
+tipos_sedes_schema = TipoSedeSchema(many=True)

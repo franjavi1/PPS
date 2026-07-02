@@ -1,45 +1,32 @@
 from datetime import datetime
 
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, DateTime, ForeignKey, func
 
-class Persona(db.Model):
-    # Nombre de la tabla asociada en la base de datos.
-    __tablename__="personas"
 
-    # Identificador principal de la persona.
+class Legajo(db.Model):
+    # Nombre de la tabla asociada en la base de datos.
+    __tablename__ = "legajos"
+
+    # Identificador principal del legajo.
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Tipo de documento asociado a la persona.
-    td_id: Mapped[int] = mapped_column(
-        "tdId",
+    # Persona asociada al legajo.
+    persona_id: Mapped[int] = mapped_column(
+        "personasId",
         Integer,
-        ForeignKey("tipos_documento.id"),
+        ForeignKey("personas.id"),
         nullable=False
     )
 
-    # Nombre de la persona.
-    nombre: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
-    )
-
-    # Apellido de la persona.
-    apellido: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
-    )
-
-    # Numero de documento registrado.
-    numero_doc: Mapped[int] = mapped_column(
-        "numeroDoc",
-        Integer,
+    # Numero identificador del legajo.
+    numero: Mapped[str] = mapped_column(
+        String(45),
         nullable=False
     )
 
@@ -74,5 +61,5 @@ class Persona(db.Model):
         nullable=False
     )
 
-    # Relacion con el modelo de tipo de documento.
-    tipo_documento = relationship("TipoDocumento")
+    # Relacion con el modelo de persona.
+    persona = relationship("Persona")

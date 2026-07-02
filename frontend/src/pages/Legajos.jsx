@@ -17,53 +17,74 @@ function Legajos() {
   const navigate = useNavigate();
 
   const [busqueda, setBusqueda] = useState("");
+  const [legajos, setLegajos] = useState([]);
   const [personas, setPersonas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    cargarPersonas();
+    cargarLegajos();
   }, []);
 
-  async function cargarPersonas() {
+  async function cargarLegajos() {
     try {
       setCargando(true);
       setError("");
-      const respuesta = await apiRequest("/personas");
-      setPersonas(respuesta.data || []);
+      const [respuestaLegajos, respuestaPersonas] = await Promise.all([
+        apiRequest("/legajos"),
+        apiRequest("/personas"),
+      ]);
+      setLegajos(respuestaLegajos.data || []);
+      setPersonas(respuestaPersonas.data || []);
     } catch (err) {
-      setError(err.message || "No se pudieron obtener las personas");
+      setError(err.message || "No se pudieron obtener los legajos");
     } finally {
       setCargando(false);
     }
   }
 
-  async function eliminarPersona(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta persona?");
+  async function eliminarLegajo(id) {
+    const confirmar = confirm("Seguro que queres eliminar este legajo?");
 
     if (!confirmar) {
       return;
     }
 
     try {
-      await apiRequest(`/personas/${id}`, {
+      await apiRequest(`/legajos/${id}`, {
         method: "DELETE",
       });
-      await cargarPersonas();
+      await cargarLegajos();
     } catch (err) {
-      alert(err.message || "No se pudo eliminar la persona");
+      alert(err.message || "No se pudo eliminar el legajo");
     }
   }
 
-  const personasFiltradas = personas.filter((persona) => {
+  function obtenerPersona(personaId) {
+    return personas.find((persona) => persona.id === personaId);
+  }
+
+  function obtenerNombrePersona(personaId) {
+    const persona = obtenerPersona(personaId);
+    return persona ? `${persona.apellido}, ${persona.nombre}` : "Persona no definida";
+  }
+
+  function obtenerDocumentoPersona(personaId) {
+    const persona = obtenerPersona(personaId);
+    return persona ? persona.numero_doc : "No definido";
+  }
+
+  const legajosFiltrados = legajos.filter((legajo) => {
     const textoBusqueda = busqueda.toLowerCase();
-    const documento = String(persona.numero_doc || "");
+    const persona = obtenerPersona(legajo.persona_id);
+    const nombreCompleto = persona ? `${persona.nombre} ${persona.apellido}`.toLowerCase() : "";
+    const documento = persona ? String(persona.numero_doc || "") : "";
 
     return (
-      persona.nombre.toLowerCase().includes(textoBusqueda) ||
-      persona.apellido.toLowerCase().includes(textoBusqueda) ||
+      legajo.numero.toLowerCase().includes(textoBusqueda) ||
+      nombreCompleto.includes(textoBusqueda) ||
       documento.includes(textoBusqueda) ||
-      String(persona.id).includes(textoBusqueda)
+      String(legajo.id).includes(textoBusqueda)
     );
   });
 
@@ -76,17 +97,17 @@ function Legajos() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div>
               <h1 className="text-4xl font-extrabold text-slate-800">
-                Personas
+                Legajos
               </h1>
 
               <p className="text-slate-500 mt-2">
-                Consulta, busca y gestiona las personas cargadas.
+                Consulta, busca y gestiona los legajos cargados.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={cargarPersonas}
+                onClick={cargarLegajos}
                 className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
               >
                 <RefreshCcw size={22} />
@@ -98,7 +119,7 @@ function Legajos() {
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
               >
                 <PlusCircle size={22} />
-                Nueva persona
+                Nuevo legajo
               </button>
             </div>
           </div>
@@ -113,7 +134,7 @@ function Legajos() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por nombre, apellido, documento o ID"
+              placeholder="Buscar por numero, persona, documento o ID"
               className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
           </div>
@@ -124,15 +145,88 @@ function Legajos() {
             </div>
           )}
 
-          <div className="overflow-x-auto border border-slate-200 rounded-xl">
+          <div className="md:hidden space-y-4">
+            {cargando ? (
+              <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
+                Cargando legajos...
+              </div>
+            ) : legajosFiltrados.length > 0 ? (
+              legajosFiltrados.map((legajo) => (
+                <article
+                  key={legajo.id}
+                  className="border border-slate-200 rounded-xl bg-white p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div>
+                      <p className="text-xs font-bold text-slate-400 uppercase">
+                        Legajo #{legajo.id}
+                      </p>
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                        Nro. {legajo.numero}
+                      </h2>
+                    </div>
+
+                    <EstadoBadge estado={legajo.estado} />
+                  </div>
+
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <p className="text-slate-400 font-bold">Persona</p>
+                      <p className="text-slate-800 font-semibold">
+                        {obtenerNombrePersona(legajo.persona_id)}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-slate-400 font-bold">Documento</p>
+                      <p className="text-slate-700">
+                        {obtenerDocumentoPersona(legajo.persona_id)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
+                    <button
+                      onClick={() => navigate(`/legajos/${legajo.id}`)}
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                    >
+                      <Eye size={16} />
+                      Ver
+                    </button>
+
+                    <button
+                      onClick={() => navigate(`/legajos/${legajo.id}/editar`)}
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                    >
+                      <Pencil size={16} />
+                      Editar
+                    </button>
+
+                    <button
+                      onClick={() => eliminarLegajo(legajo.id)}
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
+                      Borrar
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
+                No se encontraron legajos.
+              </div>
+            )}
+          </div>
+
+          <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
                   <th className="px-5 py-4 text-slate-700 font-bold">ID</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Nombre</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Apellido</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">Numero</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">Persona</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Documento</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Tipo doc.</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Estado</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Acciones</th>
                 </tr>
@@ -141,28 +235,27 @@ function Legajos() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="7" className="text-center px-5 py-10 text-slate-500">
-                      Cargando personas...
+                    <td colSpan="6" className="text-center px-5 py-10 text-slate-500">
+                      Cargando legajos...
                     </td>
                   </tr>
-                ) : personasFiltradas.length > 0 ? (
-                  personasFiltradas.map((persona) => (
+                ) : legajosFiltrados.length > 0 ? (
+                  legajosFiltrados.map((legajo) => (
                     <tr
-                      key={persona.id}
+                      key={legajo.id}
                       className="border-b border-slate-200 hover:bg-slate-50"
                     >
-                      <td className="px-5 py-5 text-slate-700">{persona.id}</td>
-                      <td className="px-5 py-5 text-slate-700">{persona.nombre}</td>
-                      <td className="px-5 py-5 text-slate-700">{persona.apellido}</td>
-                      <td className="px-5 py-5 text-slate-700">{persona.numero_doc}</td>
-                      <td className="px-5 py-5 text-slate-700">{persona.td_id}</td>
+                      <td className="px-5 py-5 text-slate-700">{legajo.id}</td>
+                      <td className="px-5 py-5 text-slate-700 font-semibold">{legajo.numero}</td>
+                      <td className="px-5 py-5 text-slate-700">{obtenerNombrePersona(legajo.persona_id)}</td>
+                      <td className="px-5 py-5 text-slate-700">{obtenerDocumentoPersona(legajo.persona_id)}</td>
                       <td className="px-5 py-5">
-                        <EstadoBadge estado={persona.estado} />
+                        <EstadoBadge estado={legajo.estado} />
                       </td>
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => navigate(`/legajos/${persona.id}`)}
+                            onClick={() => navigate(`/legajos/${legajo.id}`)}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
                           >
                             <Eye size={18} />
@@ -170,7 +263,7 @@ function Legajos() {
                           </button>
 
                           <button
-                            onClick={() => navigate(`/legajos/${persona.id}/editar`)}
+                            onClick={() => navigate(`/legajos/${legajo.id}/editar`)}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
                           >
                             <Pencil size={18} />
@@ -178,7 +271,7 @@ function Legajos() {
                           </button>
 
                           <button
-                            onClick={() => eliminarPersona(persona.id)}
+                            onClick={() => eliminarLegajo(legajo.id)}
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
                           >
                             <Trash2 size={18} />
@@ -190,8 +283,8 @@ function Legajos() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center px-5 py-10 text-slate-500">
-                      No se encontraron personas.
+                    <td colSpan="6" className="text-center px-5 py-10 text-slate-500">
+                      No se encontraron legajos.
                     </td>
                   </tr>
                 )}
@@ -200,7 +293,7 @@ function Legajos() {
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-5 py-4 bg-white">
               <p className="text-slate-500">
-                Mostrando {personasFiltradas.length} de {personas.length} personas
+                Mostrando {legajosFiltrados.length} de {legajos.length} legajos
               </p>
 
               <div className="flex items-center gap-2">

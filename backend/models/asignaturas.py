@@ -1,45 +1,23 @@
 from datetime import datetime
-
-
 from db import db
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, String, DateTime, ForeignKey, func
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Integer, String, DateTime, func
 
-class Persona(db.Model):
+
+class Asignaturas(db.Model):
     # Nombre de la tabla asociada en la base de datos.
-    __tablename__="personas"
+    __tablename__ = "asignaturas"
 
-    # Identificador principal de la persona.
+    # Identificador principal de la asignatura.
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Tipo de documento asociado a la persona.
-    td_id: Mapped[int] = mapped_column(
-        "tdId",
-        Integer,
-        ForeignKey("tipos_documento.id"),
-        nullable=False
-    )
-
-    # Nombre de la persona.
+    # Nombre de la asignatura.
     nombre: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
-    )
-
-    # Apellido de la persona.
-    apellido: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
-    )
-
-    # Numero de documento registrado.
-    numero_doc: Mapped[int] = mapped_column(
-        "numeroDoc",
-        Integer,
+        String(105),
         nullable=False
     )
 
@@ -48,6 +26,12 @@ class Persona(db.Model):
         Integer,
         nullable=False,
         default=1
+    )
+
+    # Formato en el que se dicta la asignatura.
+    formato: Mapped[str] = mapped_column(
+        String(45),
+        nullable=False
     )
 
     # Usuario que realizo la ultima accion sobre el registro.
@@ -73,6 +57,3 @@ class Persona(db.Model):
         onupdate=func.now(),
         nullable=False
     )
-
-    # Relacion con el modelo de tipo de documento.
-    tipo_documento = relationship("TipoDocumento")
