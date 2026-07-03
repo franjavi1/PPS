@@ -16,6 +16,7 @@ import Navbar from "../components/Navbar";
 import { tipoDocumentoService } from "../services/tipoDocumentoService";
 import { rangoService } from "../services/rangoService";
 import { sedeService } from "../services/sedeService";
+import { tipoSedeService } from "../services/tipoSedeService";
 import { aulaService } from "../services/aulaService";
 import { comisionService } from "../services/comisionService";
 import { asignaturaService } from "../services/asignaturaService";
@@ -33,6 +34,7 @@ function ConfigDocumentos() {
 
   // Estados para almacenar los listados recuperados asíncronamente de los servicios
   const [sedes, setSedes] = useState([]);
+  const [tiposSedes, setTiposSedes] = useState([]);
   const [aulas, setAulas] = useState([]);
   const [asignaturas, setAsignaturas] = useState([]);
   const [comisiones, setComisiones] = useState([]);
@@ -43,10 +45,11 @@ function ConfigDocumentos() {
   useEffect(() => {
     async function cargarDatos() {
       try {
-        const [resTDocs, resRgs, resSds, resAls, resAsig, resComs] = await Promise.all([
+        const [resTDocs, resPers, resRgs, resSds, resTiposSedes, resAls, resAsig, resComs] = await Promise.all([
           tipoDocumentoService.obtenerTodos(),
           rangoService.obtenerTodos(),
           sedeService.obtenerTodas(),
+          tipoSedeService.obtenerTodas(),
           aulaService.obtenerTodas(),
           asignaturaService.obtenerTodas(),
           comisionService.obtenerTodas(),
@@ -54,13 +57,21 @@ function ConfigDocumentos() {
 
         setTiposDocumento(resTDocs.data || []);
 
+        const personasMapeadas = (resPers.data || []).map((p) => ({
+          ...p,
+          tipoDocumentoId: p.td_id,
+          documento: p.numero_doc,
+        }));
+        setPersonas(personasMapeadas);
+
         const rangosMapeados = (resRgs.data || []).map((r) => ({
           ...r,
-          nivelPrioridad: r.nivel_prioridad,
+          nivelPrioridad: r.nivel_jerarquia ?? r.nivel_prioridad,
         }));
         setRangos(rangosMapeados);
 
         setSedes(resSds.data || []);
+        setTiposSedes(resTiposSedes.data || []);
 
         const aulasMapeadas = (resAls.data || []).map((a) => ({
           ...a,
@@ -85,9 +96,14 @@ function ConfigDocumentos() {
   }, []);
 
   // Estado para el control del formulario de Sede
-  const [formSede, setFormSede] = useState({ id: null, nombre: "", direccion: "" });
+  const [formSede, setFormSede] = useState({ id: null, tipo_sede_id: "", nombre: "", direccion: "" });
   const [errorSede, setErrorSede] = useState({});
   const [modoEdicionSede, setModoEdicionSede] = useState(false);
+
+  // Estado para el control del formulario de Tipo de Sede
+  const [formTipoSede, setFormTipoSede] = useState({ id: null, descripcion: "" });
+  const [errorTipoSede, setErrorTipoSede] = useState({});
+  const [modoEdicionTipoSede, setModoEdicionTipoSede] = useState(false);
 
   // Estado para el control del formulario de Aula
   const [formAula, setFormAula] = useState({ id: null, nombre: "", sedeId: "", capacidad: "" });
@@ -107,7 +123,7 @@ function ConfigDocumentos() {
   const [modoEdicionComision, setModoEdicionComision] = useState(false);
 
   // Estado para el control del formulario de Tipo de Documento (creación y edición)
-  const [formTipoDoc, setFormTipoDoc] = useState({ id: null, nombre: "", descripcion: "" });
+  const [formTipoDoc, setFormTipoDoc] = useState({ id: null, descripcion: "" });
   const [errorTipoDoc, setErrorTipoDoc] = useState({});
   const [modoEdicionTipoDoc, setModoEdicionTipoDoc] = useState(false);
 
@@ -115,6 +131,7 @@ function ConfigDocumentos() {
   const [mostrarModalTipoDoc, setMostrarModalTipoDoc] = useState(false);
   const [mostrarModalRango, setMostrarModalRango] = useState(false);
   const [mostrarModalSede, setMostrarModalSede] = useState(false);
+  const [mostrarModalTipoSede, setMostrarModalTipoSede] = useState(false);
   const [mostrarModalAula, setMostrarModalAula] = useState(false);
   const [mostrarModalComision, setMostrarModalComision] = useState(false);
 
@@ -133,22 +150,18 @@ function ConfigDocumentos() {
    */
   function validarTipoDoc() {
     const errores = {};
-    if (!formTipoDoc.nombre.trim()) {
-      errores.nombre = "El nombre identificador es requerido.";
-    } else if (formTipoDoc.nombre.length > 10) {
-      errores.nombre = "El nombre no debe exceder los 10 caracteres.";
-    }
-
     if (!formTipoDoc.descripcion.trim()) {
       errores.descripcion = "La descripción es requerida.";
     }
 
-    // Validación de unicidad de nombre (exceptuando el registro en edición)
+    // Validación de unicidad de descripcion (exceptuando el registro en edición)
     const duplicado = tiposDocumento.some(
-      (td) => td.nombre.toLowerCase() === formTipoDoc.nombre.toLowerCase() && td.id !== formTipoDoc.id
+      (td) =>
+        td.descripcion.toLowerCase() === formTipoDoc.descripcion.toLowerCase() &&
+        td.id !== formTipoDoc.id
     );
     if (duplicado) {
-      errores.nombre = "Ya existe un tipo de documento con este nombre.";
+      errores.descripcion = "Ya existe un tipo de documento con esa descripción.";
     }
 
     setErrorTipoDoc(errores);
@@ -166,8 +179,8 @@ function ConfigDocumentos() {
     try {
       let response;
       const payload = {
-        nombre: formTipoDoc.nombre,
         descripcion: formTipoDoc.descripcion,
+        usuario_accion: 1,
       };
 
       if (modoEdicionTipoDoc) {
@@ -231,15 +244,160 @@ function ConfigDocumentos() {
    * Restablece el estado del formulario de tipo de documento.
    */
   function limpiarFormTipoDoc() {
-    setFormTipoDoc({ id: null, nombre: "", descripcion: "" });
+    setFormTipoDoc({ id: null, descripcion: "" });
     setErrorTipoDoc({});
     setModoEdicionTipoDoc(false);
   }
 
-  // Estado para el control del formulario de Rango Institucional (creación y edición)
-  const [formRango, setFormRango] = useState({ id: null, descripcion: "", nivelPrioridad: "" });
-  const [errorRango, setErrorRango] = useState({});
-  const [modoEdicionRango, setModoEdicionRango] = useState(false);
+  
+
+  /**
+   * Procesa los cambios en los campos de entrada del formulario de persona.
+   */
+  function manejarCambioPersona(e) {
+    const { name, value } = e.target;
+    setFormPersona({
+      ...formPersona,
+      [name]: name === "tipoDocumentoId" ? parseInt(value, 10) || "" : value,
+    });
+  }
+
+  /**
+   * Valida la estructura, tipos de datos y restricciones de negocio para la entidad persona.
+   */
+  function validarPersona() {
+    const errores = {};
+
+    if (!formPersona.nombre.trim()) {
+      errores.nombre = "El nombre es requerido.";
+    }
+    if (!formPersona.apellido.trim()) {
+      errores.apellido = "El apellido es requerido.";
+    }
+    if (!formPersona.tipoDocumentoId) {
+      errores.tipoDocumentoId = "Debe seleccionar un tipo de documento.";
+    }
+    if (false && !formPersona.documento.trim()) {
+      errores.documento = "El número de documento es requerido.";
+    } else {
+      // Validación de unicidad de documento (exceptuando el registro en edición)
+      const duplicadoDoc = personas.some(
+        (p) => p.documento.trim() === formPersona.documento.trim() && p.id !== formPersona.id
+      );
+      if (duplicadoDoc) {
+        errores.documento = "Ya existe una persona registrada con este número de documento.";
+      }
+    }
+    if (false && !formPersona.email.trim()) {
+      errores.email = "El correo electrónico es requerido.";
+    } else if (false) {
+      errores.email = "Ingrese una dirección de correo electrónico válida.";
+    }
+
+    setErrorPersona(errores);
+    return Object.keys(errores).length === 0;
+  }
+
+  /**
+   * Guarda o actualiza una persona utilizando el servicio asíncrono.
+   * Se comunica con POST/PUT en /api/v1/personas.
+   */
+  async function guardarPersona(e) {
+    e.preventDefault();
+    if (!validarPersona()) return;
+
+    try {
+      let response;
+      const payload = {
+        nombre: formPersona.nombre,
+        apellido: formPersona.apellido,
+        td_id: formPersona.tipoDocumentoId,
+      };
+
+      if (modoEdicionPersona) {
+        response = await personaService.actualizar(formPersona.id, payload);
+      } else {
+        response = await personaService.crear(payload);
+      }
+
+      if (response.status === "error") {
+        setErrorPersona(response.errors || {});
+        alert(response.message || "Error al procesar persona.");
+        return;
+      }
+
+      alert(response.message || "Persona guardada con éxito.");
+      const actualizadas = await personaService.obtenerTodas();
+      const personasMapeadas = (actualizadas.data || []).map((p) => ({
+        ...p,
+        tipoDocumentoId: p.td_id,
+        documento: p.numero_doc,
+      }));
+      setPersonas(personasMapeadas);
+      limpiarFormPersona();
+      setMostrarModalPersona(false);
+    } catch (err) {
+      console.error("Error al guardar persona:", err);
+      alert("Error al procesar la solicitud en el servidor.");
+    }
+  }
+
+  /**
+   * Carga los datos de una persona seleccionada para su edición.
+   */
+  function editarPersona(pers) {
+    setFormPersona(pers);
+    setModoEdicionPersona(true);
+    setErrorPersona({});
+    // Se abre el modal de Persona al iniciar la edicion
+    setMostrarModalPersona(true);
+  }
+
+  /**
+   * Elimina un registro de persona utilizando el servicio asíncrono.
+   * Se comunica con DELETE en /api/v1/personas/:id.
+   */
+  async function eliminarPersona(id) {
+    if (confirm("¿Confirma la eliminación de este registro de persona?")) {
+      try {
+        const response = await personaService.eliminar(id);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+        alert(response.message || "Persona eliminada con éxito.");
+        const actualizadas = await personaService.obtenerTodas();
+        const personasMapeadas = (actualizadas.data || []).map((p) => ({
+          ...p,
+          tipoDocumentoId: p.td_id,
+          documento: p.numero_doc,
+        }));
+        setPersonas(personasMapeadas);
+        if (formPersona.id === id) limpiarFormPersona();
+      } catch (err) {
+        console.error("Error al eliminar persona:", err);
+        alert("Error al intentar eliminar el registro.");
+      }
+    }
+  }
+
+  /**
+   * Restablece el estado del formulario de persona.
+   */
+  function limpiarFormPersona() {
+    setFormPersona({
+      id: null,
+      nombre: "",
+      apellido: "",
+      tipoDocumentoId: "",
+      documento: "",
+      email: "",
+    });
+    setErrorPersona({});
+    setModoEdicionPersona(false);
+  }
+
+  
 
   /**
    * Procesa los cambios en los campos de entrada del formulario de rango.
@@ -276,7 +434,7 @@ function ConfigDocumentos() {
 
   /**
    * Guarda o actualiza un rango utilizando el servicio asíncrono.
-   * Se comunica con POST/PUT en /api/v1/rangos.
+   * Se comunica con POST/PUT en /rangos-institucionales.
    */
   async function guardarRango(e) {
     e.preventDefault();
@@ -286,7 +444,8 @@ function ConfigDocumentos() {
       let response;
       const payload = {
         descripcion: formRango.descripcion,
-        nivel_prioridad: formRango.nivelPrioridad,
+        nivel_jerarquia: Number(formRango.nivelPrioridad),
+        usuario_accion: 1,
       };
 
       if (modoEdicionRango) {
@@ -305,7 +464,7 @@ function ConfigDocumentos() {
       const actualizados = await rangoService.obtenerTodos();
       const rangosMapeados = (actualizados.data || []).map((r) => ({
         ...r,
-        nivelPrioridad: r.nivel_prioridad,
+          nivelPrioridad: r.nivel_jerarquia ?? r.nivel_prioridad,
       }));
       setRangos(rangosMapeados);
       limpiarFormRango();
@@ -329,7 +488,7 @@ function ConfigDocumentos() {
 
   /**
    * Elimina un rango utilizando el servicio asíncrono.
-   * Se comunica con DELETE en /api/v1/rangos/:id.
+   * Se comunica con DELETE en /rangos-institucionales/:id.
    */
   async function eliminarRango(id) {
     if (confirm("¿Confirma la eliminación de este rango institucional?")) {
@@ -343,7 +502,7 @@ function ConfigDocumentos() {
         const actualizados = await rangoService.obtenerTodos();
         const rangosMapeados = (actualizados.data || []).map((r) => ({
           ...r,
-          nivelPrioridad: r.nivel_prioridad,
+          nivelPrioridad: r.nivel_jerarquia ?? r.nivel_prioridad,
         }));
         setRangos(rangosMapeados);
         if (formRango.id === id) limpiarFormRango();
@@ -363,7 +522,11 @@ function ConfigDocumentos() {
     setModoEdicionRango(false);
   }
 
-
+  // Retorna el nombre legible del tipo de documento según su id (utilizado en la lista de personas)
+  function obtenerNombreTipoDocumento(id) {
+    const encontrado = tiposDocumento.find((td) => td.id === id);
+    return encontrado ? encontrado.descripcion : "No definido";
+  }
 
   // Retorna el nombre legible de la sede según su id
   function obtenerNombreSede(id) {
@@ -384,6 +547,108 @@ function ConfigDocumentos() {
   }
 
   
+  // Procesa los cambios en los campos de entrada del formulario de tipos de sede.
+  function manejarCambioTipoSede(e) {
+    const { name, value } = e.target;
+    setFormTipoSede({ ...formTipoSede, [name]: value });
+  }
+
+  // Valida que los campos obligatorios del formulario de tipos de sede no se encuentren vacios.
+  function validarTipoSede() {
+    const errores = {};
+    if (!formTipoSede.descripcion.trim()) {
+      errores.descripcion = "La descripcion del tipo de sede es requerida.";
+    }
+
+    const duplicado = tiposSedes.some(
+      (tipo) =>
+        tipo.descripcion.toLowerCase() === formTipoSede.descripcion.toLowerCase() &&
+        tipo.id !== formTipoSede.id
+    );
+    if (duplicado) {
+      errores.descripcion = "Ya existe un tipo de sede con esa descripcion.";
+    }
+
+    setErrorTipoSede(errores);
+    return Object.keys(errores).length === 0;
+  }
+
+  // Guarda la nueva tipo de sede o actualiza el registro existente.
+  async function guardarTipoSede(e) {
+    e.preventDefault();
+    if (!validarTipoSede()) return;
+
+    try {
+      let response;
+      const payload = {
+        descripcion: formTipoSede.descripcion,
+        usuario_accion: 1,
+      };
+
+      if (modoEdicionTipoSede) {
+        response = await tipoSedeService.actualizar(formTipoSede.id, payload);
+      } else {
+        response = await tipoSedeService.crear(payload);
+      }
+
+      if (response.status === "error") {
+        setErrorTipoSede(response.errors || {});
+        alert(response.message || "Error al procesar tipo de sede.");
+        return;
+      }
+
+      alert(response.message || "Tipo de sede guardado con exito.");
+      const actualizados = await tipoSedeService.obtenerTodas();
+      setTiposSedes(actualizados.data || []);
+      limpiarFormTipoSede();
+      setMostrarModalTipoSede(false);
+    } catch (err) {
+      console.error("Error al guardar tipo de sede:", err);
+      alert("Error al procesar la solicitud en el servidor.");
+    }
+  }
+
+  // Carga los datos del tipo de sede seleccionado en el formulario.
+  function editarTipoSede(tipoSede) {
+    setFormTipoSede(tipoSede);
+    setModoEdicionTipoSede(true);
+    setErrorTipoSede({});
+    setMostrarModalTipoSede(true);
+  }
+
+  // Elimina un tipo de sede validando que no tenga sedes asociadas.
+  async function eliminarTipoSede(id) {
+    const enUso = sedes.some((s) => s.tipo_sede_id === id);
+    if (enUso) {
+      alert("No es posible eliminar el tipo de sede. Existen sedes asociadas a este tipo.");
+      return;
+    }
+
+    if (confirm("Confirma la eliminacion de este registro de tipo de sede?")) {
+      try {
+        const response = await tipoSedeService.eliminar(id);
+        if (response.status === "error") {
+          alert(response.message);
+          return;
+        }
+
+        alert(response.message || "Tipo de sede eliminado con exito.");
+        const actualizados = await tipoSedeService.obtenerTodas();
+        setTiposSedes(actualizados.data || []);
+        if (formTipoSede.id === id) limpiarFormTipoSede();
+      } catch (err) {
+        console.error("Error al eliminar tipo de sede:", err);
+        alert("Error al intentar eliminar el registro.");
+      }
+    }
+  }
+
+  // Restablece los campos del formulario de tipos de sede.
+  function limpiarFormTipoSede() {
+    setFormTipoSede({ id: null, descripcion: "" });
+    setErrorTipoSede({});
+    setModoEdicionTipoSede(false);
+  }
 
   // Procesa los cambios en los campos de entrada del formulario de sedes.
   function manejarCambioSede(e) {
@@ -394,6 +659,9 @@ function ConfigDocumentos() {
   // Valida que los campos obligatorios del formulario de sedes no se encuentren vacíos.
   function validarSede() {
     const errores = {};
+    if (!formSede.tipo_sede_id) {
+      errores.tipo_sede_id = "El tipo de sede es requerido.";
+    }
     if (!formSede.nombre.trim()) {
       errores.nombre = "El nombre de la sede es requerido.";
     }
@@ -413,8 +681,10 @@ function ConfigDocumentos() {
     try {
       let response;
       const payload = {
+        tipo_sede_id: Number(formSede.tipo_sede_id),
         nombre: formSede.nombre,
         direccion: formSede.direccion,
+        usuario_accion: 1,
       };
 
       if (modoEdicionSede) {
@@ -477,7 +747,7 @@ function ConfigDocumentos() {
 
   // Restablece los campos del formulario de sedes y limpia los registros de errores asociados.
   function limpiarFormSede() {
-    setFormSede({ id: null, nombre: "", direccion: "" });
+    setFormSede({ id: null, tipo_sede_id: "", nombre: "", direccion: "" });
     setErrorSede({});
     setModoEdicionSede(false);
   }
@@ -818,7 +1088,6 @@ function ConfigDocumentos() {
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-50">
                       <tr className="border-b border-slate-200">
-                        <th className="px-5 py-4 text-slate-700 font-bold">Sigla</th>
                         <th className="px-5 py-4 text-slate-700 font-bold">Descripción</th>
                         <th className="px-5 py-4 text-slate-700 font-bold text-center">Acciones</th>
                       </tr>
@@ -827,8 +1096,7 @@ function ConfigDocumentos() {
                       {tiposDocumento.length > 0 ? (
                         tiposDocumento.map((td) => (
                           <tr key={td.id} className="border-b border-slate-200 hover:bg-slate-50">
-                            <td className="px-5 py-4 text-slate-800 font-bold">{td.nombre}</td>
-                            <td className="px-5 py-4 text-slate-600">{td.descripcion}</td>
+                            <td className="px-5 py-4 text-slate-800 font-bold">{td.descripcion}</td>
                             <td className="px-5 py-4">
                               <div className="flex items-center justify-center gap-3">
                                 <button
@@ -851,7 +1119,7 @@ function ConfigDocumentos() {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="3" className="text-center py-8 text-slate-400">
+                          <td colSpan="2" className="text-center py-8 text-slate-400">
                             No se registran tipos de documento en el sistema.
                           </td>
                         </tr>
@@ -883,7 +1151,7 @@ function ConfigDocumentos() {
                     </div>
 
                     <form onSubmit={guardarTipoDoc} className="space-y-5">
-                      <div>
+                      <div className="hidden">
                         <label className="block text-sm font-bold text-slate-700 mb-2">
                           Sigla / Nombre *
                         </label>
@@ -959,7 +1227,293 @@ function ConfigDocumentos() {
             </>
           )}
 
+          {/* TAB: PERSONA */}
+          {pestanaActiva === "persona" && (
+            <>
+              {/* Tabla de Registros (ahora ocupa todo el ancho) */}
+              <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                  <h2 className="text-xl font-bold text-slate-800">
+                    Registros de Personas
+                  </h2>
+                  {/* Botón para abrir la pantalla/modal de agregar */}
+                  <button
+                    onClick={() => {
+                      limpiarFormPersona();
+                      setMostrarModalPersona(true);
+                    }}
+                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                  >
+                    <PlusCircle size={16} />
+                    Agregar Persona
+                  </button>
+                </div>
+                <div className="md:hidden space-y-3">
+                  {personas.length > 0 ? (
+                    personas.map((p) => (
+                      <div key={p.id} className="border border-slate-200 rounded-lg p-4 bg-white">
+                        <div className="mb-3">
+                          <p className="text-xs text-slate-500 font-bold">Nombre Completo</p>
+                          <p className="text-slate-800 font-bold">
+                            {p.apellido}, {p.nombre}
+                          </p>
+                        </div>
+                        <div className="mb-3">
+                          <p className="text-xs text-slate-500 font-bold">Tipo Doc.</p>
+                          <span className="inline-flex bg-slate-100 border border-slate-300 text-slate-700 text-xs px-2 py-1 rounded font-bold">
+                            {obtenerNombreTipoDocumento(p.tipoDocumentoId)}
+                          </span>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-xs text-slate-500 font-bold">Nro. Documento</p>
+                          <p className="text-slate-700 font-medium">{p.documento}</p>
+                        </div>
+                        <div className="flex items-center gap-4 border-t border-slate-200 pt-3">
+                          <button
+                            onClick={() => editarPersona(p)}
+                            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                          >
+                            <Pencil size={16} />
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => eliminarPersona(p.id)}
+                            className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                          >
+                            <Trash2 size={16} />
+                            Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="border border-slate-200 rounded-lg p-6 text-center text-slate-400 bg-white">
+                      No se registran personas en el sistema.
+                    </div>
+                  )}
+                </div>
 
+                <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-xl">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-slate-50">
+                      <tr className="border-b border-slate-200">
+                        <th className="px-5 py-4 text-slate-700 font-bold">Nombre Completo</th>
+                        <th className="px-5 py-4 text-slate-700 font-bold">Tipo Doc.</th>
+                        <th className="px-5 py-4 text-slate-700 font-bold">Nro. Documento</th>
+                        <th className="px-5 py-4 text-center text-slate-700 font-bold">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {personas.length > 0 ? (
+                        personas.map((p) => (
+                          <tr key={p.id} className="border-b border-slate-200 hover:bg-slate-50">
+                            <td className="px-5 py-4 text-slate-800 font-semibold">
+                              {p.apellido}, {p.nombre}
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="bg-slate-100 border border-slate-300 text-slate-700 text-xs px-2 py-1 rounded font-bold">
+                                {obtenerNombreTipoDocumento(p.tipoDocumentoId)}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 text-slate-600 font-medium">{p.documento}</td>
+                            <td className="px-5 py-4">
+                              <div className="flex items-center justify-center gap-3">
+                                <button
+                                  onClick={() => editarPersona(p)}
+                                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                >
+                                  <Pencil size={16} />
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => eliminarPersona(p.id)}
+                                  className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                >
+                                  <Trash2 size={16} />
+                                  Eliminar
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4" className="text-center py-8 text-slate-400">
+                            No se registran personas en el sistema.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Formulario en Modal Emergente */}
+              {mostrarModalPersona && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
+                    <button
+                      onClick={() => {
+                        limpiarFormPersona();
+                        setMostrarModalPersona(false);
+                      }}
+                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                      title="Cerrar modal"
+                    >
+                      <X size={20} />
+                    </button>
+                    
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold text-slate-800">
+                        {modoEdicionPersona ? "Editar Persona" : "Nueva Persona"}
+                      </h2>
+                    </div>
+
+                    <form onSubmit={guardarPersona} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Nombre *</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <select
+                            name="nombre"
+                            value={formPersona.nombre}
+                            onChange={manejarCambioPersona}
+                            placeholder="Ej: Juan Pablo"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.nombre
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorPersona.nombre && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.nombre}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Apellido *</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <select
+                            name="apellido"
+                            value={formPersona.apellido}
+                            onChange={manejarCambioPersona}
+                            placeholder="Ej: González"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.apellido
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorPersona.apellido && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.apellido}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          Tipo de Documento *
+                        </label>
+                        <div className="relative">
+                          <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <select
+                            name="tipoDocumentoId"
+                            value={formPersona.tipoDocumentoId}
+                            onChange={manejarCambioPersona}
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.tipoDocumentoId
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          >
+                            <option value="">Seleccionar tipo</option>
+                            {tiposDocumento.map((td) => (
+                              <option key={td.id} value={td.id}>
+                                {td.descripcion}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {errorPersona.tipoDocumentoId && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.tipoDocumentoId}</p>
+                        )}
+                      </div>
+
+                      <div className="hidden">
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          N° Documento *
+                        </label>
+                        <div className="relative">
+                          <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <input
+                            type="text"
+                            name="documento"
+                            value={formPersona.documento}
+                            onChange={manejarCambioPersona}
+                            placeholder="Ej: 32456789"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.documento
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorPersona.documento && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.documento}</p>
+                        )}
+                      </div>
+
+                      <div className="hidden">
+                        <label className="block text-sm font-bold text-slate-700 mb-2">
+                          Email Institucional/Personal *
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                          <input
+                            type="email"
+                            name="email"
+                            value={formPersona.email}
+                            onChange={manejarCambioPersona}
+                            placeholder="Ej: correo@bomberos.org"
+                            className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                              errorPersona.email
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-slate-300 focus:ring-red-500"
+                            }`}
+                          />
+                        </div>
+                        {errorPersona.email && (
+                          <p className="text-red-600 text-xs mt-1">{errorPersona.email}</p>
+                        )}
+                      </div>
+
+                      <div className="flex gap-3 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            limpiarFormPersona();
+                            setMostrarModalPersona(false);
+                          }}
+                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                        >
+                          <PlusCircle size={18} />
+                          {modoEdicionPersona ? "Guardar" : "Agregar"}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
 
           {/* TAB: RANGO INSTITUCIONAL */}
           {pestanaActiva === "rango_institucional" && (
@@ -1059,33 +1613,22 @@ function ConfigDocumentos() {
                     <form onSubmit={guardarRango} className="space-y-5">
                       <div>
                         <label className="block text-sm font-bold text-slate-700 mb-2">
-                          Denominación Oficial *
+                          Denominacion Oficial *
                         </label>
                         <div className="relative">
                           <Shield className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                          <select
+                          <input
+                            type="text"
                             name="descripcion"
                             value={formRango.descripcion}
                             onChange={manejarCambioRango}
+                            placeholder="Ej: Bombero"
                             className={`w-full h-11 pl-10 pr-4 border rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 ${
                               errorRango.descripcion
                                 ? "border-red-500 focus:ring-red-500"
                                 : "border-slate-300 focus:ring-red-500"
                             }`}
-                          >
-                            <option value="">Seleccione una Denominación</option>
-                            <option value="Aspirante">Aspirante</option>
-                            <option value="Bombero">Bombero</option>
-                            <option value="Cabo">Cabo</option>
-                            <option value="Cabo Primero">Cabo Primero</option>
-                            <option value="Sargento">Sargento</option>
-                            <option value="Sargento Primero">Sargento Primero</option>
-                            <option value="Suboficial Principal">Suboficial Principal</option>
-                            <option value="Suboficial Mayor">Suboficial Mayor</option>
-                            <option value="Oficial Inspector">Oficial Inspector</option>
-                            <option value="Oficial Principal">Oficial Principal</option>
-                            <option value="Comandante">Comandante</option>
-                          </select>
+                          />
                         </div>
                         {errorRango.descripcion && (
                           <p className="text-red-600 text-xs mt-1">{errorRango.descripcion}</p>
@@ -1151,6 +1694,17 @@ function ConfigDocumentos() {
               <div className="lg:col-span-3 mb-2 bg-white border border-slate-200 p-2.5 rounded-2xl shadow-sm">
                 <div className="flex gap-3">
                   <button
+                    onClick={() => setSubPestanaActiva("tipos_sedes")}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all ${
+                      subPestanaActiva === "tipos_sedes"
+                        ? "bg-red-700 text-white shadow"
+                        : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    <Building2 size={18} />
+                    Tipos de Sede
+                  </button>
+                  <button
                     onClick={() => setSubPestanaActiva("sedes")}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all ${
                       subPestanaActiva === "sedes"
@@ -1185,6 +1739,141 @@ function ConfigDocumentos() {
                   </button>
                 </div>
               </div>
+
+              {/* VISTA INTERNA: TIPOS DE SEDE */}
+              {subPestanaActiva === "tipos_sedes" && (
+                <>
+                  <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                      <h2 className="text-xl font-bold text-slate-800 font-bold">
+                        Registros de Tipos de Sede
+                      </h2>
+                      <button
+                        onClick={() => {
+                          limpiarFormTipoSede();
+                          setMostrarModalTipoSede(true);
+                        }}
+                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                      >
+                        <PlusCircle size={16} />
+                        Agregar Tipo
+                      </button>
+                    </div>
+                    <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                      <table className="w-full text-left border-collapse">
+                        <thead className="bg-slate-50">
+                          <tr className="border-b border-slate-200">
+                            <th className="px-5 py-4 text-slate-700 font-bold">Descripcion</th>
+                            <th className="px-5 py-4 text-center text-slate-700 font-bold">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tiposSedes.length > 0 ? (
+                            tiposSedes.map((tipo) => (
+                              <tr key={tipo.id} className="border-b border-slate-200 hover:bg-slate-50">
+                                <td className="px-5 py-4 text-slate-800 font-bold">{tipo.descripcion}</td>
+                                <td className="px-5 py-4">
+                                  <div className="flex items-center justify-center gap-3">
+                                    <button
+                                      onClick={() => editarTipoSede(tipo)}
+                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                    >
+                                      <Pencil size={16} />
+                                      Editar
+                                    </button>
+                                    <button
+                                      onClick={() => eliminarTipoSede(tipo.id)}
+                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                    >
+                                      <Trash2 size={16} />
+                                      Eliminar
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="2" className="text-center py-8 text-slate-400">
+                                No se registran tipos de sede en el sistema.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {mostrarModalTipoSede && (
+                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
+                        <button
+                          onClick={() => {
+                            limpiarFormTipoSede();
+                            setMostrarModalTipoSede(false);
+                          }}
+                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                          title="Cerrar modal"
+                        >
+                          <X size={20} />
+                        </button>
+
+                        <div className="flex justify-between items-center mb-6">
+                          <h2 className="text-xl font-bold text-slate-800">
+                            {modoEdicionTipoSede ? "Editar Tipo de Sede" : "Nuevo Tipo de Sede"}
+                          </h2>
+                        </div>
+
+                        <form onSubmit={guardarTipoSede} className="space-y-5">
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Descripcion *
+                            </label>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                              <input
+                                type="text"
+                                name="descripcion"
+                                value={formTipoSede.descripcion}
+                                onChange={manejarCambioTipoSede}
+                                placeholder="Ej: Central"
+                                className={`w-full h-11 pl-10 pr-4 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
+                                  errorTipoSede.descripcion
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-slate-300 focus:ring-red-500"
+                                }`}
+                              />
+                            </div>
+                            {errorTipoSede.descripcion && (
+                              <p className="text-red-600 text-xs mt-1">{errorTipoSede.descripcion}</p>
+                            )}
+                          </div>
+
+                          <div className="flex gap-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                limpiarFormTipoSede();
+                                setMostrarModalTipoSede(false);
+                              }}
+                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="submit"
+                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                            >
+                              <PlusCircle size={18} />
+                              {modoEdicionTipoSede ? "Guardar" : "Agregar"}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
 
               {/* VISTA INTERNA: SEDES */}
               {subPestanaActiva === "sedes" && (
@@ -1276,6 +1965,32 @@ function ConfigDocumentos() {
                         </div>
 
                         <form onSubmit={guardarSede} className="space-y-5">
+                          <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                              Tipo de Sede *
+                            </label>
+                            <select
+                              name="tipo_sede_id"
+                              value={formSede.tipo_sede_id}
+                              onChange={manejarCambioSede}
+                              className={`w-full h-11 px-3 border rounded-lg text-slate-700 bg-white focus:outline-none focus:ring-2 ${
+                                errorSede.tipo_sede_id
+                                  ? "border-red-500 focus:ring-red-500"
+                                  : "border-slate-300 focus:ring-red-500"
+                              }`}
+                            >
+                              <option value="">Seleccione tipo de sede</option>
+                              {tiposSedes.map((tipo) => (
+                                <option key={tipo.id} value={tipo.id}>
+                                  {tipo.descripcion}
+                                </option>
+                              ))}
+                            </select>
+                            {errorSede.tipo_sede_id && (
+                              <p className="text-red-600 text-xs mt-1">{errorSede.tipo_sede_id}</p>
+                            )}
+                          </div>
+
                           <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">
                               Nombre de la Sede *

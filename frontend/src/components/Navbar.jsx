@@ -34,7 +34,7 @@ function Navbar() {
           <img
             src="/logo.jpeg"
             alt="Logo"
-            className="h-14 w-14 rounded-full object-cover border border-red-500 shadow-sm transition-transform duration-200 hover:scale-105"
+            className="h-24 w-24 shrink-0 rounded-full object-cover border border-red-500 shadow-sm"
           />
           <div>
             <h1 className="text-xl md:text-2xl font-bold leading-tight">
