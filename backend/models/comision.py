@@ -7,7 +7,7 @@ class Comision(db.Model):
     # Nombre de la tabla asociada en la base de datos.
     __tablename__ = "comisiones"
 
-    # Identificador principal de la comisión.
+    # Identificador principal de la comision
     id_comision: Mapped[int] = mapped_column(
         "idComision",
         Integer,
@@ -15,7 +15,7 @@ class Comision(db.Model):
         autoincrement=True
     )
 
-    # Relación con el plan de asignaturas.
+    # Relacion con el plan de asignaturas
     plan_asignaturas_id: Mapped[int] = mapped_column(
         "planAsignaturasId",
         Integer,
@@ -23,7 +23,7 @@ class Comision(db.Model):
         nullable=False
     )
 
-    # Relación con el aula.
+    # Relacion con el aula
     aula_id: Mapped[int] = mapped_column(
         "aulaId",
         Integer,
@@ -31,40 +31,40 @@ class Comision(db.Model):
         nullable=False
     )
 
-    # Nombre de la comisión.
+    # Nombre de la comision
     nombre: Mapped[str] = mapped_column(
         String(45),
         nullable=False
     )
 
-    # Modalidad (ej: Presencial, Virtual).
+    # Modalidad (Presencial, Virtual) // Ojo cambiar por ID
     modalidad: Mapped[str] = mapped_column(
         String(45),
         nullable=False
     )
 
-    # Cupo máximo de alumnos para la comisión.
+    # Cupo maximo de alumnos para la comision
     cupo_maximo: Mapped[int] = mapped_column(
         "cupoMaximo",
         Integer,
         nullable=False
     )
 
-    # Estado del registro dentro del sistema.
+    # Estado del registro dentro del sistema
     estado: Mapped[str] = mapped_column(
         String(45),
         nullable=False,
         default="Activo"
     )
 
-    # Usuario que realizó la última acción sobre el registro.
+    # Usuario que realizo la última accion sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
         nullable=False
     )
 
-    # Fecha y hora de creación del registro.
+    # Fecha y hora de creacion del registro
     ts_creacion: Mapped[datetime] = mapped_column(
         "tsCreacion",
         DateTime,
@@ -72,7 +72,7 @@ class Comision(db.Model):
         nullable=False
     )
 
-    # Fecha y hora de la última modificación del registro.
+    # Fecha y hora de la ultima modificacion del registro
     ts_modificacion: Mapped[datetime] = mapped_column(
         "tsModificacion",
         DateTime,

@@ -14,7 +14,7 @@ class Aula(db.Model):
         autoincrement=True
     )
 
-    # Relación con la sede
+    # Relacion con la sede
     sedes_id: Mapped[int] = mapped_column(
         "sedesId",
         Integer,
@@ -22,21 +22,21 @@ class Aula(db.Model):
         nullable=False
     )
 
-    # Nombre o número del aula
+    # Nombre o numero del aula
     aula: Mapped[str] = mapped_column(
         "aula",
         String(45),
         nullable=False
     )
 
-    # Indica si es aula virtual (1 = Sí, 0 = No)
+    # Indica si es aula virtual (1 = Si, 0 = No)
     es_virtual: Mapped[int] = mapped_column(
         "esVirtual",
         Integer,
         nullable=False
     )
 
-    # Usuario que realizó la última acción sobre el registro
+    # Usuario que realizo la última accion sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
@@ -51,7 +51,7 @@ class Aula(db.Model):
     )
 
 
-    # Fecha y hora de creación del registro
+    # Fecha y hora de creacion del registro
     ts_creacion: Mapped[datetime] = mapped_column(
         "tsCreacion",
         DateTime,
@@ -59,7 +59,7 @@ class Aula(db.Model):
         nullable=False
     )
 
-    # Fecha y hora de la última modificación del registro
+    # Fecha y hora de la ultima modificacion del registro
     ts_modificacion: Mapped[datetime] = mapped_column(
         "tsModificacion",
         DateTime,

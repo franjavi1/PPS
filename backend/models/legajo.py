@@ -6,17 +6,17 @@ from sqlalchemy import Integer, String, DateTime, ForeignKey, func
 
 
 class Legajo(db.Model):
-    # Nombre de la tabla asociada en la base de datos.
+    # Nombre de la tabla asociada en la base de datos
     __tablename__ = "legajos"
 
-    # Identificador principal del legajo.
+    # ID principal del legajo
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Persona asociada al legajo.
+    # Persona asociada al legajo
     persona_id: Mapped[int] = mapped_column(
         "personasId",
         Integer,
@@ -30,21 +30,21 @@ class Legajo(db.Model):
         nullable=False
     )
 
-    # Estado del registro dentro del sistema.
+    # Estado del registro dentro del sistema
     estado: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
         default=1
     )
 
-    # Usuario que realizo la ultima accion sobre el registro.
+    # Usuario que realizo la ultima accion sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
         nullable=False
     )
 
-    # Fecha y hora de creacion del registro.
+    # Fecha y hora de creacion del registro
     ts_creacion: Mapped[datetime] = mapped_column(
         "tsCreacion",
         DateTime,
@@ -52,7 +52,7 @@ class Legajo(db.Model):
         nullable=False
     )
 
-    # Fecha y hora de la ultima modificacion del registro.
+    # Fecha y hora de la ultima modificacion del registro
     ts_modificacion: Mapped[datetime] = mapped_column(
         "tsModificacion",
         DateTime,

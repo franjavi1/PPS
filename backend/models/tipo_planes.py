@@ -5,10 +5,10 @@ from sqlalchemy import Integer, String, DateTime, func
 
 
 class TipoPlanes(db.Model):
-    # Nombre de la tabla asociada en la base de datos.
+    # Nombre de la tabla asociada en la base de datos
     __tablename__ = "tipos_planes"
 
-    # Identificador principal del tipo de plan.
+    # Identificador principal del tipo de plan
     id_tipo_planes: Mapped[int] = mapped_column(
         "idTipoPlanes",
         Integer,
@@ -16,20 +16,20 @@ class TipoPlanes(db.Model):
         autoincrement=True
     )
 
-    # Descripcion del tipo de plan.
+    # Descripcion del tipo de plan
     descripcion: Mapped[str] = mapped_column(
         String(100),
         nullable=False
     )
 
-    # Usuario que realizo la ultima accion sobre el registro.
+    # Usuario que realizo la ultima accion sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
         nullable=False
     )
 
-    # Fecha y hora de creacion del registro.
+    # Fecha y hora de creacion del registro
     ts_creacion: Mapped[datetime] = mapped_column(
         "tsCreacion",
         DateTime,
@@ -37,7 +37,7 @@ class TipoPlanes(db.Model):
         nullable=False
     )
 
-    # Fecha y hora de la ultima modificacion del registro.
+    # Fecha y hora de la ultima modificacion del registro
     ts_modificacion: Mapped[datetime] = mapped_column(
         "tsModificacion",
         DateTime,
