@@ -1,4 +1,4 @@
-from models.tipo_autoridad import TipoAutoridad
+from models.tipos_autoridad import TipoAutoridad
 from db import ma
 from marshmallow import ValidationError, validates, pre_load
 from marshmallow.validate import Length

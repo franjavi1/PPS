@@ -44,6 +44,14 @@ class Aula(db.Model):
         nullable=False
     )
 
+    # Estado del registro dentro del sistema.
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
+
     # Fecha y hora de creación del registro
     ts_creacion: Mapped[datetime] = mapped_column(
         "tsCreacion",

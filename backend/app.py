@@ -29,7 +29,7 @@ from routes.tipos_sedes import tipos_sedes_bp
 from routes.sedes import sedes_bp
 from routes.comisiones import comisiones_bp
 from routes.aulas import aulas_bp
-from routes.pa_correlativas import pa_correlativa_bp
+from routes.pa_correlativas import pa_correlativas_bp
 from routes.tipos_autoridad import tipos_autoridad_bp
 from routes.planes_asignaturas import planes_asignaturas_bp
 from routes.legajos import legajos_bp
@@ -61,7 +61,7 @@ app.register_blueprint(tipos_sedes_bp)
 app.register_blueprint(sedes_bp)
 app.register_blueprint(comisiones_bp)
 app.register_blueprint(aulas_bp)
-app.register_blueprint(pa_correlativa_bp)
+app.register_blueprint(pa_correlativas_bp)
 app.register_blueprint(tipos_autoridad_bp)
 app.register_blueprint(planes_asignaturas_bp)
 app.register_blueprint(legajos_bp)

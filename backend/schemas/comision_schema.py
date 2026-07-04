@@ -65,9 +65,6 @@ class ComisionSchema(ma.SQLAlchemySchema):
         }
     )
 
-    # Estado actual del registro.
-    estado = ma.auto_field(dump_only=True)
-
     # Usuario que realiza la acción sobre el registro.
     usuario_accion = ma.auto_field(
         required=True,

@@ -21,6 +21,9 @@ class AulaSchema(ma.SQLAlchemySchema):
         }
     )
 
+    # Estado actual del registro.
+    estado = ma.auto_field(dump_only=True)
+
     aula = ma.auto_field(
         required=True,
         allow_none=False,

@@ -7,10 +7,10 @@ Este archivo contiene la lógica de negocio del CRUD de Comision
 """
 
 def obtener_todos():
-    return Comision.query.filter_by(estado="Activo").all()
+    return Comision.query.all()
 
 def obtener_por_id(id_comision):
-    return Comision.query.filter_by(id_comision=id_comision, estado="Activo").first()
+    return Comision.query.filter_by(id_comision=id_comision).first()
 
 def crear(datos):
     nueva_comision = comision_schema.load(datos)
