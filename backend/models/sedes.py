@@ -1,25 +1,46 @@
 from datetime import datetime
 
 from db import db
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, DateTime, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Integer, String, DateTime, ForeignKey, func
 
 
-class TipoDocumento(db.Model):
+class Sedes(db.Model):
     # Nombre de la tabla asociada en la base de datos
-    __tablename__ = "tipos_documento"
+    __tablename__ = "sedes"
 
-    # ID principal del tipo de documento
+    # ID principal de la sede
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del tipo de documento
-    descripcion: Mapped[str] = mapped_column(
-        String(45),
+    # Tipo de sede asociado
+    tipo_sede_id: Mapped[int] = mapped_column(
+        "tipoSedeId",
+        Integer,
+        ForeignKey("tipos_sedes.id"),
         nullable=False
+    )
+
+    # Nombre de la sede
+    nombre: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False
+    )
+
+    # Direccion de la sede
+    direccion: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False
+    )
+
+    # Estado del registro dentro del sistema
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
     )
 
     # Usuario que realizo la ultima accion sobre el registro
@@ -44,5 +65,7 @@ class TipoDocumento(db.Model):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
-
     )
+
+    # Relacion con el modelo de tipo de sede
+    tipo_sede = relationship("TipoSede")

@@ -1,24 +1,33 @@
 from datetime import datetime
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, DateTime, func
+from sqlalchemy import Integer, DateTime, func, ForeignKey
 
-
-class TipoDocumento(db.Model):
+class PACorrelativa(db.Model):
     # Nombre de la tabla asociada en la base de datos
-    __tablename__ = "tipos_documento"
+    __tablename__ = "PACorrelativas"
 
-    # ID principal del tipo de documento
+    # ID principal
     id: Mapped[int] = mapped_column(
+        "id",
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del tipo de documento
-    descripcion: Mapped[str] = mapped_column(
-        String(45),
+    # Relacion con Asignatura
+    asignatura_id: Mapped[int] = mapped_column(
+        "asignaturaId",
+        Integer,
+        ForeignKey("asignaturas.id"),
+        nullable=False
+    )
+
+    # Relacion con Plan de Asignatura (paId)
+    pa_id: Mapped[int] = mapped_column(
+        "paId",
+        Integer,
+        ForeignKey("PlanAsignaturas.id"),
         nullable=False
     )
 
@@ -44,5 +53,4 @@ class TipoDocumento(db.Model):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
-
     )

@@ -5,20 +5,27 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, DateTime, func
 
 
-class TipoDocumento(db.Model):
+class RangosInstitucionales(db.Model):
     # Nombre de la tabla asociada en la base de datos
-    __tablename__ = "tipos_documento"
+    __tablename__ = "rangos_institucionales"
 
-    # ID principal del tipo de documento
+    # ID principal del rango institucional
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del tipo de documento
+    # Descripcion del rango institucional
     descripcion: Mapped[str] = mapped_column(
         String(45),
+        nullable=False
+    )
+
+    # Nivel de jerarquia del rango institucional
+    nivel_jerarquia: Mapped[int] = mapped_column(
+        "nivelJerarquia",
+        Integer,
         nullable=False
     )
 
@@ -44,5 +51,4 @@ class TipoDocumento(db.Model):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
-
     )

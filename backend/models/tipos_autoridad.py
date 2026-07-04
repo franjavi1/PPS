@@ -1,28 +1,35 @@
 from datetime import datetime
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, DateTime, func
 
-
-class TipoDocumento(db.Model):
+class TipoAutoridad(db.Model):
     # Nombre de la tabla asociada en la base de datos
-    __tablename__ = "tipos_documento"
+    __tablename__ = "TipoAutoridad"
 
-    # ID principal del tipo de documento
+    # ID principal
     id: Mapped[int] = mapped_column(
+        "id",
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del tipo de documento
+    # Descripción del tipo de autoridad
     descripcion: Mapped[str] = mapped_column(
+        "descripcion",
         String(45),
         nullable=False
     )
 
-    # Usuario que realizo la ultima accion sobre el registro
+    # Estado del registro dentro del sistema
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
+    # Usuario que realizo la ultima acción sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
@@ -44,5 +51,4 @@ class TipoDocumento(db.Model):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
-
     )
