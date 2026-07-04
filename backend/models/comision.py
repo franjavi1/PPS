@@ -50,6 +50,13 @@ class Comision(db.Model):
         nullable=False
     )
 
+    # Estado del registro dentro del sistema.
+    estado: Mapped[str] = mapped_column(
+        String(45),
+        nullable=False,
+        default="Activo"
+    )
+
     # Usuario que realizó la última acción sobre el registro.
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
