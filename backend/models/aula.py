@@ -9,7 +9,6 @@ class Aula(db.Model):
 
     # Identificador principal del aula
     id_aula: Mapped[int] = mapped_column(
-        "idAulas",
         Integer,
         primary_key=True,
         autoincrement=True
