@@ -11,8 +11,7 @@ import {
   RefreshCcw,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { personaService } from "../services/personaService";
-import { tipoDocumentoService } from "../services/tipoDocumentoService";
+import { apiRequest } from "../api";
 
 function Legajos() {
   const navigate = useNavigate();
