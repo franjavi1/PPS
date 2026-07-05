@@ -8,27 +8,27 @@ class Asignaturas(db.Model):
     # Nombre de la tabla asociada en la base de datos.
     __tablename__ = "asignaturas"
 
-    # Identificador principal de la asignatura.
+    # ID principal de la asignatura.
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Nombre de la asignatura.
+    # Nombre de la asignatura
     nombre: Mapped[str] = mapped_column(
         String(105),
         nullable=False
     )
 
-    # Estado del registro dentro del sistema.
+    # Estado del registro dentro del sistema
     estado: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
         default=1
     )
 
-    # Formato en el que se dicta la asignatura.
+    # Formato en el que se dicta la asignatura // Ojo, cambiar por int
     formato: Mapped[str] = mapped_column(
         String(45),
         nullable=False

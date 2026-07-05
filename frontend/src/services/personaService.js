@@ -23,6 +23,25 @@ export const personaService = {
   },
 
   /**
+   * Obtiene una persona específica por su ID.
+   */
+  async obtenerPorId(id) {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const persona = mockPersonas.find((p) => p.id === parseInt(id, 10));
+    if (!persona) {
+      return {
+        status: "error",
+        message: "Persona no encontrada.",
+      };
+    }
+    return {
+      status: "success",
+      data: persona,
+      message: "Persona recuperada con éxito",
+    };
+  },
+
+  /**
    * Crea un nuevo registro de Persona.
    */
   crear(persona) {

@@ -19,6 +19,7 @@ function Legajos() {
   const [busqueda, setBusqueda] = useState("");
   const [legajos, setLegajos] = useState([]);
   const [personas, setPersonas] = useState([]);
+  const [tiposDocumento, setTiposDocumento] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 

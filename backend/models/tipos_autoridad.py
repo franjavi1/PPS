@@ -1,35 +1,35 @@
 from datetime import datetime
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, DateTime, func
 
-
-class RangosInstitucionales(db.Model):
+class TipoAutoridad(db.Model):
     # Nombre de la tabla asociada en la base de datos
-    __tablename__ = "rangos_institucionales"
+    __tablename__ = "TipoAutoridad"
 
-    # ID principal del rango institucional
+    # ID principal
     id: Mapped[int] = mapped_column(
+        "id",
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del rango institucional
+    # Descripción del tipo de autoridad
     descripcion: Mapped[str] = mapped_column(
+        "descripcion",
         String(45),
         nullable=False
     )
 
-    # Nivel de jerarquia del rango institucional
-    nivel_jerarquia: Mapped[int] = mapped_column(
-        "nivelJerarquia",
+    # Estado del registro dentro del sistema
+    estado: Mapped[int] = mapped_column(
         Integer,
-        nullable=False
+        nullable=False,
+        default=1
     )
 
-    # Usuario que realizo la ultima accion sobre el registro
+    # Usuario que realizo la ultima acción sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,

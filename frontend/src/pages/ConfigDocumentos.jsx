@@ -4,19 +4,16 @@ import {
   Pencil,
   Trash2,
   FileText,
-  User,
   Shield,
   X,
-  Mail,
   CreditCard,
-  Sliders,
   Building2,
+  Sliders,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 
 // Importación de la capa de servicios para la integración asíncrona con el Backend (Flask + PostgreSQL)
 import { tipoDocumentoService } from "../services/tipoDocumentoService";
-import { personaService } from "../services/personaService";
 import { rangoService } from "../services/rangoService";
 import { sedeService } from "../services/sedeService";
 import { tipoSedeService } from "../services/tipoSedeService";
@@ -42,7 +39,6 @@ function ConfigDocumentos() {
   const [asignaturas, setAsignaturas] = useState([]);
   const [comisiones, setComisiones] = useState([]);
   const [tiposDocumento, setTiposDocumento] = useState([]);
-  const [personas, setPersonas] = useState([]);
   const [rangos, setRangos] = useState([]);
 
   // Carga asíncrona inicial de todas las entidades mediante Promise.all para optimizar rendimiento
@@ -51,7 +47,6 @@ function ConfigDocumentos() {
       try {
         const [resTDocs, resPers, resRgs, resSds, resTiposSedes, resAls, resAsig, resComs] = await Promise.all([
           tipoDocumentoService.obtenerTodos(),
-          personaService.obtenerTodas(),
           rangoService.obtenerTodos(),
           sedeService.obtenerTodas(),
           tipoSedeService.obtenerTodas(),
@@ -132,26 +127,8 @@ function ConfigDocumentos() {
   const [errorTipoDoc, setErrorTipoDoc] = useState({});
   const [modoEdicionTipoDoc, setModoEdicionTipoDoc] = useState(false);
 
-  // Estado para el control del formulario de Persona (creación y edición)
-  const [formPersona, setFormPersona] = useState({
-    id: null,
-    nombre: "",
-    apellido: "",
-    tipoDocumentoId: "",
-    documento: "",
-    email: "",
-  });
-  const [errorPersona, setErrorPersona] = useState({});
-  const [modoEdicionPersona, setModoEdicionPersona] = useState(false);
-
-  // Estado para el control del formulario de Rango Institucional (creación y edición)
-  const [formRango, setFormRango] = useState({ id: null, descripcion: "", nivelPrioridad: "" });
-  const [errorRango, setErrorRango] = useState({});
-  const [modoEdicionRango, setModoEdicionRango] = useState(false);
-
   // Estados para controlar la visibilidad de los modales de creación y edición (mejorando accesibilidad y control de permisos)
   const [mostrarModalTipoDoc, setMostrarModalTipoDoc] = useState(false);
-  const [mostrarModalPersona, setMostrarModalPersona] = useState(false);
   const [mostrarModalRango, setMostrarModalRango] = useState(false);
   const [mostrarModalSede, setMostrarModalSede] = useState(false);
   const [mostrarModalTipoSede, setMostrarModalTipoSede] = useState(false);
@@ -245,15 +222,6 @@ function ConfigDocumentos() {
    * Se comunica con DELETE en /api/v1/tipos-documentos/:id.
    */
   async function eliminarTipoDoc(id) {
-    // Validación de clave foránea en la lista de personas
-    const enUso = personas.some((p) => p.tipoDocumentoId === id);
-    if (enUso) {
-      alert(
-        "No es posible eliminar el tipo de documento. Existen registros de personas asociados a este tipo."
-      );
-      return;
-    }
-
     if (confirm("¿Confirma la eliminación de este registro de tipo de documento?")) {
       try {
         const response = await tipoDocumentoService.eliminar(id);
@@ -1066,17 +1034,7 @@ function ConfigDocumentos() {
             Tipos de Documento
           </button>
 
-          <button
-            onClick={() => setPestanaActiva("persona")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${
-              pestanaActiva === "persona"
-                ? "bg-red-700 text-white shadow"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            <User size={20} />
-            Personas
-          </button>
+
 
           <button
             onClick={() => setPestanaActiva("rango_institucional")}

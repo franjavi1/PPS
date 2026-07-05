@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import {
   ArrowLeft,
   Save,
@@ -12,7 +12,9 @@ import { apiRequest } from "../api";
 function NuevoLegajo() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
   const editando = Boolean(id);
+  const esVer = editando && !location.pathname.endsWith("/editar");
 
   const [personas, setPersonas] = useState([]);
   const [guardando, setGuardando] = useState(false);
@@ -101,6 +103,7 @@ function NuevoLegajo() {
       setGuardando(true);
       setErrorGeneral("");
 
+      let response;
       if (editando) {
         await apiRequest(`/legajos/${id}`, {
           method: "PUT",
@@ -192,7 +195,7 @@ function NuevoLegajo() {
               onClick={() => navigate("/legajos")}
               className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
             >
-              Cancelar
+              {esVer ? "Volver" : "Cancelar"}
             </button>
 
             <button
@@ -219,6 +222,7 @@ function CampoTexto({
   placeholder,
   icono,
   type = "text",
+  disabled = false,
 }) {
   return (
     <div>
@@ -237,6 +241,7 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          disabled={disabled}
           className={`w-full h-14 pl-12 pr-4 border rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
             error
               ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -250,7 +255,7 @@ function CampoTexto({
   );
 }
 
-function CampoSelect({ label, name, value, onChange, error, icono, opciones }) {
+function CampoSelect({ label, name, value, onChange, error, icono, opciones, disabled = false }) {
   return (
     <div>
       <label className="block text-sm font-bold text-slate-700 mb-2">
@@ -266,6 +271,7 @@ function CampoSelect({ label, name, value, onChange, error, icono, opciones }) {
           name={name}
           value={value}
           onChange={onChange}
+          disabled={disabled}
           className={`w-full h-14 pl-12 pr-4 border rounded-xl text-slate-700 bg-white focus:outline-none focus:ring-2 ${
             error
               ? "border-red-500 focus:ring-red-500 focus:border-red-500"

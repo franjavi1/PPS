@@ -1,31 +1,33 @@
 from datetime import datetime
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, DateTime, func
+from sqlalchemy import Integer, DateTime, func, ForeignKey
 
-
-class RangosInstitucionales(db.Model):
+class PACorrelativa(db.Model):
     # Nombre de la tabla asociada en la base de datos
-    __tablename__ = "rangos_institucionales"
+    __tablename__ = "PACorrelativas"
 
-    # ID principal del rango institucional
+    # ID principal
     id: Mapped[int] = mapped_column(
+        "id",
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del rango institucional
-    descripcion: Mapped[str] = mapped_column(
-        String(45),
+    # Relacion con Asignatura
+    asignatura_id: Mapped[int] = mapped_column(
+        "asignaturaId",
+        Integer,
+        ForeignKey("asignaturas.id"),
         nullable=False
     )
 
-    # Nivel de jerarquia del rango institucional
-    nivel_jerarquia: Mapped[int] = mapped_column(
-        "nivelJerarquia",
+    # Relacion con Plan de Asignatura (paId)
+    pa_id: Mapped[int] = mapped_column(
+        "paId",
         Integer,
+        ForeignKey("PlanAsignaturas.id"),
         nullable=False
     )
 

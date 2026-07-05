@@ -11,6 +11,12 @@ from models.tipo_planes import TipoPlanes
 from models.asignaturas import Asignaturas
 from models.tipo_sede import TipoSede
 from models.sedes import Sedes
+from models.comision import Comision
+from models.aula import Aula
+from models.pa_correlativa import PACorrelativa
+from models.tipos_autoridad import TipoAutoridad
+from models.plan_asignatura import PlanAsignatura
+
 from models.legajo import Legajo
 from models.rangos_institucionales import RangosInstitucionales
 
@@ -21,6 +27,11 @@ from routes.tipos_planes import tipos_planes_bp
 from routes.asignaturas import asignaturas_bp
 from routes.tipos_sedes import tipos_sedes_bp
 from routes.sedes import sedes_bp
+from routes.comisiones import comisiones_bp
+from routes.aulas import aulas_bp
+from routes.pa_correlativas import pa_correlativas_bp
+from routes.tipos_autoridad import tipos_autoridad_bp
+from routes.planes_asignaturas import planes_asignaturas_bp
 from routes.legajos import legajos_bp
 from routes.rangos_institucionales import rangos_institucionales_bp
 
@@ -48,6 +59,11 @@ app.register_blueprint(tipos_planes_bp)
 app.register_blueprint(asignaturas_bp)
 app.register_blueprint(tipos_sedes_bp)
 app.register_blueprint(sedes_bp)
+app.register_blueprint(comisiones_bp)
+app.register_blueprint(aulas_bp)
+app.register_blueprint(pa_correlativas_bp)
+app.register_blueprint(tipos_autoridad_bp)
+app.register_blueprint(planes_asignaturas_bp)
 app.register_blueprint(legajos_bp)
 app.register_blueprint(rangos_institucionales_bp)
 

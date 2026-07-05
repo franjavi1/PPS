@@ -1,40 +1,55 @@
 from datetime import datetime
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, DateTime, func
+from sqlalchemy import Integer, String, DateTime, func, ForeignKey
 
-
-class RangosInstitucionales(db.Model):
+class Aula(db.Model):
     # Nombre de la tabla asociada en la base de datos
-    __tablename__ = "rangos_institucionales"
+    __tablename__ = "Aulas"
 
-    # ID principal del rango institucional
-    id: Mapped[int] = mapped_column(
+    # Identificador principal del aula
+    id_aula: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Descripcion del rango institucional
-    descripcion: Mapped[str] = mapped_column(
+    # Relacion con la sede
+    sedes_id: Mapped[int] = mapped_column(
+        "sedesId",
+        Integer,
+        ForeignKey("sedes.id"),
+        nullable=False
+    )
+
+    # Nombre o numero del aula
+    aula: Mapped[str] = mapped_column(
+        "aula",
         String(45),
         nullable=False
     )
 
-    # Nivel de jerarquia del rango institucional
-    nivel_jerarquia: Mapped[int] = mapped_column(
-        "nivelJerarquia",
+    # Indica si es aula virtual (1 = Si, 0 = No)
+    es_virtual: Mapped[int] = mapped_column(
+        "esVirtual",
         Integer,
         nullable=False
     )
 
-    # Usuario que realizo la ultima accion sobre el registro
+    # Usuario que realizo la última accion sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
         nullable=False
     )
+
+    # Estado del registro dentro del sistema.
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
 
     # Fecha y hora de creacion del registro
     ts_creacion: Mapped[datetime] = mapped_column(

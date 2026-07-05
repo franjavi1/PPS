@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import {
   BookOpen,
@@ -23,6 +23,7 @@ function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
+
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
@@ -32,23 +33,19 @@ function Navbar() {
     setMobileOpen(false);
   };
 
-  useEffect (()=>{
-    const handleClickOutside = (event)=>{
-      if (navRef.current && !navRef.current.contains(event.target)){
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
         setOpenMenu(null);
       }
     };
-  
+
     document.addEventListener("mousedown", handleClickOutside);
 
-
-    return ()=>{
-      document.removeEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-
-  },[]);
-
-
+  }, []);
 
   const linkClass =
     "flex items-start gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-red-50 hover:text-red-700";
@@ -80,11 +77,11 @@ function Navbar() {
           <Menu size={22} />
         </button>
 
-      <nav ref={navRef} className="hidden md:flex items-center gap-1">
+        <nav ref={navRef} className="hidden md:flex items-center gap-1">
           <NavLink
             to="/inicio"
             className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2"
-          >  
+          >
             <Home size={17} />
             Inicio
           </NavLink>
@@ -100,34 +97,54 @@ function Navbar() {
               <User size={18} />
               <span>
                 <strong>Ver legajos</strong>
-                <small className="block text-slate-500">Buscar y consultar legajos</small>
+                <small className="block text-slate-500">
+                  Buscar y consultar legajos
+                </small>
               </span>
             </NavLink>
 
-            <NavLink to="/crearLegajo" className={linkClass} onClick={closeMenus}>
+            <NavLink
+              to="/crearLegajo"
+              className={linkClass}
+              onClick={closeMenus}
+            >
               <Plus size={18} />
               <span>
                 <strong>Nuevo legajo</strong>
-                <small className="block text-slate-500">Alta de persona y legajo</small>
+                <small className="block text-slate-500">
+                  Alta de persona y legajo
+                </small>
               </span>
             </NavLink>
-            
-            <NavLink to="/crearLegajo" className={linkClass} onClick={closeMenus}>
+
+            <NavLink
+              to="/crearLegajo"
+              className={linkClass}
+              onClick={closeMenus}
+            >
               <Phone size={18} />
               <span>
                 <strong>Contactos</strong>
-                <small className="block text-slate-500">Alta de persona y legajo</small>
+                <small className="block text-slate-500">
+                  Alta de persona y legajo
+                </small>
               </span>
             </NavLink>
-            <NavLink to="/crearLegajo" className={linkClass} onClick={closeMenus}>
+
+            <NavLink
+              to="/crearLegajo"
+              className={linkClass}
+              onClick={closeMenus}
+            >
               <ClipboardPlus size={18} />
               <span>
-                <strong>Datos médicos</strong>
-                <small className="block text-slate-500">Alta de persona y legajo</small>
+                <strong>Datos medicos</strong>
+                <small className="block text-slate-500">
+                  Alta de persona y legajo
+                </small>
               </span>
             </NavLink>
           </Dropdown>
-          
 
           <Dropdown
             id="planes"
@@ -140,15 +157,23 @@ function Navbar() {
               <BookOpen size={18} />
               <span>
                 <strong>Planes</strong>
-                <small className="block text-slate-500">Resolucion y vigencia</small>
+                <small className="block text-slate-500">
+                  Resolucion y vigencia
+                </small>
               </span>
             </NavLink>
 
-            <NavLink to="/asignaturas" className={linkClass} onClick={closeMenus}>
+            <NavLink
+              to="/asignaturas"
+              className={linkClass}
+              onClick={closeMenus}
+            >
               <FileText size={18} />
               <span>
                 <strong>Asignaturas</strong>
-                <small className="block text-slate-500">Materias del sistema</small>
+                <small className="block text-slate-500">
+                  Materias del sistema
+                </small>
               </span>
             </NavLink>
           </Dropdown>
@@ -161,20 +186,34 @@ function Navbar() {
             toggleMenu={toggleMenu}
           >
             <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
-            SEDES E INFRAESTRUCTURA
+              SEDES E INFRAESTRUCTURA
             </p>
-            <NavLink to="/config-documentos" className={linkClass} onClick={closeMenus}>
+
+            <NavLink
+              to="/config-documentos"
+              className={linkClass}
+              onClick={closeMenus}
+            >
               <Building2 size={18} />
               <span>
                 <strong>Sedes</strong>
-                <small className="block text-slate-500">Documentos, sedes, aulas y rangos</small>
-                </span>
-                </NavLink>
-            <NavLink to="/config-documentos" className={linkClass} onClick={closeMenus}>
+                <small className="block text-slate-500">
+                  Documentos, sedes, aulas y rangos
+                </small>
+              </span>
+            </NavLink>
+
+            <NavLink
+              to="/config-documentos"
+              className={linkClass}
+              onClick={closeMenus}
+            >
               <Building size={18} />
               <span>
                 <strong>Tipo de Sedes</strong>
-                <small className="block text-slate-500">Documentos, sedes, aulas y rangos</small>
+                <small className="block text-slate-500">
+                  Documentos, sedes, aulas y rangos
+                </small>
               </span>
             </NavLink>
           </Dropdown>
@@ -204,31 +243,59 @@ function Navbar() {
           </p>
 
           <div className="space-y-3 pt-12">
-            <MobileLink to="/inicio" icon={<Home size={20} />} onClick={closeMenus}>
+            <MobileLink
+              to="/inicio"
+              icon={<Home size={20} />}
+              onClick={closeMenus}
+            >
               Inicio
             </MobileLink>
 
-            <MobileLink to="/legajos" icon={<Folder size={20} />} onClick={closeMenus}>
+            <MobileLink
+              to="/legajos"
+              icon={<Folder size={20} />}
+              onClick={closeMenus}
+            >
               Ver legajos
             </MobileLink>
 
-            <MobileLink to="/crearLegajo" icon={<Plus size={20} />} onClick={closeMenus}>
+            <MobileLink
+              to="/crearLegajo"
+              icon={<Plus size={20} />}
+              onClick={closeMenus}
+            >
               Nuevo legajo
             </MobileLink>
 
-            <MobileLink to="/planes" icon={<BookOpen size={20} />} onClick={closeMenus}>
+            <MobileLink
+              to="/planes"
+              icon={<BookOpen size={20} />}
+              onClick={closeMenus}
+            >
               Planes
             </MobileLink>
 
-            <MobileLink to="/asignaturas" icon={<FileText size={20} />} onClick={closeMenus}>
+            <MobileLink
+              to="/asignaturas"
+              icon={<FileText size={20} />}
+              onClick={closeMenus}
+            >
               Asignaturas
             </MobileLink>
 
-            <MobileLink to="/config-documentos" icon={<Settings size={20} />} onClick={closeMenus}>
+            <MobileLink
+              to="/config-documentos"
+              icon={<Settings size={20} />}
+              onClick={closeMenus}
+            >
               Configuracion
             </MobileLink>
 
-            <MobileLink to="/login" icon={<LogOut size={20} />} onClick={closeMenus}>
+            <MobileLink
+              to="/login"
+              icon={<LogOut size={20} />}
+              onClick={closeMenus}
+            >
               Cerrar sesion
             </MobileLink>
           </div>

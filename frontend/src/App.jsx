@@ -5,6 +5,7 @@ import Legajos from "./pages/Legajos";
 import NuevoLegajo from "./pages/crearLegajo";
 import ConfigDocumentos from "./pages/ConfigDocumentos";
 import Asignaturas from "./pages/Asignaturas";
+import Planes from "./pages/Planes";
 
 function App() {
   return (
@@ -24,9 +25,13 @@ function App() {
           <Route path="/login" element={<InicioSesion />} />
           <Route path="/inicio" element={<Inicio />} />
           <Route path="/legajos" element={<Legajos />} />
+          <Route path="/legajos/:id" element={<NuevoLegajo />} />
+          <Route path="/legajos/:id/editar" element={<NuevoLegajo />} />
           <Route path="/crearLegajo" element={<NuevoLegajo />} />
+          <Route path="/crearLegajo/:id" element={<NuevoLegajo />} />
           <Route path="/config-documentos" element={<ConfigDocumentos />} />
           <Route path="/asignaturas" element={<Asignaturas />} />
+          <Route path="/planes" element={<Planes />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>

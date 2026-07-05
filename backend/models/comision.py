@@ -1,56 +1,63 @@
 from datetime import datetime
-
-
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, DateTime, ForeignKey, func
 
-class Persona(db.Model):
-    # Nombre de la tabla asociada en la base de datos
-    __tablename__="personas"
+class Comision(db.Model):
+    # Nombre de la tabla asociada en la base de datos.
+    __tablename__ = "comisiones"
 
-    # ID principal de la persona
-    id: Mapped[int] = mapped_column(
+    # Identificador principal de la comision
+    id_comision: Mapped[int] = mapped_column(
+        "idComision",
         Integer,
         primary_key=True,
         autoincrement=True
     )
 
-    # Tipo de documento asociado a la persona
-    td_id: Mapped[int] = mapped_column(
-        "tdId",
+    # Relacion con el plan de asignaturas
+    plan_asignaturas_id: Mapped[int] = mapped_column(
+        "planAsignaturasId",
         Integer,
-        ForeignKey("tipos_documento.id"),
+        ForeignKey("PlanAsignaturas.id"),
         nullable=False
     )
 
-    # Nombre de la persona
+    # Relacion con el aula
+    aula_id: Mapped[int] = mapped_column(
+        "aulaId",
+        Integer,
+        ForeignKey("Aulas.id_aula"),
+        nullable=False
+    )
+
+    # Nombre de la comision
     nombre: Mapped[str] = mapped_column(
-        String(100),
+        String(45),
         nullable=False
     )
 
-    # Apellido de la persona
-    apellido: Mapped[str] = mapped_column(
-        String(100),
+    # Modalidad (Presencial, Virtual) // Ojo cambiar por ID
+    modalidad: Mapped[str] = mapped_column(
+        String(45),
         nullable=False
     )
 
-    # Numero de documento registrado
-    numero_doc: Mapped[int] = mapped_column(
-        "numeroDoc",
+    # Cupo maximo de alumnos para la comision
+    cupo_maximo: Mapped[int] = mapped_column(
+        "cupoMaximo",
         Integer,
         nullable=False
     )
 
     # Estado del registro dentro del sistema
-    estado: Mapped[int] = mapped_column(
-        Integer,
+    estado: Mapped[str] = mapped_column(
+        String(45),
         nullable=False,
-        default=1
+        default="Activo"
     )
 
-    # Usuario que realizo la ultima accion sobre el registro
+    # Usuario que realizo la última accion sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
@@ -73,6 +80,3 @@ class Persona(db.Model):
         onupdate=func.now(),
         nullable=False
     )
-
-    # Relacion con el modelo de tipo de documento
-    tipo_documento = relationship("TipoDocumento")

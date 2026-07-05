@@ -13,11 +13,11 @@ from services.asignaturas_service import (
     eliminar
 )
 
-# Rutas para el CRUD de asignaturas.
+# Rutas para el CRUD de asignaturas
 asignaturas_bp = Blueprint("asignaturas_bp", __name__, url_prefix="/asignaturas")
 
 
-# Helper para formatear todas las respuestas de la API.
+# Helper para formatear todas las respuestas de la API
 def respuesta_api(success=True, data=None, message="", status=200, errors=None):
     response = {
         "status": "success" if success else "error",
