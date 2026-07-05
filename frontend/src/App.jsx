@@ -6,6 +6,7 @@ import NuevoLegajo from "./pages/crearLegajo";
 import ConfigDocumentos from "./pages/ConfigDocumentos";
 import Asignaturas from "./pages/Asignaturas";
 import Planes from "./pages/Planes";
+import DatosMedicos from "./pages/DatosMedicos";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/config-documentos" element={<ConfigDocumentos />} />
           <Route path="/asignaturas" element={<Asignaturas />} />
           <Route path="/planes" element={<Planes />} />
+          <Route path="/datos-medicos" element={<DatosMedicos />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>

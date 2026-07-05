@@ -132,7 +132,7 @@ function Navbar() {
             </NavLink>
 
             <NavLink
-              to="/crearLegajo"
+              to="/datos-medicos"
               className={linkClass}
               onClick={closeMenus}
             >
@@ -140,7 +140,7 @@ function Navbar() {
               <span>
                 <strong>Datos medicos</strong>
                 <small className="block text-slate-500">
-                  Alta de persona y legajo
+                  Informacion medica asociada
                 </small>
               </span>
             </NavLink>
@@ -265,6 +265,14 @@ function Navbar() {
               onClick={closeMenus}
             >
               Nuevo legajo
+            </MobileLink>
+
+            <MobileLink
+              to="/datos-medicos"
+              icon={<ClipboardPlus size={20} />}
+              onClick={closeMenus}
+            >
+              Datos medicos
             </MobileLink>
 
             <MobileLink
