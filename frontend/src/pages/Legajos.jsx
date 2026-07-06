@@ -9,6 +9,8 @@ import {
   ChevronLeft,
   ChevronRight,
   RefreshCcw,
+  Save,
+  X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
@@ -19,9 +21,15 @@ function Legajos() {
   const [busqueda, setBusqueda] = useState("");
   const [legajos, setLegajos] = useState([]);
   const [personas, setPersonas] = useState([]);
-  const [tiposDocumento, setTiposDocumento] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [editandoId, setEditandoId] = useState(null);
+  const [formulario, setFormulario] = useState({
+    persona_id: "",
+    numero: "",
+  });
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+  const [errorFormulario, setErrorFormulario] = useState("");
 
   useEffect(() => {
     cargarLegajos();
@@ -58,6 +66,86 @@ function Legajos() {
       await cargarLegajos();
     } catch (err) {
       alert(err.message || "No se pudo eliminar el legajo");
+    }
+  }
+
+  function abrirNuevoLegajo() {
+    setFormulario({
+      persona_id: "",
+      numero: "",
+    });
+    setEditandoId(null);
+    setErrorFormulario("");
+    setMostrarModal(true);
+  }
+
+  function editarLegajo(legajo) {
+    setFormulario({
+      persona_id: legajo.persona_id,
+      numero: legajo.numero || "",
+    });
+    setEditandoId(legajo.id);
+    setErrorFormulario("");
+    setMostrarModal(true);
+  }
+
+  function cerrarModal() {
+    setMostrarModal(false);
+    setEditandoId(null);
+    setFormulario({
+      persona_id: "",
+      numero: "",
+    });
+    setErrorFormulario("");
+  }
+
+  function manejarCambio(e) {
+    const { name, value } = e.target;
+
+    setFormulario({
+      ...formulario,
+      [name]: value,
+    });
+  }
+
+  async function guardarLegajo(e) {
+    e.preventDefault();
+
+    if (!formulario.persona_id) {
+      setErrorFormulario("La persona es obligatoria");
+      return;
+    }
+
+    if (String(formulario.numero).trim() === "") {
+      setErrorFormulario("El numero de legajo es obligatorio");
+      return;
+    }
+
+    const payload = {
+      persona_id: Number(formulario.persona_id),
+      numero: String(formulario.numero).trim(),
+      usuario_accion: 1,
+    };
+
+    try {
+      setErrorFormulario("");
+
+      if (editandoId) {
+        await apiRequest(`/legajos/${editandoId}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await apiRequest("/legajos", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      }
+
+      cerrarModal();
+      await cargarLegajos();
+    } catch (err) {
+      setErrorFormulario(obtenerMensajeError(err));
     }
   }
 
@@ -116,7 +204,7 @@ function Legajos() {
               </button>
 
               <button
-                onClick={() => navigate("/crearLegajo")}
+                onClick={abrirNuevoLegajo}
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
               >
                 <PlusCircle size={22} />
@@ -196,7 +284,7 @@ function Legajos() {
                     </button>
 
                     <button
-                      onClick={() => navigate(`/legajos/${legajo.id}/editar`)}
+                      onClick={() => editarLegajo(legajo)}
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
                     >
                       <Pencil size={16} />
@@ -264,7 +352,7 @@ function Legajos() {
                           </button>
 
                           <button
-                            onClick={() => navigate(`/legajos/${legajo.id}/editar`)}
+                            onClick={() => editarLegajo(legajo)}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
                           >
                             <Pencil size={18} />
@@ -312,6 +400,84 @@ function Legajos() {
               </div>
             </div>
           </div>
+
+          {mostrarModal && (
+            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-xl relative">
+                <button
+                  onClick={cerrarModal}
+                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                  title="Cerrar modal"
+                >
+                  <X size={20} />
+                </button>
+
+                <h2 className="text-2xl font-extrabold text-slate-800 mb-5">
+                  {editandoId ? "Editar legajo" : "Nuevo legajo"}
+                </h2>
+
+                <form onSubmit={guardarLegajo} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Persona
+                    </label>
+                    <select
+                      name="persona_id"
+                      value={formulario.persona_id}
+                      onChange={manejarCambio}
+                      className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    >
+                      <option value="">Seleccione una persona</option>
+                      {personas.map((persona) => (
+                        <option key={persona.id} value={persona.id}>
+                          {persona.apellido}, {persona.nombre} - {persona.numero_doc}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Numero
+                    </label>
+                    <input
+                      type="text"
+                      name="numero"
+                      value={formulario.numero}
+                      onChange={manejarCambio}
+                      placeholder="Ej: 1001"
+                      className="w-full h-14 border border-slate-300 rounded-xl px-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
+
+                  {errorFormulario && (
+                    <p className="text-red-600 font-semibold">
+                      {errorFormulario}
+                    </p>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={cerrarModal}
+                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                    >
+                      <X size={20} />
+                      Cancelar
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
+                    >
+                      <Save size={22} />
+                      Guardar
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </section>
       </main>
     </div>
@@ -332,6 +498,17 @@ function EstadoBadge({ estado }) {
       Inactivo
     </span>
   );
+}
+
+function obtenerMensajeError(err) {
+  const errores = err.errors || {};
+  const primerCampo = Object.keys(errores)[0];
+
+  if (primerCampo && Array.isArray(errores[primerCampo])) {
+    return errores[primerCampo][0];
+  }
+
+  return err.message || "No se pudo guardar el legajo";
 }
 
 export default Legajos;

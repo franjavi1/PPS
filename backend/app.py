@@ -17,6 +17,8 @@ from models.pa_correlativa import PACorrelativa
 from models.tipos_autoridad import TipoAutoridad
 from models.plan_asignatura import PlanAsignatura
 from models.datos_medicos import DatosMedicos
+from models.tipo_contacto import TipoContacto
+from models.contactos import Contactos
 
 from models.legajo import Legajo
 from models.rangos_institucionales import RangosInstitucionales
@@ -36,6 +38,8 @@ from routes.planes_asignaturas import planes_asignaturas_bp
 from routes.legajos import legajos_bp
 from routes.rangos_institucionales import rangos_institucionales_bp
 from routes.datos_medicos import datos_medicos_bp
+from routes.tipos_contacto import tipos_contacto_bp
+from routes.contactos import contactos_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -69,6 +73,8 @@ app.register_blueprint(planes_asignaturas_bp)
 app.register_blueprint(legajos_bp)
 app.register_blueprint(rangos_institucionales_bp)
 app.register_blueprint(datos_medicos_bp)
+app.register_blueprint(tipos_contacto_bp)
+app.register_blueprint(contactos_bp)
 
 with app.app_context():
     db.create_all()

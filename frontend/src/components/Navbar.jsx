@@ -5,6 +5,7 @@ import {
   Building,
   Building2,
   ChevronDown,
+  ClipboardList,
   ClipboardPlus,
   FileText,
   Folder,
@@ -14,6 +15,7 @@ import {
   Phone,
   Plus,
   Settings,
+  SquareUserRound,
   User,
   X,
 } from "lucide-react";
@@ -87,14 +89,14 @@ function Navbar() {
           </NavLink>
 
           <Dropdown
-            id="legajos"
-            title="Legajos"
-            icon={<Folder size={17} />}
+            id="personal"
+            title="Personal"
+            icon={<SquareUserRound size={17} />}
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
             <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
-              <User size={18} />
+              <ClipboardList  size={18} />
               <span>
                 <strong>Ver legajos</strong>
                 <small className="block text-slate-500">
@@ -104,21 +106,21 @@ function Navbar() {
             </NavLink>
 
             <NavLink
-              to="/crearLegajo"
+              to="/personas"
               className={linkClass}
               onClick={closeMenus}
             >
-              <Plus size={18} />
+              <User size={18} />
               <span>
-                <strong>Nuevo legajo</strong>
+                <strong>Personas</strong>
                 <small className="block text-slate-500">
-                  Alta de persona y legajo
+                  Alta de persona 
                 </small>
               </span>
             </NavLink>
 
             <NavLink
-              to="/crearLegajo"
+              to="/contactos"
               className={linkClass}
               onClick={closeMenus}
             >
@@ -126,7 +128,7 @@ function Navbar() {
               <span>
                 <strong>Contactos</strong>
                 <small className="block text-slate-500">
-                  Alta de persona y legajo
+                  Telefonos, emails y Whatsapp
                 </small>
               </span>
             </NavLink>
@@ -256,15 +258,31 @@ function Navbar() {
               icon={<Folder size={20} />}
               onClick={closeMenus}
             >
-              Ver legajos
+             Personal
             </MobileLink>
 
             <MobileLink
-              to="/crearLegajo"
+              to="/legajos"
               icon={<Plus size={20} />}
               onClick={closeMenus}
             >
               Nuevo legajo
+            </MobileLink>
+
+            <MobileLink
+              to="/personas"
+              icon={<User size={20} />}
+              onClick={closeMenus}
+            >
+              Personas
+            </MobileLink>
+
+            <MobileLink
+              to="/contactos"
+              icon={<Phone size={20} />}
+              onClick={closeMenus}
+            >
+              Contactos
             </MobileLink>
 
             <MobileLink
