@@ -10,6 +10,9 @@ import DatosMedicos from "./pages/DatosMedicos";
 import Contactos from "./pages/Contactos";
 import Personas from "./pages/Personas";
 import LegajoRangos from "./pages/LegajoRangos";
+import LegajoSedes from "./pages/LegajoSedes";
+import Sedes from "./pages/Sedes";
+import TiposSedes from "./pages/TiposSedes";
 
 function App() {
   return (
@@ -34,10 +37,13 @@ function App() {
           <Route path="/crearLegajo" element={<NuevoLegajo />} />
           <Route path="/crearLegajo/:id" element={<NuevoLegajo />} />
           <Route path="/config-documentos" element={<ConfigDocumentos />} />
+          <Route path="/sedes" element={<Sedes />} />
+          <Route path="/tipos-sedes" element={<TiposSedes />} />
           <Route path="/asignaturas" element={<Asignaturas />} />
           <Route path="/planes" element={<Planes />} />
           <Route path="/datos-medicos" element={<DatosMedicos />} />
           <Route path="/legajo-rangos" element={<LegajoRangos />} />
+          <Route path="/legajo-sedes" element={<LegajoSedes />} />
           <Route path="/contactos" element={<Contactos />} />
           <Route path="/personas" element={<Personas />} />
           <Route path="*" element={<Navigate to="/login" replace />} />

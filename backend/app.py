@@ -23,6 +23,7 @@ from models.contactos import Contactos
 from models.legajo import Legajo
 from models.rangos_institucionales import RangosInstitucionales
 from models.legajo_rangos import LegajoRangos
+from models.legajo_sedes import LegajoSedes
 
 from routes.personas import personas_bp
 from routes.tipos_documentos import tipos_documentos_bp
@@ -39,6 +40,7 @@ from routes.planes_asignaturas import planes_asignaturas_bp
 from routes.legajos import legajos_bp
 from routes.rangos_institucionales import rangos_institucionales_bp
 from routes.legajo_rangos import legajo_rangos_bp
+from routes.legajo_sedes import legajo_sedes_bp
 from routes.datos_medicos import datos_medicos_bp
 from routes.tipos_contacto import tipos_contacto_bp
 from routes.contactos import contactos_bp
@@ -75,6 +77,7 @@ app.register_blueprint(planes_asignaturas_bp)
 app.register_blueprint(legajos_bp)
 app.register_blueprint(rangos_institucionales_bp)
 app.register_blueprint(legajo_rangos_bp)
+app.register_blueprint(legajo_sedes_bp)
 app.register_blueprint(datos_medicos_bp)
 app.register_blueprint(tipos_contacto_bp)
 app.register_blueprint(contactos_bp)

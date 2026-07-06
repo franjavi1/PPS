@@ -272,8 +272,101 @@ function Planes() {
           </button>
         </div>
 
+        <div className="lg:hidden space-y-4">
+          {planes.length > 0 ? (
+            planes.map((plan) => (
+              <article
+                key={plan.id}
+                className="border border-slate-200 rounded-xl bg-white p-5 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase">
+                      Plan
+                    </p>
+                    <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                      {plan.nombre}
+                    </h2>
+                  </div>
+
+                  <span
+                    className={`shrink-0 px-3 py-1 rounded-md text-sm font-bold border ${
+                      plan.estado
+                        ? "bg-green-100 text-green-700 border-green-300"
+                        : "bg-red-100 text-red-700 border-red-300"
+                    }`}
+                  >
+                    {plan.estado ? "Activo" : "Inactivo"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-slate-400 font-bold">Modalidad</p>
+                    <p className="text-slate-800 font-semibold">
+                      {plan.modalidad}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-slate-400 font-bold">Regimen</p>
+                    <p className="text-slate-700">
+                      {plan.regimen}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-slate-400 font-bold">Duracion</p>
+                    <p className="text-slate-700">
+                      {plan.duracion}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-slate-400 font-bold">Rango minimo</p>
+                    <p className="text-slate-700">
+                      {plan.rango_minimo}
+                    </p>
+                  </div>
+                </div>
+
+                {plan.descripcion && (
+                  <div className="mt-3 text-sm">
+                    <p className="text-slate-400 font-bold">Descripcion</p>
+                    <p className="text-slate-700">
+                      {plan.descripcion}
+                    </p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
+                  <button
+                    onClick={() => abrirEditar(plan)}
+                    className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                  >
+                    <Pencil size={16} />
+                    Editar
+                  </button>
+
+                  <button
+                    onClick={() => handleEliminar(plan.id)}
+                    className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                  >
+                    <Trash2 size={16} />
+                    Eliminar
+                  </button>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
+              No se encontraron planes registrados.
+            </div>
+          )}
+        </div>
+
         {/* Tabla principal */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden">
+        <div className="hidden lg:block bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>

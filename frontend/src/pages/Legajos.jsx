@@ -10,6 +10,7 @@ import {
   ChevronRight,
   RefreshCcw,
   Save,
+  ClipboardList,
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -172,8 +173,7 @@ function Legajos() {
     return (
       legajo.numero.toLowerCase().includes(textoBusqueda) ||
       nombreCompleto.includes(textoBusqueda) ||
-      documento.includes(textoBusqueda) ||
-      String(legajo.id).includes(textoBusqueda)
+      documento.includes(textoBusqueda)
     );
   });
 
@@ -184,14 +184,20 @@ function Legajos() {
       <main className="max-w-7xl mx-auto px-6 py-10">
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
-            <div>
-              <h1 className="text-4xl font-extrabold text-slate-800">
-                Legajos
-              </h1>
+            <div className="flex items-start gap-5">
+              <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
+                <ClipboardList size={30} />
+              </div>
 
-              <p className="text-slate-500 mt-2">
-                Consulta, busca y gestiona los legajos cargados.
-              </p>
+              <div>
+                <h1 className="text-4xl font-extrabold text-slate-800">
+                  Legajos
+                </h1>
+
+                <p className="text-slate-500 mt-2">
+                  Consulta, busca y gestiona los legajos cargados.
+                </p>
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -223,7 +229,7 @@ function Legajos() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por numero, persona, documento o ID"
+              placeholder="Buscar por numero, persona o documento"
               className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
           </div>
@@ -234,7 +240,7 @@ function Legajos() {
             </div>
           )}
 
-          <div className="md:hidden space-y-4">
+          <div className="lg:hidden space-y-4">
             {cargando ? (
               <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
                 Cargando legajos...
@@ -248,7 +254,7 @@ function Legajos() {
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div>
                       <p className="text-xs font-bold text-slate-400 uppercase">
-                        Legajo #{legajo.id}
+                        Legajo
                       </p>
                       <h2 className="text-xl font-extrabold text-slate-800 mt-1">
                         Nro. {legajo.numero}
@@ -308,11 +314,10 @@ function Legajos() {
             )}
           </div>
 
-          <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-xl">
+          <div className="hidden lg:block overflow-x-auto border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <th className="px-5 py-4 text-slate-700 font-bold">ID</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Numero</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Persona</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Documento</th>
@@ -324,7 +329,7 @@ function Legajos() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="6" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="5" className="text-center px-5 py-10 text-slate-500">
                       Cargando legajos...
                     </td>
                   </tr>
@@ -334,7 +339,6 @@ function Legajos() {
                       key={legajo.id}
                       className="border-b border-slate-200 hover:bg-slate-50"
                     >
-                      <td className="px-5 py-5 text-slate-700">{legajo.id}</td>
                       <td className="px-5 py-5 text-slate-700 font-semibold">{legajo.numero}</td>
                       <td className="px-5 py-5 text-slate-700">{obtenerNombrePersona(legajo.persona_id)}</td>
                       <td className="px-5 py-5 text-slate-700">{obtenerDocumentoPersona(legajo.persona_id)}</td>
@@ -372,7 +376,7 @@ function Legajos() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="5" className="text-center px-5 py-10 text-slate-500">
                       No se encontraron legajos.
                     </td>
                   </tr>

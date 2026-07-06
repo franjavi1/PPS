@@ -1248,7 +1248,7 @@ function ConfigDocumentos() {
                     Agregar Persona
                   </button>
                 </div>
-                <div className="md:hidden space-y-3">
+                <div className="lg:hidden space-y-3">
                   {personas.length > 0 ? (
                     personas.map((p) => (
                       <div key={p.id} className="border border-slate-200 rounded-lg p-4 bg-white">
@@ -1293,7 +1293,7 @@ function ConfigDocumentos() {
                   )}
                 </div>
 
-                <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-xl">
+                <div className="hidden lg:block overflow-x-auto border border-slate-200 rounded-xl">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-50">
                       <tr className="border-b border-slate-200">

@@ -178,7 +178,6 @@ function LegajoRangos() {
     const nivelRango = rango ? String(rango.nivel_jerarquia || "") : "";
 
     return (
-      String(registro.id).includes(textoBusqueda) ||
       numeroLegajo.toLowerCase().includes(textoBusqueda) ||
       descripcionRango.includes(textoBusqueda) ||
       nivelRango.includes(textoBusqueda)
@@ -237,7 +236,7 @@ function LegajoRangos() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por legajo, rango, nivel o ID"
+              placeholder="Buscar por legajo, rango o nivel"
               className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
           </div>
@@ -248,11 +247,71 @@ function LegajoRangos() {
             </div>
           )}
 
-          <div className="overflow-x-auto border border-slate-200 rounded-xl">
+          <div className="lg:hidden space-y-4">
+            {cargando ? (
+              <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
+                Cargando rangos de legajos...
+              </div>
+            ) : registrosFiltrados.length > 0 ? (
+              registrosFiltrados.map((registro) => (
+                <article
+                  key={registro.id}
+                  className="border border-slate-200 rounded-xl bg-white p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div>
+                      <p className="text-xs font-bold text-slate-400 uppercase">
+                        Rango asignado
+                      </p>
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                        {obtenerTextoLegajo(registro.legajo_id)}
+                      </h2>
+                    </div>
+
+                    <span className="bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-md text-sm font-bold">
+                      Nivel {obtenerNivelRango(registro.rangos_institucionales_id)}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <p className="text-slate-400 font-bold">Rango</p>
+                      <p className="text-slate-800 font-semibold">
+                        {obtenerDescripcionRango(registro.rangos_institucionales_id)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
+                    <button
+                      onClick={() => editarLegajoRangos(registro)}
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                    >
+                      <Pencil size={16} />
+                      Editar
+                    </button>
+
+                    <button
+                      onClick={() => eliminarLegajoRangos(registro.id)}
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
+                      Eliminar
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
+                No hay rangos asignados a legajos.
+              </div>
+            )}
+          </div>
+
+          <div className="hidden lg:block overflow-x-auto border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <th className="px-5 py-4 text-slate-700 font-bold">ID</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Legajo</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Rango</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Nivel jerarquico</th>
@@ -263,14 +322,13 @@ function LegajoRangos() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="5" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="4" className="text-center px-5 py-10 text-slate-500">
                       Cargando rangos de legajos...
                     </td>
                   </tr>
                 ) : registrosFiltrados.length > 0 ? (
                   registrosFiltrados.map((registro) => (
                     <tr key={registro.id} className="border-b border-slate-200 hover:bg-slate-50">
-                      <td className="px-5 py-5 text-slate-700">{registro.id}</td>
                       <td className="px-5 py-5 text-slate-700 font-semibold">
                         {obtenerTextoLegajo(registro.legajo_id)}
                       </td>
@@ -303,7 +361,7 @@ function LegajoRangos() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="4" className="text-center px-5 py-10 text-slate-500">
                       No hay rangos asignados a legajos.
                     </td>
                   </tr>

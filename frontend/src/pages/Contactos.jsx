@@ -186,8 +186,7 @@ function Contactos() {
       nombreCompleto.includes(textoBusqueda) ||
       documento.includes(textoBusqueda) ||
       tipo.includes(textoBusqueda) ||
-      (registro.contacto || "").toLowerCase().includes(textoBusqueda) ||
-      String(registro.id).includes(textoBusqueda)
+      (registro.contacto || "").toLowerCase().includes(textoBusqueda)
     );
   });
 
@@ -248,11 +247,83 @@ function Contactos() {
             />
           </div>
 
-          <div className="overflow-x-auto border border-slate-200 rounded-xl">
+          <div className="lg:hidden space-y-4">
+            {cargando ? (
+              <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
+                Cargando contactos...
+              </div>
+            ) : contactosFiltrados.length > 0 ? (
+              contactosFiltrados.map((registro) => (
+                <article
+                  key={registro.id}
+                  className="border border-slate-200 rounded-xl bg-white p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div>
+                      <p className="text-xs font-bold text-slate-400 uppercase">
+                        Contacto
+                      </p>
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1 break-words">
+                        {registro.contacto}
+                      </h2>
+                    </div>
+
+                    <PrincipalBadge principal={registro.principal} />
+                  </div>
+
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <p className="text-slate-400 font-bold">Persona</p>
+                      <p className="text-slate-800 font-semibold">
+                        {obtenerNombrePersona(registro.persona_id)}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-slate-400 font-bold">Documento</p>
+                      <p className="text-slate-700">
+                        {obtenerDocumentoPersona(registro.persona_id)}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-slate-400 font-bold">Tipo</p>
+                      <p className="text-slate-700">
+                        {obtenerNombreTipoContacto(registro.tipo_contacto_id)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
+                    <button
+                      onClick={() => editarContacto(registro)}
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                    >
+                      <Pencil size={16} />
+                      Editar
+                    </button>
+
+                    <button
+                      onClick={() => eliminarContacto(registro.id)}
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
+                      Eliminar
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
+                No hay contactos cargados.
+              </div>
+            )}
+          </div>
+
+          <div className="hidden lg:block overflow-x-auto border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <th className="px-5 py-4 text-slate-700 font-bold">ID</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Persona</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Documento</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Tipo</th>
@@ -265,14 +336,13 @@ function Contactos() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="7" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="6" className="text-center px-5 py-10 text-slate-500">
                       Cargando contactos...
                     </td>
                   </tr>
                 ) : contactosFiltrados.length > 0 ? (
                   contactosFiltrados.map((registro) => (
                     <tr key={registro.id} className="border-b border-slate-200 hover:bg-slate-50">
-                      <td className="px-5 py-5 text-slate-700">{registro.id}</td>
                       <td className="px-5 py-5 text-slate-700 font-semibold">
                         {obtenerNombrePersona(registro.persona_id)}
                       </td>
@@ -311,7 +381,7 @@ function Contactos() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="6" className="text-center px-5 py-10 text-slate-500">
                       No hay contactos cargados.
                     </td>
                   </tr>

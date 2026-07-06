@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  FileText,
+  Building,
   Pencil,
   PlusCircle,
   RefreshCcw,
@@ -10,15 +10,14 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { asignaturaService } from "../services/asignaturaService";
+import { tipoSedeService } from "../services/tipoSedeService";
 
 const formularioInicial = {
-  nombre: "",
-  formato: "",
+  descripcion: "",
 };
 
-function Asignaturas() {
-  const [asignaturas, setAsignaturas] = useState([]);
+function TiposSedes() {
+  const [tiposSedes, setTiposSedes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -28,18 +27,18 @@ function Asignaturas() {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    cargarAsignaturas();
+    cargarTiposSedes();
   }, []);
 
-  async function cargarAsignaturas() {
+  async function cargarTiposSedes() {
     try {
       setCargando(true);
       setError("");
 
-      const respuesta = await asignaturaService.obtenerTodas();
-      setAsignaturas(respuesta.data || []);
+      const respuesta = await tipoSedeService.obtenerTodas();
+      setTiposSedes(respuesta.data || []);
     } catch (err) {
-      setError(err.message || "No se pudieron obtener las asignaturas");
+      setError(err.message || "No se pudieron obtener los tipos de sede");
     } finally {
       setCargando(false);
     }
@@ -51,7 +50,7 @@ function Asignaturas() {
     setErrorFormulario("");
   }
 
-  function abrirNuevaAsignatura() {
+  function abrirNuevoTipoSede() {
     limpiarFormulario();
     setMostrarModal(true);
   }
@@ -70,45 +69,37 @@ function Asignaturas() {
     });
   }
 
-  function editarAsignatura(asignatura) {
+  function editarTipoSede(tipoSede) {
     setFormulario({
-      nombre: asignatura.nombre || "",
-      formato: asignatura.formato || "",
+      descripcion: tipoSede.descripcion || "",
     });
-    setEditandoId(asignatura.id);
+    setEditandoId(tipoSede.id);
     setErrorFormulario("");
     setMostrarModal(true);
   }
 
-  async function guardarAsignatura(e) {
+  async function guardarTipoSede(e) {
     e.preventDefault();
 
-    const nombre = formulario.nombre.trim();
-    const formato = formulario.formato.trim();
+    const descripcion = formulario.descripcion.trim();
 
-    if (!nombre) {
-      setErrorFormulario("El nombre de la asignatura es obligatorio");
+    if (!descripcion) {
+      setErrorFormulario("La descripcion es obligatoria");
       return;
     }
 
-    if (nombre.length > 105) {
-      setErrorFormulario("El nombre no puede superar los 105 caracteres");
+    if (descripcion.length > 45) {
+      setErrorFormulario("La descripcion debe tener hasta 45 caracteres");
       return;
     }
 
-    if (!formato) {
-      setErrorFormulario("El formato es obligatorio");
-      return;
-    }
-
-    if (formato.length > 45) {
-      setErrorFormulario("El formato no puede superar los 45 caracteres");
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(descripcion)) {
+      setErrorFormulario("La descripcion solo puede contener letras");
       return;
     }
 
     const payload = {
-      nombre,
-      formato,
+      descripcion,
       usuario_accion: 1,
     };
 
@@ -116,39 +107,38 @@ function Asignaturas() {
       setErrorFormulario("");
 
       if (editandoId) {
-        await asignaturaService.actualizar(editandoId, payload);
+        await tipoSedeService.actualizar(editandoId, payload);
       } else {
-        await asignaturaService.crear(payload);
+        await tipoSedeService.crear(payload);
       }
 
       cerrarModal();
-      await cargarAsignaturas();
+      await cargarTiposSedes();
     } catch (err) {
       setErrorFormulario(obtenerMensajeError(err));
     }
   }
 
-  async function eliminarAsignatura(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta asignatura?");
+  async function eliminarTipoSede(id) {
+    const confirmar = confirm("Seguro que queres eliminar este tipo de sede?");
 
     if (!confirmar) {
       return;
     }
 
     try {
-      await asignaturaService.eliminar(id);
-      await cargarAsignaturas();
+      await tipoSedeService.eliminar(id);
+      await cargarTiposSedes();
     } catch (err) {
-      setError(err.message || "No se pudo eliminar la asignatura");
+      setError(err.message || "No se pudo eliminar el tipo de sede");
     }
   }
 
-  const asignaturasFiltradas = asignaturas.filter((asignatura) => {
+  const tiposSedesFiltrados = tiposSedes.filter((tipoSede) => {
     const textoBusqueda = busqueda.toLowerCase();
 
     return (
-      String(asignatura.nombre || "").toLowerCase().includes(textoBusqueda) ||
-      String(asignatura.formato || "").toLowerCase().includes(textoBusqueda)
+      String(tipoSede.descripcion || "").toLowerCase().includes(textoBusqueda)
     );
   });
 
@@ -161,23 +151,23 @@ function Asignaturas() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
               <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
-                <FileText size={30} />
+                <Building size={30} />
               </div>
 
               <div>
                 <h1 className="text-4xl font-extrabold text-slate-800">
-                  Asignaturas
+                  Tipos de sedes
                 </h1>
 
                 <p className="text-slate-500 mt-2">
-                  Consulta y gestiona las materias asociadas a los planes de estudio.
+                  Consulta y gestiona las categorias de sedes institucionales.
                 </p>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={cargarAsignaturas}
+                onClick={cargarTiposSedes}
                 className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
               >
                 <RefreshCcw size={22} />
@@ -185,11 +175,11 @@ function Asignaturas() {
               </button>
 
               <button
-                onClick={abrirNuevaAsignatura}
+                onClick={abrirNuevoTipoSede}
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
               >
                 <PlusCircle size={22} />
-                Nueva asignatura
+                Nuevo tipo
               </button>
             </div>
           </div>
@@ -204,7 +194,7 @@ function Asignaturas() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por asignatura o formato"
+              placeholder="Buscar por descripcion"
               className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
           </div>
@@ -218,39 +208,26 @@ function Asignaturas() {
           <div className="lg:hidden space-y-4">
             {cargando ? (
               <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
-                Cargando asignaturas...
+                Cargando tipos de sede...
               </div>
-            ) : asignaturasFiltradas.length > 0 ? (
-              asignaturasFiltradas.map((asignatura) => (
+            ) : tiposSedesFiltrados.length > 0 ? (
+              tiposSedesFiltrados.map((tipoSede) => (
                 <article
-                  key={asignatura.id}
+                  key={tipoSede.id}
                   className="border border-slate-200 rounded-xl bg-white p-5 shadow-sm"
                 >
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div>
-                      <p className="text-xs font-bold text-slate-400 uppercase">
-                        Asignatura
-                      </p>
-                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
-                        {asignatura.nombre}
-                      </h2>
-                    </div>
-
-                    <EstadoBadge estado={asignatura.estado} />
-                  </div>
-
-                  <div className="space-y-3 text-sm">
-                    <div>
-                      <p className="text-slate-400 font-bold">Formato</p>
-                      <p className="text-slate-800 font-semibold">
-                        {asignatura.formato}
-                      </p>
-                    </div>
+                  <div className="mb-4">
+                    <p className="text-xs font-bold text-slate-400 uppercase">
+                      Tipo de sede
+                    </p>
+                    <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                      {tipoSede.descripcion}
+                    </h2>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
-                      onClick={() => editarAsignatura(asignatura)}
+                      onClick={() => editarTipoSede(tipoSede)}
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
                     >
                       <Pencil size={16} />
@@ -258,7 +235,7 @@ function Asignaturas() {
                     </button>
 
                     <button
-                      onClick={() => eliminarAsignatura(asignatura.id)}
+                      onClick={() => eliminarTipoSede(tipoSede.id)}
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
                     >
                       <Trash2 size={16} />
@@ -269,7 +246,7 @@ function Asignaturas() {
               ))
             ) : (
               <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
-                No se encontraron asignaturas.
+                No se encontraron tipos de sede.
               </div>
             )}
           </div>
@@ -278,9 +255,7 @@ function Asignaturas() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <th className="px-5 py-4 text-slate-700 font-bold">Nombre</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Formato</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Estado</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">Descripcion</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Acciones</th>
                 </tr>
               </thead>
@@ -288,26 +263,20 @@ function Asignaturas() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="4" className="text-center px-5 py-10 text-slate-500">
-                      Cargando asignaturas...
+                    <td colSpan="2" className="text-center px-5 py-10 text-slate-500">
+                      Cargando tipos de sede...
                     </td>
                   </tr>
-                ) : asignaturasFiltradas.length > 0 ? (
-                  asignaturasFiltradas.map((asignatura) => (
-                    <tr key={asignatura.id} className="border-b border-slate-200 hover:bg-slate-50">
+                ) : tiposSedesFiltrados.length > 0 ? (
+                  tiposSedesFiltrados.map((tipoSede) => (
+                    <tr key={tipoSede.id} className="border-b border-slate-200 hover:bg-slate-50">
                       <td className="px-5 py-5 text-slate-700 font-semibold">
-                        {asignatura.nombre}
-                      </td>
-                      <td className="px-5 py-5 text-slate-700">
-                        {asignatura.formato}
-                      </td>
-                      <td className="px-5 py-5">
-                        <EstadoBadge estado={asignatura.estado} />
+                        {tipoSede.descripcion}
                       </td>
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => editarAsignatura(asignatura)}
+                            onClick={() => editarTipoSede(tipoSede)}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
                           >
                             <Pencil size={18} />
@@ -315,7 +284,7 @@ function Asignaturas() {
                           </button>
 
                           <button
-                            onClick={() => eliminarAsignatura(asignatura.id)}
+                            onClick={() => eliminarTipoSede(tipoSede.id)}
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
                           >
                             <Trash2 size={18} />
@@ -327,8 +296,8 @@ function Asignaturas() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center px-5 py-10 text-slate-500">
-                      No se encontraron asignaturas.
+                    <td colSpan="2" className="text-center px-5 py-10 text-slate-500">
+                      No se encontraron tipos de sede.
                     </td>
                   </tr>
                 )}
@@ -348,38 +317,29 @@ function Asignaturas() {
                 </button>
 
                 <h2 className="text-2xl font-extrabold text-slate-800 mb-5">
-                  {editandoId ? "Editar asignatura" : "Nueva asignatura"}
+                  {editandoId ? "Editar tipo de sede" : "Nuevo tipo de sede"}
                 </h2>
 
-                <form onSubmit={guardarAsignatura} className="space-y-5">
+                <form onSubmit={guardarTipoSede} className="space-y-5">
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-2">
-                      Nombre
+                      Descripcion
                     </label>
-                    <input
-                      type="text"
-                      name="nombre"
-                      value={formulario.nombre}
-                      onChange={manejarCambio}
-                      placeholder="Ej: Combate de Incendios"
-                      maxLength={105}
-                      className="w-full h-14 border border-slate-300 rounded-xl px-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      Formato
-                    </label>
-                    <input
-                      type="text"
-                      name="formato"
-                      value={formulario.formato}
-                      onChange={manejarCambio}
-                      placeholder="Ej: Teorica, Practica o Taller"
-                      maxLength={45}
-                      className="w-full h-14 border border-slate-300 rounded-xl px-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
+                    <div className="relative">
+                      <Building
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        size={20}
+                      />
+                      <input
+                        type="text"
+                        name="descripcion"
+                        value={formulario.descripcion}
+                        onChange={manejarCambio}
+                        placeholder="Ej: Cuartel"
+                        maxLength={45}
+                        className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      />
+                    </div>
                   </div>
 
                   {errorFormulario && (
@@ -416,22 +376,6 @@ function Asignaturas() {
   );
 }
 
-function EstadoBadge({ estado }) {
-  if (estado === 1 || estado === undefined) {
-    return (
-      <span className="bg-green-100 text-green-700 border border-green-300 px-3 py-1 rounded-md text-sm font-bold">
-        Activa
-      </span>
-    );
-  }
-
-  return (
-    <span className="bg-yellow-100 text-yellow-700 border border-yellow-300 px-3 py-1 rounded-md text-sm font-bold">
-      Inactiva
-    </span>
-  );
-}
-
 function obtenerMensajeError(err) {
   const errores = err.errors || {};
   const primerCampo = Object.keys(errores)[0];
@@ -440,7 +384,7 @@ function obtenerMensajeError(err) {
     return errores[primerCampo][0];
   }
 
-  return err.message || "No se pudo guardar la asignatura";
+  return err.message || "No se pudo guardar el tipo de sede";
 }
 
-export default Asignaturas;
+export default TiposSedes;

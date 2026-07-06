@@ -12,6 +12,7 @@ import {
   Folder,
   Home,
   LogOut,
+  MapPinned,
   Menu,
   Phone,
   Plus,
@@ -60,8 +61,12 @@ function Navbar() {
           onClick={() => navigate("/inicio")}
           className="flex items-center gap-3 text-left"
         >
-          <div className="w-11 h-11 rounded-full bg-white text-red-800 border-2 border-yellow-400 flex items-center justify-center text-[10px] font-black leading-tight">
-            FEBO<br />CABA
+          <div className="w-12 h-12 rounded-full bg-white border-2 border-yellow-400 flex items-center justify-center overflow-hidden shadow-sm">
+            <img
+              src="/logo.jpeg"
+              alt="Logo bomberos"
+              className="w-full h-full object-contain p-1"
+            />
           </div>
 
           <div>
@@ -74,13 +79,13 @@ function Navbar() {
 
         <button
           onClick={() => setMobileOpen(true)}
-          className="md:hidden w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center"
+          className="lg:hidden w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center"
           aria-label="Abrir menu"
         >
           <Menu size={22} />
         </button>
 
-        <nav ref={navRef} className="hidden md:flex items-center gap-1">
+        <nav ref={navRef} className="hidden lg:flex items-center gap-1">
           <NavLink
             to="/inicio"
             className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2"
@@ -160,6 +165,20 @@ function Navbar() {
                 </small>
               </span>
             </NavLink>
+
+            <NavLink
+              to="/legajo-sedes"
+              className={linkClass}
+              onClick={closeMenus}
+            >
+              <MapPinned size={18} />
+              <span>
+                <strong>Legajos por sede</strong>
+                <small className="block text-slate-500">
+                  Legajos asignados a sede
+                </small>
+              </span>
+            </NavLink>
           </Dropdown>
 
           <Dropdown
@@ -206,7 +225,7 @@ function Navbar() {
             </p>
 
             <NavLink
-              to="/config-documentos"
+              to="/sedes"
               className={linkClass}
               onClick={closeMenus}
             >
@@ -214,13 +233,13 @@ function Navbar() {
               <span>
                 <strong>Sedes</strong>
                 <small className="block text-slate-500">
-                  Documentos, sedes, aulas y rangos
+                  Alta, edicion y tipos de sede
                 </small>
               </span>
             </NavLink>
 
             <NavLink
-              to="/config-documentos"
+              to="/tipos-sedes"
               className={linkClass}
               onClick={closeMenus}
             >
@@ -228,7 +247,7 @@ function Navbar() {
               <span>
                 <strong>Tipo de Sedes</strong>
                 <small className="block text-slate-500">
-                  Documentos, sedes, aulas y rangos
+                  Categorias para clasificar sedes
                 </small>
               </span>
             </NavLink>
@@ -245,7 +264,7 @@ function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="fixed inset-0 bg-slate-50 text-slate-800 z-[100] p-5 md:hidden overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-50 text-slate-800 z-[100] p-5 lg:hidden overflow-y-auto">
           <button
             onClick={closeMenus}
             className="fixed top-4 right-4 w-11 h-11 rounded-full bg-white border border-slate-200 shadow flex items-center justify-center text-red-700"
@@ -272,15 +291,7 @@ function Navbar() {
               icon={<Folder size={20} />}
               onClick={closeMenus}
             >
-             Personal
-            </MobileLink>
-
-            <MobileLink
-              to="/legajos"
-              icon={<Plus size={20} />}
-              onClick={closeMenus}
-            >
-              Nuevo legajo
+            Legajos
             </MobileLink>
 
             <MobileLink
@@ -316,6 +327,14 @@ function Navbar() {
             </MobileLink>
 
             <MobileLink
+              to="/legajo-sedes"
+              icon={<MapPinned size={20} />}
+              onClick={closeMenus}
+            >
+              Legajos por sede
+            </MobileLink>
+
+            <MobileLink
               to="/planes"
               icon={<BookOpen size={20} />}
               onClick={closeMenus}
@@ -329,6 +348,22 @@ function Navbar() {
               onClick={closeMenus}
             >
               Asignaturas
+            </MobileLink>
+
+            <MobileLink
+              to="/sedes"
+              icon={<Building2 size={20} />}
+              onClick={closeMenus}
+            >
+              Sedes
+            </MobileLink>
+
+            <MobileLink
+              to="/tipos-sedes"
+              icon={<Building size={20} />}
+              onClick={closeMenus}
+            >
+              Tipo de sedes
             </MobileLink>
 
             <MobileLink
