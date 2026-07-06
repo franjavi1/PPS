@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-  ClipboardPlus,
   Pencil,
+  Phone,
   PlusCircle,
   RefreshCcw,
   Save,
@@ -11,21 +11,19 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
-import { datosMedicosService } from "../services/datosMedicosService";
-
-const gruposSanguineos = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+import { contactosService } from "../services/contactosService";
 
 const formularioInicial = {
   persona_id: "",
-  grupo_sanguineo: "",
-  alergias: "",
-  aptitud_fisica: false,
-  seguro: "",
+  tipo_contacto_id: "",
+  principal: false,
+  contacto: "",
 };
 
-function DatosMedicos() {
-  const [datosMedicos, setDatosMedicos] = useState([]);
+function Contactos() {
+  const [contactos, setContactos] = useState([]);
   const [personas, setPersonas] = useState([]);
+  const [tiposContacto, setTiposContacto] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -42,15 +40,18 @@ function DatosMedicos() {
       setCargando(true);
       setError("");
 
-      const [respuestaDatosMedicos, respuestaPersonas] = await Promise.all([
-        datosMedicosService.obtenerTodos(),
-        apiRequest("/personas"),
-      ]);
+      const [respuestaContactos, respuestaPersonas, respuestaTiposContacto] =
+        await Promise.all([
+          contactosService.obtenerTodos(),
+          apiRequest("/personas"),
+          apiRequest("/tipos-contacto"),
+        ]);
 
-      setDatosMedicos(respuestaDatosMedicos.data || []);
+      setContactos(respuestaContactos.data || []);
       setPersonas(respuestaPersonas.data || []);
+      setTiposContacto(respuestaTiposContacto.data || []);
     } catch (err) {
-      setError(err.message || "No se pudieron obtener los datos medicos");
+      setError(err.message || "No se pudieron obtener los contactos");
     } finally {
       setCargando(false);
     }
@@ -62,7 +63,7 @@ function DatosMedicos() {
     setError("");
   }
 
-  function abrirNuevosDatosMedicos() {
+  function abrirNuevoContacto() {
     limpiarFormulario();
     setMostrarModal(true);
   }
@@ -81,20 +82,19 @@ function DatosMedicos() {
     });
   }
 
-  function editarDatosMedicos(registro) {
+  function editarContacto(registro) {
     setFormulario({
       persona_id: registro.persona_id,
-      grupo_sanguineo: registro.grupo_sanguineo,
-      alergias: registro.alergias || "",
-      aptitud_fisica: Boolean(registro.aptitud_fisica),
-      seguro: registro.seguro,
+      tipo_contacto_id: registro.tipo_contacto_id,
+      principal: Boolean(registro.principal),
+      contacto: registro.contacto || "",
     });
     setEditandoId(registro.id);
     setError("");
     setMostrarModal(true);
   }
 
-  async function guardarDatosMedicos(e) {
+  async function guardarContacto(e) {
     e.preventDefault();
 
     if (!formulario.persona_id) {
@@ -102,22 +102,21 @@ function DatosMedicos() {
       return;
     }
 
-    if (!formulario.grupo_sanguineo) {
-      setError("El grupo sanguineo es obligatorio");
+    if (!formulario.tipo_contacto_id) {
+      setError("El tipo de contacto es obligatorio");
       return;
     }
 
-    if (formulario.seguro.trim() === "") {
-      setError("El seguro es obligatorio");
+    if (formulario.contacto.trim() === "") {
+      setError("El contacto es obligatorio");
       return;
     }
 
     const payload = {
       persona_id: Number(formulario.persona_id),
-      grupo_sanguineo: formulario.grupo_sanguineo,
-      alergias: formulario.alergias.trim() || null,
-      aptitud_fisica: formulario.aptitud_fisica,
-      seguro: formulario.seguro,
+      tipo_contacto_id: Number(formulario.tipo_contacto_id),
+      principal: formulario.principal,
+      contacto: formulario.contacto,
       usuario_accion: 1,
     };
 
@@ -125,9 +124,9 @@ function DatosMedicos() {
       setError("");
 
       if (editandoId) {
-        await datosMedicosService.actualizar(editandoId, payload);
+        await contactosService.actualizar(editandoId, payload);
       } else {
-        await datosMedicosService.crear(payload);
+        await contactosService.crear(payload);
       }
 
       cerrarModal();
@@ -137,23 +136,27 @@ function DatosMedicos() {
     }
   }
 
-  async function eliminarDatosMedicos(id) {
-    const confirmar = confirm("Seguro que queres eliminar estos datos medicos?");
+  async function eliminarContacto(id) {
+    const confirmar = confirm("Seguro que queres eliminar este contacto?");
 
     if (!confirmar) {
       return;
     }
 
     try {
-      await datosMedicosService.eliminar(id);
+      await contactosService.eliminar(id);
       await cargarDatos();
     } catch (err) {
-      setError(err.message || "No se pudieron eliminar los datos medicos");
+      setError(err.message || "No se pudo eliminar el contacto");
     }
   }
 
   function obtenerPersona(personaId) {
     return personas.find((persona) => persona.id === personaId);
+  }
+
+  function obtenerTipoContacto(tipoContactoId) {
+    return tiposContacto.find((tipo) => tipo.id === tipoContactoId);
   }
 
   function obtenerNombrePersona(personaId) {
@@ -166,17 +169,24 @@ function DatosMedicos() {
     return persona ? persona.numero_doc : "No definido";
   }
 
-  const datosMedicosFiltrados = datosMedicos.filter((registro) => {
+  function obtenerNombreTipoContacto(tipoContactoId) {
+    const tipo = obtenerTipoContacto(tipoContactoId);
+    return tipo ? tipo.tipo : "Tipo no definido";
+  }
+
+  const contactosFiltrados = contactos.filter((registro) => {
     const textoBusqueda = busqueda.toLowerCase();
     const persona = obtenerPersona(registro.persona_id);
+    const tipoContacto = obtenerTipoContacto(registro.tipo_contacto_id);
     const nombreCompleto = persona ? `${persona.nombre} ${persona.apellido}`.toLowerCase() : "";
     const documento = persona ? String(persona.numero_doc || "") : "";
+    const tipo = tipoContacto ? tipoContacto.tipo.toLowerCase() : "";
 
     return (
       nombreCompleto.includes(textoBusqueda) ||
       documento.includes(textoBusqueda) ||
-      registro.grupo_sanguineo.toLowerCase().includes(textoBusqueda) ||
-      registro.seguro.toLowerCase().includes(textoBusqueda) ||
+      tipo.includes(textoBusqueda) ||
+      (registro.contacto || "").toLowerCase().includes(textoBusqueda) ||
       String(registro.id).includes(textoBusqueda)
     );
   });
@@ -190,16 +200,16 @@ function DatosMedicos() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
               <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
-                <ClipboardPlus size={30} />
+                <Phone size={30} />
               </div>
 
               <div>
                 <h1 className="text-4xl font-extrabold text-slate-800">
-                  Datos medicos
+                  Contactos
                 </h1>
 
                 <p className="text-slate-500 mt-2">
-                  Consulta y gestiona la informacion medica asociada a personas.
+                  Consulta y gestiona los contactos asociados a personas.
                 </p>
               </div>
             </div>
@@ -214,11 +224,11 @@ function DatosMedicos() {
               </button>
 
               <button
-                onClick={abrirNuevosDatosMedicos}
+                onClick={abrirNuevoContacto}
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
               >
                 <PlusCircle size={22} />
-                Nuevos datos
+                Nuevo contacto
               </button>
             </div>
           </div>
@@ -233,7 +243,7 @@ function DatosMedicos() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por persona, documento, grupo o seguro"
+              placeholder="Buscar por persona, documento, tipo o contacto"
               className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
           </div>
@@ -245,10 +255,9 @@ function DatosMedicos() {
                   <th className="px-5 py-4 text-slate-700 font-bold">ID</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Persona</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Documento</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Grupo</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Alergias</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Aptitud</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Seguro</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">Tipo</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">Contacto</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">Principal</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Acciones</th>
                 </tr>
               </thead>
@@ -256,12 +265,12 @@ function DatosMedicos() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="8" className="text-center px-5 py-10 text-slate-500">
-                      Cargando datos medicos...
+                    <td colSpan="7" className="text-center px-5 py-10 text-slate-500">
+                      Cargando contactos...
                     </td>
                   </tr>
-                ) : datosMedicosFiltrados.length > 0 ? (
-                  datosMedicosFiltrados.map((registro) => (
+                ) : contactosFiltrados.length > 0 ? (
+                  contactosFiltrados.map((registro) => (
                     <tr key={registro.id} className="border-b border-slate-200 hover:bg-slate-50">
                       <td className="px-5 py-5 text-slate-700">{registro.id}</td>
                       <td className="px-5 py-5 text-slate-700 font-semibold">
@@ -270,22 +279,19 @@ function DatosMedicos() {
                       <td className="px-5 py-5 text-slate-700">
                         {obtenerDocumentoPersona(registro.persona_id)}
                       </td>
-                      <td className="px-5 py-5 text-slate-700 font-bold">
-                        {registro.grupo_sanguineo}
-                      </td>
                       <td className="px-5 py-5 text-slate-700">
-                        {registro.alergias || "Sin alergias"}
+                        {obtenerNombreTipoContacto(registro.tipo_contacto_id)}
+                      </td>
+                      <td className="px-5 py-5 text-slate-700 font-semibold">
+                        {registro.contacto}
                       </td>
                       <td className="px-5 py-5">
-                        <AptitudBadge aptitud={registro.aptitud_fisica} />
-                      </td>
-                      <td className="px-5 py-5 text-slate-700">
-                        {registro.seguro}
+                        <PrincipalBadge principal={registro.principal} />
                       </td>
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => editarDatosMedicos(registro)}
+                            onClick={() => editarContacto(registro)}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
                           >
                             <Pencil size={18} />
@@ -293,7 +299,7 @@ function DatosMedicos() {
                           </button>
 
                           <button
-                            onClick={() => eliminarDatosMedicos(registro.id)}
+                            onClick={() => eliminarContacto(registro.id)}
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
                           >
                             <Trash2 size={18} />
@@ -305,8 +311,8 @@ function DatosMedicos() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="8" className="text-center px-5 py-10 text-slate-500">
-                      No hay datos medicos cargados.
+                    <td colSpan="7" className="text-center px-5 py-10 text-slate-500">
+                      No hay contactos cargados.
                     </td>
                   </tr>
                 )}
@@ -326,10 +332,10 @@ function DatosMedicos() {
                 </button>
 
                 <h2 className="text-2xl font-extrabold text-slate-800 mb-5">
-                  {editandoId ? "Editar datos medicos" : "Nuevos datos medicos"}
+                  {editandoId ? "Editar contacto" : "Nuevo contacto"}
                 </h2>
 
-                <form onSubmit={guardarDatosMedicos} className="space-y-5">
+                <form onSubmit={guardarContacto} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-bold text-slate-700 mb-2">
@@ -352,18 +358,18 @@ function DatosMedicos() {
 
                     <div>
                       <label className="block text-sm font-bold text-slate-700 mb-2">
-                        Grupo sanguineo
+                        Tipo de contacto
                       </label>
                       <select
-                        name="grupo_sanguineo"
-                        value={formulario.grupo_sanguineo}
+                        name="tipo_contacto_id"
+                        value={formulario.tipo_contacto_id}
                         onChange={manejarCambio}
                         className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                       >
-                        <option value="">Seleccione un grupo</option>
-                        {gruposSanguineos.map((grupo) => (
-                          <option key={grupo} value={grupo}>
-                            {grupo}
+                        <option value="">Seleccione un tipo</option>
+                        {tiposContacto.map((tipo) => (
+                          <option key={tipo.id} value={tipo.id}>
+                            {tipo.tipo}
                           </option>
                         ))}
                       </select>
@@ -371,41 +377,27 @@ function DatosMedicos() {
 
                     <div>
                       <label className="block text-sm font-bold text-slate-700 mb-2">
-                        Seguro
+                        Contacto
                       </label>
                       <input
                         type="text"
-                        name="seguro"
-                        value={formulario.seguro}
+                        name="contacto"
+                        value={formulario.contacto}
                         onChange={manejarCambio}
-                        placeholder="Ej: OSDE"
+                        placeholder="Ej: 1122334455"
                         className="w-full h-14 border border-slate-300 rounded-xl px-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-2">
-                        Alergias
-                      </label>
-                      <input
-                        type="text"
-                        name="alergias"
-                        value={formulario.alergias}
-                        onChange={manejarCambio}
-                        placeholder="Ej: Penicilina"
-                        className="w-full h-14 border border-slate-300 rounded-xl px-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                      />
-                    </div>
-
-                    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold">
+                    <label className="h-14 mt-7 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold">
                       <input
                         type="checkbox"
-                        name="aptitud_fisica"
-                        checked={formulario.aptitud_fisica}
+                        name="principal"
+                        checked={formulario.principal}
                         onChange={manejarCambio}
                         className="w-5 h-5 accent-red-700"
                       />
-                      Aptitud fisica
+                      Principal
                     </label>
                   </div>
 
@@ -443,18 +435,18 @@ function DatosMedicos() {
   );
 }
 
-function AptitudBadge({ aptitud }) {
-  if (aptitud) {
+function PrincipalBadge({ principal }) {
+  if (principal) {
     return (
       <span className="bg-green-100 text-green-700 border border-green-300 px-3 py-1 rounded-md text-sm font-bold">
-        Apto
+        Principal
       </span>
     );
   }
 
   return (
-    <span className="bg-yellow-100 text-yellow-700 border border-yellow-300 px-3 py-1 rounded-md text-sm font-bold">
-      No apto
+    <span className="bg-slate-100 text-slate-600 border border-slate-300 px-3 py-1 rounded-md text-sm font-bold">
+      Secundario
     </span>
   );
 }
@@ -467,7 +459,7 @@ function obtenerMensajeError(err) {
     return errores[primerCampo][0];
   }
 
-  return err.message || "No se pudieron guardar los datos medicos";
+  return err.message || "No se pudo guardar el contacto";
 }
 
-export default DatosMedicos;
+export default Contactos;

@@ -7,6 +7,8 @@ import ConfigDocumentos from "./pages/ConfigDocumentos";
 import Asignaturas from "./pages/Asignaturas";
 import Planes from "./pages/Planes";
 import DatosMedicos from "./pages/DatosMedicos";
+import Contactos from "./pages/Contactos";
+import Personas from "./pages/Personas";
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
           <Route path="/asignaturas" element={<Asignaturas />} />
           <Route path="/planes" element={<Planes />} />
           <Route path="/datos-medicos" element={<DatosMedicos />} />
+          <Route path="/contactos" element={<Contactos />} />
+          <Route path="/personas" element={<Personas />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>
