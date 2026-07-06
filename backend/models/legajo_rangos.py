@@ -1,0 +1,70 @@
+from datetime import datetime
+
+from db import db
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import DateTime, ForeignKey, Integer, func
+
+
+class LegajoRangos(db.Model):
+    # Nombre de la tabla asociada en la base de datos
+    __tablename__ = "LegajoRangos"
+
+    # ID principal de la relacion entre legajo y rango institucional
+    id: Mapped[int] = mapped_column(
+        "idLegajoRangos",
+        Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    # Legajo asociado
+    legajo_id: Mapped[int] = mapped_column(
+        "legajoId",
+        Integer,
+        ForeignKey("legajos.id"),
+        nullable=False
+    )
+
+    # Rango institucional asociado
+    rangos_institucionales_id: Mapped[int] = mapped_column(
+        "rangosInstitucionalesId",
+        Integer,
+        ForeignKey("rangos_institucionales.id"),
+        nullable=True
+    )
+
+    # Usuario que realizo la ultima accion sobre el registro
+    usuario_accion: Mapped[int] = mapped_column(
+        "usuarioAccion",
+        Integer,
+        nullable=True
+    )
+
+    # Fecha y hora de creacion del registro
+    ts_creacion: Mapped[datetime] = mapped_column(
+        "tsCreacion",
+        DateTime,
+        server_default=func.now(),
+        nullable=True
+    )
+
+    # Fecha y hora de la ultima modificacion del registro
+    ts_modificacion: Mapped[datetime] = mapped_column(
+        "tsModificacion",
+        DateTime,
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=True
+    )
+
+    # Relacion con el modelo de legajo.
+    legajo = relationship("Legajo", backref="legajo_rangos_items")
+
+    # Relacion con el modelo de rangos institucionales.
+    rangos_institucionales = relationship(
+        "RangosInstitucionales",
+        backref="legajo_rangos_items"
+    )
+
+    def __repr__(self):
+        return f"<LegajoRangos {self.id}>"

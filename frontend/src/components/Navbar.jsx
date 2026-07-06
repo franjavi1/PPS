@@ -5,6 +5,7 @@ import {
   Building,
   Building2,
   ChevronDown,
+  ChevronsUp,
   ClipboardList,
   ClipboardPlus,
   FileText,
@@ -143,6 +144,19 @@ function Navbar() {
                 <strong>Datos medicos</strong>
                 <small className="block text-slate-500">
                   Informacion medica asociada
+                </small>
+              </span>
+            </NavLink>
+            <NavLink
+              to="/legajo-rangos"
+              className={linkClass}
+              onClick={closeMenus}
+            >
+              <ChevronsUp size={18} />
+              <span>
+                <strong>Rangos</strong>
+                <small className="block text-slate-500">
+                  Rangos de Legajos
                 </small>
               </span>
             </NavLink>
@@ -291,6 +305,14 @@ function Navbar() {
               onClick={closeMenus}
             >
               Datos medicos
+            </MobileLink>
+
+            <MobileLink
+              to="/legajo-rangos"
+              icon={<ChevronsUp size={20} />}
+              onClick={closeMenus}
+            >
+              Rangos
             </MobileLink>
 
             <MobileLink

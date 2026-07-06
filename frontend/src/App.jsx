@@ -9,6 +9,7 @@ import Planes from "./pages/Planes";
 import DatosMedicos from "./pages/DatosMedicos";
 import Contactos from "./pages/Contactos";
 import Personas from "./pages/Personas";
+import LegajoRangos from "./pages/LegajoRangos";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="/asignaturas" element={<Asignaturas />} />
           <Route path="/planes" element={<Planes />} />
           <Route path="/datos-medicos" element={<DatosMedicos />} />
+          <Route path="/legajo-rangos" element={<LegajoRangos />} />
           <Route path="/contactos" element={<Contactos />} />
           <Route path="/personas" element={<Personas />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
