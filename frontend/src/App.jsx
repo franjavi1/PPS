@@ -12,6 +12,7 @@ import Aulas from "./pages/Aulas";
 import ComisionesAsignaturas from "./pages/ComisionesAsignaturas";
 import AutoridadesComision from "./pages/AutoridadesComision";
 import AlumnosComision from "./pages/AlumnosComision";
+import PACorrelativas from "./pages/PACorrelativas";
 import DatosMedicos from "./pages/DatosMedicos";
 import Contactos from "./pages/Contactos";
 import Personas from "./pages/Personas";
@@ -53,6 +54,7 @@ function App() {
           <Route path="/comisiones-asignaturas" element={<ComisionesAsignaturas />} />
           <Route path="/autoridades-comision" element={<AutoridadesComision />} />
           <Route path="/alumnos-comision" element={<AlumnosComision />} />
+          <Route path="/pa-correlativas" element={<PACorrelativas />} />
           <Route path="/datos-medicos" element={<DatosMedicos />} />
           <Route path="/legajo-rangos" element={<LegajoRangos />} />
           <Route path="/legajo-sedes" element={<LegajoSedes />} />

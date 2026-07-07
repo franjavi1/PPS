@@ -13,6 +13,7 @@ import {
   DoorOpen,
   FileText,
   Folder,
+  GitBranch,
   GraduationCap,
   Home,
   LogOut,
@@ -237,6 +238,15 @@ function Navbar() {
                 </small>
               </span>
             </NavLink>
+            <NavLink to="/pa-correlativas" className={linkClass} onClick={closeMenus}>
+              <GitBranch size={18} />
+              <span>
+                <strong>Correlativas</strong>
+                <small className="block text-slate-500">
+                  Plan de Asignaturas Correlativas
+                </small>
+              </span>
+            </NavLink>
             <NavLink to="/comisiones-asignaturas" className={linkClass} onClick={closeMenus}>
               <BookOpenCheck size={18} />
               <span>
@@ -317,6 +327,7 @@ function Navbar() {
                 </small>
               </span>
             </NavLink>
+      
           </Dropdown>
 
           <NavLink
@@ -430,6 +441,14 @@ function Navbar() {
               onClick={closeMenus}
             >
               Plan asignaturas
+            </MobileLink>
+
+            <MobileLink
+              to="/pa-correlativas"
+              icon={<GitBranch size={20} />}
+              onClick={closeMenus}
+            >
+              Correlativas
             </MobileLink>
 
             <MobileLink
