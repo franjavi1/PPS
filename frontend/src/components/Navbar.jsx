@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import {
   BookOpen,
+  BookMarked,
+  BookOpenCheck,
   Building,
   Building2,
   ChevronDown,
   ChevronsUp,
   ClipboardList,
   ClipboardPlus,
+  DoorOpen,
   FileText,
   Folder,
+  GraduationCap,
   Home,
   LogOut,
   MapPinned,
@@ -19,7 +23,11 @@ import {
   Settings,
   SquareUserRound,
   User,
+  Users,
+  UserRoundCheck,
   X,
+  ShieldUser,
+  School,
 } from "lucide-react";
 
 function Navbar() {
@@ -183,8 +191,8 @@ function Navbar() {
 
           <Dropdown
             id="planes"
-            title="Planes de estudio"
-            icon={<BookOpen size={17} />}
+            title="Gestion educativa"
+            icon={<GraduationCap  size={17} />}
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
@@ -208,6 +216,51 @@ function Navbar() {
                 <strong>Asignaturas</strong>
                 <small className="block text-slate-500">
                   Materias del sistema
+                </small>
+              </span>
+            </NavLink>
+            <NavLink to="/comisiones" className={linkClass} onClick={closeMenus}>
+              <Users size={18} />
+              <span>
+                <strong>Comisiones</strong>
+                <small className="block text-slate-500">
+                  Creacion de comisiones
+                </small>
+              </span>
+            </NavLink>
+            <NavLink to="/planes-asignaturas" className={linkClass} onClick={closeMenus}>
+              <BookMarked size={18} />
+              <span>
+                <strong>Plan asignaturas</strong>
+                <small className="block text-slate-500">
+                  Creacion de planes asignatura
+                </small>
+              </span>
+            </NavLink>
+            <NavLink to="/comisiones-asignaturas" className={linkClass} onClick={closeMenus}>
+              <BookOpenCheck size={18} />
+              <span>
+                <strong>Comision Asignaturas</strong>
+                <small className="block text-slate-500">
+                  Creacion de comision Asignatura
+                </small>
+              </span>
+            </NavLink>
+            <NavLink to="/autoridades-comision" className={linkClass} onClick={closeMenus}>
+              <ShieldUser size={18} />
+              <span>
+                <strong>Autoridades comision</strong>
+                <small className="block text-slate-500">
+                  Creacion de autoridad Comision
+                </small>
+              </span>
+            </NavLink>
+            <NavLink to="/alumnos-comision" className={linkClass} onClick={closeMenus}>
+              <UserRoundCheck size={18} />
+              <span>
+                <strong>Alumnos comision</strong>
+                <small className="block text-slate-500">
+                  Inscripciones y notas
                 </small>
               </span>
             </NavLink>
@@ -248,6 +301,19 @@ function Navbar() {
                 <strong>Tipo de Sedes</strong>
                 <small className="block text-slate-500">
                   Categorias para clasificar sedes
+                </small>
+              </span>
+            </NavLink>
+            <NavLink
+              to="/aulas"
+              className={linkClass}
+              onClick={closeMenus}
+            >
+              <DoorOpen size={18} />
+              <span>
+                <strong>Aulas</strong>
+                <small className="block text-slate-500">
+                  Alta de Aulas
                 </small>
               </span>
             </NavLink>
@@ -348,6 +414,46 @@ function Navbar() {
               onClick={closeMenus}
             >
               Asignaturas
+            </MobileLink>
+
+            <MobileLink
+              to="/comisiones"
+              icon={<Users size={20} />}
+              onClick={closeMenus}
+            >
+              Comisiones
+            </MobileLink>
+
+            <MobileLink
+              to="/planes-asignaturas"
+              icon={<BookMarked size={20} />}
+              onClick={closeMenus}
+            >
+              Plan asignaturas
+            </MobileLink>
+
+            <MobileLink
+              to="/comisiones-asignaturas"
+              icon={<BookOpenCheck size={20} />}
+              onClick={closeMenus}
+            >
+              Comision asignaturas
+            </MobileLink>
+
+            <MobileLink
+              to="/autoridades-comision"
+              icon={<ShieldUser size={20} />}
+              onClick={closeMenus}
+            >
+              Autoridades comision
+            </MobileLink>
+
+            <MobileLink
+              to="/alumnos-comision"
+              icon={<UserRoundCheck size={20} />}
+              onClick={closeMenus}
+            >
+              Alumnos comision
             </MobileLink>
 
             <MobileLink

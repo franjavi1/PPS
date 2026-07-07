@@ -1,13 +1,8 @@
 import { apiRequest } from "../api";
 
-/**
- * Servicio para la gestion de Planes.
- * Se conecta con el endpoint de Flask: /planes
- */
+const BASE_URL = "/alumnos-comision";
 
-const BASE_URL = "/planes";
-
-export const planService = {
+export const alumnoComisionService = {
   obtenerTodos() {
     return apiRequest(BASE_URL);
   },
@@ -16,17 +11,17 @@ export const planService = {
     return apiRequest(`${BASE_URL}/${id}`);
   },
 
-  crear(plan) {
+  crear(alumnoComision) {
     return apiRequest(BASE_URL, {
       method: "POST",
-      body: JSON.stringify(plan),
+      body: JSON.stringify(alumnoComision),
     });
   },
 
-  actualizar(id, plan) {
+  actualizar(id, alumnoComision) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "PUT",
-      body: JSON.stringify(plan),
+      body: JSON.stringify(alumnoComision),
     });
   },
 

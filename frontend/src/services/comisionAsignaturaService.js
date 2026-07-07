@@ -1,13 +1,13 @@
 import { apiRequest } from "../api";
 
 /**
- * Servicio para la gestion de Planes.
- * Se conecta con el endpoint de Flask: /planes
+ * Servicio para la gestion de Comisiones Asignaturas.
+ * Se conecta con el endpoint de Flask: /comisiones-asignaturas
  */
 
-const BASE_URL = "/planes";
+const BASE_URL = "/comisiones-asignaturas";
 
-export const planService = {
+export const comisionAsignaturaService = {
   obtenerTodos() {
     return apiRequest(BASE_URL);
   },
@@ -16,17 +16,17 @@ export const planService = {
     return apiRequest(`${BASE_URL}/${id}`);
   },
 
-  crear(plan) {
+  crear(comisionAsignatura) {
     return apiRequest(BASE_URL, {
       method: "POST",
-      body: JSON.stringify(plan),
+      body: JSON.stringify(comisionAsignatura),
     });
   },
 
-  actualizar(id, plan) {
+  actualizar(id, comisionAsignatura) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "PUT",
-      body: JSON.stringify(plan),
+      body: JSON.stringify(comisionAsignatura),
     });
   },
 

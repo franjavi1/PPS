@@ -1,13 +1,13 @@
 import { apiRequest } from "../api";
 
 /**
- * Servicio para la gestion de Planes.
- * Se conecta con el endpoint de Flask: /planes
+ * Servicio para la gestion de Tipos de Planes.
+ * Se conecta con el endpoint de Flask: /tipos-planes
  */
 
-const BASE_URL = "/planes";
+const BASE_URL = "/tipos-planes";
 
-export const planService = {
+export const tipoPlanesService = {
   obtenerTodos() {
     return apiRequest(BASE_URL);
   },
@@ -16,17 +16,17 @@ export const planService = {
     return apiRequest(`${BASE_URL}/${id}`);
   },
 
-  crear(plan) {
+  crear(tipoPlan) {
     return apiRequest(BASE_URL, {
       method: "POST",
-      body: JSON.stringify(plan),
+      body: JSON.stringify(tipoPlan),
     });
   },
 
-  actualizar(id, plan) {
+  actualizar(id, tipoPlan) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "PUT",
-      body: JSON.stringify(plan),
+      body: JSON.stringify(tipoPlan),
     });
   },
 
