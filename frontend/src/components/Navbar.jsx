@@ -25,10 +25,8 @@ import {
   SquareUserRound,
   User,
   Users,
-  UserRoundCheck,
   X,
   ShieldUser,
-  School,
 } from "lucide-react";
 
 function Navbar() {
@@ -265,15 +263,6 @@ function Navbar() {
                 </small>
               </span>
             </NavLink>
-            <NavLink to="/alumnos-comision" className={linkClass} onClick={closeMenus}>
-              <UserRoundCheck size={18} />
-              <span>
-                <strong>Alumnos comision</strong>
-                <small className="block text-slate-500">
-                  Inscripciones y notas
-                </small>
-              </span>
-            </NavLink>
           </Dropdown>
 
           <Dropdown
@@ -465,14 +454,6 @@ function Navbar() {
               onClick={closeMenus}
             >
               Autoridades comision
-            </MobileLink>
-
-            <MobileLink
-              to="/alumnos-comision"
-              icon={<UserRoundCheck size={20} />}
-              onClick={closeMenus}
-            >
-              Alumnos comision
             </MobileLink>
 
             <MobileLink

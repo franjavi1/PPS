@@ -14,8 +14,6 @@ from models.sedes import Sedes
 from models.comision import Comision
 from models.comision_asignatura import ComisionAsignatura
 from models.autoridad_comision import AutoridadComision
-from models.condicion_academica import CondicionAcademica
-from models.alumno_comision import AlumnoComision
 from models.aula import Aula
 from models.pa_correlativa import PACorrelativa
 from models.tipos_autoridad import TipoAutoridad
@@ -39,8 +37,6 @@ from routes.sedes import sedes_bp
 from routes.comisiones import comisiones_bp
 from routes.comisiones_asignaturas import comisiones_asignaturas_bp
 from routes.autoridades_comision import autoridades_comision_bp
-from routes.condiciones_academicas import condiciones_academicas_bp
-from routes.alumnos_comision import alumnos_comision_bp
 from routes.aulas import aulas_bp
 from routes.pa_correlativas import pa_correlativas_bp
 from routes.tipos_autoridad import tipos_autoridad_bp
@@ -80,8 +76,6 @@ app.register_blueprint(sedes_bp)
 app.register_blueprint(comisiones_bp)
 app.register_blueprint(comisiones_asignaturas_bp)
 app.register_blueprint(autoridades_comision_bp)
-app.register_blueprint(condiciones_academicas_bp)
-app.register_blueprint(alumnos_comision_bp)
 app.register_blueprint(aulas_bp)
 app.register_blueprint(pa_correlativas_bp)
 app.register_blueprint(tipos_autoridad_bp)
