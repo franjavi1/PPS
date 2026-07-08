@@ -161,7 +161,6 @@ function TiposDocumentos() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <th className="px-5 py-4 text-slate-700 font-bold">ID</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Descripcion</th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Acciones</th>
                 </tr>
@@ -170,14 +169,13 @@ function TiposDocumentos() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="3" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="2" className="text-center px-5 py-10 text-slate-500">
                       Cargando tipos de documento...
                     </td>
                   </tr>
                 ) : tipos.length > 0 ? (
                   tipos.map((tipo) => (
                     <tr key={tipo.id} className="border-b border-slate-200 hover:bg-slate-50">
-                      <td className="px-5 py-5 text-slate-700">{tipo.id}</td>
                       <td className="px-5 py-5 text-slate-700 font-semibold">
                         {tipo.descripcion}
                       </td>

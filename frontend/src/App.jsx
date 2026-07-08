@@ -5,7 +5,20 @@ import Legajos from "./pages/Legajos";
 import NuevoLegajo from "./pages/crearLegajo";
 import ConfigDocumentos from "./pages/ConfigDocumentos";
 import Asignaturas from "./pages/Asignaturas";
+import Comisiones from "./pages/Comisiones";
 import Planes from "./pages/Planes";
+import PlanesAsignaturas from "./pages/PlanesAsignaturas";
+import Aulas from "./pages/Aulas";
+import ComisionesAsignaturas from "./pages/ComisionesAsignaturas";
+import AutoridadesComision from "./pages/AutoridadesComision";
+import PACorrelativas from "./pages/PACorrelativas";
+import DatosMedicos from "./pages/DatosMedicos";
+import Contactos from "./pages/Contactos";
+import Personas from "./pages/Personas";
+import LegajoRangos from "./pages/LegajoRangos";
+import LegajoSedes from "./pages/LegajoSedes";
+import Sedes from "./pages/Sedes";
+import TiposSedes from "./pages/TiposSedes";
 
 function App() {
   return (
@@ -30,8 +43,21 @@ function App() {
           <Route path="/crearLegajo" element={<NuevoLegajo />} />
           <Route path="/crearLegajo/:id" element={<NuevoLegajo />} />
           <Route path="/config-documentos" element={<ConfigDocumentos />} />
+          <Route path="/sedes" element={<Sedes />} />
+          <Route path="/tipos-sedes" element={<TiposSedes />} />
           <Route path="/asignaturas" element={<Asignaturas />} />
+          <Route path="/comisiones" element={<Comisiones />} />
           <Route path="/planes" element={<Planes />} />
+          <Route path="/planes-asignaturas" element={<PlanesAsignaturas />} />
+          <Route path="/aulas" element={<Aulas />} />
+          <Route path="/comisiones-asignaturas" element={<ComisionesAsignaturas />} />
+          <Route path="/autoridades-comision" element={<AutoridadesComision />} />
+          <Route path="/pa-correlativas" element={<PACorrelativas />} />
+          <Route path="/datos-medicos" element={<DatosMedicos />} />
+          <Route path="/legajo-rangos" element={<LegajoRangos />} />
+          <Route path="/legajo-sedes" element={<LegajoSedes />} />
+          <Route path="/contactos" element={<Contactos />} />
+          <Route path="/personas" element={<Personas />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>

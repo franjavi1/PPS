@@ -57,7 +57,7 @@ def get_comision(id):
 
         if not comision:
             return respuesta_api(False, None, "Comisión no encontrada", 404, {
-                "id": "No existe una comisión activa con ese id"
+                "id": "No existe una comisión con ese id"
             })
 
         data = comision_schema.dump(comision)
@@ -104,7 +104,7 @@ def editar_comision(id):
         
         if not comision:
             return respuesta_api(False, None, "Comisión no encontrada", 404, {
-                "id": "No existe una comisión activa con ese id"
+                "id": "No existe una comisión con ese id"
             })
         
         req = request.get_json(silent=True) or {}
@@ -137,7 +137,7 @@ def eliminar_comision(id):
         
         if not comision:
             return respuesta_api(False, None, "Comisión no encontrada", 404, {
-                "id": "No existe una comisión activa con ese id"
+                "id": "No existe una comisión con ese id"
             })
         
         eliminar(comision)

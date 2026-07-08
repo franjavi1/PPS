@@ -20,8 +20,10 @@ def crear(datos):
 
 def actualizar(comision, datos):
     schema = ComisionSchema(partial=True)
+
     schema.context = {"comision_id": comision.id_comision}
     schema.load(datos, instance=comision, partial=True)
+
     db.session.commit()
     return comision
 
