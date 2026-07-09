@@ -15,6 +15,7 @@ import PACorrelativas from "./pages/PACorrelativas";
 import DatosMedicos from "./pages/DatosMedicos";
 import Contactos from "./pages/Contactos";
 import Personas from "./pages/Personas";
+import AltaPersonaWizard from "./pages/AltaPersonaWizard";
 import LegajoRangos from "./pages/LegajoRangos";
 import LegajoSedes from "./pages/LegajoSedes";
 import Sedes from "./pages/Sedes";
@@ -58,6 +59,7 @@ function App() {
           <Route path="/legajo-sedes" element={<LegajoSedes />} />
           <Route path="/contactos" element={<Contactos />} />
           <Route path="/personas" element={<Personas />} />
+          <Route path="/alta-persona" element={<AltaPersonaWizard />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>

@@ -101,13 +101,13 @@ def crear_persona():
 
        
         
-        return respuesta_api(False, None, "Error de validación", 400, e.messages)
+        return respuesta_api(False, None, "Error de validacion", 400, e.messages)
 
     except SQLAlchemyError:
         db.session.rollback()
 
         return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrió un error al crear la persona"
+            "database": "Ocurrio un error al crear la persona"
         })
 
     except Exception as e:
@@ -115,7 +115,7 @@ def crear_persona():
         print(e)
 
         return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrió un error inesperado"
+            "server": "Ocurrio un error inesperado"
         })
 
 
@@ -140,13 +140,13 @@ def editar_persona(id):
 
        
         
-        return respuesta_api(False, None, "Error de validación", 400, e.messages)
+        return respuesta_api(False, None, "Error de validacion", 400, e.messages)
 
     except SQLAlchemyError:
         db.session.rollback()
 
         return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrió un error al actualizar la persona"
+            "database": "Ocurrio un error al actualizar la persona"
         })
 
     except Exception as e:
@@ -154,7 +154,7 @@ def editar_persona(id):
         print(e)
 
         return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrió un error inesperado"
+            "server": "Ocurrio un error inesperado"
         })
     
 
@@ -185,7 +185,7 @@ def eliminar_persona(id):
         print(e)
 
         return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrió un error inesperado"
+            "server": "Ocurrio un error inesperado"
         })
 
 
