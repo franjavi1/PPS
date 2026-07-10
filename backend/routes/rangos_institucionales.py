@@ -3,6 +3,8 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.legajo_rangos import LegajoRangos
+from models.plan_asignatura import PlanAsignatura
 from schemas.rangos_institucionales_schema import (
     rango_institucional_schema,
     rangos_institucionales_schema
@@ -156,6 +158,16 @@ def eliminar_rango_institucional(id):
         if not rango:
             return respuesta_api(False, None, "Rango institucional no encontrado", 404, {
                 "id": "No existe un rango institucional con ese id"
+            })
+
+        esta_en_uso = (
+            LegajoRangos.query.filter_by(rangos_institucionales_id=id).first()
+            or PlanAsignatura.query.filter_by(rango_minimo_id=id, estado=1).first()
+        )
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar el rango institucional", 409, {
+                "rango": "No se puede eliminar un rango asociado a legajos o planes"
             })
 
         eliminar(rango)

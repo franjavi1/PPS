@@ -140,7 +140,8 @@ function LegajoSedes() {
     }
 
     try {
-      await legajoSedesService.eliminar(id);
+      const respuesta = await legajoSedesService.eliminar(id);
+      alert(respuesta.message || "Sede del legajo eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la sede del legajo");

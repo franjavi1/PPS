@@ -127,7 +127,8 @@ function TiposSedes() {
     }
 
     try {
-      await tipoSedeService.eliminar(id);
+      const respuesta = await tipoSedeService.eliminar(id);
+      alert(respuesta.message || "Tipo de sede eliminado correctamente");
       await cargarTiposSedes();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el tipo de sede");

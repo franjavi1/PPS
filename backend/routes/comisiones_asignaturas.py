@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.autoridad_comision import AutoridadComision
 from schemas.comision_asignatura_schema import (
     comision_asignatura_schema,
     comisiones_asignaturas_schema
@@ -167,6 +168,15 @@ def eliminar_comision_asignatura(id):
         if not comision_asignatura:
             return respuesta_api(False, None, "Comision asignatura no encontrada", 404, {
                 "id": "No existe una comision asignatura con ese id"
+            })
+
+        esta_en_uso = AutoridadComision.query.filter_by(
+            comision_id=id,
+        ).first()
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar la comision asignatura", 409, {
+                "comision_asignatura": "No se puede eliminar una comision asignatura con autoridades asociadas"
             })
 
         eliminar(comision_asignatura)

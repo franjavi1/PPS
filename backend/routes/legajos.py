@@ -3,6 +3,9 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.autoridad_comision import AutoridadComision
+from models.legajo_rangos import LegajoRangos
+from models.legajo_sedes import LegajoSedes
 from schemas.legajo_schema import legajo_schema, legajos_schema
 
 from services.legajo_service import (
@@ -152,6 +155,22 @@ def eliminar_legajo(id):
         if not legajo:
             return respuesta_api(False, None, "Legajo no encontrado", 404, {
                 "id": "No existe un legajo activo con ese id"
+            })
+
+        if legajo.persona and legajo.persona.estado == 1:
+            return respuesta_api(False, None, "No se puede eliminar el legajo", 409, {
+                "legajo": "No se puede eliminar un legajo asociado a una persona activa"
+            })
+
+        tiene_relaciones = (
+            LegajoRangos.query.filter_by(legajo_id=id).first()
+            or LegajoSedes.query.filter_by(legajo_id=id).first()
+            or AutoridadComision.query.filter_by(legajo_id=id).first()
+        )
+
+        if tiene_relaciones:
+            return respuesta_api(False, None, "No se puede eliminar el legajo", 409, {
+                "legajo": "No se puede eliminar un legajo con rango, sede o autoridad asociada"
             })
 
         eliminar(legajo)

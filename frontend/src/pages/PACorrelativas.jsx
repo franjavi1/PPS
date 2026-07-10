@@ -165,7 +165,8 @@ function PACorrelativas() {
     }
 
     try {
-      await paCorrelativaService.eliminar(id);
+      const respuesta = await paCorrelativaService.eliminar(id);
+      alert(respuesta.message || "Correlativa eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la correlativa");

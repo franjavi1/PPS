@@ -162,7 +162,8 @@ function AutoridadesComision() {
     }
 
     try {
-      await autoridadComisionService.eliminar(id);
+      const respuesta = await autoridadComisionService.eliminar(id);
+      alert(respuesta.message || "Autoridad de comision eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la autoridad de comision");

@@ -61,12 +61,13 @@ function Legajos() {
     }
 
     try {
-      await apiRequest(`/legajos/${id}`, {
+      const respuesta = await apiRequest(`/legajos/${id}`, {
         method: "DELETE",
       });
+      alert(respuesta.message || "Legajo eliminado correctamente");
       await cargarLegajos();
     } catch (err) {
-      alert(err.message || "No se pudo eliminar el legajo");
+      setError(err.message || "No se pudo eliminar el legajo");
     }
   }
 
@@ -162,6 +163,10 @@ function Legajos() {
   function obtenerDocumentoPersona(personaId) {
     const persona = obtenerPersona(personaId);
     return persona ? persona.numero_doc : "No definido";
+  }
+
+  function legajoTienePersonaActiva(legajo) {
+    return Boolean(obtenerPersona(legajo.persona_id));
   }
 
   const legajosFiltrados = legajos.filter((legajo) => {
@@ -299,7 +304,13 @@ function Legajos() {
 
                     <button
                       onClick={() => eliminarLegajo(legajo.id)}
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                      disabled={legajoTienePersonaActiva(legajo)}
+                      title={
+                        legajoTienePersonaActiva(legajo)
+                          ? "No se puede eliminar un legajo asociado a una persona"
+                          : "Eliminar legajo"
+                      }
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
                       <Trash2 size={16} />
                       Borrar
@@ -365,7 +376,13 @@ function Legajos() {
 
                           <button
                             onClick={() => eliminarLegajo(legajo.id)}
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
+                            disabled={legajoTienePersonaActiva(legajo)}
+                            title={
+                              legajoTienePersonaActiva(legajo)
+                                ? "No se puede eliminar un legajo asociado a una persona"
+                                : "Eliminar legajo"
+                            }
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Trash2 size={18} />
                             Eliminar

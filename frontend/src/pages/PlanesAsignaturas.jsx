@@ -183,7 +183,8 @@ function PlanesAsignaturas() {
     }
 
     try {
-      await planAsignaturaService.eliminar(id);
+      const respuesta = await planAsignaturaService.eliminar(id);
+      alert(respuesta.message || "Plan asignatura eliminado correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el plan asignatura");

@@ -5,13 +5,16 @@ import {
   FileText,
   HeartPulse,
   IdCard,
+  Mail,
   MapPinned,
+  Phone,
   Save,
   ShieldCheck,
   User,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import { contactosService } from "../services/contactosService";
 import { personasService } from "../services/personasService";
 import { datosMedicosService } from "../services/datosMedicosService";
 import { legajoRangosService } from "../services/legajoRangosService";
@@ -52,6 +55,11 @@ const datosLegajoInicial = {
   es_sede_base: true,
 };
 
+const contactosInicial = {
+  email: "",
+  celular: "",
+};
+
 const usuarioInicial = {
   rol: "bombero",
   crear_usuario: true,
@@ -65,8 +73,10 @@ function AltaPersonaWizard() {
   const [legajo, setLegajo] = useState(legajoInicial);
   const [datosMedicos, setDatosMedicos] = useState(datosMedicosInicial);
   const [datosLegajo, setDatosLegajo] = useState(datosLegajoInicial);
+  const [contactos, setContactos] = useState(contactosInicial);
   const [usuario, setUsuario] = useState(usuarioInicial);
   const [tiposDocumento, setTiposDocumento] = useState([]);
+  const [tiposContacto, setTiposContacto] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [sedes, setSedes] = useState([]);
   const [guardando, setGuardando] = useState(false);
@@ -79,16 +89,18 @@ function AltaPersonaWizard() {
 
   async function cargarCombos() {
     try {
-      const [respuestaTipos, respuestaRangos, respuestaSedes] =
+      const [respuestaTipos, respuestaRangos, respuestaSedes, respuestaTiposContacto] =
         await Promise.all([
           apiRequest("/tipos-documentos"),
           rangoService.obtenerTodos(),
           sedeService.obtenerTodas(),
+          apiRequest("/tipos-contacto"),
         ]);
 
       setTiposDocumento(respuestaTipos.data || []);
       setRangos(respuestaRangos.data || []);
       setSedes(respuestaSedes.data || []);
+      setTiposContacto(respuestaTiposContacto.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron cargar los datos iniciales");
     }
@@ -118,6 +130,11 @@ function AltaPersonaWizard() {
       ...datosLegajo,
       [name]: type === "checkbox" ? checked : value,
     });
+  }
+
+  function cambiarContactos(e) {
+    const { name, value } = e.target;
+    setContactos({ ...contactos, [name]: value });
   }
 
   function cambiarUsuario(e) {
@@ -204,6 +221,13 @@ function AltaPersonaWizard() {
       return;
     }
 
+    const mensajeContactos = validarContactos(contactos);
+
+    if (mensajeContactos) {
+      setError(mensajeContactos);
+      return;
+    }
+
     try {
       setGuardando(true);
       setError("");
@@ -251,6 +275,45 @@ function AltaPersonaWizard() {
           }),
         });
       }
+
+      const tipoEmail = obtenerTipoContacto(tiposContacto, "email");
+      const tipoCelular = obtenerTipoContacto(tiposContacto, "celular");
+      const contactosAGuardar = [];
+
+      if (contactos.email.trim()) {
+        if (!tipoEmail) {
+          setError("No existe el tipo de contacto Email en la base.");
+          return;
+        }
+
+        contactosAGuardar.push({
+          persona_id: Number(personaId),
+          tipo_contacto_id: Number(tipoEmail.id),
+          principal: true,
+          contacto: contactos.email.trim(),
+          usuario_accion: 1,
+        });
+      }
+
+      if (contactos.celular.trim()) {
+        if (!tipoCelular) {
+          setError("No existe el tipo de contacto Celular en la base.");
+          return;
+        }
+
+        contactosAGuardar.push({
+          persona_id: Number(personaId),
+          tipo_contacto_id: Number(tipoCelular.id),
+          principal: false,
+          contacto: contactos.celular.trim(),
+          usuario_accion: 1,
+        });
+      }
+
+      await Promise.all(
+        contactosAGuardar.map((contacto) => contactosService.crear(contacto)),
+      );
+
       setPasoActual(4);
     } catch (err) {
       setError(obtenerMensajeError(err));
@@ -267,7 +330,7 @@ function AltaPersonaWizard() {
       body: JSON.stringify({
         legajo_id: Number(legajoId),
         dni: persona.numero_doc,
-        email: null,
+        email: contactos.email.trim() || null,
         rol: usuario.rol,
       }),
     });
@@ -312,15 +375,21 @@ function AltaPersonaWizard() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-8">
-            {pasos.map((paso) => (
-              <PasoIndicador
-                key={paso.id}
-                paso={paso}
-                activo={pasoActual === paso.id}
-                completo={pasoActual > paso.id}
-              />
-            ))}
+          <div className="mb-8">
+            <div className="flex items-start">
+              {pasos.map((paso, index) => (
+                <PasoIndicador
+                  key={paso.id}
+                  paso={paso}
+                  activo={pasoActual === paso.id}
+                  completo={pasoActual > paso.id}
+                  ultimo={index === pasos.length - 1}
+                />
+              ))}
+            </div>
+            <p className="mt-4 text-center text-sm font-bold text-slate-500 md:hidden">
+              Paso {pasoActual}: {pasos.find((paso) => paso.id === pasoActual)?.titulo}
+            </p>
           </div>
 
           {error && (
@@ -451,6 +520,31 @@ function AltaPersonaWizard() {
 
               <div>
                 <h2 className="text-xl font-extrabold text-slate-800 mb-4">
+                  Contactos
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <CampoTexto
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={contactos.email}
+                    onChange={cambiarContactos}
+                    placeholder="Ej: persona@email.com"
+                    icono={<Mail size={20} />}
+                  />
+                  <CampoTexto
+                    label="Celular"
+                    name="celular"
+                    value={contactos.celular}
+                    onChange={cambiarContactos}
+                    placeholder="Ej: 3415551234"
+                    icono={<Phone size={20} />}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-800 mb-4">
                   Rango y sede
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -560,6 +654,15 @@ function AltaPersonaWizard() {
                   texto="Guardados si fueron seleccionados"
                 />
                 <ResumenItem
+                  icono={<Phone size={24} />}
+                  titulo="Contactos"
+                  texto={
+                    contactos.email || contactos.celular
+                      ? `${contactos.email || "Sin email"} - ${contactos.celular || "Sin celular"}`
+                      : "Omitidos"
+                  }
+                />
+                <ResumenItem
                   icono={<ShieldCheck size={24} />}
                   titulo="Usuario"
                   texto={resultadoUsuario?.mensaje || "Pendiente"}
@@ -582,24 +685,37 @@ function AltaPersonaWizard() {
   );
 }
 
-function PasoIndicador({ paso, activo, completo }) {
-  const Icono = paso.icono;
+function PasoIndicador({ paso, activo, completo, ultimo }) {
+  const resaltado = activo || completo;
 
   return (
-    <div
-      className={`border rounded-xl p-4 flex items-center gap-3 ${
-        activo
-          ? "border-red-300 bg-red-50 text-red-700"
-          : completo
-            ? "border-green-300 bg-green-50 text-green-700"
-            : "border-slate-200 bg-slate-50 text-slate-500"
-      }`}
-    >
-      <Icono size={22} />
-      <div>
-        <p className="text-xs font-bold uppercase">Paso {paso.id}</p>
-        <p className="font-extrabold">{paso.titulo}</p>
+    <div className="flex flex-1 items-start">
+      <div className="flex flex-col items-center min-w-12">
+        <div
+          className={`w-11 h-11 rounded-full flex items-center justify-center text-base font-extrabold border-2 transition ${
+            resaltado
+              ? "bg-red-700 border-red-700 text-white shadow-sm"
+              : "bg-slate-100 border-slate-300 text-slate-400"
+          }`}
+        >
+          {paso.id}
+        </div>
+        <p
+          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${
+            resaltado ? "text-red-700" : "text-slate-400"
+          }`}
+        >
+          {paso.titulo}
+        </p>
       </div>
+
+      {!ultimo && (
+        <div
+          className={`h-1 flex-1 rounded-full mt-5 transition ${
+            completo ? "bg-red-700" : "bg-slate-200"
+          }`}
+        />
+      )}
     </div>
   );
 }
@@ -622,20 +738,30 @@ function CampoTexto({
   onChange,
   placeholder,
   type = "text",
+  icono,
 }) {
   return (
     <div>
       <label className="block text-sm font-bold text-slate-700 mb-2">
         {label}
       </label>
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="w-full h-14 border border-slate-300 rounded-xl px-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-      />
+      <div className="relative">
+        {icono && (
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+            {icono}
+          </span>
+        )}
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+            icono ? "pl-12" : "px-4"
+          }`}
+        />
+      </div>
     </div>
   );
 }
@@ -754,6 +880,40 @@ function obtenerIdRespuesta(respuesta) {
     respuesta?.data?.persona_id ||
     respuesta?.data?.legajo_id
   );
+}
+
+function validarContactos(contactos) {
+  const email = contactos.email.trim();
+  const celular = contactos.celular.trim();
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regexCelular = /^[0-9+\-\s()]{6,20}$/;
+
+  if (email && !regexEmail.test(email)) {
+    return "Ingresa un email valido";
+  }
+
+  if (celular && !regexCelular.test(celular)) {
+    return "Ingresa un celular valido";
+  }
+
+  return "";
+}
+
+function obtenerTipoContacto(tiposContacto, nombre) {
+  const nombreNormalizado = normalizarTexto(nombre);
+
+  return tiposContacto.find((tipo) => {
+    const tipoNormalizado = normalizarTexto(tipo.tipo || tipo.descripcion || "");
+    return tipoNormalizado === nombreNormalizado;
+  });
+}
+
+function normalizarTexto(texto) {
+  return String(texto)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 function obtenerMensajeError(err) {

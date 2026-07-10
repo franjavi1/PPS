@@ -197,7 +197,8 @@ function ComisionesAsignaturas() {
     }
 
     try {
-      await comisionAsignaturaService.eliminar(id);
+      const respuesta = await comisionAsignaturaService.eliminar(id);
+      alert(respuesta.message || "Comision asignatura eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la comision asignatura");
