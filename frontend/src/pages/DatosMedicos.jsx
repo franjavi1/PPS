@@ -145,7 +145,8 @@ function DatosMedicos() {
     }
 
     try {
-      await datosMedicosService.eliminar(id);
+      const respuesta = await datosMedicosService.eliminar(id);
+      alert(respuesta.message || "Datos medicos eliminados correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudieron eliminar los datos medicos");

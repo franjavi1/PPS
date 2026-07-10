@@ -16,6 +16,7 @@ import {
   GitBranch,
   GraduationCap,
   Home,
+  IdCard,
   LogOut,
   MapPinned,
   Menu,
@@ -63,16 +64,16 @@ function Navbar() {
 
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md relative z-50">
-      <div className="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
         <button
           onClick={() => navigate("/inicio")}
           className="flex items-center gap-3 text-left"
         >
-          <div className="w-12 h-12 rounded-full bg-white border-2 border-yellow-400 flex items-center justify-center overflow-hidden shadow-sm">
+          <div className="w-20 h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
               src="/logo.jpeg"
               alt="Logo bomberos"
-              className="w-full h-full object-contain p-1"
+              className="w-full h-full object-cover"
             />
           </div>
 
@@ -106,14 +107,18 @@ function Navbar() {
             title="Personal"
             icon={<SquareUserRound size={17} />}
             openMenu={openMenu}
-            toggleMenu={toggleMenu}
-          >
-            <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
-              <ClipboardList  size={18} />
+            toggleMenu={toggleMenu}>
+
+
+             <NavLink
+              to="/alta-persona"
+              className={linkClass}
+              onClick={closeMenus}>
+              <Plus size={18} />
               <span>
-                <strong>Ver legajos</strong>
+                <strong>Nueva persona</strong>
                 <small className="block text-slate-500">
-                  Buscar y consultar legajos
+                  Alta guiada de persona
                 </small>
               </span>
             </NavLink>
@@ -127,62 +132,16 @@ function Navbar() {
               <span>
                 <strong>Personas</strong>
                 <small className="block text-slate-500">
-                  Alta de persona 
+                  Buscar y editar personas
                 </small>
               </span>
             </NavLink>
-
-            <NavLink
-              to="/contactos"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <Phone size={18} />
+            <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
+              <ClipboardList  size={18} />
               <span>
-                <strong>Contactos</strong>
+                <strong>Ver legajos</strong>
                 <small className="block text-slate-500">
-                  Telefonos, emails y Whatsapp
-                </small>
-              </span>
-            </NavLink>
-
-            <NavLink
-              to="/datos-medicos"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <ClipboardPlus size={18} />
-              <span>
-                <strong>Datos medicos</strong>
-                <small className="block text-slate-500">
-                  Informacion medica asociada
-                </small>
-              </span>
-            </NavLink>
-            <NavLink
-              to="/legajo-rangos"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <ChevronsUp size={18} />
-              <span>
-                <strong>Rangos</strong>
-                <small className="block text-slate-500">
-                  Rangos de Legajos
-                </small>
-              </span>
-            </NavLink>
-
-            <NavLink
-              to="/legajo-sedes"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <MapPinned size={18} />
-              <span>
-                <strong>Legajos por sede</strong>
-                <small className="block text-slate-500">
-                  Legajos asignados a sede
+                  Buscar y consultar legajos
                 </small>
               </span>
             </NavLink>
@@ -195,12 +154,21 @@ function Navbar() {
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
-            <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
+            <NavLink to="/planes/alta" className={linkClass} onClick={closeMenus}>
+              <Plus size={18} />
+              <span>
+                <strong>Nuevo plan</strong>
+                <small className="block text-slate-500">
+                  Alta guiada de plan
+                </small>
+              </span>
+            </NavLink>
+                 <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
               <BookOpen size={18} />
               <span>
                 <strong>Planes</strong>
                 <small className="block text-slate-500">
-                  Resolucion y vigencia
+                 Ver planes
                 </small>
               </span>
             </NavLink>
@@ -218,48 +186,21 @@ function Navbar() {
                 </small>
               </span>
             </NavLink>
+                  <NavLink to="/comisiones/alta" className={linkClass} onClick={closeMenus}>
+              <Plus size={18} />
+              <span>
+                <strong>Nueva Comision</strong>
+                <small className="block text-slate-500">
+                  Alta guiada de Comision
+                </small>
+              </span>
+            </NavLink>
             <NavLink to="/comisiones" className={linkClass} onClick={closeMenus}>
               <Users size={18} />
               <span>
                 <strong>Comisiones</strong>
                 <small className="block text-slate-500">
-                  Creacion de comisiones
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/planes-asignaturas" className={linkClass} onClick={closeMenus}>
-              <BookMarked size={18} />
-              <span>
-                <strong>Plan asignaturas</strong>
-                <small className="block text-slate-500">
-                  Creacion de planes asignatura
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/pa-correlativas" className={linkClass} onClick={closeMenus}>
-              <GitBranch size={18} />
-              <span>
-                <strong>Correlativas</strong>
-                <small className="block text-slate-500">
-                  Plan de Asignaturas Correlativas
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/comisiones-asignaturas" className={linkClass} onClick={closeMenus}>
-              <BookOpenCheck size={18} />
-              <span>
-                <strong>Comision Asignaturas</strong>
-                <small className="block text-slate-500">
-                  Creacion de comision Asignatura
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/autoridades-comision" className={linkClass} onClick={closeMenus}>
-              <ShieldUser size={18} />
-              <span>
-                <strong>Autoridades comision</strong>
-                <small className="block text-slate-500">
-                  Creacion de autoridad Comision
+                  Ver comisiones
                 </small>
               </span>
             </NavLink>
@@ -316,6 +257,42 @@ function Navbar() {
                 </small>
               </span>
             </NavLink>
+
+            <p className="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
+              PERSONAL
+            </p>
+            <NavLink
+              to="/tipos-documentos"
+              className={linkClass}
+              onClick={closeMenus}
+            >
+              <IdCard size={18} />
+              <span>
+                <strong>Tipo de documentos</strong>
+                <small className="block text-slate-500">
+                  Catalogo de documentos
+                </small>
+              </span>
+            </NavLink>
+
+
+
+
+            <NavLink
+              to="/tipo-rangos"
+              className={linkClass}
+              onClick={closeMenus}
+            >
+              <ChevronsUp size={18} />
+              <span>
+                <strong>Tipo de rangos</strong>
+                <small className="block text-slate-500">
+                  Catalogo de rangos
+                </small>
+              </span>
+            </NavLink>
+
+
       
           </Dropdown>
 
@@ -353,6 +330,14 @@ function Navbar() {
             </MobileLink>
 
             <MobileLink
+              to="/alta-persona"
+              icon={<Plus size={20} />}
+              onClick={closeMenus}
+            >
+              Nueva persona
+            </MobileLink>
+
+            <MobileLink
               to="/legajos"
               icon={<Folder size={20} />}
               onClick={closeMenus}
@@ -385,11 +370,19 @@ function Navbar() {
             </MobileLink>
 
             <MobileLink
-              to="/legajo-rangos"
+              to="/tipos-documentos"
+              icon={<IdCard size={20} />}
+              onClick={closeMenus}
+            >
+              Tipo de documentos
+            </MobileLink>
+
+            <MobileLink
+              to="/tipo-rangos"
               icon={<ChevronsUp size={20} />}
               onClick={closeMenus}
             >
-              Rangos
+              Tipo de rangos
             </MobileLink>
 
             <MobileLink
@@ -398,6 +391,14 @@ function Navbar() {
               onClick={closeMenus}
             >
               Legajos por sede
+            </MobileLink>
+
+            <MobileLink
+              to="/planes/alta"
+              icon={<Plus size={20} />}
+              onClick={closeMenus}
+            >
+              Nuevo plan
             </MobileLink>
 
             <MobileLink

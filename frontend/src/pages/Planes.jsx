@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   BookOpen,
   CalendarDays,
@@ -10,6 +11,7 @@ import {
   Save,
   Search,
   Trash2,
+  Eye,
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -26,6 +28,7 @@ const formularioInicial = {
 };
 
 function Planes() {
+  const navigate = useNavigate();
   const [planes, setPlanes] = useState([]);
   const [tiposPlanes, setTiposPlanes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -72,11 +75,6 @@ function Planes() {
     setErrorFormulario("");
   }
 
-  function abrirNuevoPlan() {
-    limpiarFormulario();
-    setMostrarModal(true);
-  }
-
   function cerrarModal() {
     limpiarFormulario();
     setMostrarModal(false);
@@ -92,17 +90,7 @@ function Planes() {
   }
 
   function editarPlan(plan) {
-    setFormulario({
-      tipo_planes_id_tipo_planes: String(plan.tipo_planes_id_tipo_planes || ""),
-      resolucion_ministerial: String(plan.resolucion_ministerial || ""),
-      nombre: plan.nombre || "",
-      descrip: plan.descrip || "",
-      vigencia_dde: formatearFechaInput(plan.vigencia_dde),
-      vigencia_hta: formatearFechaInput(plan.vigencia_hta),
-    });
-    setEditandoId(plan.id);
-    setErrorFormulario("");
-    setMostrarModal(true);
+    navigate(`/planes/${plan.id}/editar`);
   }
 
   async function guardarPlan(e) {
@@ -172,7 +160,8 @@ function Planes() {
     }
 
     try {
-      await planService.eliminar(id);
+      const respuesta = await planService.eliminar(id);
+      alert(respuesta.message || "Plan eliminado correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el plan");
@@ -223,7 +212,7 @@ function Planes() {
               </button>
 
               <button
-                onClick={abrirNuevoPlan}
+                onClick={() => navigate("/planes/alta")}
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
               >
                 <PlusCircle size={22} />
@@ -289,7 +278,15 @@ function Planes() {
                     </p>
                   )}
 
-                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
+                  <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
+                    <button
+                      onClick={() => navigate(`/planes/${plan.id}`)}
+                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                    >
+                      <Eye size={16} />
+                      Ver
+                    </button>
+
                     <button
                       onClick={() => editarPlan(plan)}
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
@@ -355,6 +352,14 @@ function Planes() {
                       </td>
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => navigate(`/planes/${plan.id}`)}
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                          >
+                            <Eye size={18} />
+                            Ver
+                          </button>
+
                           <button
                             onClick={() => editarPlan(plan)}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"

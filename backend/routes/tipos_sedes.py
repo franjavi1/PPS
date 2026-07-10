@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.sedes import Sedes
 from schemas.tipo_sede_schema import tipo_sede_schema, tipos_sedes_schema
 
 from services.tipo_sede_service import (
@@ -153,6 +154,13 @@ def eliminar_tipo_sede(id):
         if not tipo_sede:
             return respuesta_api(False, None, "Tipo de sede no encontrado", 404, {
                 "id": "No existe un tipo de sede con ese id"
+            })
+
+        esta_en_uso = Sedes.query.filter_by(tipo_sede_id=id).first()
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar el tipo de sede", 409, {
+                "tipo_sede": "No se puede eliminar un tipo de sede asociado a sedes"
             })
 
         eliminar(tipo_sede)

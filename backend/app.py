@@ -48,6 +48,7 @@ from routes.legajo_sedes import legajo_sedes_bp
 from routes.datos_medicos import datos_medicos_bp
 from routes.tipos_contacto import tipos_contacto_bp
 from routes.contactos import contactos_bp
+from routes.personas_relaciones import personas_relaciones_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -87,6 +88,7 @@ app.register_blueprint(legajo_sedes_bp)
 app.register_blueprint(datos_medicos_bp)
 app.register_blueprint(tipos_contacto_bp)
 app.register_blueprint(contactos_bp)
+app.register_blueprint(personas_relaciones_bp)
 
 with app.app_context():
     db.create_all()

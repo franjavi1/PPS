@@ -3,6 +3,8 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.pa_correlativa import PACorrelativa
+from models.plan_asignatura import PlanAsignatura
 from schemas.asignaturas_schema import asignatura_schema, asignaturas_schema
 
 from services.asignaturas_service import (
@@ -153,6 +155,18 @@ def eliminar_asignatura(id):
         if not asignatura:
             return respuesta_api(False, None, "Asignatura no encontrada", 404, {
                 "id": "No existe una asignatura activa con ese id"
+            })
+
+        esta_en_plan = PlanAsignatura.query.filter_by(
+            asignatura_id=id,
+            estado=1,
+        ).first()
+
+        esta_en_correlativa = PACorrelativa.query.filter_by(asignatura_id=id).first()
+
+        if esta_en_plan or esta_en_correlativa:
+            return respuesta_api(False, None, "No se puede eliminar la asignatura", 409, {
+                "asignatura": "No se puede eliminar una asignatura asociada a un plan o correlativa"
             })
 
         eliminar(asignatura)

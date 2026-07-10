@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.plan_asignatura import PlanAsignatura
 from schemas.planes_schema import plan_schema, planes_schema
 
 from services.planes_service import (
@@ -155,6 +156,13 @@ def eliminar_plan(id):
         if not plan:
             return respuesta_api(False, None, "Plan no encontrado", 404, {
                 "id": "No existe un plan con ese id"
+            })
+
+        esta_en_uso = PlanAsignatura.query.filter_by(plan_id=id, estado=1).first()
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar el plan", 409, {
+                "plan": "No se puede eliminar un plan con asignaturas asociadas"
             })
         
         eliminar(plan)

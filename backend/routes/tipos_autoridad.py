@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from db import db
 
+from models.autoridad_comision import AutoridadComision
 from schemas.tipo_autoridad_schema import tipo_autoridad_schema, tipos_autoridad_schema
 from services.tipo_autoridad_service import (
     obtener_todos,
@@ -138,6 +139,13 @@ def eliminar_tipo_autoridad(id):
         if not tipo:
             return respuesta_api(False, None, "Tipo de autoridad no encontrado", 404, {
                 "id": "No existe un registro con ese id"
+            })
+
+        esta_en_uso = AutoridadComision.query.filter_by(tipo_autoridad_id=id).first()
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar el tipo de autoridad", 409, {
+                "tipo_autoridad": "No se puede eliminar un tipo de autoridad asociado a autoridades de comision"
             })
         
         eliminar(tipo)

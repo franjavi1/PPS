@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import {
+  Eye,
   GraduationCap,
   Pencil,
   PlusCircle,
@@ -17,6 +19,7 @@ const formularioInicial = {
 };
 
 function Comisiones() {
+  const navigate = useNavigate();
   const [comisiones, setComisiones] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -122,7 +125,8 @@ function Comisiones() {
     }
 
     try {
-      await comisionService.eliminar(id);
+      const respuesta = await comisionService.eliminar(id);
+      alert(respuesta.message || "Comision eliminada correctamente");
       await cargarComisiones();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la comision");
@@ -168,7 +172,7 @@ function Comisiones() {
               </button>
 
               <button
-                onClick={abrirNuevaComision}
+                onClick={() => navigate("/comisiones/alta")}
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
               >
                 <PlusCircle size={22} />
@@ -218,9 +222,17 @@ function Comisiones() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
+                  <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
-                      onClick={() => editarComision(comision)}
+                      onClick={() => navigate(`/comisiones/${comision.id_comision}`)}
+                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                    >
+                      <Eye size={16} />
+                      Ver
+                    </button>
+
+                    <button
+                      onClick={() => navigate(`/comisiones/${comision.id_comision}/editar`)}
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
                     >
                       <Pencil size={16} />
@@ -272,7 +284,15 @@ function Comisiones() {
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => editarComision(comision)}
+                            onClick={() => navigate(`/comisiones/${comision.id_comision}`)}
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                          >
+                            <Eye size={18} />
+                            Ver
+                          </button>
+
+                          <button
+                            onClick={() => navigate(`/comisiones/${comision.id_comision}/editar`)}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
                           >
                             <Pencil size={18} />

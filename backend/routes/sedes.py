@@ -3,6 +3,9 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.aula import Aula
+from models.legajo_sedes import LegajoSedes
+from models.plan_asignatura import PlanAsignatura
 from schemas.sedes_schema import sede_schema, sedes_schema
 
 from services.sedes_service import (
@@ -152,6 +155,17 @@ def eliminar_sede(id):
         if not sede:
             return respuesta_api(False, None, "Sede no encontrada", 404, {
                 "id": "No existe una sede con ese id"
+            })
+
+        esta_en_uso = (
+            Aula.query.filter_by(sedes_id=id, estado=1).first()
+            or LegajoSedes.query.filter_by(sede_id=id).first()
+            or PlanAsignatura.query.filter_by(sedes_id=id, estado=1).first()
+        )
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar la sede", 409, {
+                "sede": "No se puede eliminar una sede asociada a aulas, legajos o planes"
             })
 
         eliminar(sede)

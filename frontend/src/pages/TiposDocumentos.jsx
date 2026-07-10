@@ -82,9 +82,10 @@ function TiposDocumentos() {
     }
 
     try {
-      await apiRequest(`/tipos-documentos/${id}`, {
+      const respuesta = await apiRequest(`/tipos-documentos/${id}`, {
         method: "DELETE",
       });
+      alert(respuesta.message || "Tipo de documento eliminado correctamente");
       await cargarTipos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el tipo de documento");

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   Pencil,
   PlusCircle,
@@ -29,6 +30,7 @@ function Personas() {
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     cargarDatos();
@@ -145,7 +147,8 @@ function Personas() {
     }
 
     try {
-      await personasService.eliminar(id);
+      const respuesta = await personasService.eliminar(id);
+      alert(respuesta.message || "Persona eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la persona");
@@ -274,7 +277,7 @@ function Personas() {
 
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
-                      onClick={() => editarPersona(persona)}
+                      onClick={() => navigate(`/personas/${persona.id}/editar`)}
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
                     >
                       <Pencil size={16} />
@@ -339,7 +342,7 @@ function Personas() {
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => editarPersona(persona)}
+                            onClick={() => navigate(`/personas/${persona.id}/editar`)}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
                           >
                             <Pencil size={18} />

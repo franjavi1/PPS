@@ -151,7 +151,8 @@ function Aulas() {
     }
 
     try {
-      await aulaService.eliminar(id);
+      const respuesta = await aulaService.eliminar(id);
+      alert(respuesta.message || "Aula eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el aula");

@@ -3,6 +3,8 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from db import db
 
+from models.comision_asignatura import ComisionAsignatura
+from models.pa_correlativa import PACorrelativa
 from schemas.plan_asignatura_schema import plan_asignatura_schema, planes_asignaturas_schema
 from services.plan_asignatura_service import (
     obtener_todos,
@@ -99,6 +101,16 @@ def eliminar_plan(id):
         plan = obtener_por_id(id)
         if not plan:
             return respuesta_api(False, None, "Registro no encontrado", 404, {"id": "No existe el registro"})
+
+        esta_en_uso = (
+            ComisionAsignatura.query.filter_by(plan_asignaturas_id=id).first()
+            or PACorrelativa.query.filter_by(pa_id=id).first()
+        )
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar la asignatura del plan", 409, {
+                "plan_asignatura": "No se puede eliminar una asignatura del plan asociada a comisiones o correlativas"
+            })
         
         eliminar(plan)
         return respuesta_api(True, {"id": id}, "Registro eliminado físicamente")

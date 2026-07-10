@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from db import db
+from models.comision_asignatura import ComisionAsignatura
 
 from schemas.aula_schema import aula_schema, aulas_schema
 from services.aula_service import (
@@ -139,7 +140,14 @@ def eliminar_aula(id):
             return respuesta_api(False, None, "Aula no encontrada", 404, {
                 "id": "No existe un aula activa con ese id"
             })
-        
+
+        esta_en_uso = ComisionAsignatura.query.filter_by(aula_id=id).first()
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar el aula", 409, {
+                "aula": "No se puede eliminar un aula asociada a comisiones"
+            })
+
         eliminar(aula)
         return respuesta_api(True, {"id_aula": id}, "Aula eliminada correctamente")
     

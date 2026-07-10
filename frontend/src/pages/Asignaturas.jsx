@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
+import { planAsignaturaService } from "../services/planAsignaturaService";
 
 const formularioInicial = {
   nombre: "",
@@ -19,6 +20,7 @@ const formularioInicial = {
 
 function Asignaturas() {
   const [asignaturas, setAsignaturas] = useState([]);
+  const [planAsignaturas, setPlanAsignaturas] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -36,8 +38,12 @@ function Asignaturas() {
       setCargando(true);
       setError("");
 
-      const respuesta = await asignaturaService.obtenerTodas();
+      const [respuesta, respuestaPlanAsignaturas] = await Promise.all([
+        asignaturaService.obtenerTodas(),
+        planAsignaturaService.obtenerTodos(),
+      ]);
       setAsignaturas(respuesta.data || []);
+      setPlanAsignaturas(respuestaPlanAsignaturas.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron obtener las asignaturas");
     } finally {
@@ -129,6 +135,11 @@ function Asignaturas() {
   }
 
   async function eliminarAsignatura(id) {
+    if (asignaturaEstaEnPlan(id)) {
+      setError("No se puede eliminar una asignatura asociada a un plan");
+      return;
+    }
+
     const confirmar = confirm("Seguro que queres eliminar esta asignatura?");
 
     if (!confirmar) {
@@ -136,7 +147,8 @@ function Asignaturas() {
     }
 
     try {
-      await asignaturaService.eliminar(id);
+      const respuesta = await asignaturaService.eliminar(id);
+      alert(respuesta.message || "Asignatura eliminada correctamente");
       await cargarAsignaturas();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la asignatura");
@@ -151,6 +163,14 @@ function Asignaturas() {
       String(asignatura.formato || "").toLowerCase().includes(textoBusqueda)
     );
   });
+
+  function asignaturaEstaEnPlan(asignaturaId) {
+    return planAsignaturas.some(
+      (item) =>
+        Number(item.asignatura_id) === Number(asignaturaId) &&
+        Number(item.estado ?? 1) === 1,
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -259,7 +279,13 @@ function Asignaturas() {
 
                     <button
                       onClick={() => eliminarAsignatura(asignatura.id)}
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                      disabled={asignaturaEstaEnPlan(asignatura.id)}
+                      title={
+                        asignaturaEstaEnPlan(asignatura.id)
+                          ? "No se puede eliminar una asignatura asociada a un plan"
+                          : "Eliminar asignatura"
+                      }
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
                       <Trash2 size={16} />
                       Eliminar
@@ -316,7 +342,13 @@ function Asignaturas() {
 
                           <button
                             onClick={() => eliminarAsignatura(asignatura.id)}
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
+                            disabled={asignaturaEstaEnPlan(asignatura.id)}
+                            title={
+                              asignaturaEstaEnPlan(asignatura.id)
+                                ? "No se puede eliminar una asignatura asociada a un plan"
+                                : "Eliminar asignatura"
+                            }
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Trash2 size={18} />
                             Eliminar

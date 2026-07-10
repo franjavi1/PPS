@@ -139,7 +139,8 @@ function Sedes() {
     }
 
     try {
-      await sedeService.eliminar(id);
+      const respuesta = await sedeService.eliminar(id);
+      alert(respuesta.message || "Sede eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la sede");

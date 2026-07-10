@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.contactos import Contactos
 from schemas.tipo_contacto_schema import tipo_contacto_schema, tipos_contacto_schema
 
 from services.tipo_contacto_service import (
@@ -153,6 +154,13 @@ def eliminar_tipo_contacto(id):
         if not tipo_contacto:
             return respuesta_api(False, None, "Tipo de contacto no encontrado", 404, {
                 "id": "No existe un tipo de contacto con ese id"
+            })
+
+        esta_en_uso = Contactos.query.filter_by(tipo_contacto_id=id).first()
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar el tipo de contacto", 409, {
+                "tipo_contacto": "No se puede eliminar un tipo de contacto asociado a contactos"
             })
 
         eliminar(tipo_contacto)

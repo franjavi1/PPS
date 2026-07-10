@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.persona import Persona
 from schemas.tipo_documento_schema import tipo_documento_schema, tipos_documento_schema
 
 
@@ -166,6 +167,13 @@ def eliminar_tipo_documento(id):
         if not tipo_documento:
             return respuesta_api(False, None, "Tipo de documento no encontrado",404,{
                 "id": "No existe un tipo de documento con ese id"
+            })
+
+        esta_en_uso = Persona.query.filter_by(td_id=id, estado=1).first()
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar el tipo de documento", 409, {
+                "tipo_documento": "No se puede eliminar un tipo de documento asociado a personas activas"
             })
 
         eliminar(tipo_documento)

@@ -134,7 +134,8 @@ function LegajoRangos() {
     }
 
     try {
-      await legajoRangosService.eliminar(id);
+      const respuesta = await legajoRangosService.eliminar(id);
+      alert(respuesta.message || "Rango del legajo eliminado correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el rango del legajo");

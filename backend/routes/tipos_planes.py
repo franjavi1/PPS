@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.planes import Planes
 from schemas.tipo_planes_schema import tipo_planes_schema, tipos_planes_schema
 
 from services.tipo_planes_service import (
@@ -154,6 +155,16 @@ def eliminar_tipo_planes(id):
         if not tipo_plan:
             return respuesta_api(False, None, "Tipo de plan no encontrado", 404, {
                 "id": "No existe un tipo de plan con ese id"
+            })
+
+        esta_en_uso = Planes.query.filter_by(
+            tipo_planes_id_tipo_planes=id,
+            estado=1,
+        ).first()
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar el tipo de plan", 409, {
+                "tipo_plan": "No se puede eliminar un tipo de plan asociado a planes activos"
             })
 
         eliminar(tipo_plan)

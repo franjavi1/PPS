@@ -3,6 +3,9 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from models.contactos import Contactos
+from models.datos_medicos import DatosMedicos
+from models.legajo import Legajo
 from schemas.persona_schema import  persona_schema, personas_schema
 
 
@@ -101,13 +104,13 @@ def crear_persona():
 
        
         
-        return respuesta_api(False, None, "Error de validación", 400, e.messages)
+        return respuesta_api(False, None, "Error de validacion", 400, e.messages)
 
     except SQLAlchemyError:
         db.session.rollback()
 
         return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrió un error al crear la persona"
+            "database": "Ocurrio un error al crear la persona"
         })
 
     except Exception as e:
@@ -115,7 +118,7 @@ def crear_persona():
         print(e)
 
         return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrió un error inesperado"
+            "server": "Ocurrio un error inesperado"
         })
 
 
@@ -140,13 +143,13 @@ def editar_persona(id):
 
        
         
-        return respuesta_api(False, None, "Error de validación", 400, e.messages)
+        return respuesta_api(False, None, "Error de validacion", 400, e.messages)
 
     except SQLAlchemyError:
         db.session.rollback()
 
         return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrió un error al actualizar la persona"
+            "database": "Ocurrio un error al actualizar la persona"
         })
 
     except Exception as e:
@@ -154,7 +157,7 @@ def editar_persona(id):
         print(e)
 
         return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrió un error inesperado"
+            "server": "Ocurrio un error inesperado"
         })
     
 
@@ -169,6 +172,18 @@ def eliminar_persona(id):
             return respuesta_api(False, None, "Persona no encontrada",404,{
                 "id": "No existe una persona activa con ese id"
             })
+
+        esta_en_uso = (
+            Legajo.query.filter_by(persona_id=id, estado=1).first()
+            or Contactos.query.filter_by(persona_id=id).first()
+            or DatosMedicos.query.filter_by(persona_id=id).first()
+        )
+
+        if esta_en_uso:
+            return respuesta_api(False, None, "No se puede eliminar la persona", 409, {
+                "persona": "No se puede eliminar una persona con legajo, contactos o datos medicos asociados"
+            })
+
         eliminar(persona)
 
         return respuesta_api(True,{"id": id}, "Persona eliminada correctamente")
@@ -185,7 +200,7 @@ def eliminar_persona(id):
         print(e)
 
         return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrió un error inesperado"
+            "server": "Ocurrio un error inesperado"
         })
 
 
