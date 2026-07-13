@@ -1,0 +1,70 @@
+microservice:
+
+  name: personas-planes-config
+
+actions:
+
+  # -------------------------
+  # PERSONAS
+  # -------------------------
+
+  - grupo1.personas.crear
+  - grupo1.personas.leer
+  - grupo1.personas.actualizar
+  - grupo1.personas.eliminar
+  - grupo1.medico.crear
+  - grupo1.medico.leer
+  - grupo1.medico.actualizar
+  - grupo1.medico.eliminar
+
+  # -------------------------
+  # PLANES
+  # -------------------------
+
+  - grupo1.planes.crear
+  - grupo1.planes.leer
+  - grupo1.planes.actualizar
+  - grupo1.planes.eliminar
+
+  # -------------------------
+  # CONFIG
+  # -------------------------
+
+  - grupo1.sedes.crear
+  - grupo1.sedes.leer
+  - grupo1.sedes.actualizar
+  - grupo1.sedes.eliminar
+  - grupo1.tiposdocumento.crear
+  - grupo1.tiposdocumento.leer
+  - grupo1.tiposdocumento.actualizar
+  - grupo1.tiposdocumento.eliminar
+  - grupo1.tipossede.crear
+  - grupo1.tipossede.leer
+  - grupo1.tipossede.actualizar
+  - grupo1.tipossede.eliminar
+  - grupo1.aulas.crear
+  - grupo1.aulas.leer
+  - grupo1.aulas.actualizar
+  - grupo1.aulas.eliminar
+  - grupo1.rangos.crear
+  - grupo1.rangos.leer
+  - grupo1.rangos.actualizar
+  - grupo1.rangos.eliminar
+
+  # -------------------------
+  # ASIGNATURAS
+  # -------------------------
+
+  - grupo1.asignaturas.crear
+  - grupo1.asignaturas.leer
+  - grupo1.asignaturas.actualizar
+  - grupo1.asignaturas.eliminar
+
+  # -------------------------
+  # COMISIONES
+  # -------------------------
+
+  - grupo1.comisiones.crear
+  - grupo1.comisiones.leer
+  - grupo1.comisiones.actualizar
+  - grupo1.comisiones.eliminar
