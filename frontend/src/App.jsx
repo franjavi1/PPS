@@ -31,6 +31,7 @@ import Sedes from "./pages/Sedes";
 import TiposSedes from "./pages/TiposSedes";
 import TipoRangos from "./pages/TipoRangos";
 import TiposDocumentos from "./pages/TiposDocumentos";
+import TiposPlanes from "./pages/TiposPlanes";
 
 
 function App() {
@@ -101,6 +102,7 @@ function App() {
           <Route path="/comisiones/:id/editar" element={<EditarComision />} />
           <Route path="/planes" element={<Planes />} />
           <Route path="/planes-asignaturas" element={<PlanesAsignaturas />} />
+          <Route path="/tipos-planes" element={<TiposPlanes />} />
           <Route path="/aulas" element={<Aulas />} />
           <Route path="/comisiones-asignaturas" element={<ComisionesAsignaturas />} />
           <Route path="/autoridades-comision" element={<AutoridadesComision />} />

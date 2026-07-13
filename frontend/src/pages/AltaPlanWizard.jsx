@@ -124,11 +124,13 @@ function AltaPlanWizard() {
         )?.nombre || "-",
       rango:
         rangos.find(
-          (rango) => Number(rango.id) === Number(asignaturaPlan.rango_minimo_id),
+          (rango) =>
+            Number(rango.id) === Number(asignaturaPlan.rango_minimo_id),
         )?.descripcion || "-",
       sede:
-        sedes.find((sede) => Number(sede.id) === Number(asignaturaPlan.sedes_id))
-          ?.nombre || "-",
+        sedes.find(
+          (sede) => Number(sede.id) === Number(asignaturaPlan.sedes_id),
+        )?.nombre || "-",
     };
   }, [asignaturaPlan, asignaturas, plan, rangos, sedes, tiposPlanes]);
 
@@ -457,20 +459,67 @@ function AltaPlanWizard() {
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <CampoSelect
-                      label="Tipo de plan"
-                      name="tipo_planes_id_tipo_planes"
-                      value={plan.tipo_planes_id_tipo_planes}
+                    <div>
+                      <CampoSelect
+                        label="Tipo de plan"
+                        name="tipo_planes_id_tipo_planes"
+                        value={plan.tipo_planes_id_tipo_planes}
+                        onChange={cambiarPlan}
+                        opciones={tiposPlanes}
+                        getValue={(tipo) => tipo.id_tipo_planes}
+                        getLabel={(tipo) => tipo.descripcion}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => navigate("/tipos-planes")}
+                        className="mt-2 flex items-center gap-1 text-sm font-semibold text-red-700 hover:text-red-800 transition cursor-pointer"
+                      >
+                        <PlusCircle size={17} />
+                        Administrar tipos de plan
+                      </button>
+                    </div>
+                    <CampoTexto
+                      label="Resolucion ministerial"
+                      name="resolucion_ministerial"
+                      type="number"
+                      value={plan.resolucion_ministerial}
                       onChange={cambiarPlan}
-                      opciones={tiposPlanes}
-                      getValue={(tipo) => tipo.id_tipo_planes}
-                      getLabel={(tipo) => tipo.descripcion}
+                      placeholder="Ej: 2026001"
+                      icono={<Hash size={20} />}
                     />
-                    <CampoTexto label="Resolucion ministerial" name="resolucion_ministerial" type="number" value={plan.resolucion_ministerial} onChange={cambiarPlan} placeholder="Ej: 2026001" icono={<Hash size={20} />} />
-                    <CampoTexto label="Nombre" name="nombre" value={plan.nombre} onChange={cambiarPlan} placeholder="Ej: Plan de Formacion Inicial" icono={<FileText size={20} />} />
-                    <CampoTexto label="Descripcion" name="descrip" value={plan.descrip} onChange={cambiarPlan} placeholder="Breve descripcion" icono={<FileText size={20} />} />
-                    <CampoTexto label="Vigencia desde" name="vigencia_dde" type="date" value={plan.vigencia_dde} onChange={cambiarPlan} icono={<CalendarDays size={20} />} />
-                    <CampoTexto label="Vigencia hasta" name="vigencia_hta" type="date" value={plan.vigencia_hta} onChange={cambiarPlan} icono={<CalendarDays size={20} />} />
+                    <CampoTexto
+                      label="Nombre"
+                      name="nombre"
+                      value={plan.nombre}
+                      onChange={cambiarPlan}
+                      placeholder="Ej: Plan de Formacion Inicial"
+                      icono={<FileText size={20} />}
+                    />
+                    <CampoTexto
+                      label="Descripcion"
+                      name="descrip"
+                      value={plan.descrip}
+                      onChange={cambiarPlan}
+                      placeholder="Breve descripcion"
+                      icono={<FileText size={20} />}
+                    />
+                    <CampoTexto
+                      label="Vigencia desde"
+                      name="vigencia_dde"
+                      type="date"
+                      value={plan.vigencia_dde}
+                      onChange={cambiarPlan}
+                      icono={<CalendarDays size={20} />}
+                    />
+                    <CampoTexto
+                      label="Vigencia hasta"
+                      name="vigencia_hta"
+                      type="date"
+                      value={plan.vigencia_hta}
+                      onChange={cambiarPlan}
+                      icono={<CalendarDays size={20} />}
+                    />
                   </div>
 
                   <Acciones
@@ -493,9 +542,33 @@ function AltaPlanWizard() {
                       label="Plan creado"
                       value={`${plan.nombre || "-"} - ID ${planId || "-"}`}
                     />
-                    <CampoSelect label="Asignatura" name="asignatura_id" value={asignaturaPlan.asignatura_id} onChange={cambiarAsignaturaPlan} opciones={asignaturas} getValue={(asignatura) => asignatura.id} getLabel={(asignatura) => asignatura.nombre} />
-                    <CampoSelect label="Rango minimo" name="rango_minimo_id" value={asignaturaPlan.rango_minimo_id} onChange={cambiarAsignaturaPlan} opciones={rangos} getValue={(rango) => rango.id} getLabel={(rango) => rango.descripcion} />
-                    <CampoSelect label="Sede" name="sedes_id" value={asignaturaPlan.sedes_id} onChange={cambiarAsignaturaPlan} opciones={sedes} getValue={(sede) => sede.id} getLabel={(sede) => sede.nombre} />
+                    <CampoSelect
+                      label="Asignatura"
+                      name="asignatura_id"
+                      value={asignaturaPlan.asignatura_id}
+                      onChange={cambiarAsignaturaPlan}
+                      opciones={asignaturas}
+                      getValue={(asignatura) => asignatura.id}
+                      getLabel={(asignatura) => asignatura.nombre}
+                    />
+                    <CampoSelect
+                      label="Rango minimo"
+                      name="rango_minimo_id"
+                      value={asignaturaPlan.rango_minimo_id}
+                      onChange={cambiarAsignaturaPlan}
+                      opciones={rangos}
+                      getValue={(rango) => rango.id}
+                      getLabel={(rango) => rango.descripcion}
+                    />
+                    <CampoSelect
+                      label="Sede"
+                      name="sedes_id"
+                      value={asignaturaPlan.sedes_id}
+                      onChange={cambiarAsignaturaPlan}
+                      opciones={sedes}
+                      getValue={(sede) => sede.id}
+                      getLabel={(sede) => sede.nombre}
+                    />
                   </div>
 
                   <Acciones
@@ -515,12 +588,61 @@ function AltaPlanWizard() {
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <CampoTexto label="Presentismo %" name="presentismo_porc" type="number" step="0.01" value={asignaturaPlan.presentismo_porc} onChange={cambiarAsignaturaPlan} placeholder="Ej: 75" icono={<Hash size={20} />} />
-                    <CampoTexto label="Regularizacion prom." name="regularizacion_prom" type="number" step="0.01" value={asignaturaPlan.regularizacion_prom} onChange={cambiarAsignaturaPlan} placeholder="Ej: 6" icono={<Hash size={20} />} />
-                    <CampoTexto label="Final aprobacion" name="final_aprobacion" type="number" value={asignaturaPlan.final_aprobacion} onChange={cambiarAsignaturaPlan} placeholder="Ej: 7" icono={<Hash size={20} />} />
-                    <CampoTexto label="Duracion" name="duracion" type="number" step="0.01" value={asignaturaPlan.duracion} onChange={cambiarAsignaturaPlan} placeholder="Ej: 120" icono={<Hash size={20} />} />
-                    <CampoTexto label="Regimen" name="regimen" value={asignaturaPlan.regimen} onChange={cambiarAsignaturaPlan} placeholder="Ej: Anual" icono={<BookMarked size={20} />} />
-                    <CampoTexto label="Modalidad" name="modalidad" value={asignaturaPlan.modalidad} onChange={cambiarAsignaturaPlan} placeholder="Ej: Presencial" icono={<Building2 size={20} />} />
+                    <CampoTexto
+                      label="Presentismo %"
+                      name="presentismo_porc"
+                      type="number"
+                      step="0.01"
+                      value={asignaturaPlan.presentismo_porc}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: 75"
+                      icono={<Hash size={20} />}
+                    />
+                    <CampoTexto
+                      label="Regularizacion prom."
+                      name="regularizacion_prom"
+                      type="number"
+                      step="0.01"
+                      value={asignaturaPlan.regularizacion_prom}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: 6"
+                      icono={<Hash size={20} />}
+                    />
+                    <CampoTexto
+                      label="Final aprobacion"
+                      name="final_aprobacion"
+                      type="number"
+                      value={asignaturaPlan.final_aprobacion}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: 7"
+                      icono={<Hash size={20} />}
+                    />
+                    <CampoTexto
+                      label="Duracion"
+                      name="duracion"
+                      type="number"
+                      step="0.01"
+                      value={asignaturaPlan.duracion}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: 120"
+                      icono={<Hash size={20} />}
+                    />
+                    <CampoTexto
+                      label="Regimen"
+                      name="regimen"
+                      value={asignaturaPlan.regimen}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: Anual"
+                      icono={<BookMarked size={20} />}
+                    />
+                    <CampoTexto
+                      label="Modalidad"
+                      name="modalidad"
+                      value={asignaturaPlan.modalidad}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: Presencial"
+                      icono={<Building2 size={20} />}
+                    />
                   </div>
 
                   <Acciones
@@ -714,12 +836,30 @@ function AltaPlanWizard() {
                             </div>
 
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-sm">
-                              <DatoResumen label="Regimen" value={item.regimen} />
-                              <DatoResumen label="Modalidad" value={item.modalidad} />
-                              <DatoResumen label="Presentismo" value={`${item.presentismo_porc}%`} />
-                              <DatoResumen label="Regularizacion" value={item.regularizacion_prom} />
-                              <DatoResumen label="Final" value={item.final_aprobacion} />
-                              <DatoResumen label="Duracion" value={item.duracion} />
+                              <DatoResumen
+                                label="Regimen"
+                                value={item.regimen}
+                              />
+                              <DatoResumen
+                                label="Modalidad"
+                                value={item.modalidad}
+                              />
+                              <DatoResumen
+                                label="Presentismo"
+                                value={`${item.presentismo_porc}%`}
+                              />
+                              <DatoResumen
+                                label="Regularizacion"
+                                value={item.regularizacion_prom}
+                              />
+                              <DatoResumen
+                                label="Final"
+                                value={item.final_aprobacion}
+                              />
+                              <DatoResumen
+                                label="Duracion"
+                                value={item.duracion}
+                              />
                             </div>
                           </div>
                         </article>
@@ -981,7 +1121,11 @@ function validarCondiciones(payload) {
   return "";
 }
 
-function validarCorrelativa(payload, asignaturasCargadas, correlativasCargadas) {
+function validarCorrelativa(
+  payload,
+  asignaturasCargadas,
+  correlativasCargadas,
+) {
   if (!payload.pa_id) {
     return "Debe seleccionar la asignatura que requiere correlativa";
   }
