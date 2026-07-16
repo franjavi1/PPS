@@ -1,4 +1,4 @@
-from models.tipo_documento import TipoDocumento
+from backend.models.tipo_documento_model import TipoDocumento
 
 from db import ma
 
@@ -14,9 +14,15 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
     class Meta:
         model = TipoDocumento
         load_instance = True
+        # los datos que sean enviados desde el front no los toma, solo el back controla esto
+        dump_only = ('id_persona_creacion', 'id_persona_modificacion', 'id_persona_baja', 'ts_creacion', 'ts_modificacion', 'ts_baja')
 
     # Campo de solo lectura para las respuestas.
-    id = ma.auto_field(dump_only=True)
+    id_tipo_documento = ma.auto_field(dump_only=True)
+    
+    # extraemos datos foraneos si es que ubiera y evitamos importacion circular, la coma(,) representa una tupla otra forma seria ["tipo_documento"]
+    # el parametro esper alista e spor eso, y sin la coma lo toma como un string
+    # documentacion = ma.Nested("Otra_Tabla", dump_only=True, exclude=("tipo_documento",))
 
     # Descripcion del tipo de documento.
     descripcion = ma.auto_field(
@@ -33,14 +39,14 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
         }
     )
 
-    # Usuario que realiza la accion sobre el registro.
-    usuario_accion = ma.auto_field(
+    # persona que realiza la accion sobre el registro.
+    id_persona_accion = ma.auto_field(
         required=True,
         allow_none=False,
         error_messages={
-            "required": "El usuario de acción es obligatorio",
-            "null": "El usuario de acción no puede ser null",
-            "invalid": "El usuario de acción debe ser un número entero"
+            "required": "El persona de acción es obligatorio",
+            "null": "El persona de acción no puede ser null",
+            "invalid": "El persona de acción debe ser un número entero"
         }
     )
 

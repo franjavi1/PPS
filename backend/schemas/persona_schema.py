@@ -1,5 +1,5 @@
 from models.persona import Persona
-from models.tipo_documento import TipoDocumento
+from backend.models.tipo_documento_model import TipoDocumentoModel
 
 from db import ma
 
@@ -97,7 +97,7 @@ class PersonaSchema(ma.SQLAlchemySchema):
         if value <= 0:
             raise ValidationError(
                 "El tipo de documento debe ser un número entero positivo")
-        if TipoDocumento.query.get(value) is None:
+        if TipoDocumentoModel.query.get(value) is None:
             raise ValidationError("El tipo de documento indicado no existe.")
 
     # Verifica que el numero de documento sea valido.
