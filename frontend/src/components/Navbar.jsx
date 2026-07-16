@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 import {
   BookOpen,
   BookMarked,
@@ -32,6 +34,7 @@ import {
 
 function Navbar() {
   const navigate = useNavigate();
+  const { currentUserRole, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
@@ -44,6 +47,13 @@ function Navbar() {
     setOpenMenu(null);
     setMobileOpen(false);
   };
+
+  function handleCerrarSesion(e) {
+    if (e) e.preventDefault();
+    logout();
+    closeMenus();
+    navigate("/login");
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -147,162 +157,160 @@ function Navbar() {
             </NavLink>
           </Dropdown>
 
-          <Dropdown
-            id="planes"
-            title="Gestion educativa"
-            icon={<GraduationCap  size={17} />}
-            openMenu={openMenu}
-            toggleMenu={toggleMenu}
-          >
-            <NavLink to="/planes/alta" className={linkClass} onClick={closeMenus}>
-              <Plus size={18} />
-              <span>
-                <strong>Nuevo plan</strong>
-                <small className="block text-slate-500">
-                  Alta guiada de plan
-                </small>
-              </span>
-            </NavLink>
-                 <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
-              <BookOpen size={18} />
-              <span>
-                <strong>Planes</strong>
-                <small className="block text-slate-500">
-                 Ver planes
-                </small>
-              </span>
-            </NavLink>
-
-            <NavLink
-              to="/asignaturas"
-              className={linkClass}
-              onClick={closeMenus}
+          {hasPermission(currentUserRole, 'leer') && (
+            <Dropdown
+              id="planes"
+              title="Gestion educativa"
+              icon={<GraduationCap  size={17} />}
+              openMenu={openMenu}
+              toggleMenu={toggleMenu}
             >
-              <FileText size={18} />
-              <span>
-                <strong>Asignaturas</strong>
-                <small className="block text-slate-500">
-                  Materias del sistema
-                </small>
-              </span>
-            </NavLink>
-                  <NavLink to="/comisiones/alta" className={linkClass} onClick={closeMenus}>
-              <Plus size={18} />
-              <span>
-                <strong>Nueva Comision</strong>
-                <small className="block text-slate-500">
-                  Alta guiada de Comision
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/comisiones" className={linkClass} onClick={closeMenus}>
-              <Users size={18} />
-              <span>
-                <strong>Comisiones</strong>
-                <small className="block text-slate-500">
-                  Ver comisiones
-                </small>
-              </span>
-            </NavLink>
-          </Dropdown>
+              <NavLink to="/planes/alta" className={linkClass} onClick={closeMenus}>
+                <Plus size={18} />
+                <span>
+                  <strong>Nuevo plan</strong>
+                  <small className="block text-slate-500">
+                    Alta guiada de plan
+                  </small>
+                </span>
+              </NavLink>
+              <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
+                <BookOpen size={18} />
+                <span>
+                  <strong>Planes</strong>
+                  <small className="block text-slate-500">
+                    Ver planes
+                  </small>
+                </span>
+              </NavLink>
 
-          <Dropdown
-            id="config"
-            title="Configuracion"
-            icon={<Settings size={17} />}
-            openMenu={openMenu}
-            toggleMenu={toggleMenu}
-          >
-            <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
-              SEDES E INFRAESTRUCTURA
-            </p>
+              <NavLink
+                to="/asignaturas"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <FileText size={18} />
+                <span>
+                  <strong>Asignaturas</strong>
+                  <small className="block text-slate-500">
+                    Materias del sistema
+                  </small>
+                </span>
+              </NavLink>
+              <NavLink to="/comisiones/alta" className={linkClass} onClick={closeMenus}>
+                <Plus size={18} />
+                <span>
+                  <strong>Nueva Comision</strong>
+                  <small className="block text-slate-500">
+                    Alta guiada de Comision
+                  </small>
+                </span>
+              </NavLink>
+              <NavLink to="/comisiones" className={linkClass} onClick={closeMenus}>
+                <Users size={18} />
+                <span>
+                  <strong>Comisiones</strong>
+                  <small className="block text-slate-500">
+                    Ver comisiones
+                  </small>
+                </span>
+              </NavLink>
+            </Dropdown>
+          )}
 
-            <NavLink
-              to="/sedes"
-              className={linkClass}
-              onClick={closeMenus}
+          {hasPermission(currentUserRole, 'leer') && (
+            <Dropdown
+              id="config"
+              title="Configuracion"
+              icon={<Settings size={17} />}
+              openMenu={openMenu}
+              toggleMenu={toggleMenu}
             >
-              <Building2 size={18} />
-              <span>
-                <strong>Sedes</strong>
-                <small className="block text-slate-500">
-                  Alta, edicion y tipos de sede
-                </small>
-              </span>
-            </NavLink>
+              <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
+                SEDES E INFRAESTRUCTURA
+              </p>
 
-            <NavLink
-              to="/tipos-sedes"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <Building size={18} />
-              <span>
-                <strong>Tipo de Sedes</strong>
-                <small className="block text-slate-500">
-                  Categorias para clasificar sedes
-                </small>
-              </span>
-            </NavLink>
-            <NavLink
-              to="/aulas"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <DoorOpen size={18} />
-              <span>
-                <strong>Aulas</strong>
-                <small className="block text-slate-500">
-                  Alta de Aulas
-                </small>
-              </span>
-            </NavLink>
+              <NavLink
+                to="/sedes"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <Building2 size={18} />
+                <span>
+                  <strong>Sedes</strong>
+                  <small className="block text-slate-500">
+                    Alta, edicion y tipos de sede
+                  </small>
+                </span>
+              </NavLink>
 
-            <p className="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
-              PERSONAL
-            </p>
-            <NavLink
-              to="/tipos-documentos"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <IdCard size={18} />
-              <span>
-                <strong>Tipo de documentos</strong>
-                <small className="block text-slate-500">
-                  Catalogo de documentos
-                </small>
-              </span>
-            </NavLink>
+              <NavLink
+                to="/tipos-sedes"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <Building size={18} />
+                <span>
+                  <strong>Tipo de Sedes</strong>
+                  <small className="block text-slate-500">
+                    Categorias para clasificar sedes
+                  </small>
+                </span>
+              </NavLink>
+              <NavLink
+                to="/aulas"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <DoorOpen size={18} />
+                <span>
+                  <strong>Aulas</strong>
+                  <small className="block text-slate-500">
+                    Alta de Aulas
+                  </small>
+                </span>
+              </NavLink>
 
+              <p className="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
+                PERSONAL
+              </p>
+              <NavLink
+                to="/tipos-documentos"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <IdCard size={18} />
+                <span>
+                  <strong>Tipo de documentos</strong>
+                  <small className="block text-slate-500">
+                    Catalogo de documentos
+                  </small>
+                </span>
+              </NavLink>
 
+              <NavLink
+                to="/tipo-rangos"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <ChevronsUp size={18} />
+                <span>
+                  <strong>Tipo de rangos</strong>
+                  <small className="block text-slate-500">
+                    Catalogo de rangos
+                  </small>
+                </span>
+              </NavLink>
+            </Dropdown>
+          )}
 
-
-            <NavLink
-              to="/tipo-rangos"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <ChevronsUp size={18} />
-              <span>
-                <strong>Tipo de rangos</strong>
-                <small className="block text-slate-500">
-                  Catalogo de rangos
-                </small>
-              </span>
-            </NavLink>
-
-
-      
-          </Dropdown>
-
-          <NavLink
-            to="/login"
-            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2"
+          <button
+            onClick={handleCerrarSesion}
+            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 text-left"
           >
             <LogOut size={17} />
             Cerrar sesion
-          </NavLink>
+          </button>
         </nav>
       </div>
 
@@ -369,125 +377,131 @@ function Navbar() {
               Datos medicos
             </MobileLink>
 
-            <MobileLink
-              to="/tipos-documentos"
-              icon={<IdCard size={20} />}
-              onClick={closeMenus}
-            >
-              Tipo de documentos
-            </MobileLink>
+            {hasPermission(currentUserRole, 'leer') && (
+              <>
+                <MobileLink
+                  to="/tipos-documentos"
+                  icon={<IdCard size={20} />}
+                  onClick={closeMenus}
+                >
+                  Tipo de documentos
+                </MobileLink>
 
-            <MobileLink
-              to="/tipo-rangos"
-              icon={<ChevronsUp size={20} />}
-              onClick={closeMenus}
-            >
-              Tipo de rangos
-            </MobileLink>
+                <MobileLink
+                  to="/tipo-rangos"
+                  icon={<ChevronsUp size={20} />}
+                  onClick={closeMenus}
+                >
+                  Tipo de rangos
+                </MobileLink>
 
-            <MobileLink
-              to="/legajo-sedes"
-              icon={<MapPinned size={20} />}
-              onClick={closeMenus}
-            >
-              Legajos por sede
-            </MobileLink>
+                <MobileLink
+                  to="/legajo-sedes"
+                  icon={<MapPinned size={20} />}
+                  onClick={closeMenus}
+                >
+                  Legajos por sede
+                </MobileLink>
 
-            <MobileLink
-              to="/planes/alta"
-              icon={<Plus size={20} />}
-              onClick={closeMenus}
-            >
-              Nuevo plan
-            </MobileLink>
+                <MobileLink
+                  to="/planes/alta"
+                  icon={<Plus size={20} />}
+                  onClick={closeMenus}
+                >
+                  Nuevo plan
+                </MobileLink>
 
-            <MobileLink
-              to="/planes"
-              icon={<BookOpen size={20} />}
-              onClick={closeMenus}
-            >
-              Planes
-            </MobileLink>
+                <MobileLink
+                  to="/planes"
+                  icon={<BookOpen size={20} />}
+                  onClick={closeMenus}
+                >
+                  Planes
+                </MobileLink>
 
-            <MobileLink
-              to="/asignaturas"
-              icon={<FileText size={20} />}
-              onClick={closeMenus}
-            >
-              Asignaturas
-            </MobileLink>
+                <MobileLink
+                  to="/asignaturas"
+                  icon={<FileText size={20} />}
+                  onClick={closeMenus}
+                >
+                  Asignaturas
+                </MobileLink>
 
-            <MobileLink
-              to="/comisiones"
-              icon={<Users size={20} />}
-              onClick={closeMenus}
-            >
-              Comisiones
-            </MobileLink>
+                <MobileLink
+                  to="/comisiones"
+                  icon={<Users size={20} />}
+                  onClick={closeMenus}
+                >
+                  Comisiones
+                </MobileLink>
 
-            <MobileLink
-              to="/planes-asignaturas"
-              icon={<BookMarked size={20} />}
-              onClick={closeMenus}
-            >
-              Plan asignaturas
-            </MobileLink>
+                <MobileLink
+                  to="/planes-asignaturas"
+                  icon={<BookMarked size={20} />}
+                  onClick={closeMenus}
+                >
+                  Plan asignaturas
+                </MobileLink>
 
-            <MobileLink
-              to="/pa-correlativas"
-              icon={<GitBranch size={20} />}
-              onClick={closeMenus}
-            >
-              Correlativas
-            </MobileLink>
+                <MobileLink
+                  to="/pa-correlativas"
+                  icon={<GitBranch size={20} />}
+                  onClick={closeMenus}
+                >
+                  Correlativas
+                </MobileLink>
 
-            <MobileLink
-              to="/comisiones-asignaturas"
-              icon={<BookOpenCheck size={20} />}
-              onClick={closeMenus}
-            >
-              Comision asignaturas
-            </MobileLink>
+                <MobileLink
+                  to="/comisiones-asignaturas"
+                  icon={<BookOpenCheck size={20} />}
+                  onClick={closeMenus}
+                >
+                  Comision asignaturas
+                </MobileLink>
 
-            <MobileLink
-              to="/autoridades-comision"
-              icon={<ShieldUser size={20} />}
-              onClick={closeMenus}
-            >
-              Autoridades comision
-            </MobileLink>
+                <MobileLink
+                  to="/autoridades-comision"
+                  icon={<ShieldUser size={20} />}
+                  onClick={closeMenus}
+                >
+                  Autoridades comision
+                </MobileLink>
 
-            <MobileLink
-              to="/sedes"
-              icon={<Building2 size={20} />}
-              onClick={closeMenus}
-            >
-              Sedes
-            </MobileLink>
+                <MobileLink
+                  to="/sedes"
+                  icon={<Building2 size={20} />}
+                  onClick={closeMenus}
+                >
+                  Sedes
+                </MobileLink>
 
-            <MobileLink
-              to="/tipos-sedes"
-              icon={<Building size={20} />}
-              onClick={closeMenus}
-            >
-              Tipo de sedes
-            </MobileLink>
+                <MobileLink
+                  to="/tipos-sedes"
+                  icon={<Building size={20} />}
+                  onClick={closeMenus}
+                >
+                  Tipo de sedes
+                </MobileLink>
 
-            <MobileLink
-              to="/config-documentos"
-              icon={<Settings size={20} />}
-              onClick={closeMenus}
-            >
-              Configuracion
-            </MobileLink>
+                <MobileLink
+                  to="/config-documentos"
+                  icon={<Settings size={20} />}
+                  onClick={closeMenus}
+                >
+                  Configuracion
+                </MobileLink>
+              </>
+            )}
 
-            <MobileLink
-              to="/login"
-              icon={<LogOut size={20} />}
-              onClick={closeMenus}
+            <button
+              onClick={handleCerrarSesion}
+              className="w-full flex items-center gap-4 rounded-2xl bg-white border border-slate-200 px-4 py-4 font-bold text-slate-700 shadow-sm text-left"
             >
+              <span className="w-10 h-10 rounded-xl bg-red-50 text-red-700 flex items-center justify-center">
+                <LogOut size={20} />
+              </span>
               Cerrar sesion
-            </MobileLink>
+            </button>
           </div>
         </div>
       )}

@@ -1,29 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import {
-  BookOpen,
-  CalendarCheck,
-  ChevronRight,
-  ClipboardList,
-  FileText,
-  GraduationCap,
-  Layers3,
-  PlusCircle,
-  ShieldCheck,
-  Users,
-} from "lucide-react";
+import { BookOpen, CalendarCheck, ClipboardList, FileText, GraduationCap, Layers3, PlusCircle, ShieldCheck, Users } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import { TarjetaResumen, AccesoRapido, IndicadorOperativo } from "../components/Inicio/InicioComponents";
 
-function Inicio() {
+const obtenerLista = (res) => (Array.isArray(res?.data) ? res.data : []);
+
+export default function Inicio() {
   const navigate = useNavigate();
-  const [resumen, setResumen] = useState({
-    legajos: 0,
-    personas: 0,
-    planes: 0,
-    comisiones: 0,
-    tiposDocumento: 0,
-  });
+  const [resumen, setResumen] = useState({ legajos: 0, personas: 0, planes: 0, comisiones: 0, tiposDocumento: 0 });
 
   useEffect(() => {
     cargarResumen();
@@ -38,7 +24,6 @@ function Inicio() {
         apiRequest("/comisiones"),
         apiRequest("/tipos-documentos"),
       ]);
-
       setResumen({
         legajos: obtenerLista(legajos).length,
         personas: obtenerLista(personas).length,
@@ -47,64 +32,47 @@ function Inicio() {
         tiposDocumento: obtenerLista(tipos).length,
       });
     } catch {
-      setResumen({
-        legajos: 0,
-        personas: 0,
-        planes: 0,
-        comisiones: 0,
-        tiposDocumento: 0,
-      });
+      // Ignorar fallos de carga inicial
     }
   }
 
   return (
     <div className="min-h-screen bg-slate-100">
       <Navbar />
-
       <main className="max-w-7xl mx-auto px-6 py-10">
         <section className="bg-white border border-slate-200 rounded-2xl shadow-md overflow-hidden mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_0.65fr]">
             <div className="p-8 lg:p-10">
               <div className="inline-flex items-center gap-2 bg-red-50 text-red-700 border border-red-100 px-4 py-2 rounded-full font-extrabold text-sm uppercase">
-                <ShieldCheck size={18} />
-                Panel principal
+                <ShieldCheck size={18} /> Panel principal
               </div>
-
               <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-900 mt-5 leading-tight">
-                Gestion academica y administrativa.
+                Gestión académica y administrativa.
               </h1>
-
               <p className="text-slate-600 text-lg mt-4 max-w-3xl">
-                Accede rapidamente a personas, planes, comisiones y legajos
-                para consultar, cargar y mantener la informacion del sistema.
+                Accede rápidamente a personas, planes, comisiones y legajos para consultar, cargar y mantener la información del sistema.
               </p>
-
               <div className="flex flex-col sm:flex-row gap-3 mt-7">
                 <button
                   type="button"
                   onClick={() => navigate("/alta-persona")}
                   className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
                 >
-                  <PlusCircle size={22} />
-                  Nueva persona
+                  <PlusCircle size={22} /> Nueva persona
                 </button>
-
                 <button
                   type="button"
                   onClick={() => navigate("/planes/alta")}
                   className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition"
                 >
-                  <BookOpen size={22} />
-                  Nuevo plan
+                  <BookOpen size={22} /> Nuevo plan
                 </button>
-
                 <button
                   type="button"
                   onClick={() => navigate("/comisiones/alta")}
                   className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition"
                 >
-                  <CalendarCheck size={22} />
-                  Nueva comision
+                  <CalendarCheck size={22} /> Nueva comisión
                 </button>
               </div>
             </div>
@@ -112,25 +80,13 @@ function Inicio() {
             <div className="bg-slate-900 text-white p-8 lg:p-10 flex flex-col justify-between">
               <div>
                 <ClipboardList className="text-red-300" size={54} />
-                <p className="text-slate-300 font-semibold mt-6">
-                  Resumen operativo
-                </p>
-                <h2 className="text-3xl font-extrabold mt-2">
-                  Datos disponibles
-                </h2>
-                <p className="text-slate-300 mt-3">
-                  Usa este panel como punto de entrada para revisar las
-                  secciones principales y mantener la carga actualizada.
-                </p>
+                <p className="text-slate-300 font-semibold mt-6">Resumen operativo</p>
+                <h2 className="text-3xl font-extrabold mt-2">Datos disponibles</h2>
+                <p className="text-slate-300 mt-3">Usa este panel como punto de entrada para revisar las secciones principales.</p>
               </div>
-
               <div className="mt-8 border border-white/15 rounded-xl p-4">
-                <p className="text-sm font-bold text-slate-300 uppercase">
-                  Modulos activos
-                </p>
-                <p className="text-4xl font-extrabold mt-1">
-                  {resumen.personas + resumen.planes + resumen.comisiones}
-                </p>
+                <p className="text-sm font-bold text-slate-300 uppercase">Módulos activos</p>
+                <p className="text-4xl font-extrabold mt-1">{resumen.personas + resumen.planes + resumen.comisiones}</p>
               </div>
             </div>
           </div>
@@ -148,146 +104,39 @@ function Inicio() {
           <div className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
-                <p className="text-sm font-bold text-red-700 uppercase">
-                  Accesos principales
-                </p>
-                <h2 className="text-2xl font-extrabold text-slate-800 mt-1">
-                  Gestion diaria
-                </h2>
+                <p className="text-sm font-bold text-red-700 uppercase">Accesos principales</p>
+                <h2 className="text-2xl font-extrabold text-slate-800 mt-1">Gestión diaria</h2>
               </div>
               <Layers3 className="text-red-700" size={34} />
             </div>
-
             <div className="space-y-3">
-              <AccesoRapido
-                icono={<Users size={28} />}
-                titulo="Personas"
-                descripcion="Alta guiada, listado y edicion de personas."
-                onClick={() => navigate("/personas")}
-              />
-              <AccesoRapido
-                icono={<BookOpen size={28} />}
-                titulo="Planes"
-                descripcion="Planes, asignaturas y correlativas."
-                onClick={() => navigate("/planes")}
-              />
-              <AccesoRapido
-                icono={<GraduationCap size={28} />}
-                titulo="Comisiones"
-                descripcion="Alta guiada, consulta y edicion de comisiones."
-                onClick={() => navigate("/comisiones")}
-              />
+              <AccesoRapido icono={<Users size={28} />} titulo="Personas" descripcion="Alta guiada, listado y edición de personas." onClick={() => navigate("/personas")} />
+              <AccesoRapido icono={<BookOpen size={28} />} titulo="Planes" descripcion="Planes, asignaturas y correlativas." onClick={() => navigate("/planes")} />
+              <AccesoRapido icono={<GraduationCap size={28} />} titulo="Comisiones" descripcion="Alta guiada y edición." onClick={() => navigate("/comisiones")} />
             </div>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
-                <p className="text-sm font-bold text-red-700 uppercase">
-                  Actividad institucional
-                </p>
-                <h2 className="text-2xl font-extrabold text-slate-800 mt-1">
-                  Estado general
-                </h2>
+                <p className="text-sm font-bold text-red-700 uppercase">Actividad institucional</p>
+                <h2 className="text-2xl font-extrabold text-slate-800 mt-1">Estado general</h2>
               </div>
               <ShieldCheck className="text-green-700" size={34} />
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <IndicadorOperativo
-                titulo="Formacion"
-                descripcion="Planes, asignaturas y correlativas disponibles para consulta."
-                valor={resumen.planes}
-              />
-              <IndicadorOperativo
-                titulo="Cursado"
-                descripcion="Comisiones registradas para organizar la actividad academica."
-                valor={resumen.comisiones}
-              />
-              <IndicadorOperativo
-                titulo="Personal"
-                descripcion="Personas cargadas en el sistema institucional."
-                valor={resumen.personas}
-              />
-              <IndicadorOperativo
-                titulo="Legajos"
-                descripcion="Registros administrativos disponibles para seguimiento."
-                valor={resumen.legajos}
-              />
+              <IndicadorOperativo titulo="Formación" descripcion="Planes y asignaturas disponibles." valor={resumen.planes} />
+              <IndicadorOperativo titulo="Cursado" descripcion="Comisiones registradas." valor={resumen.comisiones} />
+              <IndicadorOperativo titulo="Personal" descripcion="Personas cargadas." valor={resumen.personas} />
+              <IndicadorOperativo titulo="Legajos" descripcion="Registros administrativos." valor={resumen.legajos} />
             </div>
           </div>
         </section>
 
         <footer className="flex items-center justify-center gap-2 text-slate-500 mt-10">
-          <ShieldCheck size={22} />
-          <p>Acceso exclusivo para personal autorizado</p>
+          <ShieldCheck size={22} /> <p>Acceso exclusivo para personal autorizado</p>
         </footer>
       </main>
     </div>
   );
 }
-
-function TarjetaResumen({ icono, titulo, valor, tono }) {
-  const tonos = {
-    red: "text-red-700 bg-red-50 border-red-100",
-    blue: "text-blue-700 bg-blue-50 border-blue-100",
-    green: "text-green-700 bg-green-50 border-green-100",
-    amber: "text-amber-700 bg-amber-50 border-amber-100",
-    slate: "text-slate-700 bg-slate-50 border-slate-200",
-  };
-
-  return (
-    <article className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
-      <div className={`w-12 h-12 rounded-xl border flex items-center justify-center ${tonos[tono]}`}>
-        {icono}
-      </div>
-      <p className="text-slate-500 font-bold mt-4">{titulo}</p>
-      <p className="text-4xl font-extrabold text-slate-900 mt-1">{valor}</p>
-    </article>
-  );
-}
-
-function AccesoRapido({ icono, titulo, descripcion, onClick }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full border border-slate-200 rounded-xl p-4 text-left hover:bg-slate-50 hover:shadow-sm transition flex items-center justify-between gap-4"
-    >
-      <div className="flex items-center gap-4">
-        <div className="w-11 h-11 rounded-lg bg-red-50 text-red-700 flex items-center justify-center">
-          {icono}
-        </div>
-
-        <div>
-          <h3 className="text-lg font-extrabold text-slate-800">{titulo}</h3>
-          <p className="text-slate-500 text-sm mt-1">{descripcion}</p>
-        </div>
-      </div>
-
-      <ChevronRight className="text-slate-400 shrink-0" size={24} />
-    </button>
-  );
-}
-
-function IndicadorOperativo({ titulo, descripcion, valor }) {
-  return (
-    <div className="border border-slate-200 rounded-xl p-5 bg-slate-50">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="font-extrabold text-slate-800">{titulo}</h3>
-          <p className="text-slate-500 text-sm mt-2">{descripcion}</p>
-        </div>
-        <span className="min-w-11 h-11 rounded-lg bg-white border border-slate-200 text-red-700 flex items-center justify-center text-xl font-extrabold">
-          {valor}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function obtenerLista(respuesta) {
-  return Array.isArray(respuesta?.data) ? respuesta.data : [];
-}
-
-export default Inicio;
