@@ -27,6 +27,6 @@ def actualizar(pa_correlativa, datos):
 
 
 def eliminar(pa_correlativa):
-    db.session.delete(pa_correlativa)
+    pa_correlativa.estado = 0
     db.session.commit()
     return pa_correlativa

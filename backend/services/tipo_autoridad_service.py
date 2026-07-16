@@ -26,6 +26,6 @@ def actualizar(tipo_autoridad, datos):
     return tipo_autoridad
 
 def eliminar(tipo_autoridad):
-    db.session.delete(tipo_autoridad)
+    tipo_autoridad.estado = 0
     db.session.commit()
     return tipo_autoridad
