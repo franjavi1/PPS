@@ -8,6 +8,18 @@ import {
   Acciones,
 } from "../FormHelpers";
 
+// Recibimos de la vista padre:
+// - datosMedicos: objeto con atributos de aptitud física, grupo sanguíneo, seguro y alergias.
+// - cambiarDatosMedicos: callback de cambio para los inputs del formulario médico.
+// - contactos: objeto con atributos email y celular.
+// - cambiarContactos: callback de cambio para la sección de datos de contacto.
+// - datosLegajo: objeto con el rango y la sede seleccionada, y flags de autoridad/sede base.
+// - cambiarDatosLegajo: callback de cambio para la sección de legajo asociativa.
+// - rangos: colección global de rangos institucionales disponibles.
+// - sedes: colección global de sedes físicas disponibles.
+// - guardando: boolean flag de carga de peticiones API.
+// - guardarDatosDelLegajo: callback onSubmit para crear e interconectar todos los datos del legajo.
+// - onBack: función callback para retroceder en el wizard de alta.
 export default function StepDatosLegajo({
   datosMedicos,
   cambiarDatosMedicos,
@@ -22,6 +34,7 @@ export default function StepDatosLegajo({
   onBack,
 }) {
   return (
+    // Disparamos la acción onSubmit del formulario que inicia el guardado en bloque
     <form onSubmit={guardarDatosDelLegajo} className="space-y-8">
       <TituloPaso icono={<ClipboardPlus size={26} />} titulo="Datos asociados" />
 
@@ -119,3 +132,4 @@ export default function StepDatosLegajo({
     </form>
   );
 }
+

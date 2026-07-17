@@ -36,19 +36,19 @@ import TiposPlanes from "./pages/TiposPlanes";
 
 
 function App() {
+  // Redefinimos los alerts clásicos del navegador para inyectar notificaciones toast estilizadas.
   useEffect(() => {
     const alertOriginal = window.alert;
-
     window.alert = (mensaje) => {
       toast(String(mensaje || "Operacion realizada"));
     };
-
     return () => {
       window.alert = alertOriginal;
     };
   }, []);
 
   return (
+    // Envolvemos toda la aplicación en nuestro AuthProvider para dar soporte de sesión a cada página.
     <AuthProvider>
       <div className="relative min-h-screen">
         {/* Contenedor flexible para centrar la marca de agua de forma 100% responsiva */}

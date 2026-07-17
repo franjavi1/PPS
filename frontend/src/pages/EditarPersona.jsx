@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router";
 import { ArrowLeft, ChevronDown, FileText, HeartPulse, MapPinned, Phone, Save, User } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 import { contactosService } from "../services/contactosService";
 import { personasService } from "../services/personasService";
 import { SeccionPersona, SeccionLegajo, SeccionDatosMedicos, SeccionContactos, SeccionRangoSede } from "../components/EditarPersona/EditarPersonaSections";
@@ -13,7 +15,6 @@ const datosMedicosInicial = { grupo_sanguineo: "", alergias: "", aptitud_fisica:
 const rangoInicial = { rangos_institucionales_id: "" };
 const sedeInicial = { sede_id: "", es_autoridad: false, es_sede_base: true };
 const contactosInicial = { email: "", celular: "" };
-
 const obtenerLista = (res) => (Array.isArray(res?.data) ? res.data : []);
 
 function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
@@ -34,6 +35,9 @@ function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
 export default function EditarPersona() {
   const { id } = useParams();
   const navigate = useNavigate();
+  // Explicamos el inicio síncrono del componente y cómo consume el rol de sesión con el hook useAuth.
+  const { currentUserRole } = useAuth();
+
   const [persona, setPersona] = useState(personaInicial);
   const [legajo, setLegajo] = useState(legajoInicial);
   const [datosMedicos, setDatosMedicos] = useState(datosMedicosInicial);
@@ -55,51 +59,31 @@ export default function EditarPersona() {
 
   async function cargarDatos() {
     try {
-      setCargando(true);
-      setError("");
+      setCargando(true); setError("");
       const [resPers, resTipos, resLegs, resMed, resLangs, resLSedes, resConts, resRangos, resSedes] = await Promise.all([
-        personasService.obtenerPorId(id),
-        apiRequest("/tipos-documentos"),
-        apiRequest("/legajos"),
-        apiRequest("/datos-medicos"),
-        apiRequest("/legajo-rangos"),
-        apiRequest("/legajo-sedes"),
-        contactosService.obtenerTodos(),
-        apiRequest("/rangos-institucionales"),
-        apiRequest("/sedes"),
+        personasService.obtenerPorId(id), apiRequest("/tipos-documentos"), apiRequest("/legajos"), apiRequest("/datos-medicos"),
+        apiRequest("/legajo-rangos"), apiRequest("/legajo-sedes"), contactosService.obtenerTodos(), apiRequest("/rangos-institucionales"), apiRequest("/sedes"),
       ]);
-
-      setTiposDocumento(obtenerLista(resTipos));
-      setRangos(obtenerLista(resRangos));
-      setSedes(obtenerLista(resSedes));
-
+      setTiposDocumento(obtenerLista(resTipos)); setRangos(obtenerLista(resRangos)); setSedes(obtenerLista(resSedes));
       const persData = resPers.data || {};
       setPersona({ td_id: String(persData.td_id || ""), numero_doc: persData.numero_doc || "", nombre: persData.nombre || "", apellido: persData.apellido || "" });
-
       const leg = obtenerLista(resLegs).find((x) => x.persona_id === Number(id));
       if (leg) {
-        setLegajo({ numero: leg.numero || "" });
-        setIds((prev) => ({ ...prev, legajoId: leg.id }));
-
+        setLegajo({ numero: leg.numero || "" }); setIds((prev) => ({ ...prev, legajoId: leg.id }));
         const dm = obtenerLista(resMed).find((x) => x.legajo_id === leg.id);
         if (dm) {
-          setDatosMedicos({ grupo_sanguineo: dm.grupo_sanguineo || "", alergias: dm.alergias || "", aptitud_fisica: Boolean(dm.aptitud_fisica), seguro: dm.seguro || "" });
+          setDatosMedicos({ grupo_sanguineo: dm.grupo_sanguineo || "", allergies: dm.alergias || "", aptitud_fisica: Boolean(dm.aptitud_fisica), seguro: dm.seguro || "" });
           setIds((prev) => ({ ...prev, datosMedicosId: dm.id }));
         }
-
         const lr = obtenerLista(resLangs).find((x) => x.legajo_id === leg.id);
         if (lr) {
-          setRango({ rangos_institucionales_id: String(lr.rangos_institucionales_id || "") });
-          setIds((prev) => ({ ...prev, rangoId: lr.id }));
+          setRango({ rangos_institucionales_id: String(lr.rangos_institucionales_id || "") }); setIds((prev) => ({ ...prev, rangoId: lr.id }));
         }
-
         const ls = obtenerLista(resLSedes).find((x) => x.legajo_id === leg.id);
         if (ls) {
-          setSede({ sede_id: String(ls.sede_id || ""), es_autoridad: Boolean(ls.es_autoridad), es_sede_base: Boolean(ls.es_sede_base) });
-          setIds((prev) => ({ ...prev, sedeId: ls.id }));
+          setSede({ sede_id: String(ls.sede_id || ""), es_autoridad: Boolean(ls.es_autoridad), es_sede_base: Boolean(ls.es_sede_base) }); setIds((prev) => ({ ...prev, sedeId: ls.id }));
         }
       }
-
       const cList = obtenerLista(resConts).filter((x) => x.persona_id === Number(id));
       const emailC = cList.find((x) => x.tipo_contacto_id === 1);
       const celC = cList.find((x) => x.tipo_contacto_id === 2);
@@ -114,19 +98,13 @@ export default function EditarPersona() {
 
   async function guardarCambios(e) {
     e.preventDefault();
-    if (!persona.nombre || !persona.apellido || !persona.numero_doc || !persona.td_id) {
-      return setError("Complete los campos obligatorios de la persona");
-    }
+    if (!persona.nombre || !persona.apellido || !persona.numero_doc || !persona.td_id) return setError("Complete campos obligatorios");
     try {
-      setGuardando(true);
-      setError("");
-
+      setGuardando(true); setError("");
       await personasService.actualizar(id, { td_id: Number(persona.td_id), numero_doc: String(persona.numero_doc), nombre: persona.nombre, apellido: persona.apellido, usuario_accion: 1 });
-
       const promesas = [];
       if (ids.legajoId) {
         promesas.push(apiRequest(`/legajos/${ids.legajoId}`, { method: "PUT", body: JSON.stringify({ persona_id: Number(id), numero: String(legajo.numero), usuario_accion: 1 }) }));
-
         if (datosMedicos.grupo_sanguineo) {
           const bodyMed = { legajo_id: Number(ids.legajoId), grupo_sanguineo: datosMedicos.grupo_sanguineo, alergias: datosMedicos.alergias, aptitud_fisica: datosMedicos.aptitud_fisica ? 1 : 0, seguro: datosMedicos.seguro, usuario_accion: 1 };
           promesas.push(ids.datosMedicosId ? apiRequest(`/datos-medicos/${ids.datosMedicosId}`, { method: "PUT", body: JSON.stringify(bodyMed) }) : apiRequest("/datos-medicos", { method: "POST", body: JSON.stringify(bodyMed) }));
@@ -140,7 +118,6 @@ export default function EditarPersona() {
           promesas.push(ids.sedeId ? apiRequest(`/legajo-sedes/${ids.sedeId}`, { method: "PUT", body: JSON.stringify(bodySede) }) : apiRequest("/legajo-sedes", { method: "POST", body: JSON.stringify(bodySede) }));
         }
       }
-
       const guardarCont = (cId, cVal, tId) => {
         if (!cVal) return;
         const b = { persona_id: Number(id), tipo_contacto_id: tId, contacto: cVal, principal: 1, usuario_accion: 1 };
@@ -148,9 +125,7 @@ export default function EditarPersona() {
       };
       guardarCont(ids.emailContactoId, contactos.email, 1);
       guardarCont(ids.celularContactoId, contactos.celular, 2);
-
-      await Promise.all(promesas);
-      navigate("/personas");
+      await Promise.all(promesas); navigate("/personas");
     } catch (err) {
       setError(err.message || "Error al guardar cambios");
     } finally {
@@ -177,30 +152,26 @@ export default function EditarPersona() {
           {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">{error}</div>}
 
           {cargando ? <div className="p-8 text-center text-slate-500">Cargando datos...</div> : (
-            <form onSubmit={guardarCambios} className="space-y-6">
+            <form onSubmit={guardarChanges || guardarCambios} className="space-y-6">
               <Seccion id="persona" icono={<User size={23} />} titulo="Datos personales" abierta={seccionAbierta === "persona"} onToggle={setSeccionAbierta}>
                 <SeccionPersona persona={persona} cambiarPersona={(e) => setPersona({ ...persona, [e.target.name]: e.target.value })} tiposDocumento={tiposDocumento} />
               </Seccion>
-
               <Seccion id="legajo" icono={<FileText size={23} />} titulo="Legajo" abierta={seccionAbierta === "legajo"} onToggle={setSeccionAbierta}>
                 <SeccionLegajo legajo={legajo} cambiarLegajo={(e) => setLegajo({ ...legajo, [e.target.name]: e.target.value })} />
               </Seccion>
-
               <Seccion id="datos-medicos" icono={<HeartPulse size={23} />} titulo="Datos médicos" abierta={seccionAbierta === "datos-medicos"} onToggle={setSeccionAbierta}>
                 <SeccionDatosMedicos datosMedicos={datosMedicos} cambiarDatosMedicos={(e) => setDatosMedicos({ ...datosMedicos, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} />
               </Seccion>
-
               <Seccion id="contactos" icono={<Phone size={23} />} titulo="Contactos" abierta={seccionAbierta === "contactos"} onToggle={setSeccionAbierta}>
                 <SeccionContactos contactos={contactos} cambiarContactos={(e) => setContactos({ ...contactos, [e.target.name]: e.target.value })} />
               </Seccion>
-
               <Seccion id="rango-sede" icono={<MapPinned size={23} />} titulo="Rango y sede" abierta={seccionAbierta === "rango-sede"} onToggle={setSeccionAbierta}>
                 <SeccionRangoSede rango={rango} cambiarRango={(e) => setRango({ ...rango, [e.target.name]: e.target.value })} sede={sede} cambiarSede={(e) => setSede({ ...sede, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} rangos={rangos} sedes={sedes} />
               </Seccion>
-
               <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-200 bg-white">
                 <button type="button" onClick={() => navigate("/personas")} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">Cancelar</button>
-                <button type="submit" disabled={guardando} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"><Save size={22} />{guardando ? "Guardando..." : "Guardar cambios"}</button>
+                {/* Si no tiene permisos de rol, ocultamos/deshabilitamos el elemento para que no intente la llamada. */}
+                <button type="submit" disabled={guardando || !hasPermission(currentUserRole, "editar")} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"><Save size={22} />{guardando ? "Guardando..." : "Guardar cambios"}</button>
               </div>
             </form>
           )}

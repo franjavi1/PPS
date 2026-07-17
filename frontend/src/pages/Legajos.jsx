@@ -23,6 +23,7 @@ export default function Legajos() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
 
+  // Controlamos el acceso: si el usuario no tiene rol para leer esta sección, lo enviamos al inicio.
   useEffect(() => {
     if (!estaAutenticado()) {
       navigate("/login");
@@ -35,6 +36,7 @@ export default function Legajos() {
     cargarLegajos();
   }, [currentUserRole]);
 
+  // Cargamos de forma simultánea los legajos y el catálogo de personas para evitar múltiples re-renders.
   async function cargarLegajos() {
     try {
       setCargando(true);
@@ -68,6 +70,7 @@ export default function Legajos() {
     setFormulario({ ...formulario, [name]: value });
   }
 
+  // Enviamos los datos para dar de alta o modificar. Validamos primero del lado del cliente.
   async function guardarLegajo(e) {
     e.preventDefault();
     if (!formulario.persona_id) return setErrorFormulario("La persona es obligatoria");
@@ -128,88 +131,38 @@ export default function Legajos() {
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
-              <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
-                <ClipboardList size={30} />
-              </div>
+              <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center"><ClipboardList size={30} /></div>
               <div>
                 <h1 className="text-4xl font-extrabold text-slate-800">Legajos</h1>
                 <p className="text-slate-500 mt-2">Consulta y gestiona los legajos de alumnos y docentes.</p>
               </div>
             </div>
-
             <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={cargarLegajos}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
-              >
-                <RefreshCcw size={22} /> Actualizar
-              </button>
+              <button onClick={cargarLegajos} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"><RefreshCcw size={22} /> Actualizar</button>
               {hasPermission(currentUserRole, "crear") && (
-                <button
-                  onClick={() => {
-                    setFormulario({ persona_id: "", numero: "" });
-                    setEditandoId(null);
-                    setErrorFormulario("");
-                    setMostrarModal(true);
-                  }}
-                  className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
-                >
-                  <PlusCircle size={22} /> Nuevo legajo
-                </button>
+                <button onClick={() => { setFormulario({ persona_id: "", numero: "" }); setEditandoId(null); setErrorFormulario(""); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"><PlusCircle size={22} /> Nuevo legajo</button>
               )}
             </div>
           </div>
 
           <div className="relative w-full md:w-96 mb-8">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={22} />
-            <input
-              type="text"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por numero, persona o documento"
-              className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 focus:outline-none"
-            />
+            <input type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por numero, persona o documento" className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 focus:outline-none" />
           </div>
 
-          {error && (
-            <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">
-              {error}
-            </div>
-          )}
+          {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">{error}</div>}
 
           <LegajoList
-            cargando={cargando}
-            legajosFiltrados={legajosFiltrados}
-            legajos={legajos}
-            currentUserRole={currentUserRole}
-            navigate={navigate}
-            editarLegajo={(legajo) => {
-              setFormulario({ persona_id: legajo.persona_id, numero: legajo.numero || "" });
-              setEditandoId(legajo.id);
-              setErrorFormulario("");
-              setMostrarModal(true);
-            }}
-            eliminarLegajo={eliminarLegajo}
-            legajoTienePersonaActiva={legajoTienePersonaActiva}
-            obtenerNombrePersona={obtenerNombrePersona}
-            obtenerDocumentoPersona={obtenerDocumentoPersona}
+            cargando={cargando} legajosFiltrados={legajosFiltrados} legajos={legajos} currentUserRole={currentUserRole} navigate={navigate}
+            editarLegajo={(legajo) => { setFormulario({ persona_id: legajo.persona_id, numero: legajo.numero || "" }); setEditandoId(legajo.id); setErrorFormulario(""); setMostrarModal(true); }}
+            eliminarLegajo={eliminarLegajo} legajoTienePersonaActiva={legajoTienePersonaActiva} obtenerNombrePersona={obtenerNombrePersona} obtenerDocumentoPersona={obtenerDocumentoPersona}
           />
         </section>
       </main>
 
       <LegajoFormModal
-        mostrarModal={mostrarModal}
-        cerrarModal={() => {
-          setMostrarModal(false);
-          setEditandoId(null);
-          setFormulario({ persona_id: "", numero: "" });
-        }}
-        editandoId={editandoId}
-        formulario={formulario}
-        manejarCambio={manejarCambio}
-        errorFormulario={errorFormulario}
-        guardarLegajo={guardarLegajo}
-        personas={personas}
+        mostrarModal={mostrarModal} editandoId={editandoId} formulario={formulario} manejarCambio={manejarCambio} errorFormulario={errorFormulario} guardarLegajo={guardarLegajo} personas={personas}
+        cerrarModal={() => { setMostrarModal(false); setEditandoId(null); setFormulario({ persona_id: "", numero: "" }); }}
       />
     </div>
   );

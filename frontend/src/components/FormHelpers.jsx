@@ -1,5 +1,6 @@
 import { ArrowLeft, Save } from "lucide-react";
 
+// Este componente es puramente de presentación; recibe sus props del padre para no exceder el límite de líneas.
 export function TituloPaso({ icono, titulo }) {
   return (
     <div className="flex items-center gap-3 pb-4 border-b border-slate-200">

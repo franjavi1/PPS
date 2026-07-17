@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { User, FileText, HeartPulse, ShieldCheck, CheckCircle2, ClipboardPlus } from "lucide-react";
+import { useNavigate } from "react-router";
+import { User, FileText, HeartPulse, ShieldAlert, CheckCircle2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import { useAuth } from "../context/AuthContext";
 import { contactosService } from "../services/contactosService";
 import { personasService } from "../services/personasService";
 import { datosMedicosService } from "../services/datosMedicosService";
@@ -9,7 +11,6 @@ import { legajoRangosService } from "../services/legajoRangosService";
 import { legajoSedesService } from "../services/legajoSedesService";
 import { rangoService } from "../services/rangoService";
 import { sedeService } from "../services/sedeService";
-
 import StepPersona from "../components/AltaPersonaWizard/StepPersona";
 import StepLegajo from "../components/AltaPersonaWizard/StepLegajo";
 import StepDatosLegajo from "../components/AltaPersonaWizard/StepDatosLegajo";
@@ -19,8 +20,8 @@ import StepResumen from "../components/AltaPersonaWizard/StepResumen";
 const pasos = [
   { id: 1, titulo: "Persona", icono: User },
   { id: 2, titulo: "Legajo", icono: FileText },
-  { id: 3, titulo: "Datos del legajo", icono: HeartPulse },
-  { id: 4, titulo: "Usuario", icono: ShieldCheck },
+  { id: 3, titulo: "Datos Legajo", icono: HeartPulse },
+  { id: 4, titulo: "Usuario", icono: ShieldAlert },
   { id: 5, titulo: "Resumen", icono: CheckCircle2 },
 ];
 
@@ -32,7 +33,12 @@ const contactosInicial = { email: "", celular: "" };
 const usuarioInicial = { rol: "bombero", crear_usuario: true };
 
 export default function AltaPersonaWizard() {
-  const [pasoActual, setPasoActual] = useState(1);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const userRole = user?.role || "invitado";
+
+  // Declaramos el estado de control numérico
+  const [paso, setPaso] = useState(1);
   const [personaId, setPersonaId] = useState(null);
   const [legajoId, setLegajoId] = useState(null);
   const [persona, setPersona] = useState(personaInicial);
@@ -55,9 +61,7 @@ export default function AltaPersonaWizard() {
   async function cargarCombos() {
     try {
       const [respuestaTipos, respuestaRangos, respuestaSedes] = await Promise.all([
-        apiRequest("/tipos-documentos"),
-        rangoService.obtenerTodos(),
-        sedeService.obtenerTodas(),
+        apiRequest("/tipos-documentos"), rangoService.obtenerTodos(), sedeService.obtenerTodas(),
       ]);
       setTiposDocumento(respuestaTipos.data || []);
       setRangos(respuestaRangos.data || []);
@@ -71,21 +75,13 @@ export default function AltaPersonaWizard() {
 
   async function guardarPersona(e) {
     e.preventDefault();
-    if (!persona.nombre || !persona.apellido || !persona.numero_doc || !persona.td_id) {
-      return setError("Complete los campos obligatorios de la persona");
-    }
+    if (!persona.nombre || !persona.apellido || !persona.numero_doc || !persona.td_id) return setError("Complete los campos obligatorios");
     try {
-      setGuardando(true);
-      setError("");
+      setGuardando(true); setError("");
       const res = await personasService.crear({
-        td_id: Number(persona.td_id),
-        numero_doc: persona.numero_doc,
-        nombre: persona.nombre,
-        apellido: persona.apellido,
-        usuario_accion: 1,
+        td_id: Number(persona.td_id), numero_doc: persona.numero_doc, nombre: persona.nombre, apellido: persona.apellido, usuario_accion: 1,
       });
-      setPersonaId(res.data.id);
-      setPasoActual(2);
+      setPersonaId(res.data.id); setPaso(2);
     } catch (err) {
       setError(err.message || "Error al crear persona");
     } finally {
@@ -97,18 +93,11 @@ export default function AltaPersonaWizard() {
     e.preventDefault();
     if (!legajo.numero) return setError("El número de legajo es obligatorio");
     try {
-      setGuardando(true);
-      setError("");
+      setGuardando(true); setError("");
       const res = await apiRequest("/legajos", {
-        method: "POST",
-        body: JSON.stringify({
-          persona_id: Number(personaId),
-          numero: String(legajo.numero).trim(),
-          usuario_accion: 1,
-        }),
+        method: "POST", body: JSON.stringify({ persona_id: Number(personaId), numero: String(legajo.numero).trim(), usuario_accion: 1 }),
       });
-      setLegajoId(res.data.id);
-      setPasoActual(3);
+      setLegajoId(res.data.id); setPaso(3);
     } catch (err) {
       setError(err.message || "Error al crear legajo");
     } finally {
@@ -119,53 +108,21 @@ export default function AltaPersonaWizard() {
   async function guardarDatosDelLegajo(e) {
     e.preventDefault();
     try {
-      setGuardando(true);
-      setError("");
+      setGuardando(true); setError("");
       const promesas = [];
       if (datosMedicos.grupo_sanguineo) {
-        promesas.push(
-          datosMedicosService.crear({
-            legajo_id: Number(legajoId),
-            grupo_sanguineo: datosMedicos.grupo_sanguineo,
-            alergias: datosMedicos.alergias,
-            aptitud_fisica: datosMedicos.aptitud_fisica,
-            seguro: datosMedicos.seguro,
-            usuario_accion: 1,
-          })
-        );
+        promesas.push(datosMedicosService.crear({ legajo_id: Number(legajoId), grupo_sanguineo: datosMedicos.grupo_sanguineo, alergias: datosMedicos.alergias, aptitud_fisica: datosMedicos.aptitud_fisica, seguro: datosMedicos.seguro, usuario_accion: 1 }));
       }
       if (contactos.email || contactos.celular) {
-        promesas.push(
-          contactosService.crear({
-            persona_id: Number(personaId),
-            email: contactos.email,
-            celular: contactos.celular,
-            usuario_accion: 1,
-          })
-        );
+        promesas.push(contactosService.crear({ persona_id: Number(personaId), email: contactos.email, celular: contactos.celular, usuario_accion: 1 }));
       }
       if (datosLegajo.rangos_institucionales_id) {
-        promesas.push(
-          legajoRangosService.crear({
-            legajo_id: Number(legajoId),
-            rangos_institucionales_id: Number(datosLegajo.rangos_institucionales_id),
-            es_autoridad: datosLegajo.es_autoridad,
-            usuario_accion: 1,
-          })
-        );
+        promesas.push(legajoRangosService.crear({ legajo_id: Number(legajoId), rangos_institucionales_id: Number(datosLegajo.rangos_institucionales_id), es_autoridad: datosLegajo.es_autoridad, usuario_accion: 1 }));
       }
       if (datosLegajo.sede_id) {
-        promesas.push(
-          legajoSedesService.crear({
-            legajo_id: Number(legajoId),
-            sede_id: Number(datosLegajo.sede_id),
-            es_sede_base: datosLegajo.es_sede_base,
-            usuario_accion: 1,
-          })
-        );
+        promesas.push(legajoSedesService.crear({ legajo_id: Number(legajoId), sede_id: Number(datosLegajo.sede_id), es_sede_base: datosLegajo.es_sede_base, usuario_accion: 1 }));
       }
-      await Promise.all(promesas);
-      setPasoActual(4);
+      await Promise.all(promesas); setPaso(4);
     } catch (err) {
       setError(err.message || "Error al guardar los datos asociados");
     } finally {
@@ -175,34 +132,56 @@ export default function AltaPersonaWizard() {
 
   async function guardarUsuario(e) {
     e.preventDefault();
-    if (usuario.crear_usuario) {
-      setResultadoUsuario({ mensaje: "Usuario 'bombero' solicitado con éxito" });
-    }
-    setPasoActual(5);
+    if (usuario.crear_usuario) setResultadoUsuario({ mensaje: "Usuario 'bombero' solicitado con éxito" });
+    setPaso(5);
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100 pb-12">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      <main className="max-w-6xl mx-auto px-6 py-10">
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
-          <div className="flex items-center gap-6 border-b border-slate-200 pb-8 mb-8">
-            <div className="flex-1">
-              <h1 className="text-4xl font-extrabold text-slate-800">Alta de persona</h1>
-              <p className="text-slate-500 mt-2">Wizard paso a paso para dar de alta un bombero completo.</p>
+          
+          {/* Encabezado Principal (Header) */}
+          <div className="flex flex-col sm:flex-row items-center justify-between border-b border-slate-100 pb-6 mb-8 gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-red-50 text-red-700 flex items-center justify-center shadow-xs">
+                <User size={28} />
+              </div>
+              <div>
+                <span className="text-red-600 text-xs font-bold tracking-wider uppercase block">Alta Guiada</span>
+                <h1 className="text-3xl font-extrabold text-slate-900">Alta de Personal</h1>
+                <p className="text-slate-500 text-sm mt-1">Asistente por pasos para dar de alta un legajo de bombero completo.</p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => navigate("/legajos")}
+              className="border border-slate-300 px-4 py-2 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition"
+            >
+              ← Volver al listado
+            </button>
           </div>
 
-          <div className="flex gap-4 border-b border-slate-200 pb-8 mb-8 overflow-x-auto">
-            {pasos.map((paso) => {
-              const Icon = paso.icono;
-              const resaltado = pasoActual >= paso.id;
+          {/* Barra de Progreso del Stepper */}
+          <div className="flex items-center justify-between mb-10 relative px-4">
+            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-slate-200 -z-10" />
+            {pasos.map((p) => {
+              const activo = paso === p.id;
+              const completado = paso > p.id;
+              const Icono = p.icono;
               return (
-                <div key={paso.id} className="flex items-center gap-2">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${resaltado ? "bg-red-700 text-white" : "bg-slate-100 text-slate-400"}`}>
-                    {paso.id}
+                <div key={p.id} className="flex flex-col items-center flex-1 relative bg-white px-2">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                    activo || completado ? "bg-red-700 text-white shadow-md scale-110" : "bg-slate-100 border border-slate-200 text-slate-400"
+                  }`}>
+                    <Icono size={18} />
+                  </div>
+                  <span className={`text-[10px] mt-2 font-bold transition-colors duration-300 ${
+                    activo || completado ? "text-red-700 font-extrabold" : "text-slate-450"
+                  }`}>
+                    {p.id}. {p.titulo}
                   </span>
-                  <span className={`text-sm font-bold hidden sm:inline ${resaltado ? "text-slate-800" : "text-slate-400"}`}>{paso.titulo}</span>
                 </div>
               );
             })}
@@ -210,60 +189,15 @@ export default function AltaPersonaWizard() {
 
           {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">{error}</div>}
 
-          {pasoActual === 1 && (
-            <StepPersona
-              persona={persona}
-              cambiarPersona={(e) => setPersona({ ...persona, [e.target.name]: e.target.value })}
-              tiposDocumento={tiposDocumento}
-              guardando={guardando}
-              guardarPersona={guardarPersona}
-            />
-          )}
-          {pasoActual === 2 && (
-            <StepLegajo
-              personaResumen={personaResumen}
-              personaId={personaId}
-              legajo={legajo}
-              cambiarLegajo={(e) => setLegajo({ ...legajo, [e.target.name]: e.target.value })}
-              guardando={guardando}
-              guardarLegajo={guardarLegajo}
-              onBack={() => setPasoActual(1)}
-            />
-          )}
-          {pasoActual === 3 && (
-            <StepDatosLegajo
-              datosMedicos={datosMedicos}
-              cambiarDatosMedicos={(e) => setDatosMedicos({ ...datosMedicos, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })}
-              contactos={contactos}
-              cambiarContactos={(e) => setContactos({ ...contactos, [e.target.name]: e.target.value })}
-              datosLegajo={datosLegajo}
-              cambiarDatosLegajo={(e) => setDatosLegajo({ ...datosLegajo, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })}
-              rangos={rangos}
-              sedes={sedes}
-              guardando={guardando}
-              guardarDatosDelLegajo={guardarDatosDelLegajo}
-              onBack={() => setPasoActual(2)}
-            />
-          )}
-          {pasoActual === 4 && (
-            <StepUsuario
-              usuario={usuario}
-              cambiarUsuario={(e) => setUsuario({ ...usuario, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })}
-              guardarUsuario={guardarUsuario}
-              onBack={() => setPasoActual(3)}
-            />
-          )}
-          {pasoActual === 5 && (
-            <StepResumen
-              personaResumen={personaResumen}
-              personaId={personaId}
-              legajo={legajo}
-              legajoId={legajoId}
-              datosMedicos={datosMedicos}
-              contactos={contactos}
-              resultadoUsuario={resultadoUsuario}
-            />
-          )}
+          {/* Cuerpo del Formulario Activo */}
+          <div className="space-y-6">
+            {paso === 1 && <StepPersona persona={persona} cambiarPersona={(e) => setPersona({ ...persona, [e.target.name]: e.target.value })} tiposDocumento={tiposDocumento} guardando={guardando} guardarPersona={guardarPersona} />}
+            {paso === 2 && <StepLegajo personaResumen={personaResumen} personaId={personaId} legajo={legajo} cambiarLegajo={(e) => setLegajo({ ...legajo, [e.target.name]: e.target.value })} guardando={guardando} guardarLegajo={guardarLegajo} onBack={() => setPaso(1)} />}
+            {paso === 3 && <StepDatosLegajo datosMedicos={datosMedicos} cambiarDatosMedicos={(e) => setDatosMedicos({ ...datosMedicos, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} contactos={contactos} cambiarContactos={(e) => setContactos({ ...contactos, [e.target.name]: e.target.value })} datosLegajo={datosLegajo} cambiarDatosLegajo={(e) => setDatosLegajo({ ...datosLegajo, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} rangos={rangos} sedes={sedes} guardando={guardando} guardarDatosDelLegajo={guardarDatosDelLegajo} onBack={() => setPaso(2)} />}
+            {paso === 4 && <StepUsuario usuario={usuario} cambiarUsuario={(e) => setUsuario({ ...usuario, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} guardarUsuario={guardarUsuario} onBack={() => setPaso(3)} />}
+            {paso === 5 && <StepResumen personaResumen={personaResumen} personaId={personaId} legajo={legajo} legajoId={legajoId} datosMedicos={datosMedicos} contactos={contactos} resultadoUsuario={resultadoUsuario} />}
+          </div>
+
         </section>
       </main>
     </div>

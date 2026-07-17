@@ -1,6 +1,10 @@
 import { CheckCircle2, User, IdCard, HeartPulse, MapPinned, Phone, ShieldCheck } from "lucide-react";
 import { TituloPaso } from "../FormHelpers";
 
+// Recibimos de la vista padre:
+// - icono: nodo JSX del ícono para el resumen.
+// - titulo: texto de cabecera de la tarjeta.
+// - texto: contenido descriptivo.
 export function ResumenItem({ icono, titulo, texto }) {
   return (
     <div className="flex items-start gap-4 p-5 bg-slate-50 border border-slate-200 rounded-2xl">
@@ -15,6 +19,14 @@ export function ResumenItem({ icono, titulo, texto }) {
   );
 }
 
+// Recibimos de la vista padre:
+// - personaResumen: nombre completo de la persona.
+// - personaId: id de la persona creada.
+// - legajo: objeto con el número de legajo.
+// - legajoId: id del legajo creado.
+// - datosMedicos: objeto con atributos médicos.
+// - contactos: objeto con email y celular.
+// - resultadoUsuario: respuesta del backend del microservicio Login.
 export default function StepResumen({
   personaResumen,
   personaId,
@@ -64,6 +76,7 @@ export default function StepResumen({
         />
       </div>
       <div className="flex justify-end">
+        {/* Recarga la página por completo para reiniciar el wizard limpio en el paso 1 */}
         <button
           type="button"
           onClick={() => window.location.reload()}
@@ -75,3 +88,4 @@ export default function StepResumen({
     </section>
   );
 }
+

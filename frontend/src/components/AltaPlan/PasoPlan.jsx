@@ -1,6 +1,12 @@
 import React from "react";
 import { BookOpen, CalendarDays, Hash, FileText, Save } from "lucide-react";
 
+// Recibimos de la vista padre:
+// - plan: objeto de datos con los atributos del plan de estudio.
+// - tiposPlanes: colección con los tipos de plan disponibles.
+// - guardando: bandera boolean para deshabilitar controles durante la persistencia.
+// - cambiarPlan: callback manejador de los inputs.
+// - guardarPlan: callback onSubmit para crear el plan.
 export default function PasoPlan({
   plan,
   tiposPlanes,
@@ -9,6 +15,7 @@ export default function PasoPlan({
   guardarPlan,
 }) {
   return (
+    // Disparamos el submit para guardar y seguir al siguiente paso
     <form onSubmit={guardarPlan} className="space-y-6">
       <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
         <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
@@ -27,6 +34,7 @@ export default function PasoPlan({
             className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 font-bold"
           >
             <option value="">Seleccione un tipo</option>
+            {/* Mapeamos el tipo de plan asegurando un key único (el id) para optimizar el ciclo de render de React */}
             {tiposPlanes.map((tipo) => (
               <option key={tipo.id_tipo_planes} value={tipo.id_tipo_planes}>
                 {tipo.descripcion}
@@ -83,6 +91,7 @@ export default function PasoPlan({
       </div>
 
       <div className="flex justify-end pt-4">
+        {/* Si está guardando, aplicamos opacidad reducida y deshabilitamos el botón */}
         <button
           type="submit"
           disabled={guardando}
@@ -96,6 +105,7 @@ export default function PasoPlan({
   );
 }
 
+// Helper interno puramente de presentación; recibe sus props de PasoPlan
 function CampoTexto({ label, name, value, onChange, placeholder, type = "text", icono }) {
   return (
     <div>
@@ -118,3 +128,4 @@ function CampoTexto({ label, name, value, onChange, placeholder, type = "text", 
     </div>
   );
 }
+

@@ -1,6 +1,14 @@
 import React from "react";
 import { BookMarked, Save } from "lucide-react";
 
+// Recibimos de la vista padre:
+// - asignaturaPlan: objeto que contiene los ids seleccionados para la materia del plan.
+// - asignaturas: colección de asignaturas disponibles para la selección.
+// - rangos: colección de rangos jerárquicos mínimos utilizables.
+// - sedes: colección de sedes físicas habilitadas.
+// - cambiarAsignaturaPlan: callback para guardar las selecciones.
+// - guardarDatosAsignatura: callback onSubmit para validar e ir al siguiente paso.
+// - setPasoActual: función para forzar la navegación entre pasos.
 export default function PasoAsignaturaPlan({
   asignaturaPlan,
   asignaturas,
@@ -11,6 +19,7 @@ export default function PasoAsignaturaPlan({
   setPasoActual,
 }) {
   return (
+    // Disparamos el envío para almacenar la materia asociada localmente
     <form onSubmit={guardarDatosAsignatura} className="space-y-6">
       <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
         <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
@@ -29,6 +38,7 @@ export default function PasoAsignaturaPlan({
             className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 font-bold"
           >
             <option value="">Seleccione asignatura</option>
+            {/* Mapeamos las materias asignándoles su ID como key única de renderizado */}
             {asignaturas.map((asig) => (
               <option key={asig.id} value={asig.id}>
                 {asig.nombre}
@@ -46,6 +56,7 @@ export default function PasoAsignaturaPlan({
             className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 font-bold"
           >
             <option value="">Seleccione rango</option>
+            {/* Mapeamos los rangos jerárquicos asegurando un key consistente */}
             {rangos.map((rango) => (
               <option key={rango.id} value={rango.id}>
                 {rango.descripcion}
@@ -63,6 +74,7 @@ export default function PasoAsignaturaPlan({
             className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 font-bold"
           >
             <option value="">Seleccione sede</option>
+            {/* Mapeamos la colección de sedes físicas con key único */}
             {sedes.map((sede) => (
               <option key={sede.id} value={sede.id}>
                 {sede.nombre}
@@ -73,6 +85,7 @@ export default function PasoAsignaturaPlan({
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+        {/* Regresamos al paso anterior del asistente */}
         <button
           type="button"
           onClick={() => setPasoActual(1)}
@@ -91,3 +104,4 @@ export default function PasoAsignaturaPlan({
     </form>
   );
 }
+

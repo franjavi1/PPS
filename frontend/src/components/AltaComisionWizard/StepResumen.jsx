@@ -1,6 +1,9 @@
 import { Save, CheckCircle2 } from "lucide-react";
 import { TituloPaso } from "../FormHelpers";
 
+// Recibimos de la vista padre:
+// - titulo: texto de cabecera de la tarjeta.
+// - texto: contenido del resumen.
 function ResumenItem({ titulo, texto }) {
   return (
     <div className="border border-slate-200 rounded-xl bg-slate-50 p-5">
@@ -10,6 +13,13 @@ function ResumenItem({ titulo, texto }) {
   );
 }
 
+// Recibimos de la vista padre:
+// - comision: objeto de datos con los atributos de la comisión creada.
+// - comisionId: identificador generado de la comisión.
+// - comisionesAsignaturasCargadas: materias asociadas a esta comisión.
+// - autoridadesCargadas: autoridades asignadas.
+// - volverComisiones: callback para regresar al listado general.
+// - cargarOtraComision: callback para reiniciar el asistente.
 export default function StepResumen({
   comision,
   comisionId,
@@ -27,6 +37,7 @@ export default function StepResumen({
         <ResumenItem titulo="Autoridades" texto={autoridadesCargadas.length} />
       </div>
       <div className="flex flex-col sm:flex-row justify-end gap-3">
+        {/* Regresa al listado general de comisiones */}
         <button
           type="button"
           onClick={volverComisiones}
@@ -34,6 +45,7 @@ export default function StepResumen({
         >
           Volver a comisiones
         </button>
+        {/* Reinicia el wizard para dar de alta otra comisión limpia */}
         <button
           type="button"
           onClick={cargarOtraComision}
@@ -46,3 +58,4 @@ export default function StepResumen({
     </section>
   );
 }
+

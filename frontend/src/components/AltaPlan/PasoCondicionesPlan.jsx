@@ -1,6 +1,13 @@
 import React from "react";
 import { ClipboardList, Save } from "lucide-react";
 
+// Recibimos de la vista padre:
+// - asignaturaPlan: objeto con las condiciones de presentismo, nota y horas de la asignatura.
+// - resumen: contiene descripciones de texto para el encabezado (materia y sede).
+// - guardando: flag booleano para inhabilitar controles en el submit.
+// - cambiarAsignaturaPlan: manejador para actualizar campos de entrada.
+// - guardarCondiciones: manejador onSubmit para persistir y avanzar.
+// - setPasoActual: manejador para retroceder de paso.
 export default function PasoCondicionesPlan({
   asignaturaPlan,
   resumen,
@@ -10,6 +17,7 @@ export default function PasoCondicionesPlan({
   setPasoActual,
 }) {
   return (
+    // Disparamos la acción de guardar las condiciones definidas de cursado
     <form onSubmit={guardarCondiciones} className="space-y-6">
       <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
         <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
@@ -91,6 +99,7 @@ export default function PasoCondicionesPlan({
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+        {/* Callback para regresar al paso de seleccionar asignatura */}
         <button
           type="button"
           onClick={() => setPasoActual(2)}
@@ -98,6 +107,7 @@ export default function PasoCondicionesPlan({
         >
           Volver
         </button>
+        {/* Si está guardando, inhabilitamos visual y funcionalmente el botón */}
         <button
           type="submit"
           disabled={guardando}
@@ -111,6 +121,7 @@ export default function PasoCondicionesPlan({
   );
 }
 
+// Componente helper de presentación para simplificar los inputs del formulario
 function CampoTexto({ label, name, value, onChange, placeholder, type = "text" }) {
   return (
     <div>
@@ -126,3 +137,4 @@ function CampoTexto({ label, name, value, onChange, placeholder, type = "text" }
     </div>
   );
 }
+

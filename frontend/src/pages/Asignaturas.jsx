@@ -25,6 +25,7 @@ export default function Asignaturas() {
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
 
+  // Redireccionamos si no hay sesión activa o si carece de permisos de lectura.
   useEffect(() => {
     if (!estaAutenticado()) {
       navigate("/login");
@@ -37,6 +38,17 @@ export default function Asignaturas() {
     cargarAsignaturas();
   }, [currentUserRole]);
 
+  // Escuchamos el parámetro de acción de la URL para disparar el asistente de alta
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'nuevo') {
+      limpiarFormulario();
+      setMostrarModal(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  // Cargamos en paralelo tanto las asignaturas generales como su asociación en planes para no bloquear el hilo principal.
   async function cargarAsignaturas() {
     try {
       setCargando(true);
@@ -66,15 +78,13 @@ export default function Asignaturas() {
   }
 
   function editarAsignatura(asignatura) {
-    setFormulario({
-      nombre: asignatura.nombre || "",
-      formato: asignatura.formato || "",
-    });
+    setFormulario({ nombre: asignatura.nombre || "", formato: asignatura.formato || "" });
     setEditandoId(asignatura.id);
     setErrorFormulario("");
     setMostrarModal(true);
   }
 
+  // Validamos reglas de negocio para evitar guardar nombres duplicados o formatos vacíos en la API.
   async function guardarAsignatura(e) {
     e.preventDefault();
     const nombre = formulario.nombre.trim();
@@ -101,6 +111,7 @@ export default function Asignaturas() {
     }
   }
 
+  // Prevenimos la eliminación si la materia ya forma parte de algún plan de estudio.
   async function eliminarAsignatura(id) {
     if (asignaturaEstaEnPlan(id)) {
       setError("No se puede eliminar una asignatura asociada a un plan");
@@ -139,48 +150,23 @@ export default function Asignaturas() {
               </div>
               <div>
                 <h1 className="text-4xl font-extrabold text-slate-800">Asignaturas</h1>
-                <p className="text-slate-500 mt-2">
-                  Consulta y gestiona las materias asociadas a los planes de estudio.
-                </p>
+                <p className="text-slate-500 mt-2">Consulta y gestiona las materias asociadas a los planes de estudio.</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={cargarAsignaturas}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
-              >
-                <RefreshCcw size={22} /> Actualizar
-              </button>
+              <button onClick={cargarAsignaturas} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"><RefreshCcw size={22} /> Actualizar</button>
               {hasPermission(currentUserRole, "crear") && (
-                <button
-                  onClick={() => {
-                    limpiarFormulario();
-                    setMostrarModal(true);
-                  }}
-                  className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
-                >
-                  <PlusCircle size={22} /> Nueva asignatura
-                </button>
+                <button onClick={() => { limpiarFormulario(); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"><PlusCircle size={22} /> Nueva asignatura</button>
               )}
             </div>
           </div>
 
           <div className="relative w-full md:w-96 mb-8">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={22} />
-            <input
-              type="text"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por asignatura o formato"
-              className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
+            <input type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por asignatura o formato" className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500" />
           </div>
 
-          {error && (
-            <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">
-              {error}
-            </div>
-          )}
+          {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">{error}</div>}
 
           <AsignaturaList
             cargando={cargando}
@@ -195,10 +181,7 @@ export default function Asignaturas() {
 
       <AsignaturaFormModal
         mostrarModal={mostrarModal}
-        cerrarModal={() => {
-          setMostrarModal(false);
-          limpiarFormulario();
-        }}
+        cerrarModal={() => { setMostrarModal(false); limpiarFormulario(); }}
         editandoId={editandoId}
         formulario={formulario}
         manejarCambio={manejarCambio}

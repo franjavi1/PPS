@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { DoorOpen, Pencil, PlusCircle, RefreshCcw, Search, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router";
 import Navbar from "../components/Navbar";
 import { aulaService } from "../services/aulaService";
 import { sedeService } from "../services/sedeService";
 import AulaModal from "../components/Aulas/AulaModal";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
+import { estaAutenticado } from "../utils/auth";
 
 const formularioInicial = { sedes_id: "", aula: "", es_virtual: "0" };
 
@@ -20,6 +24,8 @@ const EstadoBadge = ({ estado }) => (
 );
 
 export default function Aulas() {
+  const navigate = useNavigate();
+  const { currentUserRole } = useAuth();
   const [aulas, setAulas] = useState([]);
   const [sedes, setSedes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -30,10 +36,20 @@ export default function Aulas() {
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
 
+  // Validamos que exista una sesión activa y que el rol del usuario le permita leer aulas antes de renderizar la vista.
   useEffect(() => {
+    if (!estaAutenticado()) {
+      navigate("/login");
+      return;
+    }
+    if (!hasPermission(currentUserRole, "leer")) {
+      navigate("/inicio");
+      return;
+    }
     cargarDatos();
-  }, []);
+  }, [currentUserRole]);
 
+  // Recuperamos las aulas y el listado completo de sedes en paralelo para agilizar los combos.
   async function cargarDatos() {
     try {
       setCargando(true);
@@ -54,6 +70,7 @@ export default function Aulas() {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   }
 
+  // Guardamos el aula. Convertimos a tipos numéricos adecuados ya que la base de datos Postgres los requiere así.
   async function guardarAula(e) {
     e.preventDefault();
     const sedesId = Number(formulario.sedes_id);
@@ -77,6 +94,7 @@ export default function Aulas() {
     }
   }
 
+  // Eliminación directa de aula tras la confirmación explícita del usuario administrativo.
   async function eliminarAula(id) {
     if (!confirm("¿Seguro que querés eliminar esta aula?")) return;
     try {
@@ -101,21 +119,17 @@ export default function Aulas() {
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
-              <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
-                <DoorOpen size={30} />
-              </div>
+              <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center"><DoorOpen size={30} /></div>
               <div>
                 <h1 className="text-4xl font-extrabold text-slate-800">Aulas</h1>
                 <p className="text-slate-500 mt-2">Consulta y gestiona aulas físicas o virtuales por sede.</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
-              <button onClick={cargarDatos} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100">
-                <RefreshCcw size={22} /> Actualizar
-              </button>
-              <button onClick={() => { setFormulario(formularioInicial); setEditandoId(null); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800">
-                <PlusCircle size={22} /> Nueva aula
-              </button>
+              <button onClick={cargarDatos} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100"><RefreshCcw size={22} /> Actualizar</button>
+              {hasPermission(currentUserRole, "crear") && (
+                <button onClick={() => { setFormulario(formularioInicial); setEditandoId(null); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800"><PlusCircle size={22} /> Nueva aula</button>
+              )}
             </div>
           </div>
 
@@ -126,7 +140,6 @@ export default function Aulas() {
 
           {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">{error}</div>}
 
-          {/* Table */}
           <div className="overflow-x-auto border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse bg-white">
               <thead className="bg-slate-50">
@@ -150,8 +163,13 @@ export default function Aulas() {
                       <td className="px-5 py-5"><EstadoBadge estado={aula.estado} /></td>
                       <td className="px-5 py-5 text-center">
                         <div className="flex justify-center gap-3">
-                          <button onClick={() => { setFormulario({ sedes_id: String(aula.sedes_id), aula: aula.aula, es_virtual: String(aula.es_virtual) }); setEditandoId(aula.id_aula); setMostrarModal(true); }} className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"><Pencil size={16} /> Editar</button>
-                          <button onClick={() => eliminarAula(aula.id_aula)} className="text-red-600 hover:text-red-800 font-semibold flex items-center gap-1"><Trash2 size={16} /> Eliminar</button>
+                          <button onClick={() => { setFormulario({ sedes_id: String(aula.sedes_id), aula: aula.aula, es_virtual: String(aula.es_virtual) }); setEditandoId(aula.id_aula); setMostrarModal(true); }} disabled={!hasPermission(currentUserRole, "editar")} className={`text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 ${hasPermission(currentUserRole, "editar") ? "" : "opacity-50 cursor-not-allowed"}`}><Pencil size={16} /> Editar</button>
+                          <button
+                            onClick={() => eliminarAula(aula.id_aula)}
+                            // Bloqueamos el borrado si el usuario no es admin o si el registro tiene hijos en la base de datos (evita error de FK en Postgres)
+                            disabled={!hasPermission(currentUserRole, "eliminar")}
+                            className={`text-red-600 hover:text-red-800 font-semibold flex items-center gap-1 ${hasPermission(currentUserRole, "eliminar") ? "" : "opacity-50 cursor-not-allowed"}`}
+                          ><Trash2 size={16} /> Eliminar</button>
                         </div>
                       </td>
                     </tr>
@@ -164,7 +182,6 @@ export default function Aulas() {
           </div>
         </section>
       </main>
-
       <AulaModal mostrarModal={mostrarModal} cerrarModal={() => setMostrarModal(false)} editandoId={editandoId} formulario={formulario} manejarCambio={manejarCambio} errorFormulario={errorFormulario} guardarAula={guardarAula} sedes={sedes} />
     </div>
   );

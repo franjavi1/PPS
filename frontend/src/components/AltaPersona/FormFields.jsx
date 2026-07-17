@@ -1,6 +1,9 @@
 import React from "react";
 import { Save } from "lucide-react";
 
+// Recibimos de la vista padre:
+// - icono: nodo JSX del ícono ilustrativo del paso.
+// - titulo: texto de cabecera principal del asistente.
 export function TituloPaso({ icono, titulo }) {
   return (
     <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
@@ -12,6 +15,14 @@ export function TituloPaso({ icono, titulo }) {
   );
 }
 
+// Recibimos de la vista padre:
+// - label: etiqueta de texto explicativo.
+// - name: atributo name del input.
+// - value: valor enlazado del estado.
+// - onChange: callback para capturar lo digitado.
+// - placeholder: texto de sugerencia.
+// - type: tipo de input.
+// - icono: ícono interno para el textbox.
 export function CampoTexto({
   label,
   name,
@@ -47,6 +58,13 @@ export function CampoTexto({
   );
 }
 
+// Recibimos de la vista padre:
+// - label: nombre del campo.
+// - name: atributo html name.
+// - value: valor seleccionado.
+// - onChange: callback al seleccionar.
+// - opciones: colección de registros de la BD a listar.
+// - getLabel: selector de texto para renderizar la opción.
 export function CampoSelect({ label, name, value, onChange, opciones, getLabel }) {
   return (
     <div>
@@ -60,6 +78,7 @@ export function CampoSelect({ label, name, value, onChange, opciones, getLabel }
         className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
       >
         <option value="">Seleccione una opcion</option>
+        {/* Mapeamos el listado de opciones asegurando un key único (el id de BD) para optimizar React */}
         {opciones.map((opcion) => (
           <option key={opcion.id} value={opcion.id}>
             {getLabel(opcion)}
@@ -70,6 +89,12 @@ export function CampoSelect({ label, name, value, onChange, opciones, getLabel }
   );
 }
 
+// Recibimos de la vista padre:
+// - label: nombre descriptivo.
+// - name: atributo name.
+// - value: valor actual.
+// - onChange: manejador onChange.
+// - opciones: array simple de strings.
 export function CampoSelectSimple({ label, name, value, onChange, opciones }) {
   return (
     <div>
@@ -83,6 +108,7 @@ export function CampoSelectSimple({ label, name, value, onChange, opciones }) {
         className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
       >
         <option value="">Seleccione una opcion</option>
+        {/* Mapeamos las opciones utilizando el string como key único */}
         {opciones.map((opcion) => (
           <option key={opcion} value={opcion}>
             {opcion}
@@ -93,6 +119,11 @@ export function CampoSelectSimple({ label, name, value, onChange, opciones }) {
   );
 }
 
+// Recibimos de la vista padre:
+// - label: texto al lado de la casilla.
+// - name: atributo name.
+// - checked: boolean flag.
+// - onChange: manejador onChange.
 export function CampoCheckbox({ label, name, checked, onChange }) {
   return (
     <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold">
@@ -108,6 +139,9 @@ export function CampoCheckbox({ label, name, checked, onChange }) {
   );
 }
 
+// Recibimos de la vista padre:
+// - label: etiqueta de cabecera.
+// - value: texto fijo de sólo lectura.
 export function CampoSoloLectura({ label, value }) {
   return (
     <div>
@@ -121,6 +155,10 @@ export function CampoSoloLectura({ label, value }) {
   );
 }
 
+// Recibimos de la vista padre:
+// - guardando: flag de submit que bloquea interacciones concurrentes.
+// - texto: cadena del botón principal.
+// - onBack: callback de acción para volver.
 export function Acciones({ guardando, texto, onBack }) {
   return (
     <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
@@ -133,6 +171,7 @@ export function Acciones({ guardando, texto, onBack }) {
           Volver
         </button>
       )}
+      {/* Si está guardando, inhabilitamos y aplicamos opacidad */}
       <button
         type="submit"
         disabled={guardando}
@@ -145,6 +184,10 @@ export function Acciones({ guardando, texto, onBack }) {
   );
 }
 
+// Recibimos de la vista padre:
+// - icono: nodo JSX para ilustrar el item.
+// - titulo: texto de cabecera superior.
+// - texto: contenido de la tarjeta.
 export function ResumenItem({ icono, titulo, texto }) {
   return (
     <div className="border border-slate-200 rounded-xl p-5 bg-slate-50">
@@ -154,3 +197,4 @@ export function ResumenItem({ icono, titulo, texto }) {
     </div>
   );
 }
+

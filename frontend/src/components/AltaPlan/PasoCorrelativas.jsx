@@ -1,6 +1,15 @@
 import React from "react";
 import { GitBranch, PlusCircle, Trash2, Save } from "lucide-react";
 
+// Recibimos de la vista padre:
+// - nuevaCorrelativa: objeto local de formulario que mapea el ID de la materia origen y la requerida.
+// - asignaturasCargadas: lista de materias para relacionar.
+// - correlativasCargadas: lista de correlativas configuradas.
+// - guardando: bandera para animar o bloquear submit.
+// - cambiarCorrelativa: callback para los selectores de correlativas.
+// - guardarCorrelativa: callback onSubmit para crear la correlatividad.
+// - eliminarCorrelativa: callback para remover la correlativa.
+// - setPasoActual: manejador para retroceder de paso.
 export default function PasoCorrelativas({
   nuevaCorrelativa,
   asignaturasCargadas,
@@ -30,6 +39,7 @@ export default function PasoCorrelativas({
             className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 font-bold"
           >
             <option value="">Seleccione materia</option>
+            {/* Mapeamos las materias de origen asegurando un key consistente */}
             {asignaturasCargadas.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.asignatura}
@@ -47,6 +57,7 @@ export default function PasoCorrelativas({
             className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 font-bold"
           >
             <option value="">Seleccione materia</option>
+            {/* Mapeamos las materias requeridas asignando key e id */}
             {asignaturasCargadas.map((item) => (
               <option key={item.id} value={item.asignatura_id}>
                 {item.asignatura}
@@ -56,6 +67,7 @@ export default function PasoCorrelativas({
         </div>
 
         <div className="md:col-span-2 flex justify-end">
+          {/* Si está guardando, inhabilitamos visualmente el botón */}
           <button
             type="submit"
             disabled={guardando}
@@ -70,10 +82,12 @@ export default function PasoCorrelativas({
       <div className="space-y-3">
         <h3 className="text-lg font-bold text-slate-800">Correlativas Cargadas</h3>
         {correlativasCargadas.length === 0 ? (
+          // Si no hay correlativas cargadas, mostramos un mensaje amigable
           <div className="border border-slate-200 rounded-xl bg-slate-50 p-5 text-center text-slate-500 font-semibold">
             No se cargaron correlativas aún. Podés finalizar sin correlativas.
           </div>
         ) : (
+          /* Mapeamos el listado de correlativas garantizando un ID único en el atributo key para optimizar React */
           correlativasCargadas.map((item) => (
             <div key={item.id} className="flex items-center justify-between border border-slate-200 rounded-xl bg-slate-50 p-4 shadow-sm">
               <div>
@@ -82,6 +96,7 @@ export default function PasoCorrelativas({
                   Requiere regularizar/aprobar: {item.asignaturaRequerida}
                 </p>
               </div>
+              {/* Botón para remover la correlativa seleccionada */}
               <button
                 type="button"
                 onClick={() => eliminarCorrelativa(item.id)}
@@ -95,6 +110,7 @@ export default function PasoCorrelativas({
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+        {/* Regresa al paso de condiciones del cursado */}
         <button
           type="button"
           onClick={() => setPasoActual(3)}
@@ -114,3 +130,4 @@ export default function PasoCorrelativas({
     </section>
   );
 }
+

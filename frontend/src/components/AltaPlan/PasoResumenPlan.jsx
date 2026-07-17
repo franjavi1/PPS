@@ -2,6 +2,14 @@ import React from "react";
 import { CheckCircle2, PlusCircle, Save } from "lucide-react";
 import { useNavigate } from "react-router";
 
+// Recibimos de la vista padre:
+// - plan: objeto de datos con los atributos del plan creado.
+// - planId: identificador único generado.
+// - asignaturasCargadas: lista de asignaturas vinculadas.
+// - correlativasCargadas: lista de correlatividades creadas.
+// - resumen: objeto con datos auxiliares formateados.
+// - agregarOtraAsignatura: callback para reiniciar el flujo e incorporar una nueva materia.
+// - cargarOtroPlan: callback para restablecer el asistente para un plan completamente nuevo.
 export default function PasoResumenPlan({
   plan,
   planId,
@@ -41,6 +49,7 @@ export default function PasoResumenPlan({
       </div>
 
       <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-slate-100">
+        {/* Navega de regreso al panel general de planes de estudio */}
         <button
           type="button"
           onClick={() => navigate("/planes")}
@@ -49,6 +58,7 @@ export default function PasoResumenPlan({
           Volver a planes
         </button>
 
+        {/* Reinicia el wizard para agregar más asignaturas al plan actual */}
         <button
           type="button"
           onClick={agregarOtraAsignatura}
@@ -58,6 +68,7 @@ export default function PasoResumenPlan({
           Agregar otra asignatura al plan
         </button>
 
+        {/* Reinicia el wizard para dar de alta otro plan totalmente diferente */}
         <button
           type="button"
           onClick={cargarOtroPlan}
@@ -71,6 +82,7 @@ export default function PasoResumenPlan({
   );
 }
 
+// Componente secundario reutilizable para mostrar las tarjetas del resumen
 function ResumenItem({ titulo, texto }) {
   return (
     <div className="border border-slate-200 rounded-xl p-5 bg-slate-50">
@@ -79,3 +91,4 @@ function ResumenItem({ titulo, texto }) {
     </div>
   );
 }
+

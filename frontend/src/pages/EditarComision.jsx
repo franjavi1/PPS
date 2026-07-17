@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router";
 import { ArrowLeft, BookOpenCheck, ChevronDown, GraduationCap, Save, ShieldUser } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
@@ -12,7 +14,6 @@ import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
-
 import SeccionDatos from "../components/EditarComision/SeccionDatos";
 import SeccionAsignaturas from "../components/EditarComision/SeccionAsignaturas";
 import SeccionAutoridades from "../components/EditarComision/SeccionAutoridades";
@@ -20,7 +21,6 @@ import SeccionAutoridades from "../components/EditarComision/SeccionAutoridades"
 const comisionInicial = { descripcion: "" };
 const nuevaComisionAsignaturaInicial = { plan_asignaturas_id: "", aula_id: "", nombre: "", modalidad: "", cupo_maximo: "", estado: "Activo" };
 const nuevaAutoridadInicial = { tipo_autoridad_id: "", legajo_id: "", comision_id: "" };
-
 const obtenerLista = (res) => (Array.isArray(res?.data) ? res.data : []);
 
 function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
@@ -41,6 +41,9 @@ function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
 export default function EditarComision() {
   const { id } = useParams();
   const navigate = useNavigate();
+  // Explicamos el inicio síncrono del componente y cómo consume el rol de sesión con el hook useAuth.
+  const { currentUserRole } = useAuth();
+
   const [comision, setComision] = useState(comisionInicial);
   const [comisionesAsignaturas, setComisionesAsignaturas] = useState([]);
   const [nuevaComisionAsignatura, setNuevaComisionAsignatura] = useState(nuevaComisionAsignaturaInicial);
@@ -64,34 +67,19 @@ export default function EditarComision() {
 
   async function cargarDatos() {
     try {
-      setCargando(true);
-      setError("");
+      setCargando(true); setError("");
       const [resCom, resComAsig, resAut, resPlanAsig, resAsig, resPlanes, resSedes, resAulas, resTipos, resLeg] = await Promise.all([
-        comisionService.obtenerPorId(id),
-        comisionAsignaturaService.obtenerTodos(),
-        autoridadComisionService.obtenerTodos(),
-        planAsignaturaService.obtenerTodos(),
-        asignaturaService.obtenerTodas(),
-        planService.obtenerTodos(),
-        sedeService.obtenerTodas(),
-        aulaService.obtenerTodas(),
-        tipoAutoridadService.obtenerTodos(),
-        apiRequest("/legajos"),
+        comisionService.obtenerPorId(id), comisionAsignaturaService.obtenerTodos(), autoridadComisionService.obtenerTodos(),
+        planAsignaturaService.obtenerTodos(), asignaturaService.obtenerTodas(), planService.obtenerTodos(),
+        sedeService.obtenerTodas(), aulaService.obtenerTodas(), tipoAutoridadService.obtenerTodos(), apiRequest("/legajos"),
       ]);
-
       const comisionesDeEsta = (resComAsig.data || []).filter((x) => Number(x.comision_id) === Number(id));
       const idsComisionesAsignaturas = comisionesDeEsta.map((x) => Number(x.id_comision_asignatura));
-
       setComision(resCom.data || comisionInicial);
       setComisionesAsignaturas(comisionesDeEsta);
       setAutoridades((resAut.data || []).filter((x) => idsComisionesAsignaturas.includes(Number(x.comision_id))));
-      setPlanesAsignaturas(obtenerLista(resPlanAsig));
-      setAsignaturas(obtenerLista(resAsig));
-      setPlanes(obtenerLista(resPlanes));
-      setSedes(obtenerLista(resSedes));
-      setAulas(obtenerLista(resAulas));
-      setTiposAutoridad(obtenerLista(resTipos));
-      setLegajos(obtenerLista(resLeg));
+      setPlanesAsignaturas(obtenerLista(resPlanAsig)); setAsignaturas(obtenerLista(resAsig)); setPlanes(obtenerLista(resPlanes));
+      setSedes(obtenerLista(resSedes)); setAulas(obtenerLista(resAulas)); setTiposAutoridad(obtenerLista(resTipos)); setLegajos(obtenerLista(resLeg));
     } catch (err) {
       setError(err.message || "Error al cargar datos");
     } finally {
@@ -118,8 +106,7 @@ export default function EditarComision() {
     e.preventDefault();
     if (!comision.descripcion.trim()) return setError("La descripción es obligatoria");
     try {
-      setGuardando(true);
-      setError("");
+      setGuardando(true); setError("");
       await comisionService.actualizar(id, { descripcion: comision.descripcion.trim(), usuario_accion: 1 });
       navigate(`/comisiones/${id}`);
     } catch (err) {
@@ -132,14 +119,9 @@ export default function EditarComision() {
   async function agregarComisionAsignatura() {
     if (!nuevaComisionAsignatura.plan_asignaturas_id || !nuevaComisionAsignatura.aula_id) return setError("Complete campos obligatorios");
     const payload = {
-      plan_asignaturas_id: Number(nuevaComisionAsignatura.plan_asignaturas_id),
-      aula_id: Number(nuevaComisionAsignatura.aula_id),
-      comision_id: Number(id),
-      nombre: nuevaComisionAsignatura.nombre.trim(),
-      modalidad: nuevaComisionAsignatura.modalidad.trim(),
-      cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo),
-      estado: nuevaComisionAsignatura.estado,
-      usuario_accion: 1,
+      plan_asignaturas_id: Number(nuevaComisionAsignatura.plan_asignaturas_id), aula_id: Number(nuevaComisionAsignatura.aula_id),
+      comision_id: Number(id), nombre: nuevaComisionAsignatura.nombre.trim(), modalidad: nuevaComisionAsignatura.modalidad.trim(),
+      cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo), estado: nuevaComisionAsignatura.estado, usuario_accion: 1,
     };
     try {
       setGuardando(true);
@@ -156,8 +138,7 @@ export default function EditarComision() {
   async function eliminarComisionAsignatura(caId) {
     if (!confirm("¿Seguro que querés quitar esta asignatura?")) return;
     try {
-      setGuardando(true);
-      await comisionAsignaturaService.eliminar(caId);
+      setGuardando(true); await comisionAsignaturaService.eliminar(caId);
       setComisionesAsignaturas(comisionesAsignaturas.filter((x) => x.id_comision_asignatura !== caId));
       setAutoridades(autoridades.filter((x) => x.comision_id !== caId));
     } catch (err) {
@@ -169,12 +150,7 @@ export default function EditarComision() {
 
   async function agregarAutoridad() {
     if (!nuevaAutoridad.tipo_autoridad_id || !nuevaAutoridad.legajo_id || !nuevaAutoridad.comision_id) return setError("Complete campos obligatorios de autoridad");
-    const payload = {
-      tipo_autoridad_id: Number(nuevaAutoridad.tipo_autoridad_id),
-      legajo_id: Number(nuevaAutoridad.legajo_id),
-      comision_id: Number(nuevaAutoridad.comision_id),
-      usuario_accion: 1,
-    };
+    const payload = { tipo_autoridad_id: Number(nuevaAutoridad.tipo_autoridad_id), legajo_id: Number(nuevaAutoridad.legajo_id), comision_id: Number(nuevaAutoridad.comision_id), usuario_accion: 1 };
     try {
       setGuardando(true);
       const res = await autoridadComisionService.crear(payload);
@@ -190,8 +166,7 @@ export default function EditarComision() {
   async function eliminarAutoridad(autId) {
     if (!confirm("¿Seguro que querés quitar esta autoridad?")) return;
     try {
-      setGuardando(true);
-      await autoridadComisionService.eliminar(autId);
+      setGuardando(true); await autoridadComisionService.eliminar(autId);
       setAutoridades(autoridades.filter((x) => x.id !== autId));
     } catch (err) {
       setError(err.message || "Error al eliminar");
@@ -223,18 +198,16 @@ export default function EditarComision() {
               <Seccion id="datos" icono={<GraduationCap size={23} />} titulo="Datos generales" abierta={seccionAbierta === "datos"} onToggle={setSeccionAbierta}>
                 <SeccionDatos comision={comision} cambiarComision={(e) => setComision({ descripcion: e.target.value })} />
               </Seccion>
-
               <Seccion id="asignaturas" icono={<BookOpenCheck size={23} />} titulo="Asignaturas" abierta={seccionAbierta === "asignaturas"} onToggle={setSeccionAbierta}>
                 <SeccionAsignaturas nuevaComisionAsignatura={nuevaComisionAsignatura} cambiarNuevaComisionAsignatura={(e) => setNuevaComisionAsignatura({ ...nuevaComisionAsignatura, [e.target.name]: e.target.value })} planesAsignaturas={planesAsignaturas} aulas={aulas} agregarComisionAsignatura={agregarComisionAsignatura} comisionesAsignaturas={comisionesAsignaturas} eliminarComisionAsignatura={eliminarComisionAsignatura} mapas={mapas} guardando={guardando} />
               </Seccion>
-
               <Seccion id="autoridades" icono={<ShieldUser size={23} />} titulo="Autoridades" abierta={seccionAbierta === "autoridades"} onToggle={setSeccionAbierta}>
                 <SeccionAutoridades nuevaAutoridad={nuevaAutoridad} cambiarNuevaAutoridad={(e) => setNuevaAutoridad({ ...nuevaAutoridad, [e.target.name]: e.target.value })} tiposAutoridad={tiposAutoridad} legajos={legajos} comisionesAsignaturas={comisionesAsignaturas} agregarAutoridad={agregarAutoridad} autoridades={autoridades} eliminarAutoridad={eliminarAutoridad} mapas={mapas} guardando={guardando} />
               </Seccion>
-
               <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-200 bg-white">
                 <button type="button" onClick={() => navigate(`/comisiones/${id}`)} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">Cancelar</button>
-                <button type="submit" disabled={guardando} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"><Save size={22} />{guardando ? "Guardando..." : "Guardar comisión"}</button>
+                {/* Si no tiene permisos de rol, ocultamos/deshabilitamos el elemento para que no intente la llamada. */}
+                <button type="submit" disabled={guardando || !hasPermission(currentUserRole, "editar")} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"><Save size={22} />{guardando ? "Guardando..." : "Guardar comisión"}</button>
               </div>
             </form>
           )}

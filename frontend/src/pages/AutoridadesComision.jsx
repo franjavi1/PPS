@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { BookOpenCheck, Pencil, PlusCircle, RefreshCcw, Search, Trash2, ShieldUser } from "lucide-react";
+import { useNavigate } from "react-router";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
 import { autoridadComisionService } from "../services/autoridadComisionService";
 import { comisionAsignaturaService } from "../services/comisionAsignaturaService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
 import AutoridadesComisionModal from "../components/AutoridadesComision/AutoridadesComisionModal";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
+import { estaAutenticado } from "../utils/auth";
 
 const formularioInicial = { tipo_autoridad_id: "", legajo_id: "", comision_id: "" };
 
@@ -16,6 +20,8 @@ const EstadoBadge = ({ estado }) => (
 );
 
 export default function AutoridadesComision() {
+  const navigate = useNavigate();
+  const { currentUserRole } = useAuth();
   const [registros, setRegistros] = useState([]);
   const [tiposAutoridad, setTiposAutoridad] = useState([]);
   const [legajos, setLegajos] = useState([]);
@@ -28,10 +34,20 @@ export default function AutoridadesComision() {
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
 
+  // Verificamos permisos de rol del usuario de manera preventiva antes de cargar los datos de comisiones.
   useEffect(() => {
+    if (!estaAutenticado()) {
+      navigate("/login");
+      return;
+    }
+    if (!hasPermission(currentUserRole, "leer")) {
+      navigate("/inicio");
+      return;
+    }
     cargarDatos();
-  }, []);
+  }, [currentUserRole]);
 
+  // Cargamos en paralelo tipos de autoridad, legajos y comisiones asignaturas para poblar los listados rápidamente.
   async function cargarDatos() {
     try {
       setCargando(true);
@@ -63,14 +79,13 @@ export default function AutoridadesComision() {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   }
 
+  // Guardamos la asociación asegurando de castear a números los identificadores relacionales requeridos.
   async function guardarRegistro(e) {
     e.preventDefault();
     const tipoId = Number(formulario.tipo_autoridad_id);
     const legajoId = Number(formulario.legajo_id);
     const comisionId = Number(formulario.comision_id);
-    if (!tipoId) return setErrorFormulario("Debe seleccionar un tipo de autoridad");
-    if (!legajoId) return setErrorFormulario("Debe seleccionar un legajo");
-    if (!comisionId) return setErrorFormulario("Debe seleccionar una comisión asignatura");
+    if (!tipoId || !legajoId || !comisionId) return setErrorFormulario("Debe completar todos los select obligatorios");
 
     const payload = { tipo_autoridad_id: tipoId, legajo_id: legajoId, comision_id: comisionId, usuario_accion: 1 };
     try {
@@ -88,23 +103,23 @@ export default function AutoridadesComision() {
     }
   }
 
+  // Eliminamos el registro de la autoridad de la comisión tras la confirmación formal del administrador.
   async function eliminarRegistro(id) {
-    if (!confirm("¿Seguro que querés eliminar esta autoridad de comisión?")) return;
+    if (!confirm("¿Seguro que querés quitar esta autoridad?")) return;
     try {
-      const res = await autoridadComisionService.eliminar(id);
-      alert(res.message || "Autoridad eliminada correctamente");
+      await autoridadComisionService.eliminar(id);
       await cargarDatos();
     } catch (err) {
-      setError(err.message || "No se pudo eliminar la autoridad");
+      setError(err.message || "No se pudo quitar la autoridad");
     }
   }
 
   const registrosFiltrados = registros.filter((r) => {
     const term = busqueda.toLowerCase();
-    const tipoDesc = (mapas.tiposAutoridad[r.tipo_autoridad_id] || "").toLowerCase();
-    const legajoDesc = (mapas.legajos[r.legajo_id] || "").toLowerCase();
-    const comisionDesc = (mapas.comisiones[r.comision_id] || "").toLowerCase();
-    return tipoDesc.includes(term) || legajoDesc.includes(term) || comisionDesc.includes(term);
+    const tipo = (mapas.tiposAutoridad[r.tipo_autoridad_id] || "").toLowerCase();
+    const leg = (mapas.legajos[r.legajo_id] || "").toLowerCase();
+    const com = (mapas.comisiones[r.comision_id] || "").toLowerCase();
+    return tipo.includes(term) || leg.includes(term) || com.includes(term);
   });
 
   return (
@@ -122,7 +137,9 @@ export default function AutoridadesComision() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <button onClick={cargarDatos} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100"><RefreshCcw size={22} /> Actualizar</button>
-              <button onClick={() => { setFormulario(formularioInicial); setEditandoId(null); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800"><PlusCircle size={22} /> Nueva Autoridad</button>
+              {hasPermission(currentUserRole, "crear") && (
+                <button onClick={() => { setFormulario(formularioInicial); setEditandoId(null); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800"><PlusCircle size={22} /> Nueva Autoridad</button>
+              )}
             </div>
           </div>
 
@@ -133,7 +150,6 @@ export default function AutoridadesComision() {
 
           {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">{error}</div>}
 
-          {/* Table */}
           <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
@@ -157,8 +173,13 @@ export default function AutoridadesComision() {
                       <td className="px-5 py-5"><EstadoBadge estado={r.estado} /></td>
                       <td className="px-5 py-5 text-center">
                         <div className="flex justify-center gap-3">
-                          <button onClick={() => { setFormulario({ tipo_autoridad_id: r.tipo_autoridad_id, legajo_id: r.legajo_id, comision_id: r.comision_id }); setEditandoId(r.id); setMostrarModal(true); }} className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"><Pencil size={16} /> Editar</button>
-                          <button onClick={() => eliminarRegistro(r.id)} className="text-red-600 hover:text-red-800 font-semibold flex items-center gap-1"><Trash2 size={16} /> Eliminar</button>
+                          <button onClick={() => { setFormulario({ tipo_autoridad_id: r.tipo_autoridad_id, legajo_id: r.legajo_id, comision_id: r.comision_id }); setEditandoId(r.id); setMostrarModal(true); }} disabled={!hasPermission(currentUserRole, "editar")} className={`text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 ${hasPermission(currentUserRole, "editar") ? "" : "opacity-50 cursor-not-allowed"}`}><Pencil size={16} /> Editar</button>
+                          <button
+                            onClick={() => eliminarRegistro(r.id)}
+                            // Bloqueamos el borrado si el usuario no es admin o si el registro tiene hijos en la base de datos (evita error de FK en Postgres)
+                            disabled={!hasPermission(currentUserRole, "eliminar")}
+                            className={`text-red-600 hover:text-red-800 font-semibold flex items-center gap-1 ${hasPermission(currentUserRole, "eliminar") ? "" : "opacity-50 cursor-not-allowed"}`}
+                          ><Trash2 size={16} /> Eliminar</button>
                         </div>
                       </td>
                     </tr>
@@ -171,7 +192,6 @@ export default function AutoridadesComision() {
           </div>
         </section>
       </main>
-
       <AutoridadesComisionModal mostrarModal={mostrarModal} cerrarModal={() => setMostrarModal(false)} editandoId={editandoId} formulario={formulario} manejarCambio={manejarCambio} errorFormulario={errorFormulario} guardarRegistro={guardarRegistro} tiposAutoridad={tiposAutoridad} legajos={legajos} comisionesAsignaturas={comisionesAsignaturas} />
     </div>
   );

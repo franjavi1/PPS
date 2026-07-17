@@ -10,6 +10,14 @@ import {
 } from "lucide-react";
 import { TituloPaso, ResumenItem } from "./FormFields";
 
+// Recibimos de la vista padre:
+// - personaResumen: nombre de la persona.
+// - personaId: id de la persona física.
+// - legajo: objeto de datos del legajo.
+// - legajoId: id del legajo creado.
+// - datosMedicos: objeto con atributos médicos.
+// - contactos: objeto con email y celular.
+// - resultadoUsuario: respuesta del microservicio de usuarios.
 export default function PasoResumen({
   personaResumen,
   personaId,
@@ -66,6 +74,7 @@ export default function PasoResumen({
         />
       </div>
       <div className="flex justify-end">
+        {/* Provoca la recarga completa para limpiar el asistente y cargar una nueva persona */}
         <button
           type="button"
           onClick={() => window.location.reload()}

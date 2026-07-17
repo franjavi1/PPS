@@ -1,5 +1,10 @@
 import React from "react";
 
+// Recibimos de la vista padre:
+// - paso: objeto con el ícono y el título del paso.
+// - activo: boolean flag que indica si es el paso actual del wizard.
+// - completo: boolean flag que indica si el paso ya fue aprobado.
+// - ultimo: boolean flag para evitar dibujar la línea conectora al final.
 export function PasoIndicador({ paso, activo, completo, ultimo }) {
   const resaltado = activo || completo;
   const Icono = paso.icono;
@@ -7,6 +12,7 @@ export function PasoIndicador({ paso, activo, completo, ultimo }) {
   return (
     <div className="flex flex-1 items-start">
       <div className="flex flex-col items-center min-w-12">
+        {/* Renderiza el círculo del paso aplicando colores según si está activo/completo */}
         <div
           className={`w-11 h-11 rounded-full flex items-center justify-center text-base font-extrabold border-2 transition ${
             resaltado
@@ -25,6 +31,7 @@ export function PasoIndicador({ paso, activo, completo, ultimo }) {
         </p>
       </div>
 
+      {/* Renderiza la línea de transición/conexión entre pasos */}
       {!ultimo && (
         <div
           className={`h-1 flex-1 rounded-full mt-5 transition ${
@@ -35,3 +42,4 @@ export function PasoIndicador({ paso, activo, completo, ultimo }) {
     </div>
   );
 }
+

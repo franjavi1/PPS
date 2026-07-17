@@ -2,6 +2,11 @@ import React from "react";
 import { ShieldCheck } from "lucide-react";
 import { TituloPaso, CampoTexto, CampoCheckbox, Acciones } from "./FormFields";
 
+// Recibimos de la vista padre:
+// - usuario: objeto de formulario para crear el rol de acceso.
+// - cambiarUsuario: callback de cambio para los inputs y checkboxes.
+// - guardarUsuario: callback onSubmit para finalizar la creación del usuario.
+// - onBack: manejador callback para volver al paso anterior.
 export default function PasoUsuario({
   usuario,
   cambiarUsuario,
@@ -9,6 +14,7 @@ export default function PasoUsuario({
   onBack,
 }) {
   return (
+    // Dispara el submit para crear el usuario en el microservicio correspondiente
     <form onSubmit={guardarUsuario} className="space-y-6">
       <TituloPaso
         icono={<ShieldCheck size={26} />}
@@ -29,6 +35,7 @@ export default function PasoUsuario({
           onChange={cambiarUsuario}
         />
       </div>
+      {/* Aviso informativo de microservicio pendiente */}
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4 text-yellow-800 font-semibold">
         Este paso queda en modo pendiente/mock hasta conectar el
         microservicio de usuarios.
@@ -41,3 +48,4 @@ export default function PasoUsuario({
     </form>
   );
 }
+

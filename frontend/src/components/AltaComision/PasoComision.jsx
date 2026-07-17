@@ -1,6 +1,11 @@
 import React from "react";
 import { GraduationCap, Save } from "lucide-react";
 
+// Recibimos de la vista padre:
+// - comision: objeto local de formulario para crear la comisión.
+// - guardando: flag booleano para inhabilitar controles en el submit.
+// - cambiarComision: callback para registrar cambios en los inputs.
+// - guardarComision: callback onSubmit para persistir la comisión.
 export default function PasoComision({
   comision,
   guardando,
@@ -8,6 +13,7 @@ export default function PasoComision({
   guardarComision,
 }) {
   return (
+    // Dispara el submit para crear la comisión inicial e ir al siguiente paso
     <form onSubmit={guardarComision} className="space-y-6">
       <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
         <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
@@ -34,6 +40,7 @@ export default function PasoComision({
       </div>
 
       <div className="flex justify-end pt-4">
+        {/* Si está guardando, aplicamos opacidad reducida y deshabilitamos el botón */}
         <button
           type="submit"
           disabled={guardando}
@@ -46,3 +53,4 @@ export default function PasoComision({
     </form>
   );
 }
+

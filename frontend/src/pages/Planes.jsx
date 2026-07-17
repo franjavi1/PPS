@@ -29,6 +29,14 @@ export default function Planes() {
     cargarDatos();
   }, []);
 
+  // Escuchamos el parámetro de acción de la URL para redirigir al asistente de alta guiada
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'nuevo') {
+      navigate("/planes/alta");
+    }
+  }, []);
+
   async function cargarDatos() {
     try {
       setCargando(true);
@@ -114,7 +122,7 @@ export default function Planes() {
               <button onClick={cargarDatos} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100">
                 <RefreshCcw size={22} /> Actualizar
               </button>
-              <button onClick={() => { setFormulario(formularioInicial); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800">
+              <button onClick={() => navigate("/planes/alta")} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800">
                 <PlusCircle size={22} /> Nuevo Plan
               </button>
             </div>

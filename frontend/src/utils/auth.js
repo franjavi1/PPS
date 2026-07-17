@@ -2,14 +2,21 @@
  * Utilidades para decodificar JWT localmente y gestionar permisos (RBAC).
  */
 
+// Decodificamos el token JWT de manera local y manual.
+// De esta forma evitamos añadir dependencias externas pesadas (como jwt-decode) en nuestro bundle.
+// El JWT consta de tres partes separadas por puntos: Header, Payload y Signature.
+// Nos enfocamos en el Payload (segunda sección), que contiene la data de sesión del usuario.
 export function parseJWT(token) {
   if (!token) return null;
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) return null; // Validamos que el formato cumpla con la especificación JWT estándar.
     
     const base64Url = parts[1];
+    // Reemplazamos caracteres especiales de la variante Base64Url a Base64 clásica para que sea compatible con atob().
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    // Deserializamos el payload decodificado a un objeto JSON útil para el resto de la app,
+    // manejando correctamente los caracteres especiales mediante codificación URI.
     const jsonPayload = decodeURIComponent(
       window.atob(base64)
         .split('')
@@ -23,11 +30,17 @@ export function parseJWT(token) {
   }
 }
 
+// Obtenemos el token almacenado en el almacenamiento de sesión del navegador (sessionStorage).
+// Optamos por sessionStorage en lugar de localStorage para que la sesión expire automáticamente
+// en cuanto el usuario cierre la pestaña o el navegador, aportando mayor seguridad.
 export function obtenerUsuarioActual() {
   const token = sessionStorage.getItem("token");
   return parseJWT(token);
 }
 
+// Normalizamos el rol que viene en el token JWT. Dado que diferentes backends de Spring Boot o Node
+// pueden estructurar las claims de manera distinta (claims como 'role', 'rol', o el array de 'authorities'),
+// recorremos las alternativas para mapearlas limpiamente a nuestros roles normalizados internos.
 export function obtenerRolNormalizado(decoded) {
   if (!decoded) return null;
   
@@ -68,6 +81,7 @@ export function obtenerRolNormalizado(decoded) {
   }
 }
 
+// Extraemos el rol del usuario actual decodificando el token almacenado en la sesión.
 export function obtenerRolActual() {
   const usuario = obtenerUsuarioActual();
   return obtenerRolNormalizado(usuario);

@@ -1,6 +1,8 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { hasPermission } from "../../utils/authHelper";
 
+// Recibimos de la vista padre:
+// - estado: número identificador del estado (1 = Activa, otros = Inactiva).
 export function EstadoBadge({ estado }) {
   if (estado === 1 || estado === undefined) {
     return (
@@ -16,6 +18,13 @@ export function EstadoBadge({ estado }) {
   );
 }
 
+// Recibimos de la vista padre:
+// - cargando: flag para renderizar pantalla de carga.
+// - asignaturasFiltradas: lista filtrada de materias a mostrar.
+// - currentUserRole: rol del usuario activo para evaluar permisos.
+// - editarAsignatura: callback para abrir el formulario modal en modo edición.
+// - eliminarAsignatura: callback para borrar el registro de asignatura.
+// - asignaturaEstaEnPlan: función para comprobar integridad relacional Postgres FK localmente.
 export default function AsignaturaList({
   cargando,
   asignaturasFiltradas,
@@ -24,6 +33,7 @@ export default function AsignaturaList({
   eliminarAsignatura,
   asignaturaEstaEnPlan,
 }) {
+  // Si la petición a la API está cargando, mostramos un aviso preventivo
   if (cargando) {
     return (
       <div className="border border-slate-200 rounded-xl bg-white p-8 text-center text-slate-500 font-semibold">
@@ -32,6 +42,7 @@ export default function AsignaturaList({
     );
   }
 
+  // Si la colección viene vacía, mostramos un mensaje amigable en lugar de una tabla rota
   if (asignaturasFiltradas.length === 0) {
     return (
       <div className="border border-slate-200 rounded-xl bg-white p-8 text-center text-slate-500 font-semibold">
@@ -42,8 +53,9 @@ export default function AsignaturaList({
 
   return (
     <>
-      {/* Vista Móvil */}
+      {/* Vista Móvil: Muestra las materias en formato de tarjetas responsivas */}
       <div className="lg:hidden space-y-4">
+        {/* Mapeamos las materias asignando su id como key única para que React optimice el render */}
         {asignaturasFiltradas.map((asignatura) => (
           <article
             key={asignatura.id}
@@ -69,6 +81,7 @@ export default function AsignaturaList({
             </div>
 
             <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
+              {/* Disparamos la acción de edición pasando el objeto seleccionado */}
               <button
                 onClick={() => editarAsignatura(asignatura)}
                 disabled={!hasPermission(currentUserRole, "editar")}
@@ -80,6 +93,7 @@ export default function AsignaturaList({
                 Editar
               </button>
 
+              {/* Botón borrar: si tiene dependencias en planes (Postgres FK) lo inhabilitamos preventivamente */}
               <button
                 onClick={() => eliminarAsignatura(asignatura.id)}
                 disabled={!hasPermission(currentUserRole, "eliminar") || asignaturaEstaEnPlan(asignatura.id)}
@@ -98,7 +112,7 @@ export default function AsignaturaList({
         ))}
       </div>
 
-      {/* Vista Escritorio */}
+      {/* Vista Escritorio: Tabla estructurada tradicional */}
       <div className="hidden lg:block overflow-x-auto border border-slate-200 rounded-xl">
         <table className="w-full text-left border-collapse bg-white">
           <thead className="bg-slate-50">
@@ -110,6 +124,7 @@ export default function AsignaturaList({
             </tr>
           </thead>
           <tbody>
+            {/* Mapeamos las materias con key única para optimización en grillas de escritorio */}
             {asignaturasFiltradas.map((asignatura) => (
               <tr
                 key={asignatura.id}
@@ -133,6 +148,7 @@ export default function AsignaturaList({
                       Editar
                     </button>
 
+                    {/* Remueve la materia controlando la integridad Postgres FK mediante deshabilitación visual por Tailwind */}
                     <button
                       onClick={() => eliminarAsignatura(asignatura.id)}
                       disabled={!hasPermission(currentUserRole, "eliminar") || asignaturaEstaEnPlan(asignatura.id)}
@@ -156,3 +172,4 @@ export default function AsignaturaList({
     </>
   );
 }
+

@@ -1,6 +1,15 @@
 import { Save, X, Building2, DoorOpen, Monitor } from "lucide-react";
 import { CampoTexto, CampoSelect } from "../FormHelpers";
 
+// Recibimos de la vista padre:
+// - mostrarModal: bandera boolean para pintar o no el modal.
+// - cerrarModal: callback para ocultar el modal.
+// - editandoId: ID del aula en edición (null si es nueva).
+// - formulario: objeto local con los campos sedes_id, aula y es_virtual.
+// - manejarCambio: callback para registrar cambios en los inputs.
+// - errorFormulario: mensaje de error de validación para la cabecera.
+// - guardarAula: callback onSubmit para enviar y guardar los datos.
+// - sedes: colección global de sedes disponibles para asociar el aula.
 export default function AulaModal({
   mostrarModal,
   cerrarModal,
@@ -11,11 +20,13 @@ export default function AulaModal({
   guardarAula,
   sedes,
 }) {
+  // Si la bandera está en false, evitamos pintar el modal en la pantalla
   if (!mostrarModal) return null;
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-2xl w-full max-w-xl relative">
+        {/* Botón superior de cierre rápido */}
         <button
           onClick={cerrarModal}
           className="absolute right-6 top-6 text-slate-400 hover:text-slate-600 transition"
@@ -33,6 +44,7 @@ export default function AulaModal({
           </p>
         </div>
 
+        {/* Mostramos alertas de error detectadas por el formulario */}
         {errorFormulario && (
           <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">
             {errorFormulario}
@@ -80,6 +92,7 @@ export default function AulaModal({
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
+            {/* Propagamos la acción de cancelar cerrando el modal */}
             <button
               type="button"
               onClick={cerrarModal}
@@ -102,3 +115,4 @@ export default function AulaModal({
     </div>
   );
 }
+

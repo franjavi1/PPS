@@ -1,6 +1,14 @@
 import { Save, X } from "lucide-react";
 import { CampoTexto } from "../FormHelpers";
 
+// Recibimos de la vista padre:
+// - mostrarModal: boolean flag para mostrar visualmente el modal.
+// - cerrarModal: callback para ocultar el modal.
+// - editandoId: ID de la comisión en edición (null si es nueva).
+// - formulario: objeto local del formulario con la descripción.
+// - manejarCambio: callback para registrar cambios en los inputs.
+// - errorFormulario: mensaje de error de validación para la cabecera.
+// - guardarComision: callback onSubmit para crear o actualizar la comisión.
 export default function ComisionModal({
   mostrarModal,
   cerrarModal,
@@ -10,11 +18,13 @@ export default function ComisionModal({
   errorFormulario,
   guardarComision,
 }) {
+  // Si la bandera está en false, evitamos pintar el modal
   if (!mostrarModal) return null;
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-2xl w-full max-w-xl relative">
+        {/* Botón superior de cierre rápido */}
         <button
           onClick={cerrarModal}
           className="absolute right-6 top-6 text-slate-400 hover:text-slate-600 transition"
@@ -32,6 +42,7 @@ export default function ComisionModal({
           </p>
         </div>
 
+        {/* Mostramos alertas de error del formulario */}
         {errorFormulario && (
           <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">
             {errorFormulario}
@@ -48,6 +59,7 @@ export default function ComisionModal({
           />
 
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
+            {/* Propagamos la acción de cancelar cerrando el modal */}
             <button
               type="button"
               onClick={cerrarModal}
@@ -70,3 +82,4 @@ export default function ComisionModal({
     </div>
   );
 }
+

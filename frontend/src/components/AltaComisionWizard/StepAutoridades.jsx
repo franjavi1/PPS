@@ -1,8 +1,20 @@
 import { ShieldUser, PlusCircle } from "lucide-react";
 import { TituloPaso, CampoSelect, Acciones } from "../FormHelpers";
 
+// Recibimos de la vista padre:
+// - texto: cadena descriptiva para el estado vacío.
 const EstadoVacio = ({ texto }) => <div className="border border-slate-200 rounded-xl bg-slate-50 p-5 text-center text-slate-500 font-semibold">{texto}</div>;
 
+// Recibimos de la vista padre:
+// - autoridad: objeto local de formulario que mapea el ID de tipo de autoridad, legajo y materia.
+// - cambiarAutoridad: callback para registrar cambios en los selectores.
+// - tiposAutoridad: catálogo de roles jerárquicos (Titular, Auxiliar, etc).
+// - legajos: colección de legajos cargados de alumnos/docentes.
+// - comisionesAsignaturasCargadas: materias asociadas previamente a esta comisión.
+// - agregarAutoridad: callback para persistir la relación de autoridad en el backend.
+// - autoridadesCargadas: lista de autoridades que ya fueron guardadas.
+// - guardando: bandera boolean de carga del submit.
+// - onBack / onNext: callbacks de navegación del asistente.
 export default function StepAutoridades({
   autoridad,
   cambiarAutoridad,
@@ -45,6 +57,7 @@ export default function StepAutoridades({
         />
       </div>
       <div className="flex justify-end">
+        {/* Si está guardando, deshabilitamos el botón e inyectamos opacidad reducida */}
         <button
           type="button"
           onClick={agregarAutoridad}
@@ -60,6 +73,7 @@ export default function StepAutoridades({
         <EstadoVacio texto="Podés finalizar sin autoridades cargadas." />
       ) : (
         <div className="space-y-3">
+          {/* Mapeamos el listado de autoridades cargadas asegurando un key consistente */}
           {autoridadesCargadas.map((item, index) => (
             <div key={index} className="border border-slate-200 rounded-xl bg-slate-50 p-4">
               <p className="text-slate-800 font-extrabold">{item.tipoAutoridad}</p>

@@ -9,6 +9,18 @@ import {
   Acciones,
 } from "./FormFields";
 
+// Recibimos de la vista padre:
+// - datosMedicos: objeto de datos con los atributos de salud de la persona.
+// - cambiarDatosMedicos: callback para actualizar los campos del formulario médico.
+// - contactos: objeto con email y celular.
+// - cambiarContactos: callback para registrar cambios en los datos de contacto.
+// - datosLegajo: objeto con el rango y la sede del legajo.
+// - cambiarDatosLegajo: callback para actualizar datos del legajo.
+// - rangos: colección global de rangos institucionales.
+// - sedes: colección global de sedes físicas.
+// - guardarDatosDelLegajo: callback onSubmit para procesar el envío.
+// - guardando: bandera para inhabilitar controles en el submit.
+// - onBack: callback para volver al paso anterior.
 export default function PasoContacto({
   datosMedicos,
   cambiarDatosMedicos,
@@ -23,6 +35,7 @@ export default function PasoContacto({
   onBack,
 }) {
   return (
+    // Disparamos el submit para guardar los datos médicos, contactos y relaciones del legajo
     <form onSubmit={guardarDatosDelLegajo} className="space-y-8">
       <TituloPaso icono={<ClipboardPlus size={26} />} titulo="Datos asociados" />
 
@@ -130,3 +143,4 @@ export default function PasoContacto({
     </form>
   );
 }
+

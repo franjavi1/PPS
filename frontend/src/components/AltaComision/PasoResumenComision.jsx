@@ -2,6 +2,12 @@ import React from "react";
 import { CheckCircle2, Save } from "lucide-react";
 import { useNavigate } from "react-router";
 
+// Recibimos de la vista padre:
+// - comision: objeto de datos con los atributos de la comisión creada.
+// - comisionId: identificador generado de la comisión.
+// - comisionesAsignaturasCargadas: materias asociadas a esta comisión.
+// - autoridadesCargadas: autoridades asignadas.
+// - cargarOtraComision: callback para reiniciar el asistente.
 export default function PasoResumenComision({
   comision,
   comisionId,
@@ -36,6 +42,7 @@ export default function PasoResumenComision({
       </div>
 
       <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-100">
+        {/* Navega de regreso al panel general de comisiones */}
         <button
           type="button"
           onClick={() => navigate("/comisiones")}
@@ -43,6 +50,7 @@ export default function PasoResumenComision({
         >
           Volver a comisiones
         </button>
+        {/* Reinicia el wizard para dar de alta otra comision limpia */}
         <button
           type="button"
           onClick={cargarOtraComision}
@@ -56,6 +64,7 @@ export default function PasoResumenComision({
   );
 }
 
+// Componente secundario reutilizable para mostrar las tarjetas del resumen
 function ResumenItem({ titulo, texto }) {
   return (
     <div className="border border-slate-200 rounded-xl p-5 bg-slate-50">
@@ -64,3 +73,4 @@ function ResumenItem({ titulo, texto }) {
     </div>
   );
 }
+

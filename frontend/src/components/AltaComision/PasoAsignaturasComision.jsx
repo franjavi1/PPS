@@ -1,6 +1,16 @@
 import React from "react";
 import { BookOpenCheck, PlusCircle, Tag, BookOpen, Hash, Save } from "lucide-react";
 
+// Recibimos de la vista padre:
+// - comisionAsignatura: objeto de formulario local con datos de la materia a asociar.
+// - planesAsignaturas: coleccion de asignaturas vinculadas a planes.
+// - aulas: coleccion de aulas fisicas.
+// - mapas: diccionario con traducciones de nombres por ID.
+// - comisionesAsignaturasCargadas: materias asociadas previamente en esta carga.
+// - guardando: flag booleano para inhabilitar controles en el submit.
+// - cambiarComisionAsignatura: callback para actualizar los campos.
+// - agregarComisionAsignatura: callback para persistir la asociacion.
+// - setPasoActual: manejador callback para la navegación entre pasos.
 export default function PasoAsignaturasComision({
   comisionAsignatura,
   planesAsignaturas,
@@ -29,6 +39,7 @@ export default function PasoAsignaturasComision({
           onChange={cambiarComisionAsignatura}
         >
           <option value="">Seleccione</option>
+          {/* Mapeamos los planes de asignaturas utilizando su ID como key única */}
           {planesAsignaturas.map((item) => (
             <option key={item.id} value={item.id}>
               {mapas.planesAsignaturas[item.id]}
@@ -43,6 +54,7 @@ export default function PasoAsignaturasComision({
           onChange={cambiarComisionAsignatura}
         >
           <option value="">Seleccione</option>
+          {/* Mapeamos las aulas asociadas utilizando su ID como key */}
           {aulas.map((item) => (
             <option key={item.id_aula} value={item.id_aula}>
               {item.aula}
@@ -93,6 +105,7 @@ export default function PasoAsignaturasComision({
       </div>
 
       <div className="flex justify-end">
+        {/* Deshabilita el botón si la API está en proceso de creación */}
         <button
           type="button"
           onClick={agregarComisionAsignatura}
@@ -104,12 +117,14 @@ export default function PasoAsignaturasComision({
         </button>
       </div>
 
+      {/* Renderiza el listado de materias de la comisión */}
       <ListaItems
         items={comisionesAsignaturasCargadas}
         vacio="Todavia no agregaste asignaturas."
       />
 
       <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+        {/* Regresa al paso de datos básicos de la comisión */}
         <button
           type="button"
           onClick={() => setPasoActual(1)}
@@ -117,6 +132,7 @@ export default function PasoAsignaturasComision({
         >
           Volver
         </button>
+        {/* Bloqueamos el botón continuar si no hay materias registradas en la comisión */}
         <button
           type="button"
           onClick={() => setPasoActual(3)}
@@ -131,6 +147,7 @@ export default function PasoAsignaturasComision({
   );
 }
 
+// Input de texto helper para PasoAsignaturasComision
 function CampoTexto({ label, name, value, onChange, placeholder, type = "text", icono }) {
   return (
     <div>
@@ -154,6 +171,7 @@ function CampoTexto({ label, name, value, onChange, placeholder, type = "text", 
   );
 }
 
+// Selector dropdown helper para PasoAsignaturasComision
 function CampoSelect({ label, name, value, onChange, children }) {
   return (
     <div>
@@ -170,9 +188,11 @@ function CampoSelect({ label, name, value, onChange, children }) {
   );
 }
 
+// Grilla/lista de items cargados con manejo preventivo de estado vacío
 function ListaItems({ items, vacio }) {
   if (items.length === 0) {
     return (
+      // Si la colección viene vacía, mostramos un mensaje amigable
       <div className="border border-slate-200 rounded-xl bg-slate-50 p-5 text-center text-slate-500 font-semibold">
         {vacio}
       </div>
@@ -181,6 +201,7 @@ function ListaItems({ items, vacio }) {
 
   return (
     <div className="space-y-3">
+      {/* Mapeamos los elementos asegurando un key consistente */}
       {items.map((item, index) => (
         <div key={index} className="border border-slate-200 rounded-xl bg-slate-50 p-4">
           <p className="text-slate-800 font-extrabold">{item.nombre}</p>
@@ -192,3 +213,4 @@ function ListaItems({ items, vacio }) {
     </div>
   );
 }
+
