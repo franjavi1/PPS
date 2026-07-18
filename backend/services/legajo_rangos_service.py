@@ -40,7 +40,7 @@ def actualizar(legajo_rangos, datos):
 
 
 def eliminar(legajo_rangos):
-    db.session.delete(legajo_rangos)
+    legajo_rangos.estado = 0
     db.session.commit()
 
     return legajo_rangos

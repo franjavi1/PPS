@@ -35,11 +35,16 @@ def eliminar(comision):
     ).all()
 
     for comision_asignatura in comisiones_asignaturas:
-        AutoridadComision.query.filter_by(
+        autoridades = AutoridadComision.query.filter_by(
             comision_id=comision_asignatura.id_comision_asignatura
-        ).delete(synchronize_session=False)
-        db.session.delete(comision_asignatura)
+        ).all()
 
-    db.session.delete(comision)
+        for autoridad in autoridades:
+            autoridad.estado = 0
+
+        comision_asignatura.estado = 0
+
+    comision.estado = 0
+
     db.session.commit()
     return comision

@@ -36,7 +36,7 @@ def actualizar(datos_medicos, datos):
 
 
 def eliminar(datos_medicos):
-    db.session.delete(datos_medicos)
+    datos_medicos.estado = 0
     db.session.commit()
 
     return datos_medicos

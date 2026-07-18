@@ -22,6 +22,6 @@ def actualizar(plan, datos):
     return plan
 
 def eliminar(plan):
-    db.session.delete(plan)
+    plan.estado = 0
     db.session.commit()
     return plan

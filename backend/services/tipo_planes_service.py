@@ -40,7 +40,7 @@ def actualizar(tipo_plan, datos):
 
 
 def eliminar(tipo_plan):
-    db.session.delete(tipo_plan)
+    tipo_plan.estado = 0
     db.session.commit()
 
     return tipo_plan

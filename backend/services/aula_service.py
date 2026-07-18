@@ -27,6 +27,6 @@ def actualizar(aula, datos):
     return aula
 
 def eliminar(aula):
-    db.session.delete(aula)
+    aula.estado = 0
     db.session.commit()
     return aula
