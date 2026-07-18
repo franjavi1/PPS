@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { PlusCircle, X, ChevronRight, ChevronLeft } from "lucide-react";
+import { PlusCircle, ChevronRight, ChevronLeft, Building2, MapPin, CheckCircle2 } from "lucide-react";
+import { CampoTexto, CampoSelect, TituloPaso } from "../FormHelpers";
 
 export default function SedeFormModal({
   mostrarModal,
@@ -12,11 +13,9 @@ export default function SedeFormModal({
   guardar,
   limpiarForm
 }) {
-  // Declaramos el estado de control numérico para el wizard
   const [paso, setPaso] = useState(1);
   const [erroresLocales, setErroresLocales] = useState({});
 
-  // Reiniciamos el stepper al cerrar el modal
   useEffect(() => {
     if (!mostrarModal) {
       setPaso(1);
@@ -27,12 +26,11 @@ export default function SedeFormModal({
   if (!mostrarModal) return null;
 
   const pasos = [
-    { id: 1, label: "Datos Básicos" },
-    { id: 2, label: "Ubicación" },
-    { id: 3, label: "Confirmación" }
+    { id: 1, label: "Datos Básicos", icono: Building2 },
+    { id: 2, label: "Ubicación", icono: MapPin },
+    { id: 3, label: "Confirmación", icono: CheckCircle2 }
   ];
 
-  // Validación local y restrictiva por paso
   function avanzarPaso() {
     const nuevosErrores = {};
     if (paso === 1) {
@@ -59,161 +57,169 @@ export default function SedeFormModal({
   const nombreTipoSede = tiposSedes.find(t => String(t.id) === String(form.tipo_sede_id))?.descripcion || "-";
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
+    <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+      {/* Encabezado Principal */}
+      <div className="flex flex-col sm:flex-row items-center justify-between border-b border-slate-100 pb-6 gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full bg-red-50 text-red-700 flex items-center justify-center shadow-xs">
+            <Building2 size={28} />
+          </div>
+          <div>
+            <span className="text-red-600 text-xs font-bold tracking-wider uppercase block">Alta Guiada</span>
+            <h1 className="text-3xl font-extrabold text-slate-900">
+              {modoEdicion ? "Editar Sede" : "Alta de Nueva Sede"}
+            </h1>
+            <p className="text-slate-500 text-sm mt-1">
+              {modoEdicion ? "Modifica los datos y ubicación de la sede." : "Registra una nueva sede en el sistema completando los pasos."}
+            </p>
+          </div>
+        </div>
         <button
+          type="button"
           onClick={() => { limpiarForm(); setMostrarModal(false); }}
-          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
-          title="Cerrar modal"
+          className="border border-slate-300 px-4 py-2 rounded-xl text-slate-700 text-sm font-semibold bg-white hover:bg-slate-50 transition"
         >
-          <X size={20} />
+          ← Volver al listado
         </button>
+      </div>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-slate-800">
-            {modoEdicion ? "Editar Sede" : "Nueva Sede"}
-          </h2>
-        </div>
-
-        {/* Stepper visual horizontal */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
-          {pasos.map((p) => {
-            const activo = paso === p.id;
-            const completado = paso > p.id;
-            return (
-              <div key={p.id} className="flex flex-col items-center flex-1">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                  activo ? "bg-red-700 text-white shadow-sm" : completado ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-400"
-                }`}>
-                  {p.id}
-                </div>
-                <span className={`text-[10px] font-bold mt-1.5 ${activo || completado ? "text-slate-800" : "text-slate-400"}`}>
-                  {p.label}
-                </span>
+      {/* Stepper Horizontal */}
+      <div className="flex items-center justify-between mb-10 relative px-4">
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-slate-200 -z-10" />
+        {pasos.map((p) => {
+          const activo = paso === p.id;
+          const completado = paso > p.id;
+          const Icono = p.icono;
+          return (
+            <div key={p.id} className="flex flex-col items-center flex-1 relative bg-white px-2">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                activo || completado ? "bg-red-700 text-white shadow-md scale-110" : "bg-slate-100 border border-slate-200 text-slate-400"
+              }`}>
+                <Icono size={18} />
               </div>
-            );
-          })}
-        </div>
-
-        <form onSubmit={(e) => { e.preventDefault(); if (paso === 3) guardar(e); }} className="space-y-4">
-          
-          {/* Paso 1: Datos Básicos */}
-          {paso === 1 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Tipo de Sede *</label>
-                <select
-                  name="tipo_sede_id"
-                  value={form.tipo_sede_id}
-                  onChange={manejarCambio}
-                  className={`w-full h-10 px-3 border rounded-lg text-slate-700 bg-white focus:outline-none focus:ring-2 ${
-                    errorCombinado.tipo_sede_id ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-red-500"
-                  }`}
-                >
-                  <option value="">Seleccione tipo de sede</option>
-                  {tiposSedes.map((tipo) => (
-                    <option key={tipo.id} value={tipo.id}>{tipo.descripcion}</option>
-                  ))}
-                </select>
-                {errorCombinado.tipo_sede_id && <p className="text-red-600 text-xs mt-1">{errorCombinado.tipo_sede_id}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Nombre de la Sede *</label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={form.nombre}
-                  onChange={manejarCambio}
-                  placeholder="Ej: Cuartel Central"
-                  className={`w-full h-10 px-3 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                    errorCombinado.nombre ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-red-500"
-                  }`}
-                />
-                {errorCombinado.nombre && <p className="text-red-600 text-xs mt-1">{errorCombinado.nombre}</p>}
-              </div>
+              <span className={`text-[10px] mt-2 font-bold transition-colors duration-300 ${
+                activo || completado ? "text-red-700 font-extrabold" : "text-slate-500"
+              }`}>
+                {p.id}. {p.label}
+              </span>
             </div>
-          )}
+          );
+        })}
+      </div>
 
-          {/* Paso 2: Ubicación */}
-          {paso === 2 && (
+      {/* Cuerpo del Formulario */}
+      <form onSubmit={(e) => { e.preventDefault(); if (paso === 3) guardar(e); }} className="space-y-6">
+        {/* Paso 1: Datos Básicos */}
+        {paso === 1 && (
+          <div className="space-y-6">
+            <TituloPaso icono={<Building2 size={26} />} titulo="Datos Básicos" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <CampoSelect
+                label="Tipo de Sede *"
+                name="tipo_sede_id"
+                value={form.tipo_sede_id}
+                onChange={manejarCambio}
+                opciones={tiposSedes}
+                getLabel={(t) => t.descripcion}
+                error={errorCombinado.tipo_sede_id}
+              />
+              <CampoTexto
+                label="Nombre de la Sede *"
+                name="nombre"
+                value={form.nombre}
+                onChange={manejarCambio}
+                placeholder="Ej: Cuartel Central"
+                error={errorCombinado.nombre}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Paso 2: Ubicación */}
+        {paso === 2 && (
+          <div className="space-y-6">
+            <TituloPaso icono={<MapPin size={26} />} titulo="Ubicación de la Sede" />
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1">Dirección *</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Dirección *</label>
               <textarea
                 name="direccion"
-                value={form.direccion}
+                value={form.direccion || ""}
                 onChange={manejarCambio}
                 placeholder="Dirección completa"
-                className={`w-full h-20 px-3 py-1 border rounded-lg text-slate-700 focus:outline-none focus:ring-2 ${
-                  errorCombinado.direccion ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-red-500"
+                className={`w-full border rounded-xl p-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 min-h-[120px] ${
+                  errorCombinado.direccion ? "border-red-500 focus:ring-red-500" : "border-slate-300"
                 }`}
               />
-              {errorCombinado.direccion && <p className="text-red-600 text-xs mt-1">{errorCombinado.direccion}</p>}
+              {errorCombinado.direccion && <p className="text-red-600 text-sm mt-2">{errorCombinado.direccion}</p>}
             </div>
-          )}
-
-          {/* Paso 3: Confirmación y Resumen */}
-          {paso === 3 && (
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 text-sm">
-              <p className="text-slate-500 font-bold uppercase text-[10px] tracking-wider mb-2">Resumen del registro</p>
-              <div>
-                <span className="text-slate-400 font-bold block">Tipo Sede:</span>
-                <span className="text-slate-800 font-extrabold">{nombreTipoSede}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 font-bold block">Nombre:</span>
-                <span className="text-slate-800 font-extrabold">{form.nombre}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 font-bold block">Dirección:</span>
-                <span className="text-slate-800 font-semibold">{form.direccion}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Botonera en el Footer */}
-          <div className="flex gap-3 pt-4 border-t border-slate-100">
-            {paso === 1 ? (
-              <button
-                type="button"
-                onClick={() => { limpiarForm(); setMostrarModal(false); }}
-                className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
-              >
-                Cancelar
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={retrocederPaso}
-                className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition flex items-center justify-center gap-1.5"
-              >
-                <ChevronLeft size={16} />
-                Volver
-              </button>
-            )}
-
-            {paso < 3 ? (
-              <button
-                type="button"
-                onClick={avanzarPaso}
-                className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-1.5"
-              >
-                Siguiente
-                <ChevronRight size={16} />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-1.5"
-              >
-                <PlusCircle size={18} />
-                Confirmar y Guardar
-              </button>
-            )}
           </div>
+        )}
 
-        </form>
-      </div>
+        {/* Paso 3: Confirmación */}
+        {paso === 3 && (
+          <div className="space-y-6">
+            <TituloPaso icono={<CheckCircle2 size={26} />} titulo="Confirmación de Datos" />
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
+              <p className="text-slate-500 font-bold uppercase text-xs tracking-wider mb-2">Resumen del registro</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="border border-slate-200 rounded-xl bg-white p-4">
+                  <p className="text-xs font-bold text-slate-400 uppercase">Tipo Sede</p>
+                  <p className="text-slate-800 font-extrabold mt-1 text-base">{nombreTipoSede}</p>
+                </div>
+                <div className="border border-slate-200 rounded-xl bg-white p-4">
+                  <p className="text-xs font-bold text-slate-400 uppercase">Nombre</p>
+                  <p className="text-slate-800 font-semibold mt-1 text-base">{form.nombre}</p>
+                </div>
+                <div className="border border-slate-200 rounded-xl bg-white p-4">
+                  <p className="text-xs font-bold text-slate-400 uppercase">Dirección</p>
+                  <p className="text-slate-800 font-semibold mt-1 text-base">{form.direccion}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Botonera de control de navegación */}
+        <div className="flex justify-end gap-3 pt-6 border-t border-slate-200">
+          {paso === 1 ? (
+            <button
+              type="button"
+              onClick={() => { limpiarForm(); setMostrarModal(false); }}
+              className="px-6 py-3 border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 transition"
+            >
+              Cancelar
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={retrocederPaso}
+              className="px-6 py-3 border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 transition flex items-center justify-center gap-1.5"
+            >
+              <ChevronLeft size={16} />
+              Volver
+            </button>
+          )}
+
+          {paso < 3 ? (
+            <button
+              type="button"
+              onClick={avanzarPaso}
+              className="px-8 py-3 bg-red-700 text-white font-bold rounded-xl hover:bg-red-800 transition flex items-center justify-center gap-1.5"
+            >
+              Siguiente
+              <ChevronRight size={16} />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="px-8 py-3 bg-red-700 text-white font-bold rounded-xl hover:bg-red-800 transition flex items-center justify-center gap-1.5"
+            >
+              <PlusCircle size={18} />
+              Confirmar y Guardar
+            </button>
+          )}
+        </div>
+      </form>
     </div>
   );
 }

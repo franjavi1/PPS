@@ -124,6 +124,22 @@ export default function SedesPanel({ currentUserRole }) {
     </div>
   );
 
+  if (mostrarModal) {
+    return (
+      <SedeFormModal
+        mostrarModal={mostrarModal}
+        setMostrarModal={setMostrarModal}
+        modoEdicion={modoEdicion}
+        form={form}
+        error={error}
+        tiposSedes={tiposSedes}
+        manejarCambio={manejarCambio}
+        guardar={guardar}
+        limpiarForm={limpiarForm}
+      />
+    );
+  }
+
   return (
     <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
@@ -136,8 +152,6 @@ export default function SedesPanel({ currentUserRole }) {
       </div>
 
       <TablaPrincipal data={sedes} columnas={columnasConfig} accionesPorFila={accionesPorFila} propiedadKey="id" placeholderBusqueda="Buscar sedes..." />
-
-      <SedeFormModal mostrarModal={mostrarModal} setMostrarModal={setMostrarModal} modoEdicion={modoEdicion} form={form} error={error} tiposSedes={tiposSedes} manejarCambio={manejarCambio} guardar={guardar} limpiarForm={limpiarForm} />
     </div>
   );
 }

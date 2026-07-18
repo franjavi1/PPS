@@ -134,6 +134,23 @@ export default function ComisionesPanel({ currentUserRole }) {
     </div>
   );
 
+  if (mostrarModal) {
+    return (
+      <ComisionFormModal
+        mostrarModal={mostrarModal}
+        setMostrarModal={setMostrarModal}
+        modoEdicion={modoEdicion}
+        form={form}
+        error={error}
+        asignaturas={asignaturas}
+        aulas={aulas}
+        manejarCambio={manejarCambio}
+        guardar={guardar}
+        limpiarForm={limpiarForm}
+      />
+    );
+  }
+
   return (
     <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
@@ -146,8 +163,6 @@ export default function ComisionesPanel({ currentUserRole }) {
       </div>
 
       <TablaPrincipal data={comisiones} columnas={columnasConfig} accionesPorFila={accionesPorFila} propiedadKey="id" placeholderBusqueda="Buscar comisiones..." />
-
-      <ComisionFormModal mostrarModal={mostrarModal} setMostrarModal={setMostrarModal} modoEdicion={modoEdicion} form={form} error={error} asignaturas={asignaturas} aulas={aulas} manejarCambio={manejarCambio} guardar={guardar} limpiarForm={limpiarForm} />
     </div>
   );
 }
