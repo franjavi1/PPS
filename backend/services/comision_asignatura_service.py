@@ -1,4 +1,6 @@
 from models.comision_asignatura import ComisionAsignatura
+from models.comision import Comision
+from models.legajo import Legajo
 from schemas.comision_asignatura_schema import (
     ComisionAsignaturaSchema,
     comision_asignatura_schema
@@ -9,6 +11,18 @@ from db import db
 def obtener_todos():
     return ComisionAsignatura.query.all()
 
+def obtener_detalle_por_id(id):
+    plan = (
+        legajo = db.session.query(Legajo).filter(Legajo.id == id).first()
+        
+        if not legajo:
+            return None
+        
+        
+        db.session.query(ComisionAsignatura)
+        .join(Comision, Comision.id_comision == ComisionAsignatura.comision_id)
+    )
+    return Planes.query.filter_
 
 def obtener_por_id(id_comision_asignatura):
     return ComisionAsignatura.query.filter_by(
