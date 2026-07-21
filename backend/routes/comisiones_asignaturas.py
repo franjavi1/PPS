@@ -13,7 +13,8 @@ from services.comision_asignatura_service import (
     crear,
     eliminar,
     obtener_por_id,
-    obtener_todos
+    obtener_todos,
+    obtener_detalle_por_id
 )
 
 
@@ -88,7 +89,32 @@ def get_comision_asignatura(id):
             "server": "Ocurrio un error inesperado"
         })
 
+#Devuelve las comisiones por asignatura disonibles para el id de legajo que se envia por parametro
+@comisiones_asignaturas_bp.route("/GetDetalle/<int:id>", methods=["GET"])
+def get_plan(id):
+    try:
+        plan = obtener_detalle_por_id(id)
 
+        if not plan:
+            return respuesta_api(False, None, "Plan no encontrado", 404, {
+                "id": "No existe un plan activo para el legajo"
+
+            })
+
+        data = plan_schema.dump(plan)
+
+        return respuesta_api(True, data, "Plan obtenido correctamente")
+
+    except SQLAlchemyError:
+        return respuesta_api(False, None, "Error de base de datos", 500, {
+            "database": "Ocurrio un error al obtener el plan"
+        })
+
+    except Exception:
+        return respuesta_api(False, None, "Error inesperado", 500, {
+            "server": "Ocurrio un error inesperado"
+        })
+        
 @comisiones_asignaturas_bp.route("", methods=["POST"])
 def crear_comision_asignatura():
     req = request.get_json(silent=True) or {}

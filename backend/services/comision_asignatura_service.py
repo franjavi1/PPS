@@ -22,7 +22,7 @@ def obtener_detalle_por_id(id):
         db.session.query(ComisionAsignatura)
         .join(Comision, Comision.id_comision == ComisionAsignatura.comision_id)
     )
-    return Planes.query.filter_
+    return ComisionAsignatura.query.filter_
 
 def obtener_por_id(id_comision_asignatura):
     return ComisionAsignatura.query.filter_by(
