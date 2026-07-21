@@ -1,9 +1,9 @@
-
+// frontend/src/services/api.jsx
 import toast from "react-hot-toast";
 
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/g1";
 
-
+// compatible para js
 export async function apiRequest(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {
     headers: {
@@ -29,3 +29,22 @@ export async function apiRequest(path, options = {}) {
 
   return data;
 }
+
+// compatible para jsx
+export const api = {
+  get: (path) => apiRequest(path, { method: "GET" }),
+  
+  post: (path, body) => apiRequest(path, { 
+    method: "POST", 
+    body: JSON.stringify(body) 
+  }),
+  
+  put: (path, body) => apiRequest(path, { 
+    method: "PUT", 
+    body: JSON.stringify(body) 
+  }),
+  
+  delete: (path) => apiRequest(path, { method: "DELETE" }),
+};
+
+export default api;

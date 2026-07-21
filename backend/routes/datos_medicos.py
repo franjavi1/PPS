@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from schemas.datos_medicos_schema import datos_medicos_schema, datos_medicos_lista_schema
 
 from services.datos_medicos_service import (

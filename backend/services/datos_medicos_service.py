@@ -1,6 +1,6 @@
 from models.datos_medicos import DatosMedicos
 from schemas.datos_medicos_schema import DatosMedicosSchema, datos_medicos_schema
-from db import db
+from extensions import db
 
 
 """

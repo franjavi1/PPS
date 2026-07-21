@@ -1,5 +1,5 @@
 from models.pa_correlativa import PACorrelativa
-from db import ma
+from extensions import ma
 from marshmallow import ValidationError, validates
 from marshmallow.validate import Range
 

@@ -1,9 +1,12 @@
+# /backend/requirements.txt
 Flask
+flask-cors
 Flask-SQLAlchemy
-Flask-Migrate
-Flask-Cors
-psycopg2-binary
-python-dotenv
-marshmallow
-flask-marshmallow
+Flask-Marshmallow
 marshmallow-sqlalchemy
+python-dotenv
+psycopg2-binary
+Flask-Migrate
+marshmallow
+redis
+PyJWT

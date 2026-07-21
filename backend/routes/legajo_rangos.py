@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from schemas.legajo_rangos_schema import legajo_rangos_schema, legajos_rangos_schema
 
 from services.legajo_rangos_service import (

@@ -2,7 +2,7 @@ from models.comision import Comision
 from models.autoridad_comision import AutoridadComision
 from models.comision_asignatura import ComisionAsignatura
 from schemas.comision_schema import ComisionSchema, comision_schema
-from db import db
+from extensions import db
 
 """
 Este archivo contiene la lógica de negocio del CRUD de Comision

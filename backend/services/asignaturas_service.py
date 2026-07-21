@@ -1,6 +1,6 @@
 from models.asignaturas import Asignaturas
 from schemas.asignaturas_schema import AsignaturasSchema, asignatura_schema
-from db import db
+from extensions import db
 
 """
 Este archivo contiene la logica de negocio del CRUD de Asignaturas

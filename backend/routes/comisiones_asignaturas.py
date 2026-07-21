@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from models.autoridad_comision import AutoridadComision
 from schemas.comision_asignatura_schema import (
     comision_asignatura_schema,

@@ -3,7 +3,7 @@ from models.comision import Comision
 from models.comision_asignatura import ComisionAsignatura
 from models.plan_asignatura import PlanAsignatura
 
-from db import ma
+from extensions import ma
 from marshmallow import ValidationError, validates, validates_schema, pre_load
 from marshmallow.validate import Length
 

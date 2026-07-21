@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from db import db
+from extensions import db
 
 from schemas.comision_schema import comision_schema, comisiones_schema
 from services.comision_service import (

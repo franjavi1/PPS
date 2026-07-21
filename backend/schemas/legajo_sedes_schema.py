@@ -2,7 +2,7 @@ from models.legajo import Legajo
 from models.legajo_sedes import LegajoSedes
 from models.sedes import Sedes
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates, validates_schema
 

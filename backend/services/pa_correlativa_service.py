@@ -1,6 +1,6 @@
 from models.pa_correlativa import PACorrelativa
 from schemas.pa_correlativa_schema import PACorrelativaSchema, pa_correlativa_schema
-from db import db
+from extensions import db
 
 """
 Este archivo contiene la lógica de negocio del CRUD de PACorrelativas

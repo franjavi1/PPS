@@ -29,7 +29,7 @@ Descripción general
 La aplicación está dividida en dos partes principales:
 
 Backend: desarrollado con Flask, encargado de manejar la lógica del sistema, las rutas de la API, la conexión con la base de datos, validaciones y servicios.
-Frontend: desarrollado con React, encargado de la interfaz visual del usuario y la comunicación con la API del backend.
+Frontend: desarrollado con React, encargado de la interfaz visual del usuario y la comunicación con la API del 
 Flujo de trabajo con Git
 
 El proyecto utiliza una estructura de ramas para organizar el desarrollo:

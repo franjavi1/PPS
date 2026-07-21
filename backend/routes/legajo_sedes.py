@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from schemas.legajo_sedes_schema import legajo_sedes_schema, legajos_sedes_schema
 
 from services.legajo_sedes_service import (

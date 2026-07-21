@@ -1,6 +1,6 @@
 from models.asignaturas import Asignaturas
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates, pre_load, post_dump
 from marshmallow.validate import Length

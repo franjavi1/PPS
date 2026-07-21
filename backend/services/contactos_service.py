@@ -1,6 +1,6 @@
 from models.contactos import Contactos
 from schemas.contactos_schema import ContactosSchema, contacto_schema
-from db import db
+from extensions import db
 
 
 """

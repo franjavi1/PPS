@@ -1,5 +1,5 @@
 from models.aula import Aula
-from db import ma
+from extensions import ma
 from marshmallow import ValidationError, validates, pre_load
 from marshmallow.validate import Length, OneOf
 

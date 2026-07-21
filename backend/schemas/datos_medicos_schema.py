@@ -1,7 +1,7 @@
 from models.datos_medicos import DatosMedicos
 from models.persona import Persona
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates, pre_load, post_dump
 from marshmallow.validate import Length, OneOf

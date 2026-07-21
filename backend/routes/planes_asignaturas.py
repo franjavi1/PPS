@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from db import db
+from extensions import db
 
 from models.comision_asignatura import ComisionAsignatura
 from models.pa_correlativa import PACorrelativa

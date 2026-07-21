@@ -3,7 +3,7 @@ from models.comision_asignatura import ComisionAsignatura
 from models.legajo import Legajo
 from models.tipos_autoridad import TipoAutoridad
 
-from db import ma
+from extensions import ma
 from marshmallow import ValidationError, validates, validates_schema
 
 

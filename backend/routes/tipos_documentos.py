@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from models.persona import Persona
 from schemas.tipo_documento_schema import tipo_documento_schema, tipos_documento_schema
 

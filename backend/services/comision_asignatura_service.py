@@ -3,7 +3,7 @@ from schemas.comision_asignatura_schema import (
     ComisionAsignaturaSchema,
     comision_asignatura_schema
 )
-from db import db
+from extensions import db
 
 
 def obtener_todos():

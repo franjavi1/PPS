@@ -1,6 +1,6 @@
 from models.legajo_rangos import LegajoRangos
 from schemas.legajo_rangos_schema import LegajoRangosSchema, legajo_rangos_schema
-from db import db
+from extensions import db
 
 
 """

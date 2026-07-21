@@ -1,6 +1,6 @@
 from models.tipo_planes import TipoPlanes
 from schemas.tipo_planes_schema import TipoPlanesSchema, tipo_planes_schema
-from db import db
+from extensions import db
 
 """
 Este archivo contiene la logica de negocio del CRUD de TipoPlanes

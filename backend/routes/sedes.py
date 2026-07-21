@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from models.aula import Aula
 from models.legajo_sedes import LegajoSedes
 from models.plan_asignatura import PlanAsignatura

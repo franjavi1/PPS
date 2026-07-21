@@ -1,36 +1,45 @@
 import { Routes, Route, Navigate } from "react-router";
 import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import InicioSesion from "./pages/Login";
-import Inicio from "./pages/Inicio";
-import Legajos from "./pages/Legajos";
-import NuevoLegajo from "./pages/crearLegajo";
-import ConfigDocumentos from "./pages/ConfigDocumentos";
-import Asignaturas from "./pages/Asignaturas";
-import Comisiones from "./pages/Comisiones";
-import AltaComisionWizard from "./pages/AltaComisionWizard";
-import VerComision from "./pages/VerComision";
-import EditarComision from "./pages/EditarComision";
-import Planes from "./pages/Planes";
-import PlanesAsignaturas from "./pages/PlanesAsignaturas";
-import Aulas from "./pages/Aulas";
-import ComisionesAsignaturas from "./pages/ComisionesAsignaturas";
-import AutoridadesComision from "./pages/AutoridadesComision";
-import PACorrelativas from "./pages/PACorrelativas";
-import DatosMedicos from "./pages/DatosMedicos";
-import Contactos from "./pages/Contactos";
-import Personas from "./pages/Personas";
-import EditarPersona from "./pages/EditarPersona";
-import EditarPlan from "./pages/EditarPlan";
-import VerPlan from "./pages/VerPlan";
-import AltaPersonaWizard from "./pages/AltaPersonaWizard";
-import AltaPlanWizard from "./pages/AltaPlanWizard";
-import LegajoRangos from "./pages/LegajoRangos";
-import LegajoSedes from "./pages/LegajoSedes";
-import Sedes from "./pages/Sedes";
-import TiposSedes from "./pages/TiposSedes";
-import TipoRangos from "./pages/TipoRangos";
-import TiposDocumentos from "./pages/TiposDocumentos";
+import InicioSesion from "../pages/Login";
+import Inicio from "../pages/Inicio";
+
+// TiposDocumento
+import IndexTiposDocumentoPage from "../pages/tiposDocumento/index";
+import CreateTiposDocumentoPage from "../pages/tiposDocumento/create";
+import EditTiposDocumentoPage from "../pages/tiposDocumento/edit";
+import DeleteTiposDocumentoPage from "../pages/tiposDocumento/delete";
+import DetailsTiposDocumentoPage from "../pages/tiposDocumento/details";
+
+
+import Legajos from "../pages/Legajos";
+import NuevoLegajo from "../pages/crearLegajo";
+import ConfigDocumentos from "../pages/ConfigDocumentos";
+import Asignaturas from "../pages/Asignaturas";
+import Comisiones from "../pages/Comisiones";
+import AltaComisionWizard from "../pages/AltaComisionWizard";
+import VerComision from "../pages/VerComision";
+import EditarComision from "../pages/EditarComision";
+import Planes from "../pages/Planes";
+import PlanesAsignaturas from "../pages/PlanesAsignaturas";
+import Aulas from "../pages/Aulas";
+import ComisionesAsignaturas from "../pages/ComisionesAsignaturas";
+import AutoridadesComision from "../pages/AutoridadesComision";
+import PACorrelativas from "../pages/PACorrelativas";
+import DatosMedicos from "../pages/DatosMedicos";
+import Contactos from "../pages/Contactos";
+import Personas from "../pages/Personas";
+import EditarPersona from "../pages/EditarPersona";
+import EditarPlan from "../pages/EditarPlan";
+import VerPlan from "../pages/VerPlan";
+import AltaPersonaWizard from "../pages/AltaPersonaWizard";
+import AltaPlanWizard from "../pages/AltaPlanWizard";
+import LegajoRangos from "../pages/LegajoRangos";
+import LegajoSedes from "../pages/LegajoSedes";
+import Sedes from "../pages/Sedes";
+import TiposSedes from "../pages/TiposSedes";
+import TipoRangos from "../pages/TipoRangos";
+
 
 
 function App() {
@@ -81,6 +90,15 @@ function App() {
           }}
         />
         <Routes>
+
+          {/* Tipos Documento */}
+            <Route path="/tipos-documento" element={<IndexTiposDocumentoPage />} />
+            <Route path="/tipos-documento/create" element={<CreateTiposDocumentoPage />} />
+            <Route path="/tipos-documento/edit/:id" element={<EditTiposDocumentoPage />} />
+            <Route path="/tipos-documento/delete/:id" element={<DeleteTiposDocumentoPage />} />
+            <Route path="/tipos-documento/details/:id" element={<DetailsTiposDocumentoPage />} />
+
+
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<InicioSesion />} />
           <Route path="/inicio" element={<Inicio />} />
@@ -93,7 +111,6 @@ function App() {
           <Route path="/sedes" element={<Sedes />} />
           <Route path="/tipos-sedes" element={<TiposSedes />} />
           <Route path="/tipo-rangos" element={<TipoRangos />} />
-          <Route path="/tipos-documentos" element={<TiposDocumentos />} />
           <Route path="/asignaturas" element={<Asignaturas />} />
           <Route path="/comisiones" element={<Comisiones />} />
           <Route path="/comisiones/alta" element={<AltaComisionWizard />} />

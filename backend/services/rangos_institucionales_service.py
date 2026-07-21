@@ -3,7 +3,7 @@ from schemas.rangos_institucionales_schema import (
     RangosInstitucionalesSchema,
     rango_institucional_schema
 )
-from db import db
+from extensions import db
 
 
 """

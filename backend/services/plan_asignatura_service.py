@@ -1,6 +1,6 @@
 from models.plan_asignatura import PlanAsignatura
 from schemas.plan_asignatura_schema import PlanAsignaturaSchema, plan_asignatura_schema
-from db import db
+from extensions import db
 
 def obtener_todos():
     return PlanAsignatura.query.all()

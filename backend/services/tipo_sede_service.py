@@ -1,6 +1,6 @@
 from models.tipo_sede import TipoSede
 from schemas.tipo_sede_schema import TipoSedeSchema, tipo_sede_schema
-from db import db
+from extensions import db
 
 
 """

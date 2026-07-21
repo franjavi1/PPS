@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from models.legajo_rangos import LegajoRangos
 from models.plan_asignatura import PlanAsignatura
 from schemas.rangos_institucionales_schema import (

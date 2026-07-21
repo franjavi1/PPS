@@ -1,6 +1,6 @@
 from models.legajo import Legajo
 from schemas.legajo_schema import LegajoSchema, legajo_schema
-from db import db
+from extensions import db
 
 
 """

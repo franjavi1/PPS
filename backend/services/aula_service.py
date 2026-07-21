@@ -1,6 +1,6 @@
 from models.aula import Aula
 from schemas.aula_schema import AulaSchema, aula_schema
-from db import db
+from extensions import db
 
 """
 Este archivo contiene la lógica de negocio del CRUD de Aula

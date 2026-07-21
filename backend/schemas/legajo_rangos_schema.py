@@ -2,7 +2,7 @@ from models.legajo import Legajo
 from models.legajo_rangos import LegajoRangos
 from models.rangos_institucionales import RangosInstitucionales
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates, validates_schema
 

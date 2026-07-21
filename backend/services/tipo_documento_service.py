@@ -1,6 +1,6 @@
 from models.tipo_documento import TipoDocumento
 from schemas.tipo_documento_schema import TipoDocumentoSchema, tipo_documento_schema
-from db import db
+from extensions import db
 
 
 """

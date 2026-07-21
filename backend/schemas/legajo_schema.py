@@ -1,7 +1,7 @@
 from models.legajo import Legajo
 from models.persona import Persona
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates, validates_schema, pre_load, post_dump
 from marshmallow.validate import Length

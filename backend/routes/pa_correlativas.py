@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from schemas.pa_correlativa_schema import pa_correlativa_schema, pa_correlativas_schema
 
 from services.pa_correlativa_service import (

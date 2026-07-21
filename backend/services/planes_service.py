@@ -1,6 +1,6 @@
 from models.planes import Planes
 from schemas.planes_schema import PlanesSchema, plan_schema
-from db import db
+from extensions import db
 
 """
 Este archivo contiene la logica de negocio del CRUD de Planes

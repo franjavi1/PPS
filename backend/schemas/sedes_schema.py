@@ -1,7 +1,7 @@
 from models.sedes import Sedes
 from models.tipo_sede import TipoSede
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates, pre_load, post_dump
 from marshmallow.validate import Length

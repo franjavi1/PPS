@@ -1,6 +1,6 @@
 from models.persona import Persona
 from schemas.persona_schema import PersonaSchema, persona_schema
-from db import db
+from extensions import db
 
 
 """

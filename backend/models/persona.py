@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-from db import db
+from extensions import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, DateTime, ForeignKey, func
 
@@ -20,7 +20,7 @@ class Persona(db.Model):
     td_id: Mapped[int] = mapped_column(
         "tdId",
         Integer,
-        ForeignKey("tipos_documento.id"),
+        ForeignKey("tipos_documento.idTipoDocumento"),
         nullable=False
     )
 

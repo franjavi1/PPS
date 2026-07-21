@@ -3,7 +3,7 @@ from schemas.autoridad_comision_schema import (
     AutoridadComisionSchema,
     autoridad_comision_schema
 )
-from db import db
+from extensions import db
 
 
 def obtener_todos():

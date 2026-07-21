@@ -1,6 +1,6 @@
 from models.tipo_planes import TipoPlanes
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates_schema, pre_load, post_dump
 from marshmallow.validate import Length, Regexp

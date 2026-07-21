@@ -1,6 +1,6 @@
 from models.tipo_contacto import TipoContacto
 from schemas.tipo_contacto_schema import TipoContactoSchema, tipo_contacto_schema
-from db import db
+from extensions import db
 
 
 """

@@ -1,7 +1,7 @@
 from models.persona import Persona
 from models.tipo_documento import TipoDocumento
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates, pre_load, post_dump, validates_schema
 from marshmallow.validate import Regexp, Length

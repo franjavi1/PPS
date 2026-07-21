@@ -1,6 +1,6 @@
 from models.rangos_institucionales import RangosInstitucionales
 
-from db import ma
+from extensions import ma
 
 from marshmallow import ValidationError, validates, validates_schema, pre_load, post_dump
 from marshmallow.validate import Length

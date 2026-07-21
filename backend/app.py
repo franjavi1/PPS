@@ -1,98 +1,164 @@
-from flask import Flask
+# /backend/app.py
+from flask import Flask, jsonify
 from flask_cors import CORS
-
-from db import db, ma
 from config.config import Config
+from extensions import db, ma, redis_client
+from marshmallow import ValidationError
+from sqlalchemy.exc import DataError, IntegrityError
+from werkzeug.exceptions import HTTPException
+from utils.utilidades import responder
+from utils.errores import APIError 
 
-from models.persona import Persona
-from models.tipo_documento import TipoDocumento
-from models.planes import Planes
-from models.tipo_planes import TipoPlanes
-from models.asignaturas import Asignaturas
-from models.tipo_sede import TipoSede
-from models.sedes import Sedes
-from models.comision import Comision
-from models.comision_asignatura import ComisionAsignatura
-from models.autoridad_comision import AutoridadComision
-from models.aula import Aula
-from models.pa_correlativa import PACorrelativa
-from models.tipos_autoridad import TipoAutoridad
-from models.plan_asignatura import PlanAsignatura
-from models.datos_medicos import DatosMedicos
-from models.tipo_contacto import TipoContacto
-from models.contactos import Contactos
+ 
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-from models.legajo import Legajo
-from models.rangos_institucionales import RangosInstitucionales
-from models.legajo_rangos import LegajoRangos
-from models.legajo_sedes import LegajoSedes
+    db.init_app(app)
+    ma.init_app(app)
+    
+    CORS(app)
 
-from routes.personas import personas_bp
-from routes.tipos_documentos import tipos_documentos_bp
-from routes.planes import planes_bp
-from routes.tipos_planes import tipos_planes_bp
-from routes.asignaturas import asignaturas_bp
-from routes.tipos_sedes import tipos_sedes_bp
-from routes.sedes import sedes_bp
-from routes.comisiones import comisiones_bp
-from routes.comisiones_asignaturas import comisiones_asignaturas_bp
-from routes.autoridades_comision import autoridades_comision_bp
-from routes.aulas import aulas_bp
-from routes.pa_correlativas import pa_correlativas_bp
-from routes.tipos_autoridad import tipos_autoridad_bp
-from routes.planes_asignaturas import planes_asignaturas_bp
-from routes.legajos import legajos_bp
-from routes.rangos_institucionales import rangos_institucionales_bp
-from routes.legajo_rangos import legajo_rangos_bp
-from routes.legajo_sedes import legajo_sedes_bp
-from routes.datos_medicos import datos_medicos_bp
-from routes.tipos_contacto import tipos_contacto_bp
-from routes.contactos import contactos_bp
-from routes.personas_relaciones import personas_relaciones_bp
+    redis_client.connection_pool.connection_kwargs.update({
+        'host': app.config['REDIS_HOST'],
+        'port': int(app.config['REDIS_PORT']),
+        'db': int(app.config['REDIS_DB']),    
+        'decode_responses': True
+    })
+    
+    # se ejecuta al finalizar cada peticion https
+    @app.teardown_request
+    def gestionar_sesion(exception=None):
+        if exception:
+            db.session.rollback()
+        db.session.remove()
+        
+    # errores de validacion de schemas que implementamos nosotros
+    @app.errorhandler(ValidationError)
+    def manejar_validacion_marshmallow(err):
+        return responder(
+            ok=False, 
+            message=err.messages, 
+            error=err.messages,
+            status=400
+        )
 
-app = Flask(__name__)
-app.config.from_object(Config)
+    # control de errores de negocio que implementamos manualmente
+    @app.errorhandler(APIError)
+    def manejar_errores_negocio(err):
+        return responder(
+            ok=False,
+            message=err.message,
+            error="",
+            status=err.status
+        )
 
-db.init_app(app)
-ma.init_app(app)
+    # controla errores de base de datos, como FK, Datos Duplicados, Tipos Incorrectos de datos
+    @app.errorhandler(DataError)
+    @app.errorhandler(IntegrityError)
+    def manejar_errores_base_datos(err):
+        db.session.rollback()
+        detalles_bd = str(err.orig) if hasattr(err, 'orig') else str(err)
+        return responder(
+            ok=False,
+            message="Error de persistencia o consistencia en la base de datos.",
+            error=detalles_bd,
+            status=400
+        )
 
-CORS(app)
+    # Ataja cualquier fallo que no haya sido previsto 
+    @app.errorhandler(Exception)
+    def manejar_error_general(e):
+        if isinstance(e, HTTPException):
+            return responder(ok=False, message=e.description, error=e.name, status=e.code)
+            
+        return responder(
+            ok=False, 
+            message="Ocurrio un error inesperado en el servidor.", 
+            error=str(e), 
+            status=500
+        )
 
 
-@app.route("/health", methods=["GET"])
-def health():
-    return {
-        "status": "success",
-        "message": "API funcionando"
-    }, 200
+    with app.app_context():
+
+        from models.tiposDocumentoModel import TiposDocumentoModel
+
+        from models.persona import Persona
+        from models.planes import Planes
+        from models.tipo_planes import TipoPlanes
+        from models.asignaturas import Asignaturas
+        from models.tipo_sede import TipoSede
+        from models.sedes import Sedes
+        from models.comision import Comision
+        from models.comision_asignatura import ComisionAsignatura
+        from models.autoridad_comision import AutoridadComision
+        from models.aula import Aula
+        from models.pa_correlativa import PACorrelativa
+        from models.tipos_autoridad import TipoAutoridad
+        from models.plan_asignatura import PlanAsignatura
+        from models.datos_medicos import DatosMedicos
+        from models.tipo_contacto import TipoContacto
+        from models.contactos import Contactos
+
+        from models.legajo import Legajo
+        from models.rangos_institucionales import RangosInstitucionales
+        from models.legajo_rangos import LegajoRangos
+        from models.legajo_sedes import LegajoSedes
+
+        from routes.tiposDocumentoRoutes import tipos_documento_bp
+        from routes.personas import personas_bp
+        from routes.planes import planes_bp
+        from routes.tipos_planes import tipos_planes_bp
+        from routes.asignaturas import asignaturas_bp
+        from routes.tipos_sedes import tipos_sedes_bp
+        from routes.sedes import sedes_bp
+        from routes.comisiones import comisiones_bp
+        from routes.comisiones_asignaturas import comisiones_asignaturas_bp
+        from routes.autoridades_comision import autoridades_comision_bp
+        from routes.aulas import aulas_bp
+        from routes.pa_correlativas import pa_correlativas_bp
+        from routes.tipos_autoridad import tipos_autoridad_bp
+        from routes.planes_asignaturas import planes_asignaturas_bp
+        from routes.legajos import legajos_bp
+        from routes.rangos_institucionales import rangos_institucionales_bp
+        from routes.legajo_rangos import legajo_rangos_bp
+        from routes.legajo_sedes import legajo_sedes_bp
+        from routes.datos_medicos import datos_medicos_bp
+        from routes.tipos_contacto import tipos_contacto_bp
+        from routes.contactos import contactos_bp
+        from routes.personas_relaciones import personas_relaciones_bp
+      
 
 
-app.register_blueprint(personas_bp)
-app.register_blueprint(tipos_documentos_bp)
-app.register_blueprint(planes_bp)
-app.register_blueprint(tipos_planes_bp)
-app.register_blueprint(asignaturas_bp)
-app.register_blueprint(tipos_sedes_bp)
-app.register_blueprint(sedes_bp)
-app.register_blueprint(comisiones_bp)
-app.register_blueprint(comisiones_asignaturas_bp)
-app.register_blueprint(autoridades_comision_bp)
-app.register_blueprint(aulas_bp)
-app.register_blueprint(pa_correlativas_bp)
-app.register_blueprint(tipos_autoridad_bp)
-app.register_blueprint(planes_asignaturas_bp)
-app.register_blueprint(legajos_bp)
-app.register_blueprint(rangos_institucionales_bp)
-app.register_blueprint(legajo_rangos_bp)
-app.register_blueprint(legajo_sedes_bp)
-app.register_blueprint(datos_medicos_bp)
-app.register_blueprint(tipos_contacto_bp)
-app.register_blueprint(contactos_bp)
-app.register_blueprint(personas_relaciones_bp)
+        app.register_blueprint(tipos_documento_bp, url_prefix='/tipos-documento')
+        app.register_blueprint(personas_bp)
+        app.register_blueprint(planes_bp)
+        app.register_blueprint(tipos_planes_bp)
+        app.register_blueprint(asignaturas_bp)
+        app.register_blueprint(tipos_sedes_bp)
+        app.register_blueprint(sedes_bp)
+        app.register_blueprint(comisiones_bp)
+        app.register_blueprint(comisiones_asignaturas_bp)
+        app.register_blueprint(autoridades_comision_bp)
+        app.register_blueprint(aulas_bp)
+        app.register_blueprint(pa_correlativas_bp)
+        app.register_blueprint(tipos_autoridad_bp)
+        app.register_blueprint(planes_asignaturas_bp)
+        app.register_blueprint(legajos_bp)
+        app.register_blueprint(rangos_institucionales_bp)
+        app.register_blueprint(legajo_rangos_bp)
+        app.register_blueprint(legajo_sedes_bp)
+        app.register_blueprint(datos_medicos_bp)
+        app.register_blueprint(tipos_contacto_bp)
+        app.register_blueprint(contactos_bp)
+        app.register_blueprint(personas_relaciones_bp)
 
-with app.app_context():
-    db.create_all()
+        with app.app_context():
+            db.create_all()
+    return app
 
+app = create_app()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

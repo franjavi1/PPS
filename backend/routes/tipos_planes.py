@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from models.planes import Planes
 from schemas.tipo_planes_schema import tipo_planes_schema, tipos_planes_schema
 

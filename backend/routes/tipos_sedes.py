@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
+from extensions import db
 from models.sedes import Sedes
 from schemas.tipo_sede_schema import tipo_sede_schema, tipos_sedes_schema
 
