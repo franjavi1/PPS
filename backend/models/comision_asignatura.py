@@ -52,10 +52,12 @@ class ComisionAsignatura(db.Model):
         nullable=False
     )
 
-    estado: Mapped[str] = mapped_column(
-        String(45),
-        nullable=False
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
     )
+
 
     usuario_accion: Mapped[int | None] = mapped_column(
         "usuarioAccion",
