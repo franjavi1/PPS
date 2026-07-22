@@ -18,6 +18,32 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+-- Limpiar datos previos para permitir volver a cargar el seed sin errores por PK duplicadas.
+TRUNCATE TABLE
+  public."Contactos",
+  public."DatosMedicos",
+  public."LegajoSedes",
+  public."LegajoRangos",
+  public."AutoridadComision",
+  public."PACorrelativas",
+  public."ComisionAsignatura",
+  public."PlanAsignaturas",
+  public.planes,
+  public.personas,
+  public.legajos,
+  public."TipoAutoridad",
+  public."tipoContacto",
+  public.tipos_documento,
+  public."Modalidades",
+  public.tipos_planes,
+  public."Comision",
+  public."Aulas",
+  public.sedes,
+  public.tipos_sedes,
+  public.rangos_institucionales,
+  public.asignaturas
+RESTART IDENTITY CASCADE;
+
 --
 -- Data for Name: tipos_sedes; Type: TABLE DATA; Schema: public; Owner: -
 --
