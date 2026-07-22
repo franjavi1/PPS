@@ -3,10 +3,10 @@ from schemas.plan_asignatura_schema import PlanAsignaturaSchema, plan_asignatura
 from db import db
 
 def obtener_todos():
-    return PlanAsignatura.query.all()
+    return PlanAsignatura.query.filter_by(estado=1).all()
 
 def obtener_por_id(id_plan_asignatura):
-    return PlanAsignatura.query.filter_by(id=id_plan_asignatura).first()
+    return PlanAsignatura.query.filter_by(id=id_plan_asignatura, estado=1).first()
 
 def crear(datos):
     nuevo_plan = plan_asignatura_schema.load(datos)

@@ -11,8 +11,8 @@ export const personasService = {
   /**
    * Obtiene todos los registros de Personas desde la base de datos.
    */
-  obtenerTodas() {
-    return apiRequest(BASE_URL);
+  obtenerTodas(estado = 1) {
+    return apiRequest(`${BASE_URL}?estado=${estado}`);
   },
 
   /**
@@ -48,6 +48,15 @@ export const personasService = {
   eliminar(id) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "DELETE",
+    });
+  },
+
+  /**
+   * Reactiva una Persona que fue dada de baja.
+   */
+  reactivar(id) {
+    return apiRequest(`${BASE_URL}/${id}/reactivar`, {
+      method: "PATCH",
     });
   },
 };

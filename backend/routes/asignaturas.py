@@ -171,7 +171,7 @@ def eliminar_asignatura(id):
 
         eliminar(asignatura)
 
-        return respuesta_api(True, {"id": id}, "Asignatura eliminada correctamente")
+        return respuesta_api(True, {"id": id}, "Asignatura dada de baja correctamente")
 
     except SQLAlchemyError:
         db.session.rollback()
