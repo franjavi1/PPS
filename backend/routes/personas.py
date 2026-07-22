@@ -3,18 +3,17 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
-from models.contactos import Contactos
-from models.datos_medicos import DatosMedicos
-from models.legajo import Legajo
 from schemas.persona_schema import  persona_schema, personas_schema
 
 
 from services.persona_service import (
     obtener_todos,
     obtener_por_id,
+    obtener_por_id_sin_filtrar_estado,
     crear,
     actualizar,
-    eliminar
+    eliminar,
+    reactivar
 )
 
 
@@ -44,7 +43,14 @@ def respuesta_api(success=True, data=None, message="",status=200, errors=None):
 @personas_bp.route("",methods=["GET"])
 def get_personas():
     try:
-        personas = obtener_todos()
+        estado = request.args.get("estado", default=1, type=int)
+
+        if estado not in (0, 1):
+            return respuesta_api(False, None, "Estado no valido", 400, {
+                "estado": "El estado debe ser 0 o 1"
+            })
+
+        personas = obtener_todos(estado)
         data = personas_schema.dump(personas)
 
         if len(data)==0:
@@ -173,26 +179,45 @@ def eliminar_persona(id):
                 "id": "No existe una persona activa con ese id"
             })
 
-        esta_en_uso = (
-            Legajo.query.filter_by(persona_id=id, estado=1).first()
-            or Contactos.query.filter_by(persona_id=id).first()
-            or DatosMedicos.query.filter_by(persona_id=id).first()
-        )
-
-        if esta_en_uso:
-            return respuesta_api(False, None, "No se puede eliminar la persona", 409, {
-                "persona": "No se puede eliminar una persona con legajo, contactos o datos medicos asociados"
-            })
-
         eliminar(persona)
 
-        return respuesta_api(True,{"id": id}, "Persona eliminada correctamente")
+        return respuesta_api(True, {"id": id}, "Persona dada de baja correctamente")
     
     except SQLAlchemyError:
         db.session.rollback()
 
         return respuesta_api(False, None, "Error de base de datos", 500, {
             "database": "Ocurrió un error al eliminar la persona"
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+
+        return respuesta_api(False, None, "Error inesperado", 500, {
+            "server": "Ocurrio un error inesperado"
+        })
+
+
+@personas_bp.route("/<int:id>/reactivar", methods=["PATCH"])
+def reactivar_persona(id):
+    try:
+        persona = obtener_por_id_sin_filtrar_estado(id)
+
+        if not persona or persona.estado != 0:
+            return respuesta_api(False, None, "Persona inactiva no encontrada", 404, {
+                "id": "No existe una persona inactiva con ese id"
+            })
+
+        reactivar(persona)
+
+        return respuesta_api(True, {"id": id}, "Persona reactivada correctamente")
+
+    except SQLAlchemyError:
+        db.session.rollback()
+
+        return respuesta_api(False, None, "Error de base de datos", 500, {
+            "database": "Ocurrio un error al reactivar la persona"
         })
 
     except Exception as e:

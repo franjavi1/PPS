@@ -102,18 +102,25 @@ def eliminar_plan(id):
         if not plan:
             return respuesta_api(False, None, "Registro no encontrado", 404, {"id": "No existe el registro"})
 
-        esta_en_uso = (
-            ComisionAsignatura.query.filter_by(plan_asignaturas_id=id).first()
-            or PACorrelativa.query.filter_by(pa_id=id).first()
-        )
+        # Solo se consultan los identificadores para evitar cargar columnas
+        # de Comisión que no son necesarias para esta validación.
+        esta_en_comision = db.session.query(
+            ComisionAsignatura.id_comision_asignatura
+        ).filter(
+            ComisionAsignatura.plan_asignaturas_id == id
+        ).first()
 
-        if esta_en_uso:
-            return respuesta_api(False, None, "No se puede eliminar la asignatura del plan", 409, {
-                "plan_asignatura": "No se puede eliminar una asignatura del plan asociada a comisiones o correlativas"
+        esta_en_correlativa = db.session.query(PACorrelativa.id).filter(
+            PACorrelativa.pa_id == id
+        ).first()
+
+        if esta_en_comision or esta_en_correlativa:
+            return respuesta_api(False, None, "No se puede quitar la asignatura del plan", 409, {
+                "plan_asignatura": "No se puede quitar una asignatura asociada a comisiones o correlativas"
             })
         
         eliminar(plan)
-        return respuesta_api(True, {"id": id}, "Registro eliminado físicamente")
+        return respuesta_api(True, {"id": id}, "Asignatura quitada del plan correctamente")
     except SQLAlchemyError:
         db.session.rollback()
         return respuesta_api(False, None, "Error de base de datos", 500, {"database": "Error al eliminar"})

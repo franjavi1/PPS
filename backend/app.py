@@ -50,6 +50,7 @@ from routes.datos_medicos import datos_medicos_bp
 from routes.tipos_contacto import tipos_contacto_bp
 from routes.contactos import contactos_bp
 from routes.personas_relaciones import personas_relaciones_bp
+from routes.modalidades import modalidades_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -69,6 +70,7 @@ def health():
 
 
 app.register_blueprint(personas_bp)
+app.register_blueprint(modalidades_bp)
 app.register_blueprint(tipos_documentos_bp)
 app.register_blueprint(planes_bp)
 app.register_blueprint(tipos_planes_bp)

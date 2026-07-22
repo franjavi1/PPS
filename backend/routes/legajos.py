@@ -41,7 +41,14 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 @legajos_bp.route("", methods=["GET"])
 def get_legajos():
     try:
-        legajos = obtener_todos()
+        estado = request.args.get("estado", default=1, type=int)
+
+        if estado not in (0, 1):
+            return respuesta_api(False, None, "Estado no valido", 400, {
+                "estado": "El estado debe ser 0 o 1"
+            })
+
+        legajos = obtener_todos(estado)
         data = legajos_schema.dump(legajos)
 
         if len(data) == 0:
