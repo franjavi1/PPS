@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
+--\restrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
 
 -- Dumped from database version 16.14 (Debian 16.14-1.pgdg13+1)
 -- Dumped by pg_dump version 16.14 (Debian 16.14-1.pgdg13+1)
@@ -389,5 +389,5 @@ SELECT pg_catalog.setval('public.tipos_sedes_id_seq', 1, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
+--\unrestrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
 
