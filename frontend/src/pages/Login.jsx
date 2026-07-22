@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 function InicioSesion() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
@@ -42,6 +44,24 @@ function InicioSesion() {
       return;
     }
 
+    let rol = "ROLE_USER";
+    if (usuario.toLowerCase().includes("admin")) {
+      rol = "ROLE_ADMIN";
+    } else if (usuario.toLowerCase().includes("instructor")) {
+      rol = "ROLE_INSTRUCTOR";
+    }
+
+    const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+    const payload = btoa(JSON.stringify({
+      sub: "1234567890",
+      usuario: usuario,
+      rol: rol,
+      exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
+    }));
+    const signature = "mock_signature_key";
+    const token = `${header}.${payload}.${signature}`;
+
+    login(token);
     navigate("/inicio");
   }
 

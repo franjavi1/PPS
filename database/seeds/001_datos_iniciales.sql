@@ -219,6 +219,13 @@ INSERT INTO public."PACorrelativas" (id, "asignaturaId", "paId", "usuarioAccion"
 
 
 --
+-- Data for Name: Modalidades; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+INSERT INTO public."Modalidades" ("Descripcion") VALUES ('Presencial')
+INSERT INTO public."Modalidades" ("Descripcion") VALUES ('Virtual')
+INSERT INTO public."Modalidades" ("Descripcion") VALUES ('Hibrida')
+--
 -- Data for Name: comisiones; Type: TABLE DATA; Schema: public; Owner: -
 --
 
