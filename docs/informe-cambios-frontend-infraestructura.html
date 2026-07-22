@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Informe de cambios — feature/frontend-infraestructura</title>
+  <style>
+    @page { size: A4; margin: 17mm 15mm 18mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #1e293b; font: 10.2pt/1.46 Arial, sans-serif; }
+    h1 { margin: 0 0 4mm; color: #991b1b; font-size: 25pt; line-height: 1.12; }
+    h2 { margin: 8mm 0 3mm; padding-bottom: 2mm; border-bottom: 1px solid #fecaca; color: #991b1b; font-size: 16pt; }
+    h3 { margin: 5mm 0 2mm; color: #334155; font-size: 12.5pt; }
+    h4 { margin: 4mm 0 1.5mm; color: #475569; font-size: 11pt; }
+    p { margin: 2mm 0; }
+    ul, ol { margin: 2mm 0 3mm 5mm; padding-left: 5mm; }
+    li { margin: 1mm 0; }
+    code { font: 9pt Consolas, monospace; }
+    pre { margin: 3mm 0; padding: 4mm; border-radius: 5px; background: #0f172a; color: #e2e8f0; white-space: pre-wrap; overflow-wrap: anywhere; font: 8.1pt/1.42 Consolas, monospace; break-inside: avoid; }
+    table { width: 100%; margin: 3mm 0; border-collapse: collapse; break-inside: avoid; }
+    th, td { padding: 2.4mm; border: 1px solid #cbd5e1; text-align: left; vertical-align: top; }
+    th { background: #f1f5f9; }
+    .cover { min-height: 247mm; display: flex; flex-direction: column; justify-content: center; }
+    .subtitle { color: #64748b; font-size: 14pt; }
+    .meta { margin-top: 15mm; padding: 5mm; border-left: 5px solid #b91c1c; background: #f8fafc; }
+    .page { break-before: page; }
+    .note, .warning, .success { margin: 4mm 0; padding: 4mm; border-radius: 5px; break-inside: avoid; }
+    .note { background: #eff6ff; border: 1px solid #93c5fd; }
+    .warning { background: #fff7ed; border: 1px solid #fdba74; }
+    .success { background: #f0fdf4; border: 1px solid #86efac; }
+    .tag { display: inline-block; padding: 0.5mm 2mm; border-radius: 10px; font-size: 8.5pt; font-weight: bold; }
+    .done { background: #dcfce7; color: #166534; }
+    .partial { background: #fef3c7; color: #92400e; }
+    .future { background: #e0e7ff; color: #3730a3; }
+    .small { color: #64748b; font-size: 8.8pt; }
+    .files { columns: 2; column-gap: 8mm; font: 8.3pt/1.4 Consolas, monospace; }
+    .files li { break-inside: avoid; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <h1>Cambios realizados en<br>feature/frontend-infraestructura</h1>
+    <p class="subtitle">Contraste técnico con el documento “Arquitectura General y Stack Tecnológico”</p>
+    <div class="meta">
+      <p><strong>Proyecto:</strong> Sistema de Legajos — Bomberos Voluntarios</p>
+      <p><strong>Rama examinada:</strong> feature/frontend-infraestructura</p>
+      <p><strong>Base de comparación:</strong> 98dad46 — feature/frontend-planes-navegacion</p>
+      <p><strong>Último commit:</strong> 58dcc3e</p>
+      <p><strong>Fecha de verificación:</strong> 22 de julio de 2026</p>
+      <p><strong>Alcance:</strong> frontend React; revisión de Git, código y build de producción.</p>
+    </div>
+  </section>
+
+  <h2>Resumen ejecutivo</h2>
+  <p>La rama incorpora cuatro bloques principales que coinciden con el documento entregado:</p>
+  <ol>
+    <li>RBAC visual, sesión en <code>sessionStorage</code> e integridad referencial preventiva.</li>
+    <li>Refactor de paneles mediante <code>TablaPrincipal</code>, componentes y hooks reutilizables.</li>
+    <li>Unificación de formularios y flujos guiados a pantalla completa.</li>
+    <li>Code-splitting por rutas y separación manual de dependencias externas.</li>
+  </ol>
+
+  <table>
+    <thead><tr><th>Indicador</th><th>Resultado comprobado</th></tr></thead>
+    <tbody>
+      <tr><td>Commits propios de la rama</td><td>4</td></tr>
+      <tr><td>Cambio total frente a la base</td><td>176 archivos; 20.687 inserciones y 15.860 eliminaciones</td></tr>
+      <tr><td>Build actual</td><td>Correcto; 233 módulos; 1,96 segundos</td></tr>
+      <tr><td>Bundle de entrada</td><td>14,39 kB; 4,49 kB comprimido</td></tr>
+      <tr><td>Vendor React</td><td>251,90 kB; 80,97 kB comprimido</td></tr>
+      <tr><td>Chunk mayor de negocio</td><td>ConfigDocumentos: 75,16 kB</td></tr>
+      <tr><td>Advertencias de tamaño</td><td>Ninguna en la verificación actual</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning">
+    <strong>Conclusión importante:</strong> el RBAC de esta rama es una demostración de interfaz. El login genera un token simulado y el backend no valida esos permisos. Por eso no debe presentarse como seguridad completa de producción.
+  </div>
+
+  <h2 class="page">1. Historial de cambios de la rama</h2>
+  <table>
+    <thead><tr><th>Commit</th><th>Propósito</th><th>Magnitud</th></tr></thead>
+    <tbody>
+      <tr><td><code>6275b4f</code></td><td>RBAC con sessionStorage, validaciones de integridad y separación masiva en componentes/hooks.</td><td>154 archivos; +19.962 / −14.856</td></tr>
+      <tr><td><code>2158a75</code></td><td>Migración de paneles a <code>TablaPrincipal</code> y unificación adicional de altas guiadas.</td><td>95 archivos; +4.785 / −5.380</td></tr>
+      <tr><td><code>bd68a0c</code></td><td>Unificación visual de formularios guiados a pantalla completa.</td><td>11 archivos; +1.116 / −828</td></tr>
+      <tr><td><code>58dcc3e</code></td><td>Code-splitting con <code>React.lazy</code>, <code>Suspense</code> y <code>manualChunks</code>.</td><td>2 archivos; +97 / −69</td></tr>
+    </tbody>
+  </table>
+
+  <p>La suma por commit puede contener líneas modificadas varias veces. La diferencia final contra la base es la cifra consolidada de 176 archivos.</p>
+
+  <h2>2. Arquitectura y stack tecnológico</h2>
+  <p><span class="tag done">COMPROBADO</span></p>
+  <p>El <code>package.json</code> confirma el stack descrito:</p>
+  <table>
+    <thead><tr><th>Tecnología</th><th>Versión declarada</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>React</td><td>^19.2.7</td><td>Componentes y estado de interfaz.</td></tr>
+      <tr><td>React DOM</td><td>^19.2.7</td><td>Renderizado en navegador.</td></tr>
+      <tr><td>React Router</td><td>^8.0.1</td><td>SPA y navegación.</td></tr>
+      <tr><td>Vite</td><td>^8.1.0</td><td>Servidor de desarrollo y build.</td></tr>
+      <tr><td>Tailwind CSS</td><td>^4.3.1</td><td>Estilos utilitarios.</td></tr>
+      <tr><td>@tailwindcss/vite</td><td>^4.3.1</td><td>Integración nativa con Vite.</td></tr>
+      <tr><td>Oxlint</td><td>^1.69.0</td><td>Lint mediante <code>npm run lint</code>.</td></tr>
+      <tr><td>Lucide React</td><td>^1.21.0</td><td>Iconografía.</td></tr>
+      <tr><td>React Hot Toast</td><td>^2.6.0</td><td>Notificaciones.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Identidad visual</h3>
+  <p>Los componentes utilizan rojo institucional, fondos slate, tarjetas blancas, bordes suaves y estados hover. Se observa de forma consistente el uso de clases como <code>bg-red-700</code>, <code>hover:bg-red-800</code>, <code>bg-slate-50</code> y <code>bg-slate-100</code>.</p>
+
+  <h3>Archivos de referencia</h3>
+  <ul>
+    <li><code>frontend/package.json</code></li>
+    <li><code>frontend/vite.config.js</code></li>
+    <li><code>frontend/src/index.css</code></li>
+    <li>Componentes y páginas bajo <code>frontend/src</code></li>
+  </ul>
+
+  <div class="note">
+    La elección de React frente a Next.js es una justificación arquitectónica, no un cambio específico de estos cuatro commits. El repositorio ya era una SPA antes de esta rama.
+  </div>
+
+  <h2 class="page">3. Patrón TablaPrincipal</h2>
+  <p><span class="tag done">IMPLEMENTADO</span></p>
+  <p>Se creó <code>frontend/src/components/TablaPrincipal/TablaPrincipal.jsx</code> para centralizar búsqueda, ordenamiento, paginación y renderizado de filas.</p>
+
+  <h3>Comportamientos comprobados</h3>
+  <ul>
+    <li><strong>Búsqueda global:</strong> filtra sobre <code>propiedadesFiltro</code> o sobre las columnas configuradas.</li>
+    <li><strong>Ordenamiento:</strong> usa <code>useMemo</code> y <code>localeCompare(..., "es")</code>.</li>
+    <li><strong>Valores anidados:</strong> admite <code>valorOrden(item)</code> por columna.</li>
+    <li><strong>Paginación:</strong> usa <code>slice</code> y permite 10, 25 o 50 filas.</li>
+    <li><strong>Reinicio de página:</strong> vuelve a página 1 cuando cambia la búsqueda o el tamaño.</li>
+    <li><strong>Acciones:</strong> acepta una función <code>accionesPorFila</code>.</li>
+  </ul>
+
+  <pre>useEffect(() =&gt; {
+  setPaginaActual(1);
+}, [busqueda, filasPorPagina]);
+
+const comparacion = valorA.localeCompare(valorB, "es", {
+  sensitivity: "base",
+  numeric: true,
+});
+
+const inicio = (paginaActual - 1) * filasPorPagina;
+return datosProcesados.slice(inicio, inicio + filasPorPagina);</pre>
+
+  <h3>Paneles que consumen TablaPrincipal</h3>
+  <ul>
+    <li>AulasPanel</li>
+    <li>ComisionesPanel</li>
+    <li>PersonasPanel</li>
+    <li>RangoPanel</li>
+    <li>SedesPanel</li>
+    <li>TipoDocumentoPanel</li>
+    <li>TiposSedesPanel</li>
+  </ul>
+
+  <h3>Componentes auxiliares</h3>
+  <ul>
+    <li><code>components/filtros/filtroGlobal.jsx</code></li>
+    <li><code>components/filtros/filtroTablas.jsx</code></li>
+  </ul>
+
+  <h2 class="page">4. Altas guiadas y wizards</h2>
+  <p><span class="tag done">IMPLEMENTADO</span></p>
+  <p>Los flujos complejos se dividieron en pasos independientes, componentes visuales y hooks de lógica. Los tres wizards principales son:</p>
+  <table>
+    <thead><tr><th>Flujo</th><th>Página principal</th><th>Hook/componentes relevantes</th></tr></thead>
+    <tbody>
+      <tr><td>Alta de persona</td><td>AltaPersonaWizard.jsx</td><td>useAltaPersonaWizard.js y componentes StepPersona, StepLegajo, StepDatosLegajo, StepUsuario y StepResumen.</td></tr>
+      <tr><td>Alta de plan</td><td>AltaPlanWizard.jsx</td><td>useAltaPlanWizard.js y pasos Plan, Asignatura, Condiciones, Correlativas y Resumen.</td></tr>
+      <tr><td>Alta de comisión</td><td>AltaComisionWizard.jsx</td><td>useAltaComisionWizard.js y pasos Comisión, Asignaturas, Autoridades y Resumen.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Persistencia escalonada</h3>
+  <p>El alta de Plan guarda primero la entidad base. Con el identificador resultante habilita la carga de asignaturas, condiciones y correlativas. El flujo mantiene un estado de paso y culmina en un resumen.</p>
+
+  <pre>const [pasoActual, setPasoActual] = useState(1);
+
+async function guardarPlan(event) {
+  // valida y crea el plan base
+  // conserva el id generado
+  // avanza al siguiente paso
+}</pre>
+
+  <h3>Mejoras visuales</h3>
+  <p>El commit <code>bd68a0c</code> ajustó once archivos de formularios y paneles para unificar la experiencia a pantalla completa, especialmente en infraestructura, personas y configuraciones.</p>
+
+  <div class="note">
+    En el árbol actual coexisten algunas familias de componentes con nombres <code>Paso...</code> y <code>Step...</code>. Esto refleja etapas sucesivas del refactor y conviene tenerlo presente para evitar duplicación futura.
+  </div>
+
+  <h2 class="page">5. Integridad referencial preventiva</h2>
+  <p><span class="tag done">IMPLEMENTADO EN UI</span></p>
+  <p>Los paneles consultan relaciones existentes antes de habilitar acciones destructivas. El ejemplo del documento está presente en <code>TipoDocumentoPanel.jsx</code>:</p>
+
+  <pre>const estaAsociado = (id) =&gt;
+  personas.some(
+    (persona) =&gt; persona.td_id === id || persona.tipoDocumentoId === id
+  );
+
+&lt;button
+  disabled={
+    !hasPermission(currentUserRole, "eliminar") || estaAsociado(td.id)
+  }
+  title={
+    estaAsociado(td.id)
+      ? "No se puede eliminar: tiene personas asociadas"
+      : "Eliminar Tipo de Doc."
+  }
+&gt;
+  Eliminar
+&lt;/button&gt;</pre>
+
+  <p>También se observan controles equivalentes en sedes, aulas, comisiones, asignaturas y otros paneles.</p>
+
+  <div class="warning">
+    La prevención visual evita peticiones innecesarias, pero la base de datos y el backend deben conservar sus restricciones. El frontend nunca debe ser la única defensa de integridad.
+  </div>
+
+  <h2>6. RBAC y sesión en frontend</h2>
+  <p><span class="tag partial">PARCIAL / DEMOSTRATIVO</span></p>
+
+  <h3>Matriz centralizada</h3>
+  <p><code>authHelper.js</code> define:</p>
+  <pre>ROLE_ADMIN:      ["crear", "editar", "eliminar", "leer"]
+ROLE_INSTRUCTOR: ["editar_notas", "leer"]
+ROLE_USER:       ["leer"]</pre>
+
+  <h3>Distribución del rol</h3>
+  <ul>
+    <li><code>AuthContext.jsx</code> guarda el token en <code>sessionStorage</code>.</li>
+    <li><code>auth.js</code> decodifica el payload y normaliza distintos nombres de claim.</li>
+    <li><code>Navbar.jsx</code> entrega <code>currentUserRole</code> a <code>DesktopNav</code> y <code>MobileDrawer</code>.</li>
+    <li>Los paneles usan <code>hasPermission()</code> para ocultar altas o deshabilitar edición/eliminación.</li>
+  </ul>
+
+  <h3>Menús</h3>
+  <p>El escritorio y el drawer móvil aplican el mismo criterio. Las opciones de lectura se muestran a los tres roles; las opciones de creación se muestran al administrador.</p>
+
+  <h3>Limitaciones detectadas</h3>
+  <ul>
+    <li>El login asigna roles según si el texto del usuario contiene “admin” o “instructor”.</li>
+    <li>El token utiliza una firma simulada: <code>mock_signature_key</code>.</li>
+    <li>Los permisos son genéricos y no distinguen recursos.</li>
+    <li>Las rutas declaradas en <code>App.jsx</code> no están envueltas en una guarda central.</li>
+    <li>El backend Flask no valida este token ni estos permisos.</li>
+    <li><code>sessionStorage</code> puede manipularse desde el navegador.</li>
+  </ul>
+
+  <div class="warning">
+    La frase “asegura que un usuario no pueda realizar operaciones de escritura” debe matizarse: lo evita desde los controles visibles del frontend, pero no impide una llamada directa a la API.
+  </div>
+
+  <h2 class="page">7. Code-splitting y optimización de build</h2>
+  <p><span class="tag done">IMPLEMENTADO Y VERIFICADO</span></p>
+  <p>El commit <code>58dcc3e</code> modifica únicamente <code>App.jsx</code> y <code>vite.config.js</code>.</p>
+
+  <h3>App.jsx</h3>
+  <ul>
+    <li>Mantiene el Login como importación estática.</li>
+    <li>Convierte las páginas administrativas en importaciones dinámicas con <code>lazy()</code>.</li>
+    <li>Envuelve las rutas con <code>Suspense</code>.</li>
+    <li>Muestra “Cargando sección...” mientras llega el chunk.</li>
+  </ul>
+
+  <pre>import { lazy, Suspense } from "react";
+
+const Legajos = lazy(() =&gt; import("./pages/Legajos"));
+const Personas = lazy(() =&gt; import("./pages/Personas"));
+const Planes = lazy(() =&gt; import("./pages/Planes"));
+
+&lt;Suspense fallback={&lt;div&gt;Cargando sección...&lt;/div&gt;}&gt;
+  &lt;Routes&gt;...&lt;/Routes&gt;
+&lt;/Suspense&gt;</pre>
+
+  <h3>vite.config.js</h3>
+  <ul>
+    <li>Configura <code>codeSplitting: true</code>.</li>
+    <li>Agrupa dependencias React en <code>vendor-react</code>.</li>
+    <li>Agrupa las demás dependencias en <code>vendor-helpers</code>.</li>
+    <li>Configura el umbral de advertencia en 600 kB.</li>
+  </ul>
+
+  <pre>manualChunks(id) {
+  if (id.includes("node_modules")) {
+    if (id.includes("react")) return "vendor-react";
+    return "vendor-helpers";
+  }
+}</pre>
+
+  <h2 class="page">8. Resultado actual de producción</h2>
+  <p>Se ejecutó directamente Vite 8.1.0 sobre el estado actual de la rama. La compilación finalizó correctamente:</p>
+  <pre>vite v8.1.0 building client environment for production...
+233 modules transformed.
+✓ built in 1.96s</pre>
+
+  <table>
+    <thead><tr><th>Recurso</th><th>Tamaño</th><th>Gzip</th></tr></thead>
+    <tbody>
+      <tr><td>index JS</td><td>14,39 kB</td><td>4,49 kB</td></tr>
+      <tr><td>vendor-react</td><td>251,90 kB</td><td>80,97 kB</td></tr>
+      <tr><td>vendor-helpers</td><td>5,80 kB</td><td>2,73 kB</td></tr>
+      <tr><td>CSS principal</td><td>38,28 kB</td><td>7,36 kB</td></tr>
+      <tr><td>ConfigDocumentos</td><td>75,16 kB</td><td>10,80 kB</td></tr>
+      <tr><td>AltaPlanWizard</td><td>15,50 kB</td><td>4,20 kB</td></tr>
+      <tr><td>AltaPersonaWizard</td><td>12,75 kB</td><td>3,86 kB</td></tr>
+      <tr><td>Personas</td><td>8,11 kB</td><td>2,63 kB</td></tr>
+      <tr><td>Comisiones</td><td>7,35 kB</td><td>2,36 kB</td></tr>
+      <tr><td>Aulas</td><td>9,13 kB</td><td>2,87 kB</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Comparación con el texto entregado</h3>
+  <table>
+    <thead><tr><th>Afirmación</th><th>Estado</th><th>Observación</th></tr></thead>
+    <tbody>
+      <tr><td>Index reducido a 14,39 kB</td><td>Confirmada</td><td>Coincide con el build actual.</td></tr>
+      <tr><td>vendor-react de 251,90 kB</td><td>Confirmada</td><td>Coincide con el build actual.</td></tr>
+      <tr><td>Chunks de pantallas independientes</td><td>Confirmada</td><td>Se generan numerosos archivos bajo demanda.</td></tr>
+      <tr><td>Sin advertencias de tamaño</td><td>Confirmada</td><td>No aparecieron advertencias.</td></tr>
+      <tr><td>Build de 1,34 s</td><td>Histórica</td><td>La medición actual fue 1,96 s; varía según equipo y caché.</td></tr>
+      <tr><td>Reducción del 97,6%</td><td>Consistente</td><td>Comparar 622,20 kB con 14,39 kB da aproximadamente 97,7% para el archivo de entrada; no equivale a reducir en igual proporción todos los bytes iniciales porque también se carga vendor-react.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="page">9. Organización y mantenibilidad adicional</h2>
+  <p>Además de los puntos explícitos del documento, la rama realizó un refactor estructural amplio:</p>
+  <ul>
+    <li>Separó páginas extensas en componentes pequeños por dominio.</li>
+    <li>Extrajo lógica compleja a hooks especializados.</li>
+    <li>Creó componentes de formularios, tablas, modales y secciones de edición.</li>
+    <li>Separó la navegación de escritorio y móvil.</li>
+    <li>Centralizó helpers de formularios y wizards.</li>
+  </ul>
+
+  <h3>Hooks incorporados</h3>
+  <div class="files">
+    <ul>
+      <li>useAltaComisionWizard.js</li>
+      <li>useAltaPersonaWizard.js</li>
+      <li>useAltaPlanWizard.js</li>
+      <li>useAutoridadesComision.js</li>
+      <li>useComisionesAsignaturas.js</li>
+      <li>useConfigDocumentos.js</li>
+      <li>useContactos.js</li>
+      <li>useDatosMedicos.js</li>
+      <li>useEditarComision.js</li>
+      <li>useEditarPersona.js</li>
+      <li>useEditarPlan.js</li>
+      <li>useNuevoLegajo.js</li>
+    </ul>
+  </div>
+
+  <h3>Áreas componentizadas</h3>
+  <div class="files">
+    <ul>
+      <li>AltaComision</li>
+      <li>AltaPersona</li>
+      <li>AltaPlan</li>
+      <li>Asignaturas</li>
+      <li>Aulas</li>
+      <li>AutoridadesComision</li>
+      <li>ComisionesAsignaturas</li>
+      <li>ConfigDocumentos</li>
+      <li>Contactos</li>
+      <li>DatosMedicos</li>
+      <li>EditarComision</li>
+      <li>EditarPersona</li>
+      <li>EditarPlan</li>
+      <li>Legajos</li>
+      <li>LegajoRangos</li>
+      <li>LegajoSedes</li>
+      <li>Personas</li>
+      <li>Planes</li>
+      <li>PlanesAsignaturas</li>
+      <li>Sedes</li>
+      <li>TiposDocumentos</li>
+      <li>TiposSedes</li>
+      <li>VerComision</li>
+      <li>VerPlan</li>
+    </ul>
+  </div>
+
+  <h2>10. Qué está pendiente</h2>
+  <p><span class="tag future">SIGUIENTE ETAPA</span></p>
+  <ul>
+    <li>Reemplazar el JWT simulado por un token emitido por el servicio de autenticación.</li>
+    <li>Definir permisos por recurso: <code>personas.leer</code>, <code>planes.crear</code>, etc.</li>
+    <li>Agregar guardas centralizadas a las rutas React.</li>
+    <li>Validar token y permisos en cada endpoint Flask.</li>
+    <li>Agregar pruebas automatizadas para la matriz de permisos.</li>
+    <li>Revisar componentes duplicados de etapas sucesivas del refactor.</li>
+    <li>Medir rendimiento en navegador, no solamente tamaño de archivos.</li>
+  </ul>
+
+  <h2 class="page">11. Archivos clave para presentar o reproducir</h2>
+  <table>
+    <thead><tr><th>Tema</th><th>Archivos principales</th></tr></thead>
+    <tbody>
+      <tr><td>Stack</td><td>package.json, vite.config.js, index.css</td></tr>
+      <tr><td>Tabla genérica</td><td>TablaPrincipal.jsx, filtroGlobal.jsx, filtroTablas.jsx</td></tr>
+      <tr><td>Wizards</td><td>AltaPersonaWizard.jsx, AltaPlanWizard.jsx, AltaComisionWizard.jsx, sus hooks y componentes Step/Paso</td></tr>
+      <tr><td>Integridad</td><td>TipoDocumentoPanel.jsx y demás paneles de configuración</td></tr>
+      <tr><td>RBAC</td><td>authHelper.js, auth.js, AuthContext.jsx, Login.jsx</td></tr>
+      <tr><td>Menús</td><td>Navbar.jsx, DesktopNav.jsx, MobileDrawer.jsx</td></tr>
+      <tr><td>Code-splitting</td><td>App.jsx y vite.config.js</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12. Conclusión</h2>
+  <p>La rama implementa materialmente los ejes técnicos descritos: componentización, tabla reutilizable, wizards progresivos, controles preventivos, RBAC visual y code-splitting. El resultado de build es reproducible y mantiene el bundle de entrada en 14,39 kB.</p>
+  <p>La principal precisión necesaria para una presentación es separar <strong>control visual de permisos</strong> de <strong>seguridad real</strong>. La rama evita acciones desde la interfaz, pero aún requiere autenticación y autorización verificadas por el backend.</p>
+
+  <div class="success">
+    <strong>Resultado general:</strong> el documento entregado representa correctamente la dirección del trabajo. Este informe ajusta las métricas al build actual y documenta las limitaciones que deben declararse con claridad.
+  </div>
+
+  <p class="small">Informe generado mediante inspección de Git, lectura del código fuente y compilación local. No se modificaron archivos funcionales del frontend.</p>
+</body>
+</html>

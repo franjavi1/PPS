@@ -20,6 +20,7 @@ import { planService } from "../services/planesService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { rangoService } from "../services/rangoService";
 import { sedeService } from "../services/sedeService";
+import { useAuth } from "../context/AuthContext";
 
 const formularioInicial = {
   asignatura_id: "",
@@ -35,6 +36,8 @@ const formularioInicial = {
 };
 
 function PlanesAsignaturas() {
+  const { currentUserRole } = useAuth();
+  const esAdministrador = currentUserRole === "ROLE_ADMIN";
   const [registros, setRegistros] = useState([]);
   const [asignaturas, setAsignaturas] = useState([]);
   const [planes, setPlanes] = useState([]);
@@ -176,7 +179,7 @@ function PlanesAsignaturas() {
   }
 
   async function eliminarRegistro(id) {
-    const confirmar = confirm("Seguro que queres eliminar este plan asignatura?");
+    const confirmar = confirm("Seguro que queres quitar esta asignatura del plan?");
 
     if (!confirmar) {
       return;
@@ -184,10 +187,10 @@ function PlanesAsignaturas() {
 
     try {
       const respuesta = await planAsignaturaService.eliminar(id);
-      alert(respuesta.message || "Plan asignatura eliminado correctamente");
+      alert(respuesta.message || "Asignatura quitada del plan correctamente");
       await cargarDatos();
     } catch (err) {
-      setError(err.message || "No se pudo eliminar el plan asignatura");
+      setError(err.message || "No se pudo quitar la asignatura del plan");
     }
   }
 
@@ -240,7 +243,9 @@ function PlanesAsignaturas() {
 
               <button
                 onClick={abrirNuevoRegistro}
-                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
+                disabled={!esAdministrador}
+                title={esAdministrador ? "Agregar una asignatura a un plan" : "Solo los administradores pueden agregar asignaturas"}
+                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-700"
               >
                 <PlusCircle size={22} />
                 Nuevo registro
@@ -294,8 +299,8 @@ function PlanesAsignaturas() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
-                    <BotonAccion onClick={() => editarRegistro(registro)} tipo="editar" />
-                    <BotonAccion onClick={() => eliminarRegistro(registro.id)} tipo="eliminar" />
+                    <BotonAccion onClick={() => editarRegistro(registro)} tipo="editar" disabled={!esAdministrador} />
+                    <BotonAccion onClick={() => eliminarRegistro(registro.id)} tipo="quitar" disabled={!esAdministrador} />
                   </div>
                 </article>
               ))
@@ -336,8 +341,8 @@ function PlanesAsignaturas() {
                       <Td>{registro.modalidad}</Td>
                       <Td>
                         <div className="flex items-center gap-4">
-                          <BotonAccion onClick={() => editarRegistro(registro)} tipo="editar" />
-                          <BotonAccion onClick={() => eliminarRegistro(registro.id)} tipo="eliminar" />
+                          <BotonAccion onClick={() => editarRegistro(registro)} tipo="editar" disabled={!esAdministrador} />
+                          <BotonAccion onClick={() => eliminarRegistro(registro.id)} tipo="quitar" disabled={!esAdministrador} />
                         </div>
                       </Td>
                     </tr>
@@ -562,20 +567,28 @@ function CampoSelect({ label, icon, children, ...props }) {
   );
 }
 
-function BotonAccion({ onClick, tipo }) {
+function BotonAccion({ onClick, tipo, disabled = false }) {
   const esEditar = tipo === "editar";
 
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
+      title={
+        disabled
+          ? "Solo los administradores pueden realizar esta acción"
+          : esEditar
+          ? "Editar relación"
+          : "Quitar asignatura del plan"
+      }
       className={`flex items-center gap-1 font-semibold ${
         esEditar
           ? "text-blue-600 hover:text-blue-800"
           : "text-red-600 hover:text-red-800"
-      }`}
+      } disabled:opacity-40 disabled:cursor-not-allowed`}
     >
       {esEditar ? <Pencil size={18} /> : <Trash2 size={18} />}
-      {esEditar ? "Editar" : "Eliminar"}
+      {esEditar ? "Editar" : "Quitar del plan"}
     </button>
   );
 }

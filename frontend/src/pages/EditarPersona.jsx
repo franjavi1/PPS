@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { ArrowLeft, ChevronDown, FileText, HeartPulse, IdCard, Mail, MapPinned, Phone, Save, User } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronDown,
+  FileText,
+  HeartPulse,
+  IdCard,
+  Mail,
+  MapPinned,
+  Phone,
+  Save,
+  User,
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
 import { contactosService } from "../services/contactosService";
@@ -39,7 +50,7 @@ const contactosInicial = {
   celular: "",
 };
 
-function EditarPersona() {
+function EditarPersona({ soloLectura = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [persona, setPersona] = useState(personaInicial);
@@ -215,12 +226,21 @@ function EditarPersona() {
   async function guardarCambios(e) {
     e.preventDefault();
 
-    if (!persona.td_id || !persona.numero_doc || !persona.nombre.trim() || !persona.apellido.trim()) {
+    if (
+      !persona.td_id ||
+      !persona.numero_doc ||
+      !persona.nombre.trim() ||
+      !persona.apellido.trim()
+    ) {
       setError("Completa tipo de documento, numero, nombre y apellido.");
       return;
     }
 
-    if ((rango.rangos_institucionales_id || sede.sede_id) && !legajo.numero.trim() && !ids.legajoId) {
+    if (
+      (rango.rangos_institucionales_id || sede.sede_id) &&
+      !legajo.numero.trim() &&
+      !ids.legajoId
+    ) {
       setError("Para asignar rango o sede primero carga un numero de legajo.");
       return;
     }
@@ -369,10 +389,11 @@ function EditarPersona() {
               </div>
               <div>
                 <p className="text-sm font-bold text-red-700 uppercase">
-                  Edicion
+                  {soloLectura ? "Consulta" : "Edición"}
                 </p>
+
                 <h1 className="text-3xl font-extrabold text-slate-800 mt-1">
-                  Editar persona
+                  {soloLectura ? "Ver persona" : "Editar persona"}
                 </h1>
                 <p className="text-slate-500 mt-2">
                   Modifica persona, legajo, datos medicos, rango y sede.
@@ -414,6 +435,7 @@ function EditarPersona() {
                 titulo="Datos personales"
                 abierta={seccionAbierta === "persona"}
                 onToggle={setSeccionAbierta}
+                soloLectura={soloLectura}
               >
                 <CampoSelect
                   label="Tipo de documento"
@@ -453,6 +475,7 @@ function EditarPersona() {
                 titulo="Legajo"
                 abierta={seccionAbierta === "legajo"}
                 onToggle={setSeccionAbierta}
+                soloLectura={soloLectura}
               >
                 <CampoTexto
                   label="Numero de legajo"
@@ -469,6 +492,7 @@ function EditarPersona() {
                 titulo="Datos medicos"
                 abierta={seccionAbierta === "datos-medicos"}
                 onToggle={setSeccionAbierta}
+                soloLectura={soloLectura}
               >
                 <CampoSelectSimple
                   label="Grupo sanguineo"
@@ -505,6 +529,7 @@ function EditarPersona() {
                 titulo="Contactos"
                 abierta={seccionAbierta === "contactos"}
                 onToggle={setSeccionAbierta}
+                soloLectura={soloLectura}
               >
                 <CampoTexto
                   label="Email"
@@ -531,6 +556,7 @@ function EditarPersona() {
                 titulo="Rango y sede"
                 abierta={seccionAbierta === "rango-sede"}
                 onToggle={setSeccionAbierta}
+                soloLectura={soloLectura}
               >
                 <CampoSelect
                   label="Rango"
@@ -538,7 +564,9 @@ function EditarPersona() {
                   value={rango.rangos_institucionales_id}
                   onChange={cambiarRango}
                   opciones={rangos}
-                  getLabel={(item) => `${item.descripcion} - Nivel ${item.nivel_jerarquia}`}
+                  getLabel={(item) =>
+                    `${item.descripcion} - Nivel ${item.nivel_jerarquia}`
+                  }
                 />
                 <CampoSelect
                   label="Sede"
@@ -570,15 +598,17 @@ function EditarPersona() {
                 >
                   Cancelar
                 </button>
+                {!soloLectura && (
+                  <button
+                    type="submit"
+                    disabled={guardando}
+                    className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                  >
+                    <Save size={22} />
 
-                <button
-                  type="submit"
-                  disabled={guardando}
-                  className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
-                >
-                  <Save size={22} />
-                  {guardando ? "Guardando..." : "Guardar cambios"}
-                </button>
+                    {guardando ? "Guardando..." : "Guardar cambios"}
+                  </button>
+                )}
               </div>
             </form>
           )}
@@ -588,7 +618,15 @@ function EditarPersona() {
   );
 }
 
-function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
+function Seccion({
+  id,
+  icono,
+  titulo,
+  abierta,
+  onToggle,
+  soloLectura,
+  children,
+}) {
   return (
     <section className="border border-slate-200 rounded-xl overflow-hidden">
       <button
@@ -600,9 +638,7 @@ function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
           <div className="w-11 h-11 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
             {icono}
           </div>
-          <h2 className="text-xl font-extrabold text-slate-800">
-            {titulo}
-          </h2>
+          <h2 className="text-xl font-extrabold text-slate-800">{titulo}</h2>
         </div>
         <ChevronDown
           size={22}
@@ -611,15 +647,26 @@ function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
       </button>
 
       {abierta && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 border-t border-slate-200 p-5">
+        <fieldset
+          disabled={soloLectura}
+          className="grid grid-cols-1 md:grid-cols-2 gap-5 border-t border-slate-200 p-5"
+        >
           {children}
-        </div>
+        </fieldset>
       )}
     </section>
   );
 }
 
-function CampoTexto({ label, name, value, onChange, placeholder, type = "text", icono }) {
+function CampoTexto({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  icono,
+}) {
   return (
     <div>
       <label className="block text-sm font-bold text-slate-700 mb-2">
@@ -772,7 +819,9 @@ function obtenerTipoContacto(tiposContacto, nombre) {
   const nombreNormalizado = normalizarTexto(nombre);
 
   return tiposContacto.find((tipo) => {
-    const tipoNormalizado = normalizarTexto(tipo.tipo || tipo.descripcion || "");
+    const tipoNormalizado = normalizarTexto(
+      tipo.tipo || tipo.descripcion || "",
+    );
     return tipoNormalizado === nombreNormalizado;
   });
 }

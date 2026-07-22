@@ -12,6 +12,7 @@ import {
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
+import { useAuth } from "../context/AuthContext";
 
 const formularioInicial = {
   nombre: "",
@@ -19,6 +20,8 @@ const formularioInicial = {
 };
 
 function Asignaturas() {
+  const { currentUserRole } = useAuth();
+  const esAdministrador = currentUserRole === "ROLE_ADMIN";
   const [asignaturas, setAsignaturas] = useState([]);
   const [planAsignaturas, setPlanAsignaturas] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -136,11 +139,11 @@ function Asignaturas() {
 
   async function eliminarAsignatura(id) {
     if (asignaturaEstaEnPlan(id)) {
-      setError("No se puede eliminar una asignatura asociada a un plan");
+      setError("No se puede dar de baja una asignatura asociada a un plan");
       return;
     }
 
-    const confirmar = confirm("Seguro que queres eliminar esta asignatura?");
+    const confirmar = confirm("Seguro que queres dar de baja esta asignatura?");
 
     if (!confirmar) {
       return;
@@ -148,10 +151,10 @@ function Asignaturas() {
 
     try {
       const respuesta = await asignaturaService.eliminar(id);
-      alert(respuesta.message || "Asignatura eliminada correctamente");
+      alert(respuesta.message || "Asignatura dada de baja correctamente");
       await cargarAsignaturas();
     } catch (err) {
-      setError(err.message || "No se pudo eliminar la asignatura");
+      setError(err.message || "No se pudo dar de baja la asignatura");
     }
   }
 
@@ -271,7 +274,9 @@ function Asignaturas() {
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => editarAsignatura(asignatura)}
-                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                      disabled={!esAdministrador}
+                      title={esAdministrador ? "Editar asignatura" : "Solo los administradores pueden editar"}
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
                       <Pencil size={16} />
                       Editar
@@ -279,16 +284,18 @@ function Asignaturas() {
 
                     <button
                       onClick={() => eliminarAsignatura(asignatura.id)}
-                      disabled={asignaturaEstaEnPlan(asignatura.id)}
+                      disabled={!esAdministrador || asignaturaEstaEnPlan(asignatura.id)}
                       title={
-                        asignaturaEstaEnPlan(asignatura.id)
-                          ? "No se puede eliminar una asignatura asociada a un plan"
-                          : "Eliminar asignatura"
+                        !esAdministrador
+                          ? "Solo los administradores pueden dar de baja"
+                          : asignaturaEstaEnPlan(asignatura.id)
+                          ? "No se puede dar de baja una asignatura asociada a un plan"
+                          : "Dar de baja asignatura"
                       }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
                       <Trash2 size={16} />
-                      Eliminar
+                      Dar de baja
                     </button>
                   </div>
                 </article>
@@ -334,7 +341,9 @@ function Asignaturas() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarAsignatura(asignatura)}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
+                            disabled={!esAdministrador}
+                            title={esAdministrador ? "Editar asignatura" : "Solo los administradores pueden editar"}
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Pencil size={18} />
                             Editar
@@ -342,16 +351,18 @@ function Asignaturas() {
 
                           <button
                             onClick={() => eliminarAsignatura(asignatura.id)}
-                            disabled={asignaturaEstaEnPlan(asignatura.id)}
+                            disabled={!esAdministrador || asignaturaEstaEnPlan(asignatura.id)}
                             title={
-                              asignaturaEstaEnPlan(asignatura.id)
-                                ? "No se puede eliminar una asignatura asociada a un plan"
-                                : "Eliminar asignatura"
+                              !esAdministrador
+                                ? "Solo los administradores pueden dar de baja"
+                                : asignaturaEstaEnPlan(asignatura.id)
+                                ? "No se puede dar de baja una asignatura asociada a un plan"
+                                : "Dar de baja asignatura"
                             }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Trash2 size={18} />
-                            Eliminar
+                            Dar de baja
                           </button>
                         </div>
                       </td>

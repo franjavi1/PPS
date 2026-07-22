@@ -25,6 +25,7 @@ import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
+import { modalidadService } from "../services/modalidadService";
 
 const comisionInicial = {
   descripcion: "",
@@ -62,6 +63,7 @@ function EditarComision() {
   const [aulas, setAulas] = useState([]);
   const [tiposAutoridad, setTiposAutoridad] = useState([]);
   const [legajos, setLegajos] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
@@ -88,6 +90,7 @@ function EditarComision() {
         resAulas,
         resTiposAutoridad,
         resLegajos,
+        resModalidades,
       ] = await Promise.all([
         comisionService.obtenerPorId(id),
         comisionAsignaturaService.obtenerTodos(),
@@ -99,6 +102,7 @@ function EditarComision() {
         aulaService.obtenerTodas(),
         tipoAutoridadService.obtenerTodos(),
         apiRequest("/legajos"),
+        modalidadService.obtenerTodas(),
       ]);
 
       const comisionesDeEsta = obtenerLista(resComisionesAsignaturas).filter(
@@ -124,6 +128,7 @@ function EditarComision() {
       setAulas(obtenerLista(resAulas));
       setTiposAutoridad(obtenerLista(resTiposAutoridad));
       setLegajos(obtenerLista(resLegajos));
+      setModalidades(obtenerLista(resModalidades));
     } catch (err) {
       setError(obtenerMensajeError(err));
     } finally {
@@ -435,14 +440,14 @@ function EditarComision() {
                       maxLength={45}
                       icono={<Tag size={20} />}
                     />
-                    <CampoTexto
+                    <CampoSelect
                       label="Modalidad"
                       name="modalidad"
                       value={nuevaComisionAsignatura.modalidad}
                       onChange={cambiarNuevaComisionAsignatura}
-                      placeholder="Ej: Presencial"
-                      maxLength={45}
-                      icono={<BookOpenCheck size={20} />}
+                      opciones={modalidades}
+                      getValue={(item) => item.descripcion}
+                      getLabel={(item) => item.descripcion}
                     />
                     <CampoTexto
                       label="Cupo maximo"
