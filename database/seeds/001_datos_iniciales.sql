@@ -58,7 +58,7 @@ INSERT INTO public.tipos_sedes (id, descripcion, "usuarioAccion", "tsCreacion", 
 INSERT INTO public.sedes (id, "tipoSedeId", nombre, direccion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 'Sede Central', 'Brandsen 567', 1, 1, '2026-07-05 04:53:47.672499', '2026-07-06 05:15:48.584695');
 INSERT INTO public.sedes (id, "tipoSedeId", nombre, direccion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 1, 'Bomberos Voluntarios De Nueva Pompeya Y Barracas Sur', 'Iriarte 3520', 1, 1, '2026-07-06 05:17:12.852419', '2026-07-06 05:17:12.852419');
 INSERT INTO public.sedes (id, "tipoSedeId", nombre, direccion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 1, 'Bomberos Voluntarios De San Telmo', 'Balcarce 1249', 1, 1, '2026-07-06 05:17:49.690638', '2026-07-06 05:17:49.690638');
-INSERT INTO public.sedes (id, "tipoSedeId", nombre, direccion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 1, 'Bomberos Voluntarios De Villa Soldati', 'Tabaré 3294', 1, 1, '2026-07-06 05:18:13.104928', '2026-07-06 05:18:55.027141');
+INSERT INTO public.sedes (id, "tipoSedeId", nombre, direccion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 1, 'Bomberos Voluntarios De Villa Soldati', 'Tabare 3294', 1, 1, '2026-07-06 05:18:13.104928', '2026-07-06 05:18:55.027141');
 INSERT INTO public.sedes (id, "tipoSedeId", nombre, direccion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 1, 'Bomberos Voluntarios De Vuelta De Rocha', 'Garibaldi 2042/48', 1, 1, '2026-07-06 05:20:02.382749', '2026-07-06 05:20:02.382749');
 
 
@@ -83,10 +83,10 @@ INSERT INTO public."Comision" ("idComision", "Descripcion", "usuarioAccion", "ts
 -- Data for Name: asignaturas; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Atención Prehospitalaria', 1, 'Practica', 1, '2026-07-06 05:32:15.662127', '2026-07-06 05:32:15.662127');
+INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Atencion Prehospitalaria', 1, 'Practica', 1, '2026-07-06 05:32:15.662127', '2026-07-06 05:32:15.662127');
 INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Rescate', 1, 'Practica', 1, '2026-07-06 05:32:35.815778', '2026-07-06 05:32:35.815778');
 INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 'Comunicaciones', 1, 'Taller', 1, '2026-07-06 05:33:04.714313', '2026-07-06 05:33:04.714313');
-INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 'Vehículos De Emergencia', 1, 'Teorica', 1, '2026-07-06 05:33:25.680854', '2026-07-06 05:33:25.680854');
+INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 'Vehiculos De Emergencia', 1, 'Teorica', 1, '2026-07-06 05:33:25.680854', '2026-07-06 05:33:25.680854');
 INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Materiales Peligrosos I', 1, 'Teorica', 1, '2026-07-06 05:31:50.630877', '2026-07-07 04:55:28.395505');
 INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (37, 'Materiales Peligrosos 2', 1, 'Teorica', 1, '2026-07-07 04:56:41.889887', '2026-07-07 04:56:41.889887');
 
@@ -115,9 +115,9 @@ INSERT INTO public."Modalidades" ("descripcion", "usuarioAccion", "tsCreacion", 
 -- Data for Name: planes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
---INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 2026001, 'Plan De Formacion Inicial Bombero', 'Plan basico para aspirantes a bombero voluntario.', '2026-01-02 00:00:00', '2030-12-06 00:00:00', 1, 1, '2026-07-07 01:34:54.086585', '2026-07-07 01:34:54.086585');
---INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 2, 202602, 'Plan De Capacitacion Continua', 'Capacitacion anual para personal activo del cuerpo.', '2026-04-01 00:00:00', '2030-12-06 00:00:00', 1, 1, '2026-07-07 01:35:54.436147', '2026-07-07 01:35:54.436147');
---INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 2026001, 'Plan De Especializacion En Rescate', 'Formacion orientada a tecnicas de rescate urbano y vehicular.', '2026-02-06 00:00:00', '2027-09-23 00:00:00', 1, 1, '2026-07-07 01:36:55.233854', '2026-07-07 01:36:55.233854');
+INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 2026001, 'Plan De Formacion Inicial Bombero', 'Plan basico para aspirantes a bombero voluntario.', '2026-01-02 00:00:00', '2030-12-06 00:00:00', 1, 1, '2026-07-07 01:34:54.086585', '2026-07-07 01:34:54.086585');
+INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 2, 202602, 'Plan De Capacitacion Continua', 'Capacitacion anual para personal activo del cuerpo.', '2026-04-01 00:00:00', '2030-12-06 00:00:00', 1, 1, '2026-07-07 01:35:54.436147', '2026-07-07 01:35:54.436147');
+INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 2026001, 'Plan De Especializacion En Rescate', 'Formacion orientada a tecnicas de rescate urbano y vehicular.', '2026-02-06 00:00:00', '2027-09-23 00:00:00', 1, 1, '2026-07-07 01:36:55.233854', '2026-07-07 01:36:55.233854');
 
 
 --
