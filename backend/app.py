@@ -12,6 +12,7 @@ from models.asignaturas import Asignaturas
 from models.tipo_sede import TipoSede
 from models.sedes import Sedes
 from models.comision import Comision
+from models.modalidades import Modalidades
 from models.comision_asignatura import ComisionAsignatura
 from models.autoridad_comision import AutoridadComision
 from models.aula import Aula

@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
+--\restrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
 
 -- Dumped from database version 16.14 (Debian 16.14-1.pgdg13+1)
 -- Dumped by pg_dump version 16.14 (Debian 16.14-1.pgdg13+1)
@@ -76,32 +76,40 @@ INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "
 INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 'Instructorado', 1, '2026-07-07 01:12:44.38481', '2026-07-07 01:12:44.38481');
 INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (6, 'Reentrenamiento', 1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
 
+--
+-- Data for Name: Modalidades; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+INSERT INTO public."Modalidades" ("descripcion", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Presencial',1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
+INSERT INTO public."Modalidades" ("descripcion", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Virtual',1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
+INSERT INTO public."Modalidades" ("descripcion", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Hibrida',1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
+
 
 --
 -- Data for Name: planes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 2026001, 'Plan De Formacion Inicial Bombero', 'Plan basico para aspirantes a bombero voluntario.', '2026-01-02 00:00:00', '2030-12-06 00:00:00', 1, 1, '2026-07-07 01:34:54.086585', '2026-07-07 01:34:54.086585');
-INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 2, 202602, 'Plan De Capacitacion Continua', 'Capacitacion anual para personal activo del cuerpo.', '2026-04-01 00:00:00', '2030-12-06 00:00:00', 1, 1, '2026-07-07 01:35:54.436147', '2026-07-07 01:35:54.436147');
-INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 2026001, 'Plan De Especializacion En Rescate', 'Formacion orientada a tecnicas de rescate urbano y vehicular.', '2026-02-06 00:00:00', '2027-09-23 00:00:00', 1, 1, '2026-07-07 01:36:55.233854', '2026-07-07 01:36:55.233854');
+--INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 2026001, 'Plan De Formacion Inicial Bombero', 'Plan basico para aspirantes a bombero voluntario.', '2026-01-02 00:00:00', '2030-12-06 00:00:00', 1, 1, '2026-07-07 01:34:54.086585', '2026-07-07 01:34:54.086585');
+--INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 2, 202602, 'Plan De Capacitacion Continua', 'Capacitacion anual para personal activo del cuerpo.', '2026-04-01 00:00:00', '2030-12-06 00:00:00', 1, 1, '2026-07-07 01:35:54.436147', '2026-07-07 01:35:54.436147');
+--INSERT INTO public.planes (id, "tipoPlanesIdTipoPlanes", "ResolucionMinisterial", nombre, descrip, "vigenciaDde", "vigenciaHta", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 2026001, 'Plan De Especializacion En Rescate', 'Formacion orientada a tecnicas de rescate urbano y vehicular.', '2026-02-06 00:00:00', '2027-09-23 00:00:00', 1, 1, '2026-07-07 01:36:55.233854', '2026-07-07 01:36:55.233854');
 
 
 --
 -- Data for Name: PlanAsignaturas; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."PlanAsignaturas" (id, "asignaturaId", "planId", "rangoMinimoId", "sedesId", "presentismoPorc", "regularizacionProm", "finalAprobacion", duracion, regimen, modalidad, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 1, 4, 1, 80, 7, 6, 64, 'Cuatrimestral', 'Presencial', 1, 1, '2026-07-07 01:54:11.13216', '2026-07-07 01:54:11.13216');
-INSERT INTO public."PlanAsignaturas" (id, "asignaturaId", "planId", "rangoMinimoId", "sedesId", "presentismoPorc", "regularizacionProm", "finalAprobacion", duracion, regimen, modalidad, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 2, 1, 1, 2, 70, 7, 7, 24, 'Cuatrimestral', 'Presencial', 1, 1, '2026-07-07 01:54:59.696223', '2026-07-07 01:54:59.696223');
-INSERT INTO public."PlanAsignaturas" (id, "asignaturaId", "planId", "rangoMinimoId", "sedesId", "presentismoPorc", "regularizacionProm", "finalAprobacion", duracion, regimen, modalidad, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 3, 3, 7, 4, 80, 7, 7, 24, 'Anual', 'Prensencial', 1, 1, '2026-07-07 01:55:37.954298', '2026-07-07 01:55:37.954298');
-INSERT INTO public."PlanAsignaturas" (id, "asignaturaId", "planId", "rangoMinimoId", "sedesId", "presentismoPorc", "regularizacionProm", "finalAprobacion", duracion, regimen, modalidad, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 37, 1, 1, 1, 80, 7, 7, 24, 'Cuatrimestral', 'Presencial', 1, 1, '2026-07-07 04:57:38.225115', '2026-07-07 04:57:38.225115');
+--INSERT INTO public."PlanAsignaturas" (id, "asignaturaId", "planId", "rangoMinimoId", "sedesId", "presentismoPorc", "regularizacionProm", "finalAprobacion", duracion, regimen, modalidad, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 1, 4, 1, 80, 7, 6, 64, 'Cuatrimestral', 'Presencial', 1, 1, '2026-07-07 01:54:11.13216', '2026-07-07 01:54:11.13216');
+--INSERT INTO public."PlanAsignaturas" (id, "asignaturaId", "planId", "rangoMinimoId", "sedesId", "presentismoPorc", "regularizacionProm", "finalAprobacion", duracion, regimen, modalidad, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 2, 1, 1, 2, 70, 7, 7, 24, 'Cuatrimestral', 'Presencial', 1, 1, '2026-07-07 01:54:59.696223', '2026-07-07 01:54:59.696223');
+--INSERT INTO public."PlanAsignaturas" (id, "asignaturaId", "planId", "rangoMinimoId", "sedesId", "presentismoPorc", "regularizacionProm", "finalAprobacion", duracion, regimen, modalidad, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 3, 3, 7, 4, 80, 7, 7, 24, 'Anual', 'Prensencial', 1, 1, '2026-07-07 01:55:37.954298', '2026-07-07 01:55:37.954298');
+--INSERT INTO public."PlanAsignaturas" (id, "asignaturaId", "planId", "rangoMinimoId", "sedesId", "presentismoPorc", "regularizacionProm", "finalAprobacion", duracion, regimen, modalidad, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 37, 1, 1, 1, 80, 7, 7, 24, 'Cuatrimestral', 'Presencial', 1, 1, '2026-07-07 04:57:38.225115', '2026-07-07 04:57:38.225115');
 
 
 --
 -- Data for Name: ComisionAsignatura; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."ComisionAsignatura" ("idComisionAsignatura", "planAsignaturasId", "aulaId", nombre, modalidad, "cupoMaximo", estado, "usuarioAccion", "tsCreacion", "tsModificacion", "idComision") VALUES (1, 1, 2, 'Comision Materiales Peligrosos', 'Virtual', 30, 'Activo', 1, '2026-07-07 03:05:50.902723', '2026-07-07 03:05:50.902723', 1);
-INSERT INTO public."ComisionAsignatura" ("idComisionAsignatura", "planAsignaturasId", "aulaId", nombre, modalidad, "cupoMaximo", estado, "usuarioAccion", "tsCreacion", "tsModificacion", "idComision") VALUES (2, 3, 1, 'Rescate', 'Presencial', 15, 'Activo', 1, '2026-07-07 03:06:33.337983', '2026-07-07 03:06:33.337983', 2);
+--INSERT INTO public."ComisionAsignatura" ("idComisionAsignatura", "planAsignaturasId", "aulaId", nombre, modalidad, "cupoMaximo", estado, "usuarioAccion", "tsCreacion", "tsModificacion", "idComision", "modalidadesid") VALUES (1, 1, 2, 'Comision Materiales Peligrosos', 'Virtual', 30, 'Activo', 1, '2026-07-07 03:05:50.902723', '2026-07-07 03:05:50.902723', 1,1);
+--INSERT INTO public."ComisionAsignatura" ("idComisionAsignatura", "planAsignaturasId", "aulaId", nombre, modalidad, "cupoMaximo", estado, "usuarioAccion", "tsCreacion", "tsModificacion", "idComision", "modalidadesid") VALUES (2, 3, 1, 'Rescate', 'Presencial', 15, 'Activo', 1, '2026-07-07 03:06:33.337983', '2026-07-07 03:06:33.337983', 2,1);
 
 
 --
@@ -143,7 +151,7 @@ INSERT INTO public.legajos (id, "personasId", numero, estado, "usuarioAccion", "
 -- Data for Name: AutoridadComision; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."AutoridadComision" (id, "tipoAutoridadId", "legajoId", "comisionId", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 3, 1, 1, '2026-07-07 03:30:21.387249', '2026-07-07 03:30:49.66783');
+--INSERT INTO public."AutoridadComision" (id, "tipoAutoridadId", "legajoId", "comisionId", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 3, 1, 1, '2026-07-07 03:30:21.387249', '2026-07-07 03:30:49.66783');
 
 
 --
@@ -215,7 +223,7 @@ INSERT INTO public."LegajoSedes" ("idSedeLegajo", "sedesId", "Legajo_id", "esAut
 -- Data for Name: PACorrelativas; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."PACorrelativas" (id, "asignaturaId", "paId", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 4, 1, '2026-07-07 04:58:02.644187', '2026-07-07 04:58:02.644187');
+--INSERT INTO public."PACorrelativas" (id, "asignaturaId", "paId", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 4, 1, '2026-07-07 04:58:02.644187', '2026-07-07 04:58:02.644187');
 
 
 --
@@ -235,21 +243,21 @@ SELECT pg_catalog.setval('public."Aulas_id_aula_seq"', 3, true);
 -- Name: AutoridadComision_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."AutoridadComision_id_seq"', 1, true);
+--SELECT pg_catalog.setval('public."AutoridadComision_id_seq"', 1, true);
 
 
 --
 -- Name: ComisionAsignatura_idComisionAsignatura_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."ComisionAsignatura_idComisionAsignatura_seq"', 2, true);
+--SELECT pg_catalog.setval('public."ComisionAsignatura_idComisionAsignatura_seq"', 2, true);
 
 
 --
 -- Name: Comision_idComision_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."Comision_idComision_seq"', 2, true);
+--SELECT pg_catalog.setval('public."Comision_idComision_seq"', 2, true);
 
 
 --
@@ -312,7 +320,7 @@ SELECT pg_catalog.setval('public.asignaturas_id_seq', 37, true);
 -- Name: comisiones_idComision_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."comisiones_idComision_seq"', 1, false);
+--SELECT pg_catalog.setval('public."comisiones_idComision_seq"', 1, false);
 
 
 --
@@ -382,5 +390,5 @@ SELECT pg_catalog.setval('public.tipos_sedes_id_seq', 1, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
+--\unrestrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
 
