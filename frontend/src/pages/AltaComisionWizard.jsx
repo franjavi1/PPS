@@ -1,8 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
+import {
+  ArrowLeft,
+  BookOpenCheck,
+  CheckCircle2,
+  GraduationCap,
+  Hash,
+  PlusCircle,
+  Save,
+  ShieldUser,
+  Tag,
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
-import { useAuth } from "../context/AuthContext";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
@@ -12,22 +22,32 @@ import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
-import StepAsignaturas from "../components/AltaComisionWizard/StepAsignaturas";
-import StepAutoridades from "../components/AltaComisionWizard/StepAutoridades";
-import StepResumen from "../components/AltaComisionWizard/StepResumen";
+
+const pasos = [
+  { id: 1, titulo: "Comision", icono: GraduationCap },
+  { id: 2, titulo: "Asignaturas", icono: BookOpenCheck },
+  { id: 3, titulo: "Autoridades", icono: ShieldUser },
+  { id: 4, titulo: "Resumen", icono: CheckCircle2 },
+];
 
 const comisionInicial = { descripcion: "" };
-const comisionAsignaturaInicial = { plan_asignaturas_id: "", aula_id: "", nombre: "", modalidad: "", cupo_maximo: "", estado: "Activo" };
-const autoridadInicial = { tipo_autoridad_id: "", legajo_id: "", comision_id: "" };
-const obtenerLista = (res) => (Array.isArray(res?.data) ? res.data : []);
+const comisionAsignaturaInicial = {
+  plan_asignaturas_id: "",
+  aula_id: "",
+  nombre: "",
+  modalidad: "",
+  cupo_maximo: "",
+  estado: "Activo",
+};
+const autoridadInicial = {
+  tipo_autoridad_id: "",
+  legajo_id: "",
+  comision_id: "",
+};
 
-export default function AltaComisionWizard() {
+function AltaComisionWizard() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const userRole = user?.role || "invitado";
-
-  // Control de paso actual del asistente
-  const [paso, setPaso] = useState(1);
+  const [pasoActual, setPasoActual] = useState(1);
   const [comisionId, setComisionId] = useState(null);
   const [comision, setComision] = useState(comisionInicial);
   const [comisionAsignatura, setComisionAsignatura] = useState(comisionAsignaturaInicial);
@@ -52,56 +72,88 @@ export default function AltaComisionWizard() {
   async function cargarCombos() {
     try {
       setCargando(true);
-      const [resPlanAsig, resAsig, resPlanes, resSedes, resAulas, resTipos, resLeg] = await Promise.all([
-        planAsignaturaService.obtenerTodos(), asignaturaService.obtenerTodas(), planService.obtenerTodos(),
-        sedeService.obtenerTodas(), aulaService.obtenerTodas(), tipoAutoridadService.obtenerTodos(), apiRequest("/legajos"),
+      const [
+        resPlanesAsignaturas,
+        resAsignaturas,
+        resPlanes,
+        resSedes,
+        resAulas,
+        resTiposAutoridad,
+        resLegajos,
+      ] = await Promise.all([
+        planAsignaturaService.obtenerTodos(),
+        asignaturaService.obtenerTodas(),
+        planService.obtenerTodos(),
+        sedeService.obtenerTodas(),
+        aulaService.obtenerTodas(),
+        tipoAutoridadService.obtenerTodos(),
+        apiRequest("/legajos"),
       ]);
-      setPlanesAsignaturas(obtenerLista(resPlanAsig));
-      setAsignaturas(obtenerLista(resAsig));
+
+      setPlanesAsignaturas(obtenerLista(resPlanesAsignaturas));
+      setAsignaturas(obtenerLista(resAsignaturas));
       setPlanes(obtenerLista(resPlanes));
       setSedes(obtenerLista(resSedes));
       setAulas(obtenerLista(resAulas));
-      setTiposAutoridad(obtenerLista(resTipos));
-      setLegajos(obtenerLista(resLeg));
-    } catch {
-      // Ignorar fallos silenciosamente
+      setTiposAutoridad(obtenerLista(resTiposAutoridad));
+      setLegajos(obtenerLista(resLegajos));
+    } catch (err) {
+      setError(err.message || "No se pudieron cargar los datos iniciales");
     } finally {
       setCargando(false);
     }
   }
 
   const mapas = useMemo(() => {
-    const labelPlanAsig = (pa) => {
-      const asig = asignaturas.find((x) => x.id === pa.asignatura_id);
-      const pl = planes.find((x) => x.id === pa.plan_id);
-      const se = sedes.find((x) => x.id === pa.sedes_id);
-      return [asig?.nombre, pl?.nombre, se?.nombre].filter(Boolean).join(" - ") || `Plan asignatura #${pa.id}`;
-    };
     return {
-      planesAsignaturas: planesAsignaturas.reduce((acc, x) => ({ ...acc, [x.id]: labelPlanAsig(x) }), {}),
-      aulas: aulas.reduce((acc, x) => ({ ...acc, [x.id_aula]: x.aula }), {}),
-      tiposAutoridad: tiposAutoridad.reduce((acc, x) => ({ ...acc, [x.id]: x.descripcion }), {}),
-      legajos: legajos.reduce((acc, x) => ({ ...acc, [x.id]: x.numero ? `Nro. ${x.numero}` : `Legajo #${x.id}` }), {}),
+      planesAsignaturas: planesAsignaturas.reduce((acc, item) => {
+        acc[item.id] = obtenerEtiquetaPlanAsignatura(item, asignaturas, planes, sedes);
+        return acc;
+      }, {}),
+      aulas: crearMapa(aulas, "id_aula", "aula"),
+      tiposAutoridad: crearMapa(tiposAutoridad, "id", "descripcion"),
+      legajos: legajos.reduce((acc, item) => {
+        acc[item.id] = obtenerEtiquetaLegajo(item);
+        return acc;
+      }, {}),
     };
   }, [planesAsignaturas, asignaturas, planes, sedes, aulas, tiposAutoridad, legajos]);
 
+  function cambiarComision(e) {
+    setComision({ ...comision, [e.target.name]: e.target.value });
+  }
+
+  function cambiarComisionAsignatura(e) {
+    setComisionAsignatura({ ...comisionAsignatura, [e.target.name]: e.target.value });
+  }
+
+  function cambiarAutoridad(e) {
+    setAutoridad({ ...autoridad, [e.target.name]: e.target.value });
+  }
+
   async function guardarComision(e) {
     e.preventDefault();
-    if (!comision.descripcion.trim()) return setError("La descripción es obligatoria");
+    const descripcion = comision.descripcion.trim();
+
+    if (!descripcion) {
+      setError("La descripcion es obligatoria");
+      return;
+    }
+
     try {
-      setGuardando(true); setError("");
-      const res = await comisionService.crear({ descripcion: comision.descripcion.trim(), usuario_accion: 1 });
-      setComisionId(res.data.id_comision);
-      setPaso(2);
+      setGuardando(true);
+      setError("");
+      const respuesta = await comisionService.crear({ descripcion, usuario_accion: 1 });
+      setComisionId(obtenerIdRespuesta(respuesta));
+      setPasoActual(2);
     } catch (err) {
-      setError(err.message || "Error al crear comisión");
+      setError(obtenerMensajeError(err));
     } finally {
       setGuardando(false);
     }
   }
 
   async function agregarComisionAsignatura() {
-    if (!comisionAsignatura.plan_asignaturas_id || !comisionAsignatura.aula_id) return setError("Complete campos requeridos");
     const payload = {
       plan_asignaturas_id: Number(comisionAsignatura.plan_asignaturas_id),
       aula_id: Number(comisionAsignatura.aula_id),
@@ -112,194 +164,360 @@ export default function AltaComisionWizard() {
       estado: comisionAsignatura.estado,
       usuario_accion: 1,
     };
+    const mensaje = validarComisionAsignatura(payload);
+
+    if (mensaje) {
+      setError(mensaje);
+      return;
+    }
+
     try {
-      setGuardando(true); setError("");
-      const res = await comisionAsignaturaService.crear(payload);
+      setGuardando(true);
+      setError("");
+      const respuesta = await comisionAsignaturaService.crear(payload);
+      const idCreado = obtenerIdRespuesta(respuesta);
       setComisionesAsignaturasCargadas([
         ...comisionesAsignaturasCargadas,
         {
-          id_comision_asignatura: res.data.id || res.data.id_comision_asignatura, ...payload,
-          planAsignatura: mapas.planesAsignaturas[payload.plan_asignaturas_id], aula: mapas.aulas[payload.aula_id],
+          id_comision_asignatura: idCreado,
+          ...payload,
+          planAsignatura: mapas.planesAsignaturas[payload.plan_asignaturas_id],
+          aula: mapas.aulas[payload.aula_id],
         },
       ]);
       setComisionAsignatura(comisionAsignaturaInicial);
     } catch (err) {
-      setError(err.message || "Error al agregar asignatura");
+      setError(obtenerMensajeError(err));
     } finally {
       setGuardando(false);
     }
   }
 
   async function agregarAutoridad() {
-    if (!autoridad.tipo_autoridad_id || !autoridad.legajo_id || !autoridad.comision_id) return setError("Complete campos obligatorios de autoridad");
     const payload = {
-      tipo_autoridad_id: Number(autoridad.tipo_autoridad_id), legajo_id: Number(autoridad.legajo_id), comision_id: Number(autoridad.comision_id), usuario_accion: 1,
+      tipo_autoridad_id: Number(autoridad.tipo_autoridad_id),
+      legajo_id: Number(autoridad.legajo_id),
+      comision_id: Number(autoridad.comision_id),
+      usuario_accion: 1,
     };
+    const mensaje = validarAutoridad(payload);
+
+    if (mensaje) {
+      setError(mensaje);
+      return;
+    }
+
     try {
-      setGuardando(true); setError("");
+      setGuardando(true);
+      setError("");
       await autoridadComisionService.crear(payload);
       setAutoridadesCargadas([
         ...autoridadesCargadas,
         {
-          ...payload, tipoAutoridad: mapas.tiposAutoridad[payload.tipo_autoridad_id], legajo: mapas.legajos[payload.legajo_id],
-          comisionAsignatura: comisionesAsignaturasCargadas.find((x) => Number(x.id_comision_asignatura) === payload.comision_id)?.nombre || "",
+          ...payload,
+          tipoAutoridad: mapas.tiposAutoridad[payload.tipo_autoridad_id],
+          legajo: mapas.legajos[payload.legajo_id],
+          comisionAsignatura: obtenerEtiquetaComisionAsignaturaCargada(
+            payload.comision_id,
+            comisionesAsignaturasCargadas,
+          ),
         },
       ]);
       setAutoridad(autoridadInicial);
     } catch (err) {
-      setError(err.message || "Error al agregar autoridad");
+      setError(obtenerMensajeError(err));
     } finally {
       setGuardando(false);
     }
   }
 
   function cargarOtraComision() {
-    setPaso(1); setComisionId(null); setComision(comisionInicial); setComisionAsignatura(comisionAsignaturaInicial);
-    setAutoridad(autoridadInicial); setComisionesAsignaturasCargadas([]); setAutoridadesCargadas([]); setError("");
+    setPasoActual(1);
+    setComisionId(null);
+    setComision(comisionInicial);
+    setComisionAsignatura(comisionAsignaturaInicial);
+    setAutoridad(autoridadInicial);
+    setComisionesAsignaturasCargadas([]);
+    setAutoridadesCargadas([]);
+    setError("");
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-12">
+    <div className="min-h-screen bg-slate-100">
       <Navbar />
-      <main className="p-8">
-        
-        {/* 1. CABECERA PRINCIPAL */}
-        <div className="flex items-center justify-between mb-8 max-w-4xl mx-auto">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-600">
-              <span className="text-xl">🎓</span>
-            </div>
-            <div>
-              <span className="text-red-600 text-xs font-bold tracking-wider uppercase block">Alta Guiada</span>
-              <h1 className="text-slate-900 text-3xl font-extrabold">Comision</h1>
-              <p className="text-slate-500 text-sm mt-1">Crea una comision, agrega asignaturas y asigna autoridades.</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => navigate("/comisiones")}
-            className="flex items-center gap-2 border border-slate-300 px-4 py-2 rounded-xl text-slate-700 text-sm font-semibold bg-white hover:bg-slate-50 transition"
-          >
-            <span>←</span> Volver
-          </button>
-        </div>
-
-        {/* 2. STEPPER DE PROGRESO */}
-        <div className="flex items-center justify-between mb-12 max-w-4xl mx-auto px-4">
-          {/* Paso 1: Comisión */}
-          <div className="flex flex-col items-center gap-2">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition ${paso >= 1 ? 'bg-red-700 text-white' : 'bg-slate-100 text-slate-400'}`}>
-              🎓
-            </div>
-            <span className={`text-xs font-bold ${paso >= 1 ? 'text-red-700' : 'text-slate-400'}`}>Comision</span>
-          </div>
-          <div className="flex-1 h-0.5 mx-4 bg-slate-200" />
-
-          {/* Paso 2: Asignaturas */}
-          <div className="flex flex-col items-center gap-2">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition ${paso >= 2 ? 'bg-red-700 text-white' : 'bg-slate-100 text-slate-400'}`}>
-              📖
-            </div>
-            <span className={`text-xs font-bold ${paso >= 2 ? 'text-red-700' : 'text-slate-400'}`}>Asignaturas</span>
-          </div>
-          <div className="flex-1 h-0.5 mx-4 bg-slate-200" />
-
-          {/* Paso 3: Autoridades */}
-          <div className="flex flex-col items-center gap-2">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition ${paso >= 3 ? 'bg-red-700 text-white' : 'bg-slate-100 text-slate-400'}`}>
-              👤
-            </div>
-            <span className={`text-xs font-bold ${paso >= 3 ? 'text-red-700' : 'text-slate-400'}`}>Autoridades</span>
-          </div>
-          <div className="flex-1 h-0.5 mx-4 bg-slate-200" />
-
-          {/* Paso 4: Resumen */}
-          <div className="flex flex-col items-center gap-2">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition ${paso === 4 ? 'bg-red-700 text-white' : 'bg-slate-100 text-slate-400'}`}>
-              ✓
-            </div>
-            <span className={`text-xs font-bold ${paso === 4 ? 'text-red-700' : 'text-slate-400'}`}>Resumen</span>
-          </div>
-        </div>
-
-        {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold max-w-4xl mx-auto">{error}</div>}
-
-        {/* 3. CONTENIDO DEL PASO ACTIVO */}
-        <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-xs max-w-4xl mx-auto min-h-[300px]">
-          {paso === 1 && (
-            <form onSubmit={guardarComision} className="space-y-6">
-              <div className="flex items-center gap-2 text-slate-800 text-xl font-bold mb-2">
-                <span>🎓</span> Datos de la comision
+      <main className="max-w-6xl mx-auto px-6 py-10">
+        <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
+                <GraduationCap size={28} />
               </div>
-              <hr className="border-slate-200 mb-6" />
-              <div className="flex flex-col gap-2">
-                <label className="text-slate-700 text-sm font-bold">Descripcion</label>
-                <div className="relative flex items-center">
-                  <span className="absolute left-4 text-slate-400">🎓</span>
-                  <input 
-                    type="text" 
+              <div>
+                <p className="text-sm font-bold text-red-700 uppercase">Alta guiada</p>
+                <h1 className="text-4xl font-extrabold text-slate-800 mt-1">
+                  Comision
+                </h1>
+                <p className="text-slate-500 mt-2">
+                  Crea una comision, agrega asignaturas y asigna autoridades.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/comisiones")}
+              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"
+            >
+              <ArrowLeft size={20} />
+              Volver
+            </button>
+          </div>
+
+          <div className="mb-8 flex items-start">
+            {pasos.map((paso, index) => (
+              <PasoIndicador
+                key={paso.id}
+                paso={paso}
+                activo={pasoActual === paso.id}
+                completo={pasoActual > paso.id}
+                ultimo={index === pasos.length - 1}
+              />
+            ))}
+          </div>
+
+          {error && (
+            <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">
+              {error}
+            </div>
+          )}
+
+          {cargando ? (
+            <EstadoVacio texto="Cargando datos..." />
+          ) : (
+            <>
+              {pasoActual === 1 && (
+                <form onSubmit={guardarComision} className="space-y-6">
+                  <TituloPaso icono={<GraduationCap size={26} />} titulo="Datos de la comision" />
+                  <CampoTexto
+                    label="Descripcion"
+                    name="descripcion"
                     value={comision.descripcion}
-                    onChange={(e) => setComision({ descripcion: e.target.value })}
-                    placeholder="Ej: Comision A" 
-                    className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:border-red-600 text-slate-800"
+                    onChange={cambiarComision}
+                    placeholder="Ej: Comision A"
+                    icono={<GraduationCap size={20} />}
                   />
-                </div>
-              </div>
-              
-              {/* Botón de acción para el Paso 1 */}
-              <div className="flex justify-end mt-8 pt-6 border-t border-slate-100">
-                <button 
-                  type="submit"
-                  disabled={guardando}
-                  className="bg-red-700 hover:bg-red-800 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition"
-                >
-                  <span>💾</span> {guardando ? "Guardando..." : "Crear comision y seguir"}
-                </button>
-              </div>
-            </form>
-          )}
+                  <Acciones guardando={guardando} texto="Crear comision y seguir" />
+                </form>
+              )}
 
-          {paso === 2 && (
-            <StepAsignaturas 
-              comisionAsignatura={comisionAsignatura} 
-              cambiarComisionAsignatura={(e) => setComisionAsignatura({ ...comisionAsignatura, [e.target.name]: e.target.value })} 
-              planesAsignaturas={planesAsignaturas} 
-              aulas={aulas} 
-              agregarComisionAsignatura={agregarComisionAsignatura} 
-              comisionesAsignaturasCargadas={comisionesAsignaturasCargadas} 
-              mapas={mapas} 
-              guardando={guardando} 
-              onBack={() => setPaso(1)} 
-              onNext={() => setPaso(3)} 
-            />
-          )}
+              {pasoActual === 2 && (
+                <section className="space-y-6">
+                  <TituloPaso icono={<BookOpenCheck size={26} />} titulo="Asignaturas de la comision" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <CampoSelect label="Plan asignatura" name="plan_asignaturas_id" value={comisionAsignatura.plan_asignaturas_id} onChange={cambiarComisionAsignatura} opciones={planesAsignaturas} getValue={(item) => item.id} getLabel={(item) => mapas.planesAsignaturas[item.id]} />
+                    <CampoSelect label="Aula" name="aula_id" value={comisionAsignatura.aula_id} onChange={cambiarComisionAsignatura} opciones={aulas} getValue={(item) => item.id_aula} getLabel={(item) => item.aula} />
+                    <CampoTexto label="Nombre" name="nombre" value={comisionAsignatura.nombre} onChange={cambiarComisionAsignatura} placeholder="Ej: Comision A - Incendios" icono={<Tag size={20} />} />
+                    <CampoTexto label="Modalidad" name="modalidad" value={comisionAsignatura.modalidad} onChange={cambiarComisionAsignatura} placeholder="Ej: Presencial" icono={<BookOpenCheck size={20} />} />
+                    <CampoTexto label="Cupo maximo" name="cupo_maximo" type="number" value={comisionAsignatura.cupo_maximo} onChange={cambiarComisionAsignatura} placeholder="Ej: 30" icono={<Hash size={20} />} />
+                    <CampoSelectSimple label="Estado" name="estado" value={comisionAsignatura.estado} onChange={cambiarComisionAsignatura} opciones={["Activo", "Inactivo"]} />
+                  </div>
+                  <div className="flex justify-end">
+                    <button type="button" onClick={agregarComisionAsignatura} disabled={guardando} className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60">
+                      <PlusCircle size={22} />
+                      Agregar asignatura
+                    </button>
+                  </div>
+                  <ListaItems items={comisionesAsignaturasCargadas} getTitulo={(item) => item.nombre} getDetalle={(item) => `${item.planAsignatura || "-"} - Aula ${item.aula || "-"}`} vacio="Todavia no agregaste asignaturas." />
+                  <Acciones guardando={false} texto="Continuar" onBack={() => setPasoActual(1)} onSubmit={() => setPasoActual(3)} deshabilitado={comisionesAsignaturasCargadas.length === 0} />
+                </section>
+              )}
 
-          {paso === 3 && (
-            <StepAutoridades 
-              autoridad={autoridad} 
-              cambiarAutoridad={(e) => setAutoridad({ ...autoridad, [e.target.name]: e.target.value })} 
-              tiposAutoridad={tiposAutoridad} 
-              legajos={legajos} 
-              comisionesAsignaturasCargadas={comisionesAsignaturasCargadas} 
-              agregarAutoridad={agregarAutoridad} 
-              autoridadesCargadas={autoridadesCargadas} 
-              guardando={guardando} 
-              onBack={() => setPaso(2)} 
-              onNext={() => setPaso(4)} 
-            />
-          )}
+              {pasoActual === 3 && (
+                <section className="space-y-6">
+                  <TituloPaso icono={<ShieldUser size={26} />} titulo="Autoridades" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <CampoSelect label="Tipo autoridad" name="tipo_autoridad_id" value={autoridad.tipo_autoridad_id} onChange={cambiarAutoridad} opciones={tiposAutoridad} getValue={(item) => item.id} getLabel={(item) => item.descripcion} />
+                    <CampoSelect label="Legajo" name="legajo_id" value={autoridad.legajo_id} onChange={cambiarAutoridad} opciones={legajos} getValue={(item) => item.id} getLabel={obtenerEtiquetaLegajo} />
+                    <CampoSelect label="Comision asignatura" name="comision_id" value={autoridad.comision_id} onChange={cambiarAutoridad} opciones={comisionesAsignaturasCargadas} getValue={(item) => item.id_comision_asignatura} getLabel={(item) => item.nombre} />
+                  </div>
+                  <div className="flex justify-end">
+                    <button type="button" onClick={agregarAutoridad} disabled={guardando} className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60">
+                      <PlusCircle size={22} />
+                      Agregar autoridad
+                    </button>
+                  </div>
+                  <ListaItems items={autoridadesCargadas} getTitulo={(item) => item.tipoAutoridad} getDetalle={(item) => `${item.legajo || "-"} - ${item.comisionAsignatura || "-"}`} vacio="Podés finalizar sin autoridades cargadas." />
+                  <Acciones guardando={false} texto="Finalizar" onBack={() => setPasoActual(2)} onSubmit={() => setPasoActual(4)} />
+                </section>
+              )}
 
-          {paso === 4 && (
-            <StepResumen 
-              comision={comision} 
-              comisionId={comisionId} 
-              comisionesAsignaturasCargadas={comisionesAsignaturasCargadas} 
-              autoridadesCargadas={autoridadesCargadas} 
-              volverComisiones={() => navigate("/comisiones")} 
-              cargarOtraComision={cargarOtraComision} 
-            />
+              {pasoActual === 4 && (
+                <section className="space-y-6">
+                  <TituloPaso icono={<CheckCircle2 size={26} />} titulo="Resumen" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <ResumenItem titulo="Comision" texto={`${comision.descripcion || "-"} - ID ${comisionId || "-"}`} />
+                    <ResumenItem titulo="Asignaturas" texto={comisionesAsignaturasCargadas.length} />
+                    <ResumenItem titulo="Autoridades" texto={autoridadesCargadas.length} />
+                  </div>
+                  <div className="flex flex-col sm:flex-row justify-end gap-3">
+                    <button type="button" onClick={() => navigate("/comisiones")} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">Volver a comisiones</button>
+                    <button type="button" onClick={cargarOtraComision} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800"><Save size={22} />Cargar otra comision</button>
+                  </div>
+                </section>
+              )}
+            </>
           )}
-        </div>
+        </section>
       </main>
     </div>
   );
 }
+
+function PasoIndicador({ paso, activo, completo, ultimo }) {
+  const Icono = paso.icono;
+  const resaltado = activo || completo;
+  return (
+    <div className="flex flex-1 items-start">
+      <div className="flex flex-col items-center min-w-12">
+        <div className={`w-11 h-11 rounded-full flex items-center justify-center border-2 ${resaltado ? "bg-red-700 border-red-700 text-white" : "bg-slate-100 border-slate-300 text-slate-400"}`}>
+          <Icono size={20} />
+        </div>
+        <p className={`hidden md:block mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"}`}>{paso.titulo}</p>
+      </div>
+      {!ultimo && <div className={`h-1 flex-1 rounded-full mt-5 ${completo ? "bg-red-700" : "bg-slate-200"}`} />}
+    </div>
+  );
+}
+
+function TituloPaso({ icono, titulo }) {
+  return (
+    <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
+      <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center">{icono}</div>
+      <h2 className="text-2xl font-extrabold text-slate-800">{titulo}</h2>
+    </div>
+  );
+}
+
+function CampoTexto({ label, name, value, onChange, placeholder, icono, type = "text" }) {
+  return (
+    <div>
+      <label className="block text-sm font-bold text-slate-700 mb-2">{label}</label>
+      <div className="relative">
+        {icono && <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">{icono}</span>}
+        <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"}`} />
+      </div>
+    </div>
+  );
+}
+
+function CampoSelect({ label, name, value, onChange, opciones, getValue, getLabel }) {
+  const opcionesSeguras = Array.isArray(opciones) ? opciones : [];
+
+  return (
+    <div>
+      <label className="block text-sm font-bold text-slate-700 mb-2">{label}</label>
+      <select name={name} value={value} onChange={onChange} className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500">
+        <option value="">Seleccione una opcion</option>
+        {opcionesSeguras.map((opcion) => <option key={getValue(opcion)} value={getValue(opcion)}>{getLabel(opcion)}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function CampoSelectSimple({ label, name, value, onChange, opciones }) {
+  return <CampoSelect label={label} name={name} value={value} onChange={onChange} opciones={opciones.map((item) => ({ id: item, label: item }))} getValue={(item) => item.id} getLabel={(item) => item.label} />;
+}
+
+function Acciones({ guardando, texto, onBack, onSubmit, deshabilitado }) {
+  return (
+    <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+      {onBack && <button type="button" onClick={onBack} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">Volver</button>}
+      <button type={onSubmit ? "button" : "submit"} onClick={onSubmit} disabled={guardando || deshabilitado} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"><Save size={22} />{guardando ? "Guardando..." : texto}</button>
+    </div>
+  );
+}
+
+function ListaItems({ items, getTitulo, getDetalle, vacio }) {
+  if (items.length === 0) return <EstadoVacio texto={vacio} />;
+  return (
+    <div className="space-y-3">
+      {items.map((item, index) => (
+        <div key={item.id_comision_asignatura || index} className="border border-slate-200 rounded-xl bg-slate-50 p-4">
+          <p className="text-slate-800 font-extrabold">{getTitulo(item)}</p>
+          <p className="text-slate-500 font-semibold mt-1">{getDetalle(item)}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ResumenItem({ titulo, texto }) {
+  return (
+    <div className="border border-slate-200 rounded-xl p-5 bg-slate-50">
+      <p className="text-sm font-bold text-slate-400 uppercase">{titulo}</p>
+      <p className="text-slate-800 font-extrabold mt-1">{texto}</p>
+    </div>
+  );
+}
+
+function EstadoVacio({ texto }) {
+  return <div className="border border-slate-200 rounded-xl bg-slate-50 p-5 text-center text-slate-500 font-semibold">{texto}</div>;
+}
+
+function obtenerEtiquetaPlanAsignatura(planAsignatura, asignaturas, planes, sedes) {
+  const asignatura = asignaturas.find((item) => item.id === planAsignatura.asignatura_id);
+  const plan = planes.find((item) => item.id === planAsignatura.plan_id);
+  const sede = sedes.find((item) => item.id === planAsignatura.sedes_id);
+  const partes = [asignatura?.nombre, plan?.nombre, sede?.nombre].filter(Boolean);
+  return partes.length ? partes.join(" - ") : `Plan asignatura #${planAsignatura.id}`;
+}
+
+function obtenerEtiquetaLegajo(legajo) {
+  return legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
+}
+
+function obtenerEtiquetaComisionAsignaturaCargada(id, items) {
+  const item = items.find((registro) => Number(registro.id_comision_asignatura) === Number(id));
+  return item?.nombre || `Comision asignatura #${id}`;
+}
+
+function crearMapa(items, idKey, valueKey) {
+  const lista = Array.isArray(items) ? items : [];
+
+  return lista.reduce((acc, item) => {
+    acc[item[idKey]] = item[valueKey];
+    return acc;
+  }, {});
+}
+
+function obtenerLista(respuesta) {
+  return Array.isArray(respuesta?.data) ? respuesta.data : [];
+}
+
+function validarComisionAsignatura(payload) {
+  if (!payload.plan_asignaturas_id) return "Debe seleccionar un plan asignatura";
+  if (!payload.aula_id) return "Debe seleccionar un aula";
+  if (!payload.nombre) return "El nombre es obligatorio";
+  if (!payload.modalidad) return "La modalidad es obligatoria";
+  if (!payload.cupo_maximo || payload.cupo_maximo <= 0) return "El cupo maximo debe ser mayor a cero";
+  return "";
+}
+
+function validarAutoridad(payload) {
+  if (!payload.tipo_autoridad_id) return "Debe seleccionar un tipo de autoridad";
+  if (!payload.legajo_id) return "Debe seleccionar un legajo";
+  if (!payload.comision_id) return "Debe seleccionar una comision asignatura";
+  return "";
+}
+
+function obtenerIdRespuesta(respuesta) {
+  return respuesta?.data?.id || respuesta?.data?.id_comision || respuesta?.data?.id_comision_asignatura;
+}
+
+function obtenerMensajeError(err) {
+  const errores = err.errors || {};
+  const primerCampo = Object.keys(errores)[0];
+  if (primerCampo && Array.isArray(errores[primerCampo])) return errores[primerCampo][0];
+  return err.message || "No se pudo completar la operacion";
+}
+
+export default AltaComisionWizard;
