@@ -6,6 +6,7 @@ from schemas.comision_asignatura_schema import (
 )
 from db import db
 from sqlalchemy import func
+from utils.errores import APIError
 
 
 def obtener_modalidad(modalidad):
@@ -31,7 +32,7 @@ def crear(datos):
     modalidad = obtener_modalidad(nueva_comision_asignatura.modalidad)
 
     if modalidad is None:
-        raise ValueError("La modalidad indicada no existe")
+        raise APIError("La modalidad indicada no existe", status=400)
 
     nueva_comision_asignatura.modalidadesid = modalidad.modalidadesid
 
@@ -53,7 +54,7 @@ def actualizar(comision_asignatura, datos):
         modalidad = obtener_modalidad(comision_asignatura.modalidad)
 
         if modalidad is None:
-            raise ValueError("La modalidad indicada no existe")
+            raise APIError("La modalidad indicada no existe", status=400)
 
         comision_asignatura.modalidadesid = modalidad.modalidadesid
 

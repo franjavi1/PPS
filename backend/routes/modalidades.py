@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
-from sqlalchemy.exc import SQLAlchemyError
 
 from services.modalidades_service import obtener_todas
+from utils.utilidades import respuesta_api
 
 
 modalidades_bp = Blueprint(
@@ -13,24 +13,17 @@ modalidades_bp = Blueprint(
 
 @modalidades_bp.route("", methods=["GET"])
 def get_modalidades():
-    try:
-        modalidades = [
-            {
-                "modalidadesid": modalidad.modalidadesid,
-                "descripcion": modalidad.descripcion,
-            }
-            for modalidad in obtener_todas()
-        ]
+    modalidades = [
+        {
+            "modalidadesid": modalidad.modalidadesid,
+            "descripcion": modalidad.descripcion,
+        }
+        for modalidad in obtener_todas()
+    ]
 
-        return jsonify({
-            "status": "success",
-            "message": "Lista de modalidades obtenida",
-            "data": modalidades,
-            "total": len(modalidades),
-        }), 200
-
-    except SQLAlchemyError:
-        return jsonify({
-            "status": "error",
-            "message": "No se pudieron obtener las modalidades",
-        }), 500
+    return respuesta_api(
+        success=True,
+        data=modalidades,
+        message="Lista de modalidades obtenida",
+        status=200
+    )

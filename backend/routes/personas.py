@@ -1,10 +1,8 @@
 from flask import Blueprint, request, jsonify
-from marshmallow import ValidationError
-from sqlalchemy.exc import SQLAlchemyError
 
-from db import db
-from schemas.persona_schema import  persona_schema, personas_schema
-
+from utils.utilidades import respuesta_api
+from utils.errores import APIError
+from schemas.persona_schema import persona_schema, personas_schema
 
 from services.persona_service import (
     obtener_todos,
@@ -16,220 +14,78 @@ from services.persona_service import (
     reactivar
 )
 
+personas_bp = Blueprint("personas_bp", __name__, url_prefix="/personas")
 
 
-personas_bp = Blueprint("personas_bp",__name__, url_prefix="/personas")
-
-#Helper para formatear todas las respuestas de la API
-def respuesta_api(success=True, data=None, message="",status=200, errors=None):
-    response={
-        "status": "success" if success else "error",
-        "message" : message
-    }
-    if data is not None:
-        response["data"]= data
-    
-        if isinstance(data,list):
-            response["total"] = len(data)
-
-    if errors is not None:
-        response["errors"] = errors
-    
-    return jsonify(response),status
-
-
-
-
-@personas_bp.route("",methods=["GET"])
+@personas_bp.route("", methods=["GET"])
 def get_personas():
-    try:
-        estado = request.args.get("estado", default=1, type=int)
+    estado = request.args.get("estado", default=1, type=int)
 
-        if estado not in (0, 1):
-            return respuesta_api(False, None, "Estado no valido", 400, {
-                "estado": "El estado debe ser 0 o 1"
-            })
+    if estado not in (0, 1):
+        raise APIError("Estado no valido", status=400)
 
-        personas = obtener_todos(estado)
-        data = personas_schema.dump(personas)
+    personas = obtener_todos(estado)
+    data = personas_schema.dump(personas)
 
-        if len(data)==0:
-            return respuesta_api(True,[], "No se encontraron resultados")
+    if len(data) == 0:
+        return respuesta_api(True, [], "No se encontraron resultados")
 
-        return respuesta_api(True, data,"Lista de personas obtenida")
-    
-    except SQLAlchemyError:
-        return respuesta_api(False, None, "Error de base de datos", 500,{
-            "database": "Ocurrió un error al obtener la lista de personas"
+    return respuesta_api(True, data, "Lista de personas obtenida")
 
-        })
-    
-    except Exception:
-           return respuesta_api(False, None, "Error inesperado", 500,{
-            "server": "Ocurrio un error inesperado"
 
-        })
-
-@personas_bp.route("/<int:id>",methods=["GET"])
+@personas_bp.route("/<int:id>", methods=["GET"])
 def get_persona(id):
-    try:
-        persona = obtener_por_id(id)
+    persona = obtener_por_id(id)
 
-        if not persona:
-            return respuesta_api(False, None, "Persona no encontrada",404,{
-                "id": "No existe una persona activa con ese id"
-            })
+    if not persona:
+        raise APIError("Persona no encontrada", status=404)
 
-        data = persona_schema.dump(persona)
-        
-        return respuesta_api(True, data,"Persona obtenida correctamente")
+    data = persona_schema.dump(persona)
     
-    except SQLAlchemyError:
-        return respuesta_api(False, None, "Error de base de datos", 500,{
-            "database": "Ocurrió un error al obtener la lista de personas"
+    return respuesta_api(True, data, "Persona obtenida correctamente")
 
-        })
-    
-    except Exception:
-           return respuesta_api(False, None, "Error inesperado", 500,{
-            "server": "Ocurrio un error inesperado"
 
-        })
-    
-
-@personas_bp.route("",methods=["POST"])
+@personas_bp.route("", methods=["POST"])
 def crear_persona():
     req = request.get_json(silent=True) or {}
-    try:
-        nueva_persona= crear(req)
-        data = persona_schema.dump(nueva_persona)
-        return respuesta_api(True,{"id": data["id"]}, "Persona creada correctamente", 201)
-
-    except ValidationError as e:
-        db.session.rollback()
-
-       
-        
-        return respuesta_api(False, None, "Error de validacion", 400, e.messages)
-
-    except SQLAlchemyError:
-        db.session.rollback()
-
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrio un error al crear la persona"
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
+    nueva_persona = crear(req)
+    data = persona_schema.dump(nueva_persona)
+    return respuesta_api(True, {"id": data["id"]}, "Persona creada correctamente", 201)
 
 
-@personas_bp.route("/<int:id>",methods=["PUT"])
+@personas_bp.route("/<int:id>", methods=["PUT"])
 def editar_persona(id):
+    persona = obtener_por_id(id)
     
-    try:
-        persona = obtener_por_id(id)
+    if not persona:
+        raise APIError("Persona no encontrada", status=404)
         
-        if not persona:
-            return respuesta_api(False, None, "Persona no encontrada",404,{
-                "id": "No existe una persona activa con ese id"
-            })
-        req = request.get_json(silent=True) or {}
-        persona_actualizada = actualizar(persona, req)
-        data = persona_schema.dump(persona_actualizada)
+    req = request.get_json(silent=True) or {}
+    persona_actualizada = actualizar(persona, req)
+    data = persona_schema.dump(persona_actualizada)
 
-        return respuesta_api(True,{"id": data["id"]}, "Persona actualizada correctamente")
-
-    except ValidationError as e:
-        db.session.rollback()
-
-       
-        
-        return respuesta_api(False, None, "Error de validacion", 400, e.messages)
-
-    except SQLAlchemyError:
-        db.session.rollback()
-
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrio un error al actualizar la persona"
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
-    
+    return respuesta_api(True, {"id": data["id"]}, "Persona actualizada correctamente")
 
 
-@personas_bp.route("/<int:id>",methods=["DELETE"])
+@personas_bp.route("/<int:id>", methods=["DELETE"])
 def eliminar_persona(id):
+    persona = obtener_por_id(id)
     
-    try:
-        persona = obtener_por_id(id)
-        
-        if not persona:
-            return respuesta_api(False, None, "Persona no encontrada",404,{
-                "id": "No existe una persona activa con ese id"
-            })
+    if not persona:
+        raise APIError("Persona no encontrada", status=404)
 
-        eliminar(persona)
+    eliminar(persona)
 
-        return respuesta_api(True, {"id": id}, "Persona dada de baja correctamente")
-    
-    except SQLAlchemyError:
-        db.session.rollback()
-
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrió un error al eliminar la persona"
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
+    return respuesta_api(True, {"id": id}, "Persona dada de baja correctamente")
 
 
 @personas_bp.route("/<int:id>/reactivar", methods=["PATCH"])
 def reactivar_persona(id):
-    try:
-        persona = obtener_por_id_sin_filtrar_estado(id)
+    persona = obtener_por_id_sin_filtrar_estado(id)
 
-        if not persona or persona.estado != 0:
-            return respuesta_api(False, None, "Persona inactiva no encontrada", 404, {
-                "id": "No existe una persona inactiva con ese id"
-            })
+    if not persona or persona.estado != 0:
+        raise APIError("Persona inactiva no encontrada", status=404)
 
-        reactivar(persona)
+    reactivar(persona)
 
-        return respuesta_api(True, {"id": id}, "Persona reactivada correctamente")
-
-    except SQLAlchemyError:
-        db.session.rollback()
-
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrio un error al reactivar la persona"
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
-
-
-
-
-
-    
+    return respuesta_api(True, {"id": id}, "Persona reactivada correctamente")
