@@ -43,7 +43,7 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
             "invalid": "El usuario de acción debe ser un número entero"
         }
     )
-
+    estado = ma.auto_field(dump_only=True)
     # Fechas administradas por la base de datos.
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)

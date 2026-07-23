@@ -56,6 +56,13 @@ class AutoridadComision(db.Model):
         nullable=True
     )
 
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
+
     tipo_autoridad = relationship(
         "TipoAutoridad",
         backref="autoridad_comision_items"

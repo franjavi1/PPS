@@ -48,7 +48,7 @@ class LegajoSedesSchema(ma.SQLAlchemySchema):
             "invalid": "Es autoridad debe ser verdadero o falso"
         }
     )
-
+    estado = ma.auto_field(dump_only=True)
     # Usuario que realiza la accion sobre el registro.
     usuario_accion = ma.auto_field(
         required=False,

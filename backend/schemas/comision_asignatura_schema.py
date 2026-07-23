@@ -18,7 +18,7 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
     plan_asignaturas_id = ma.auto_field(required=True, allow_none=False)
     aula_id = ma.auto_field(required=True, allow_none=False)
     comision_id = ma.auto_field(required=True, allow_none=False)
-
+    estado = ma.auto_field(dump_only=True)
     nombre = ma.auto_field(
         required=True,
         allow_none=False,
