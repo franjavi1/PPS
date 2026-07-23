@@ -1,11 +1,9 @@
-from flask import Blueprint, request, jsonify
-from marshmallow import ValidationError
-from sqlalchemy.exc import SQLAlchemyError
-
-from db import db
+from flask import Blueprint, request
 from models.pa_correlativa import PACorrelativa
 from models.plan_asignatura import PlanAsignatura
 from schemas.asignaturas_schema import asignatura_schema, asignaturas_schema
+from utils.errores import APIError
+from utils.utilidades import respuesta_api
 
 from services.asignaturas_service import (
     obtener_todos,
@@ -19,169 +17,68 @@ from services.asignaturas_service import (
 asignaturas_bp = Blueprint("asignaturas_bp", __name__, url_prefix="/asignaturas")
 
 
-# Helper para formatear todas las respuestas de la API
-def respuesta_api(success=True, data=None, message="", status=200, errors=None):
-    response = {
-        "status": "success" if success else "error",
-        "message": message
-    }
-
-    if data is not None:
-        response["data"] = data
-
-        if isinstance(data, list):
-            response["total"] = len(data)
-
-    if errors is not None:
-        response["errors"] = errors
-
-    return jsonify(response), status
-
-
 @asignaturas_bp.route("", methods=["GET"])
 def get_asignaturas():
-    try:
-        asignaturas = obtener_todos()
-        data = asignaturas_schema.dump(asignaturas)
+    asignaturas = obtener_todos()
+    data = asignaturas_schema.dump(asignaturas)
 
-        if len(data) == 0:
-            return respuesta_api(True, [], "No se encontraron resultados")
+    if not data:
+        return respuesta_api(success=True, data=[], message="No se encontraron resultados", status=200)
 
-        return respuesta_api(True, data, "Lista de asignaturas obtenida")
-
-    except SQLAlchemyError:
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrio un error al obtener la lista de asignaturas"
-        })
-
-    except Exception:
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
+    return respuesta_api(success=True, data=data, message="Lista de asignaturas obtenida", status=200)
 
 
 @asignaturas_bp.route("/<int:id>", methods=["GET"])
 def get_asignatura(id):
-    try:
-        asignatura = obtener_por_id(id)
+    asignatura = obtener_por_id(id)
 
-        if not asignatura:
-            return respuesta_api(False, None, "Asignatura no encontrada", 404, {
-                "id": "No existe una asignatura activa con ese id"
-            })
+    if not asignatura:
+        raise APIError("Asignatura no encontrada.", status=404)
 
-        data = asignatura_schema.dump(asignatura)
-
-        return respuesta_api(True, data, "Asignatura obtenida correctamente")
-
-    except SQLAlchemyError:
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrio un error al obtener la asignatura"
-        })
-
-    except Exception:
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
+    data = asignatura_schema.dump(asignatura)
+    return respuesta_api(success=True, data=data, message="Asignatura obtenida correctamente", status=200)
 
 
 @asignaturas_bp.route("", methods=["POST"])
 def crear_asignatura():
     req = request.get_json(silent=True) or {}
+    nueva_asignatura = crear(req)
+    data = asignatura_schema.dump(nueva_asignatura)
 
-    try:
-        nueva_asignatura = crear(req)
-        data = asignatura_schema.dump(nueva_asignatura)
-
-        return respuesta_api(True, {"id": data["id"]}, "Asignatura creada correctamente", 201)
-
-    except ValidationError as e:
-        db.session.rollback()
-        return respuesta_api(False, None, "Error de validacion", 400, e.messages)
-
-    except SQLAlchemyError:
-        db.session.rollback()
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrio un error al crear la asignatura"
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
+    return respuesta_api(success=True, data={"id": data["id"]}, message="Asignatura creada correctamente", status=201)
 
 
 @asignaturas_bp.route("/<int:id>", methods=["PUT"])
 def editar_asignatura(id):
-    try:
-        asignatura = obtener_por_id(id)
+    asignatura = obtener_por_id(id)
 
-        if not asignatura:
-            return respuesta_api(False, None, "Asignatura no encontrada", 404, {
-                "id": "No existe una asignatura activa con ese id"
-            })
+    if not asignatura:
+        raise APIError("Asignatura no encontrada.", status=404)
 
-        req = request.get_json(silent=True) or {}
-        asignatura_actualizada = actualizar(asignatura, req)
-        data = asignatura_schema.dump(asignatura_actualizada)
+    req = request.get_json(silent=True) or {}
+    asignatura_actualizada = actualizar(asignatura, req)
+    data = asignatura_schema.dump(asignatura_actualizada)
 
-        return respuesta_api(True, {"id": data["id"]}, "Asignatura actualizada correctamente")
-
-    except ValidationError as e:
-        db.session.rollback()
-        return respuesta_api(False, None, "Error de validacion", 400, e.messages)
-
-    except SQLAlchemyError:
-        db.session.rollback()
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrio un error al actualizar la asignatura"
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
+    return respuesta_api(success=True, data={"id": data["id"]}, message="Asignatura actualizada correctamente", status=200)
 
 
 @asignaturas_bp.route("/<int:id>", methods=["DELETE"])
 def eliminar_asignatura(id):
-    try:
-        asignatura = obtener_por_id(id)
+    asignatura = obtener_por_id(id)
 
-        if not asignatura:
-            return respuesta_api(False, None, "Asignatura no encontrada", 404, {
-                "id": "No existe una asignatura activa con ese id"
-            })
+    if not asignatura:
+        raise APIError("Asignatura no encontrada.", status=404)
 
-        esta_en_plan = PlanAsignatura.query.filter_by(
-            asignatura_id=id,
-            estado=1,
-        ).first()
+    esta_en_plan = PlanAsignatura.query.filter_by(
+        asignatura_id=id,
+        estado=1,
+    ).first()
 
-        esta_en_correlativa = PACorrelativa.query.filter_by(asignatura_id=id).first()
+    esta_en_correlativa = PACorrelativa.query.filter_by(asignatura_id=id).first()
 
-        if esta_en_plan or esta_en_correlativa:
-            return respuesta_api(False, None, "No se puede eliminar la asignatura", 409, {
-                "asignatura": "No se puede eliminar una asignatura asociada a un plan o correlativa"
-            })
+    if esta_en_plan or esta_en_correlativa:
+        raise APIError("No se puede eliminar una asignatura asociada a un plan o correlativa.", status=409)
 
-        eliminar(asignatura)
+    eliminar(asignatura)
 
-        return respuesta_api(True, {"id": id}, "Asignatura dada de baja correctamente")
-
-    except SQLAlchemyError:
-        db.session.rollback()
-        return respuesta_api(False, None, "Error de base de datos", 500, {
-            "database": "Ocurrio un error al eliminar la asignatura"
-        })
-
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-        return respuesta_api(False, None, "Error inesperado", 500, {
-            "server": "Ocurrio un error inesperado"
-        })
+    return respuesta_api(success=True, data={"id": id}, message="Asignatura dada de baja correctamente", status=200)

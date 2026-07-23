@@ -4,6 +4,14 @@ from flask_cors import CORS
 from db import db, ma
 from config.config import Config
 
+# control errores
+from sqlalchemy.exc import DataError, IntegrityError
+from werkzeug.exceptions import HTTPException
+from utils.errores import APIError
+from marshmallow import ValidationError 
+from utils.utilidades import respuesta_api
+import traceback
+
 from models.persona import Persona
 from models.tipo_documento import TipoDocumento
 from models.planes import Planes
@@ -67,6 +75,61 @@ def health():
         "status": "success",
         "message": "API funcionando"
     }, 200
+    
+# se ejecuta al finalizar cada peticion https
+@app.teardown_request
+def gestionar_sesion(exception=None):
+    if exception:
+        db.session.rollback()
+    db.session.remove()
+    
+# errores de validacion de schemas que implementamos nosotros
+@app.errorhandler(ValidationError)
+def manejar_validacion_marshmallow(err):
+    return respuesta_api(
+        success=False, 
+        message=err.messages, 
+        errors=err.messages,
+        status=400
+    )
+
+# control de errores de negocio que implementamos manualmente
+@app.errorhandler(APIError)
+def manejar_errores_negocio(err):
+    return respuesta_api(
+        success=False,
+        message=err.message,
+        errors="",
+        status=err.status
+    )
+
+# controla errores de base de datos, como FK, Datos Duplicados, Tipos Incorrectos de datos
+@app.errorhandler(DataError)
+@app.errorhandler(IntegrityError)
+def manejar_errores_base_datos(err):
+    db.session.rollback()
+    detalles_bd = str(err.orig) if hasattr(err, 'orig') else str(err)
+    return respuesta_api(
+        success=False,
+        message="Error de persistencia o consistencia en la base de datos.",
+        errors=detalles_bd,
+        status=400
+    )
+
+# Ataja cualquier fallo que no haya sido previsto 
+@app.errorhandler(Exception)
+def manejar_error_general(e):
+    if isinstance(e, HTTPException):
+        return respuesta_api(ok=False, message=e.description, error=e.name, status=e.code)
+
+    app.logger.error(f"Error 500 detectado:\n{traceback.format_exc()}")
+        
+    return respuesta_api(
+        success=False, 
+        message="Ocurrio un error inesperado en el servidor.", 
+        errors=str(e), 
+        status=500
+    )
 
 
 app.register_blueprint(personas_bp)
