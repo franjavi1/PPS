@@ -35,7 +35,7 @@ def actualizar(autoridad_comision, datos):
 
 
 def eliminar(autoridad_comision):
-    db.session.delete(autoridad_comision)
+    autoridad_comision.estado = 0
     db.session.commit()
 
     return autoridad_comision

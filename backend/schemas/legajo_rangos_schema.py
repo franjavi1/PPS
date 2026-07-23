@@ -35,7 +35,7 @@ class LegajoRangosSchema(ma.SQLAlchemySchema):
             "invalid": "El rango institucional debe ser un numero entero"
         }
     )
-
+    estado = ma.auto_field(dump_only=True)
     # Usuario que realiza la accion sobre el registro.
     usuario_accion = ma.auto_field(
         required=False,

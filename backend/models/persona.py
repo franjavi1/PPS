@@ -15,6 +15,8 @@ class Persona(db.Model):
         primary_key=True,
         autoincrement=True
     )
+    # id de usuario del microservicio de auth
+    usuario_id: Mapped[int | None ] = mapped_column(Integer, nullable=True, unique=True)
 
     # Tipo de documento asociado a la persona
     td_id: Mapped[int] = mapped_column(

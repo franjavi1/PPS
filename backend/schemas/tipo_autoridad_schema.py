@@ -23,7 +23,7 @@ class TipoAutoridadSchema(ma.SQLAlchemySchema):
         }
     )
 
-
+    estado = ma.auto_field(dump_only=True)
     usuario_accion = ma.auto_field(
         required=True,
         allow_none=False,

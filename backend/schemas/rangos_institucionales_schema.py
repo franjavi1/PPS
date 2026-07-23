@@ -39,7 +39,7 @@ class RangosInstitucionalesSchema(ma.SQLAlchemySchema):
             "invalid": "El nivel de jerarquia debe ser un numero entero"
         }
     )
-
+    estado = ma.auto_field(dump_only=True)
     # Usuario que realiza la accion sobre el registro.
     usuario_accion = ma.auto_field(
         required=True,
