@@ -55,7 +55,7 @@ services:
         ipv4_address: 172.10.10.30
 
   postgres:
-    image: postgres:16
+    image: postgres:17
     container_name: bomberos_postgres
     restart: always
     environment:
