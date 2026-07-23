@@ -18,7 +18,7 @@ legajo_sedes_bp = Blueprint("legajo_sedes_bp", __name__, url_prefix="/legajo-sed
 @legajo_sedes_bp.route("", methods=["GET"])
 def get_legajos_sedes():
     legajos_sedes = obtener_todos()
-    data = legajos_sedes_schema.dump(legajos_sedes)
+    data = legajo_sedes_schema.dump(legajos_sedes)
 
     if len(data) == 0:
         return respuesta_api(True, [], "No se encontraron resultados")

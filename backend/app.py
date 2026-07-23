@@ -10,6 +10,7 @@ from werkzeug.exceptions import HTTPException
 from utils.errores import APIError
 from marshmallow import ValidationError 
 from utils.utilidades import respuesta_api
+import traceback
 
 from models.persona import Persona
 from models.tipo_documento import TipoDocumento
@@ -120,6 +121,8 @@ def manejar_errores_base_datos(err):
 def manejar_error_general(e):
     if isinstance(e, HTTPException):
         return respuesta_api(ok=False, message=e.description, error=e.name, status=e.code)
+
+    app.logger.error(f"Error 500 detectado:\n{traceback.format_exc()}")
         
     return respuesta_api(
         success=False, 
