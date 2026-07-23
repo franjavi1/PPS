@@ -22,6 +22,7 @@ import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
+import { modalidadService } from "../services/modalidadService";
 
 const pasos = [
   { id: 1, titulo: "Comision", icono: GraduationCap },
@@ -61,6 +62,7 @@ function AltaComisionWizard() {
   const [aulas, setAulas] = useState([]);
   const [tiposAutoridad, setTiposAutoridad] = useState([]);
   const [legajos, setLegajos] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
@@ -80,6 +82,7 @@ function AltaComisionWizard() {
         resAulas,
         resTiposAutoridad,
         resLegajos,
+        resModalidades,
       ] = await Promise.all([
         planAsignaturaService.obtenerTodos(),
         asignaturaService.obtenerTodas(),
@@ -88,6 +91,7 @@ function AltaComisionWizard() {
         aulaService.obtenerTodas(),
         tipoAutoridadService.obtenerTodos(),
         apiRequest("/legajos"),
+        modalidadService.obtenerTodas(),
       ]);
 
       setPlanesAsignaturas(obtenerLista(resPlanesAsignaturas));
@@ -97,6 +101,7 @@ function AltaComisionWizard() {
       setAulas(obtenerLista(resAulas));
       setTiposAutoridad(obtenerLista(resTiposAutoridad));
       setLegajos(obtenerLista(resLegajos));
+      setModalidades(obtenerLista(resModalidades));
     } catch (err) {
       setError(err.message || "No se pudieron cargar los datos iniciales");
     } finally {
@@ -316,7 +321,7 @@ function AltaComisionWizard() {
                     <CampoSelect label="Plan asignatura" name="plan_asignaturas_id" value={comisionAsignatura.plan_asignaturas_id} onChange={cambiarComisionAsignatura} opciones={planesAsignaturas} getValue={(item) => item.id} getLabel={(item) => mapas.planesAsignaturas[item.id]} />
                     <CampoSelect label="Aula" name="aula_id" value={comisionAsignatura.aula_id} onChange={cambiarComisionAsignatura} opciones={aulas} getValue={(item) => item.id_aula} getLabel={(item) => item.aula} />
                     <CampoTexto label="Nombre" name="nombre" value={comisionAsignatura.nombre} onChange={cambiarComisionAsignatura} placeholder="Ej: Comision A - Incendios" icono={<Tag size={20} />} />
-                    <CampoTexto label="Modalidad" name="modalidad" value={comisionAsignatura.modalidad} onChange={cambiarComisionAsignatura} placeholder="Ej: Presencial" icono={<BookOpenCheck size={20} />} />
+                    <CampoSelect label="Modalidad" name="modalidad" value={comisionAsignatura.modalidad} onChange={cambiarComisionAsignatura} opciones={modalidades} getValue={(item) => item.descripcion} getLabel={(item) => item.descripcion} />
                     <CampoTexto label="Cupo maximo" name="cupo_maximo" type="number" value={comisionAsignatura.cupo_maximo} onChange={cambiarComisionAsignatura} placeholder="Ej: 30" icono={<Hash size={20} />} />
                     <CampoSelectSimple label="Estado" name="estado" value={comisionAsignatura.estado} onChange={cambiarComisionAsignatura} opciones={["Activo", "Inactivo"]} />
                   </div>

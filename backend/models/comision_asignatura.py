@@ -45,7 +45,7 @@ class ComisionAsignatura(db.Model):
         ForeignKey("Modalidades.modalidadesid"),
         nullable=False
     )
-    
+
     cupo_maximo: Mapped[int] = mapped_column(
         "cupoMaximo",
         Integer,

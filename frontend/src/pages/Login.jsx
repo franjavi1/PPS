@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { useAuth} from "../context/AuthContext"
 
 function InicioSesion() {
   const navigate = useNavigate();
-
+  const { login } = useAuth();
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [verPassword, setVerPassword] = useState(false);
@@ -35,15 +36,48 @@ function InicioSesion() {
     return Object.keys(nuevosErrores).length === 0;
   }
 
-  function ingresar(e) {
-    e.preventDefault();
+function ingresar(event) {
+  event.preventDefault();
 
-    if (!validarFormulario()) {
-      return;
-    }
-
-    navigate("/inicio");
+  if (!validarFormulario()) {
+    return;
   }
+
+  // Asignación temporal hasta conectar el login real.
+  let role = "ROLE_USER";
+
+  if (usuario.toLowerCase().includes("admin")) {
+    role = "ROLE_ADMIN";
+  } else if (
+    usuario.toLowerCase().includes("instructor")
+  ) {
+    role = "ROLE_INSTRUCTOR";
+  }
+
+  const header = window.btoa(
+    JSON.stringify({
+      alg: "HS256",
+      typ: "JWT",
+    })
+  );
+
+  const payload = window.btoa(
+    JSON.stringify({
+      sub: "1234567890",
+      usuario,
+      role,
+      exp:
+        Math.floor(Date.now() / 1000) +
+        60 * 60 * 24,
+    })
+  );
+
+  // Esta firma solo permite probar los permisos del frontend.
+  const token = `${header}.${payload}.mock_signature`;
+
+  login(token);
+  navigate("/inicio");
+}
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-8">
