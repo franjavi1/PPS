@@ -31,6 +31,8 @@ class PersonaSchema(ma.SQLAlchemySchema):
         }
     )
 
+    usuario_id = ma.auto_field(dump_only=True)
+
     # Nombre de la persona.
     nombre = ma.auto_field(
         required=True,

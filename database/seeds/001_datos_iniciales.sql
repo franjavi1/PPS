@@ -22,7 +22,7 @@ SET row_security = off;
 -- Data for Name: tipos_sedes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.tipos_sedes (id, descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Cuartel', 1, '2026-07-05 04:52:54.193872', '2026-07-05 04:52:54.193872');
+INSERT INTO public.tipos_sedes (id, descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Cuartel', 1, 1, '2026-07-05 04:52:54.193872', '2026-07-05 04:52:54.193872');
 
 
 --
@@ -49,8 +49,8 @@ INSERT INTO public."Aulas" (id_aula, "sedesId", aula, "esVirtual", "usuarioAccio
 -- Data for Name: Comision; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Comision" ("idComision", "Descripcion", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Comision A 2026 1C', 1, '2026-07-06 22:11:08.521056', '2026-07-06 22:11:08.521056');
-INSERT INTO public."Comision" ("idComision", "Descripcion", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Comision B 2026 1C', 1, '2026-07-06 22:11:21.611114', '2026-07-06 22:11:21.611114');
+INSERT INTO public."Comision" ("idComision", "Descripcion", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Comision A 2026 1C', 1, 1, '2026-07-06 22:11:08.521056', '2026-07-06 22:11:08.521056');
+INSERT INTO public."Comision" ("idComision", "Descripcion", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Comision B 2026 1C', 1, 1, '2026-07-06 22:11:21.611114', '2026-07-06 22:11:21.611114');
 
 
 --
@@ -69,20 +69,20 @@ INSERT INTO public.asignaturas (id, nombre, estado, formato, "usuarioAccion", "t
 -- Data for Name: tipos_planes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Formacion Inicial', 1, '2026-07-07 01:08:53.933584', '2026-07-07 01:08:53.933584');
-INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Especializacion', 1, '2026-07-07 01:11:40.677887', '2026-07-07 01:11:40.677887');
-INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Actualizacion Obligatoria', 1, '2026-07-07 01:11:50.881504', '2026-07-07 01:11:50.881504');
-INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 'Ascenso Jerarquico', 1, '2026-07-07 01:12:11.253643', '2026-07-07 01:12:11.253643');
-INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 'Instructorado', 1, '2026-07-07 01:12:44.38481', '2026-07-07 01:12:44.38481');
-INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (6, 'Reentrenamiento', 1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
+INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Formacion Inicial', 1, 1, '2026-07-07 01:08:53.933584', '2026-07-07 01:08:53.933584');
+INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Especializacion', 1, 1, '2026-07-07 01:11:40.677887', '2026-07-07 01:11:40.677887');
+INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Actualizacion Obligatoria', 1, 1, '2026-07-07 01:11:50.881504', '2026-07-07 01:11:50.881504');
+INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 'Ascenso Jerarquico', 1, 1, '2026-07-07 01:12:11.253643', '2026-07-07 01:12:11.253643');
+INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 'Instructorado', 1, 1, '2026-07-07 01:12:44.38481', '2026-07-07 01:12:44.38481');
+INSERT INTO public.tipos_planes ("idTipoPlanes", descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (6, 'Reentrenamiento', 1, 1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
 
 --
 -- Data for Name: Modalidades; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Modalidades" ("descripcion", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Presencial',1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
-INSERT INTO public."Modalidades" ("descripcion", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Virtual',1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
-INSERT INTO public."Modalidades" ("descripcion", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Hibrida',1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
+INSERT INTO public."Modalidades" ("descripcion", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Presencial', 1, 1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
+INSERT INTO public."Modalidades" ("descripcion", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Virtual', 1, 1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
+INSERT INTO public."Modalidades" ("descripcion", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES ('Hibrida', 1, 1, '2026-07-07 01:12:58.712361', '2026-07-07 01:12:58.712361');
 
 
 --
@@ -125,8 +125,8 @@ INSERT INTO public."TipoAutoridad" (id, descripcion, estado, "usuarioAccion", "t
 -- Data for Name: tipos_documento; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.tipos_documento (id, descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Dni', 1, '2026-07-05 02:34:46.398369', '2026-07-05 03:10:56.187263');
-INSERT INTO public.tipos_documento (id, descripcion, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Cedula', 1, '2026-07-05 03:11:34.164687', '2026-07-05 03:11:34.164687');
+INSERT INTO public.tipos_documento (id, descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Dni', 1, 1, '2026-07-05 02:34:46.398369', '2026-07-05 03:10:56.187263');
+INSERT INTO public.tipos_documento (id, descripcion, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Cedula', 1, 1, '2026-07-05 03:11:34.164687', '2026-07-05 03:11:34.164687');
 
 
 --
@@ -151,79 +151,79 @@ INSERT INTO public.legajos (id, "personasId", numero, estado, "usuarioAccion", "
 -- Data for Name: AutoridadComision; Type: TABLE DATA; Schema: public; Owner: -
 --
 
---INSERT INTO public."AutoridadComision" (id, "tipoAutoridadId", "legajoId", "comisionId", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 3, 1, 1, '2026-07-07 03:30:21.387249', '2026-07-07 03:30:49.66783');
+--INSERT INTO public."AutoridadComision" (id, "tipoAutoridadId", "legajoId", "comisionId", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 3, 1, 1, 1, '2026-07-07 03:30:21.387249', '2026-07-07 03:30:49.66783');
 
 
 --
 -- Data for Name: tipoContacto; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Celular', 1, '2026-07-05 22:56:33.859913', '2026-07-05 22:56:33.859913');
-INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Email', 1, '2026-07-05 22:57:21.667944', '2026-07-05 22:57:21.667944');
-INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Whatsapp', 1, '2026-07-05 22:57:49.444912', '2026-07-05 22:57:49.444912');
-INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 'Telefono Fijo', 1, '2026-07-05 22:58:17.49204', '2026-07-05 22:58:17.49204');
+INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Celular', 1, 1, '2026-07-05 22:56:33.859913', '2026-07-05 22:56:33.859913');
+INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Email', 1, 1, '2026-07-05 22:57:21.667944', '2026-07-05 22:57:21.667944');
+INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Whatsapp', 1, 1, '2026-07-05 22:57:49.444912', '2026-07-05 22:57:49.444912');
+INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 'Telefono Fijo', 1, 1, '2026-07-05 22:58:17.49204', '2026-07-05 22:58:17.49204');
 
 
 --
 -- Data for Name: Contactos; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 1, 1, true, '1122334455', 1, '2026-07-05 23:16:42.028058', '2026-07-05 23:16:42.028058');
-INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 1, true, '1122334455', 1, '2026-07-05 23:17:03.023635', '2026-07-05 23:17:03.023635');
-INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 3, 1, true, '1122334455', 1, '2026-07-05 23:17:09.237241', '2026-07-05 23:17:09.237241');
-INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 1, 2, true, 'Juan@gmail.com', 1, '2026-07-05 23:17:34.166658', '2026-07-05 23:17:34.166658');
+INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 1, 1, true, '1122334455', 1, 1, '2026-07-05 23:16:42.028058', '2026-07-05 23:16:42.028058');
+INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 1, true, '1122334455', 1, 1, '2026-07-05 23:17:03.023635', '2026-07-05 23:17:03.023635');
+INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 3, 1, true, '1122334455', 1, 1, '2026-07-05 23:17:09.237241', '2026-07-05 23:17:09.237241');
+INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 1, 2, true, 'Juan@gmail.com', 1, 1, '2026-07-05 23:17:34.166658', '2026-07-05 23:17:34.166658');
 
 
 --
 -- Data for Name: DatosMedicos; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."DatosMedicos" ("idDatosMedicos", "personasId", "grupoSanguineo", alergias, "aptitudFisica", seguro, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 'O+', 'Ninguna', true, 'OSDE', 1, '2026-07-05 22:27:44.213386', '2026-07-05 22:27:44.213386');
-INSERT INTO public."DatosMedicos" ("idDatosMedicos", "personasId", "grupoSanguineo", alergias, "aptitudFisica", seguro, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 1, 'A-', 'Penicilina', false, 'Swiss Medical', 1, '2026-07-05 22:27:34.891378', '2026-07-05 22:29:15.408921');
-INSERT INTO public."DatosMedicos" ("idDatosMedicos", "personasId", "grupoSanguineo", alergias, "aptitudFisica", seguro, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 3, 'AB+', 'Ibuprofeno', true, 'Galeno', 1, '2026-07-05 22:30:50.282902', '2026-07-05 22:30:50.282902');
+INSERT INTO public."DatosMedicos" ("idDatosMedicos", "personasId", "grupoSanguineo", alergias, "aptitudFisica", seguro, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 'O+', 'Ninguna', true, 'OSDE', 1, 1, '2026-07-05 22:27:44.213386', '2026-07-05 22:27:44.213386');
+INSERT INTO public."DatosMedicos" ("idDatosMedicos", "personasId", "grupoSanguineo", alergias, "aptitudFisica", seguro, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 1, 'A-', 'Penicilina', false, 'Swiss Medical', 1, 1, '2026-07-05 22:27:34.891378', '2026-07-05 22:29:15.408921');
+INSERT INTO public."DatosMedicos" ("idDatosMedicos", "personasId", "grupoSanguineo", alergias, "aptitudFisica", seguro, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 3, 'AB+', 'Ibuprofeno', true, 'Galeno', 1, 1, '2026-07-05 22:30:50.282902', '2026-07-05 22:30:50.282902');
 
 
 --
 -- Data for Name: rangos_institucionales; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Bombero', 1, 1, '2026-07-06 03:40:02.323424', '2026-07-06 03:40:02.323424');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Cabo', 2, 1, '2026-07-06 03:40:19.61734', '2026-07-06 03:40:19.61734');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Cabo Primero', 3, 1, '2026-07-06 03:40:30.294857', '2026-07-06 03:40:30.294857');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 'Sargento', 4, 1, '2026-07-06 03:40:39.957696', '2026-07-06 03:40:39.957696');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 'Sargento Primero', 5, 1, '2026-07-06 03:40:51.555355', '2026-07-06 03:40:51.555355');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (6, 'Suboficial Principal', 6, 1, '2026-07-06 03:41:00.955091', '2026-07-06 03:41:00.955091');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (7, 'Suboficial Mayor', 7, 1, '2026-07-06 03:41:12.554998', '2026-07-06 03:41:12.554998');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (8, 'Oficial Ayudante', 8, 1, '2026-07-06 03:41:21.250803', '2026-07-06 03:41:21.250803');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (9, 'Oficial Inspector', 9, 1, '2026-07-06 03:41:33.101194', '2026-07-06 03:41:33.101194');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (10, 'Oficial Principal', 10, 1, '2026-07-06 03:41:44.432066', '2026-07-06 03:41:44.432066');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (11, 'Sub-Comandante', 11, 1, '2026-07-06 03:41:57.355629', '2026-07-06 03:41:57.355629');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (12, 'Comandante', 12, 1, '2026-07-06 03:42:10.123047', '2026-07-06 03:42:10.123047');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (13, 'Comandante Mayor', 13, 1, '2026-07-06 03:42:19.307127', '2026-07-06 03:42:19.307127');
-INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (14, 'Comandante General', 14, 1, '2026-07-06 03:42:27.141716', '2026-07-06 03:42:27.141716');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 'Bombero', 1, 1, 1, '2026-07-06 03:40:02.323424', '2026-07-06 03:40:02.323424');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 'Cabo', 2, 1, 1, '2026-07-06 03:40:19.61734', '2026-07-06 03:40:19.61734');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 'Cabo Primero', 3, 1, 1, '2026-07-06 03:40:30.294857', '2026-07-06 03:40:30.294857');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 'Sargento', 4, 1, 1, '2026-07-06 03:40:39.957696', '2026-07-06 03:40:39.957696');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 'Sargento Primero', 5, 1, 1, '2026-07-06 03:40:51.555355', '2026-07-06 03:40:51.555355');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (6, 'Suboficial Principal', 6, 1, 1, '2026-07-06 03:41:00.955091', '2026-07-06 03:41:00.955091');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (7, 'Suboficial Mayor', 7, 1, 1, '2026-07-06 03:41:12.554998', '2026-07-06 03:41:12.554998');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (8, 'Oficial Ayudante', 8, 1, 1, '2026-07-06 03:41:21.250803', '2026-07-06 03:41:21.250803');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (9, 'Oficial Inspector', 9, 1, 1, '2026-07-06 03:41:33.101194', '2026-07-06 03:41:33.101194');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (10, 'Oficial Principal', 10, 1, 1, '2026-07-06 03:41:44.432066', '2026-07-06 03:41:44.432066');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (11, 'Sub-Comandante', 11, 1, 1, '2026-07-06 03:41:57.355629', '2026-07-06 03:41:57.355629');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (12, 'Comandante', 12, 1, 1, '2026-07-06 03:42:10.123047', '2026-07-06 03:42:10.123047');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (13, 'Comandante Mayor', 13, 1, 1, '2026-07-06 03:42:19.307127', '2026-07-06 03:42:19.307127');
+INSERT INTO public.rangos_institucionales (id, descripcion, "nivelJerarquia", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (14, 'Comandante General', 14, 1, 1, '2026-07-06 03:42:27.141716', '2026-07-06 03:42:27.141716');
 
 
 --
 -- Data for Name: LegajoRangos; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."LegajoRangos" ("idLegajoRangos", "legajoId", "rangosInstitucionalesId", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 1, 1, '2026-07-06 04:07:20.069196', '2026-07-06 04:07:20.069196');
-INSERT INTO public."LegajoRangos" ("idLegajoRangos", "legajoId", "rangosInstitucionalesId", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 2, 6, 1, '2026-07-06 04:09:32.322998', '2026-07-06 04:09:32.322998');
+INSERT INTO public."LegajoRangos" ("idLegajoRangos", "legajoId", "rangosInstitucionalesId", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 1, 1, 1, '2026-07-06 04:07:20.069196', '2026-07-06 04:07:20.069196');
+INSERT INTO public."LegajoRangos" ("idLegajoRangos", "legajoId", "rangosInstitucionalesId", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 2, 6, 1, 1, '2026-07-06 04:09:32.322998', '2026-07-06 04:09:32.322998');
 
 
 --
 -- Data for Name: LegajoSedes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."LegajoSedes" ("idSedeLegajo", "sedesId", "Legajo_id", "esAutoridad", "usuarioAccion", "tsCreacion", "tsModificacion", "esSedeBase") VALUES (1, 1, 1, true, 1, '2026-07-06 04:50:54.849665', '2026-07-06 04:50:54.849665', true);
-INSERT INTO public."LegajoSedes" ("idSedeLegajo", "sedesId", "Legajo_id", "esAutoridad", "usuarioAccion", "tsCreacion", "tsModificacion", "esSedeBase") VALUES (2, 4, 2, false, 1, '2026-07-06 05:20:35.11998', '2026-07-06 05:20:35.11998', false);
+INSERT INTO public."LegajoSedes" ("idSedeLegajo", "sedesId", "Legajo_id", "esAutoridad", estado, "usuarioAccion", "tsCreacion", "tsModificacion", "esSedeBase") VALUES (1, 1, 1, true, 1, 1, '2026-07-06 04:50:54.849665', '2026-07-06 04:50:54.849665', true);
+INSERT INTO public."LegajoSedes" ("idSedeLegajo", "sedesId", "Legajo_id", "esAutoridad", estado, "usuarioAccion", "tsCreacion", "tsModificacion", "esSedeBase") VALUES (2, 4, 2, false, 1, 1, '2026-07-06 05:20:35.11998', '2026-07-06 05:20:35.11998', false);
 
 
 --
 -- Data for Name: PACorrelativas; Type: TABLE DATA; Schema: public; Owner: -
 --
 
---INSERT INTO public."PACorrelativas" (id, "asignaturaId", "paId", "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 4, 1, '2026-07-07 04:58:02.644187', '2026-07-07 04:58:02.644187');
+--INSERT INTO public."PACorrelativas" (id, "asignaturaId", "paId", estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (1, 1, 4, 1, 1, '2026-07-07 04:58:02.644187', '2026-07-07 04:58:02.644187');
 
 
 --
@@ -391,4 +391,3 @@ SELECT pg_catalog.setval('public.tipos_sedes_id_seq', 1, true);
 --
 
 --\unrestrict GHsy0q5JXkR3sqVf4Ab5oZ7srG7onwjdEArllazfBzxrDgp7zetZolDqfOiaVzk
-
