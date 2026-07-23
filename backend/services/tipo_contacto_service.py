@@ -40,7 +40,7 @@ def actualizar(tipo_contacto, datos):
 
 
 def eliminar(tipo_contacto):
-    db.session.delete(tipo_contacto)
+    tipo_contacto.estado = 0
     db.session.commit()
 
     return tipo_contacto

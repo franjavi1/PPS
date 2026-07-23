@@ -63,7 +63,7 @@ def actualizar(comision_asignatura, datos):
 
 
 def eliminar(comision_asignatura):
-    db.session.delete(comision_asignatura)
+    comision_asignatura.estado = 0
     db.session.commit()
 
     return comision_asignatura
