@@ -38,7 +38,7 @@ const comisionAsignaturaInicial = {
   nombre: "",
   modalidad: "",
   cupo_maximo: "",
-  estado: "Activo",
+  estado: "1",
 };
 const autoridadInicial = {
   tipo_autoridad_id: "",
@@ -166,7 +166,7 @@ function AltaComisionWizard() {
       nombre: comisionAsignatura.nombre.trim(),
       modalidad: comisionAsignatura.modalidad.trim(),
       cupo_maximo: Number(comisionAsignatura.cupo_maximo),
-      estado: comisionAsignatura.estado,
+      estado: Number(comisionAsignatura.estado),
       usuario_accion: 1,
     };
     const mensaje = validarComisionAsignatura(payload);
@@ -323,7 +323,15 @@ function AltaComisionWizard() {
                     <CampoTexto label="Nombre" name="nombre" value={comisionAsignatura.nombre} onChange={cambiarComisionAsignatura} placeholder="Ej: Comision A - Incendios" icono={<Tag size={20} />} />
                     <CampoSelect label="Modalidad" name="modalidad" value={comisionAsignatura.modalidad} onChange={cambiarComisionAsignatura} opciones={modalidades} getValue={(item) => item.descripcion} getLabel={(item) => item.descripcion} />
                     <CampoTexto label="Cupo maximo" name="cupo_maximo" type="number" value={comisionAsignatura.cupo_maximo} onChange={cambiarComisionAsignatura} placeholder="Ej: 30" icono={<Hash size={20} />} />
-                    <CampoSelectSimple label="Estado" name="estado" value={comisionAsignatura.estado} onChange={cambiarComisionAsignatura} opciones={["Activo", "Inactivo"]} />
+                    <CampoSelect
+                      label="Estado"
+                      name="estado"
+                      value={comisionAsignatura.estado}
+                      onChange={cambiarComisionAsignatura}
+                      opciones={[{ id: 1, label: "Activo" }, { id: 0, label: "Inactivo" }]}
+                      getValue={(item) => item.id}
+                      getLabel={(item) => item.label}
+                    />
                   </div>
                   <div className="flex justify-end">
                     <button type="button" onClick={agregarComisionAsignatura} disabled={guardando} className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60">

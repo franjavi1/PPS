@@ -37,7 +37,7 @@ const nuevaComisionAsignaturaInicial = {
   nombre: "",
   modalidad: "",
   cupo_maximo: "",
-  estado: "Activo",
+  estado: "1",
 };
 
 const nuevaAutoridadInicial = {
@@ -211,7 +211,7 @@ function EditarComision() {
       nombre: nuevaComisionAsignatura.nombre.trim(),
       modalidad: nuevaComisionAsignatura.modalidad.trim(),
       cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo),
-      estado: nuevaComisionAsignatura.estado,
+      estado: Number(nuevaComisionAsignatura.estado),
       usuario_accion: 1,
     };
 
@@ -421,12 +421,17 @@ function EditarComision() {
                       getValue={(item) => item.id_aula}
                       getLabel={(item) => item.aula}
                     />
-                    <CampoSelectSimple
+                    <CampoSelect
                       label="Estado"
                       name="estado"
                       value={nuevaComisionAsignatura.estado}
                       onChange={cambiarNuevaComisionAsignatura}
-                      opciones={["Activo", "Inactivo"]}
+                      opciones={[
+                        { value: "1", label: "Activo" },
+                        { value: "0", label: "Inactivo" },
+                      ]}
+                      getValue={(item) => item.value}
+                      getLabel={(item) => item.label}
                     />
                   </div>
 
