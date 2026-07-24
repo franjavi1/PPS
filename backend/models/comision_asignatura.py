@@ -39,16 +39,25 @@ class ComisionAsignatura(db.Model):
         nullable=False
     )
 
+    modalidadesid: Mapped[int] = mapped_column(
+        "modalidadesid",
+        Integer,
+        ForeignKey("Modalidades.modalidadesid"),
+        nullable=False
+    )
+
     cupo_maximo: Mapped[int] = mapped_column(
         "cupoMaximo",
         Integer,
         nullable=False
     )
 
-    estado: Mapped[str] = mapped_column(
-        String(45),
-        nullable=False
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
     )
+
 
     usuario_accion: Mapped[int | None] = mapped_column(
         "usuarioAccion",

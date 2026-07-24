@@ -43,7 +43,7 @@ def actualizar(legajo_sedes, datos):
 
 
 def eliminar(legajo_sedes):
-    db.session.delete(legajo_sedes)
+    legajo_sedes.estado = 0
     db.session.commit()
 
     return legajo_sedes

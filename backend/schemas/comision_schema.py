@@ -25,7 +25,7 @@ class ComisionSchema(ma.SQLAlchemySchema):
             "invalid": "La descripcion debe ser un texto valido"
         }
     )
-
+    estado = ma.auto_field(dump_only=True)
     # Usuario que realiza la accion sobre el registro.
     usuario_accion = ma.auto_field(
         required=True,

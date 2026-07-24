@@ -1,4 +1,5 @@
 from models.planes import Planes
+from models.plan_asignatura import PlanAsignatura
 from schemas.planes_schema import PlanesSchema, plan_schema
 from db import db
 
@@ -35,6 +36,14 @@ def actualizar(plan, datos):
 
 
 def eliminar(plan):
+    relaciones_activas = PlanAsignatura.query.filter_by(
+        plan_id=plan.id,
+        estado=1
+    ).all()
+
+    for relacion in relaciones_activas:
+        relacion.estado = 0
+
     plan.estado = 0
     db.session.commit()
 

@@ -43,7 +43,7 @@ def actualizar(rango, datos):
 
 
 def eliminar(rango):
-    db.session.delete(rango)
+    rango.estado = 0
     db.session.commit()
 
     return rango

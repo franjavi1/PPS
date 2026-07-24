@@ -18,7 +18,7 @@ class AutoridadComisionSchema(ma.SQLAlchemySchema):
     legajo_id = ma.auto_field(required=True, allow_none=False)
     comision_id = ma.auto_field(required=True, allow_none=False)
     usuario_accion = ma.auto_field(required=False, allow_none=True)
-
+    estado = ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
 

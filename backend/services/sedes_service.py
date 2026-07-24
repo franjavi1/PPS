@@ -34,7 +34,7 @@ def actualizar(sede, datos):
 
 
 def eliminar(sede):
-    db.session.delete(sede)
+    sede.estado = 0
     db.session.commit()
 
     return sede

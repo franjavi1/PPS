@@ -21,6 +21,7 @@ import { comisionService } from "../services/comisionService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
+import { modalidadService } from "../services/modalidadService";
 
 const formularioInicial = {
   plan_asignaturas_id: "",
@@ -40,6 +41,7 @@ function ComisionesAsignaturas() {
   const [aulas, setAulas] = useState([]);
   const [comisiones, setComisiones] = useState([]);
   const [sedes, setSedes] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -65,6 +67,7 @@ function ComisionesAsignaturas() {
         resAulas,
         resComisiones,
         resSedes,
+        resModalidades,
       ] =
         await Promise.all([
           comisionAsignaturaService.obtenerTodos(),
@@ -74,6 +77,7 @@ function ComisionesAsignaturas() {
           aulaService.obtenerTodas(),
           comisionService.obtenerTodas(),
           sedeService.obtenerTodas(),
+          modalidadService.obtenerTodas(),
         ]);
 
       setRegistros(resRegistros.data || []);
@@ -83,6 +87,7 @@ function ComisionesAsignaturas() {
       setAulas(resAulas.data || []);
       setComisiones(resComisiones.data || []);
       setSedes(resSedes.data || []);
+      setModalidades(resModalidades.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron obtener las comisiones asignaturas");
     } finally {
@@ -450,15 +455,23 @@ function ComisionesAsignaturas() {
                       icon={<Tag size={20} />}
                     />
 
-                    <CampoInput
+                    <CampoSelect
                       label="Modalidad"
                       name="modalidad"
                       value={formulario.modalidad}
                       onChange={manejarCambio}
-                      placeholder="Ej: Presencial"
-                      maxLength={45}
                       icon={<BookOpenCheck size={20} />}
-                    />
+                    >
+                      <option value="">Seleccione</option>
+                      {modalidades.map((modalidad) => (
+                        <option
+                          key={modalidad.modalidadesid}
+                          value={modalidad.descripcion}
+                        >
+                          {modalidad.descripcion}
+                        </option>
+                      ))}
+                    </CampoSelect>
 
                     <CampoInput
                       label="Cupo maximo"

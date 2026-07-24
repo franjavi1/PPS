@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Guía de permisos por rol en menús — Frontend</title>
+  <style>
+    @page { size: A4; margin: 18mm 16mm; }
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; color: #1e293b; font-size: 10.5pt; line-height: 1.45; margin: 0; }
+    h1 { color: #991b1b; font-size: 24pt; margin: 0 0 6mm; }
+    h2 { color: #991b1b; font-size: 16pt; margin: 8mm 0 3mm; border-bottom: 1px solid #fecaca; padding-bottom: 2mm; }
+    h3 { color: #334155; font-size: 12.5pt; margin: 6mm 0 2mm; }
+    p { margin: 2mm 0; }
+    ul, ol { margin: 2mm 0 3mm 6mm; padding-left: 5mm; }
+    li { margin: 1mm 0; }
+    code { font-family: Consolas, monospace; font-size: 9pt; }
+    pre { background: #0f172a; color: #e2e8f0; border-radius: 5px; padding: 4mm; white-space: pre-wrap; overflow-wrap: anywhere; font: 8.3pt/1.42 Consolas, monospace; break-inside: avoid; }
+    .cover { min-height: 245mm; display: flex; flex-direction: column; justify-content: center; }
+    .subtitle { font-size: 14pt; color: #64748b; }
+    .meta { margin-top: 18mm; border-left: 4px solid #b91c1c; padding: 4mm; background: #f8fafc; }
+    .warning { background: #fff7ed; border: 1px solid #fdba74; padding: 4mm; border-radius: 5px; margin: 4mm 0; }
+    .info { background: #eff6ff; border: 1px solid #93c5fd; padding: 4mm; border-radius: 5px; margin: 4mm 0; }
+    .ok { background: #f0fdf4; border: 1px solid #86efac; padding: 4mm; border-radius: 5px; margin: 4mm 0; }
+    table { width: 100%; border-collapse: collapse; margin: 3mm 0; break-inside: avoid; }
+    th, td { border: 1px solid #cbd5e1; padding: 2.5mm; text-align: left; vertical-align: top; }
+    th { background: #f1f5f9; }
+    .page-break { break-before: page; }
+    .small { font-size: 9pt; color: #64748b; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <h1>Permisos por rol en los menús</h1>
+    <p class="subtitle">Guía para reproducir manualmente los cambios del frontend en otra rama</p>
+    <div class="meta">
+      <p><strong>Proyecto:</strong> Sistema de Legajos — Bomberos Voluntarios</p>
+      <p><strong>Rama analizada:</strong> feature/frontend-infraestructura</p>
+      <p><strong>Commit de referencia:</strong> 6275b4f — implementación de RBAC con sessionStorage</p>
+      <p><strong>Alcance:</strong> interfaz React. No modifica ni protege el backend.</p>
+    </div>
+  </section>
+
+  <h2>1. Objetivo y funcionamiento</h2>
+  <p>El objetivo es que React muestre, oculte o deshabilite opciones según el rol del usuario. El flujo implementado en la rama de referencia es:</p>
+  <ol>
+    <li>El login obtiene o genera un token con un rol.</li>
+    <li>El token se guarda en <code>sessionStorage</code>.</li>
+    <li><code>AuthContext</code> decodifica el token y publica el rol para toda la aplicación.</li>
+    <li><code>Navbar</code> entrega el rol a los menús de escritorio y móvil.</li>
+    <li><code>hasPermission()</code> decide qué elementos se renderizan.</li>
+  </ol>
+
+  <table>
+    <thead><tr><th>Rol</th><th>Permisos de la implementación actual</th></tr></thead>
+    <tbody>
+      <tr><td>ROLE_ADMIN</td><td>crear, editar, eliminar, leer</td></tr>
+      <tr><td>ROLE_INSTRUCTOR</td><td>editar_notas, leer</td></tr>
+      <tr><td>ROLE_USER</td><td>leer</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning">
+    <strong>Importante:</strong> ocultar un menú no protege la API. Un usuario todavía podría llamar al backend directamente. Esta guía reproduce la capa visual; la autorización definitiva debe realizarse también en Flask.
+  </div>
+
+  <h2>2. Archivos involucrados</h2>
+  <table>
+    <thead><tr><th>Archivo</th><th>Responsabilidad</th></tr></thead>
+    <tbody>
+      <tr><td>src/utils/authHelper.js</td><td>Matriz de permisos y función <code>hasPermission</code>.</td></tr>
+      <tr><td>src/utils/auth.js</td><td>Decodificación del JWT y normalización del rol.</td></tr>
+      <tr><td>src/context/AuthContext.jsx</td><td>Estado global del rol, login y logout.</td></tr>
+      <tr><td>src/App.jsx</td><td>Coloca <code>AuthProvider</code> alrededor de la aplicación.</td></tr>
+      <tr><td>src/pages/Login.jsx</td><td>Entrega el token a <code>login()</code>.</td></tr>
+      <tr><td>src/components/Navbar.jsx</td><td>Obtiene el rol y lo pasa a ambos menús.</td></tr>
+      <tr><td>src/components/DesktopNav.jsx</td><td>Filtra opciones del menú de escritorio.</td></tr>
+      <tr><td>src/components/MobileDrawer.jsx</td><td>Filtra opciones del menú móvil.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="page-break">3. Paso 1 — Matriz de permisos</h2>
+  <p>Crear <code>frontend/src/utils/authHelper.js</code>:</p>
+  <pre>export const PERMISSIONS_MAP = {
+  ROLE_ADMIN: ["crear", "editar", "eliminar", "leer"],
+  ROLE_INSTRUCTOR: ["editar_notas", "leer"],
+  ROLE_USER: ["leer"],
+};
+
+export function hasPermission(userRole, action) {
+  if (!userRole) return false;
+  const permissions = PERMISSIONS_MAP[userRole] || [];
+  return permissions.includes(action);
+}</pre>
+
+  <p>Ejemplos:</p>
+  <pre>hasPermission("ROLE_ADMIN", "crear");      // true
+hasPermission("ROLE_USER", "crear");       // false
+hasPermission("ROLE_INSTRUCTOR", "leer");  // true</pre>
+
+  <div class="info">
+    Esta matriz utiliza permisos genéricos. Una versión más precisa debería utilizar permisos por recurso, por ejemplo <code>personas.leer</code>, <code>planes.crear</code> y <code>configuracion.editar</code>.
+  </div>
+
+  <h2>4. Paso 2 — Leer el rol del token</h2>
+  <p>Crear <code>frontend/src/utils/auth.js</code>. Esta versión decodifica el contenido del JWT; no verifica su firma:</p>
+  <pre>export function parseJWT(token) {
+  try {
+    const payload = token.split(".")[1];
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = decodeURIComponent(
+      atob(normalized)
+        .split("")
+        .map((char) =&gt; "%" + ("00" + char.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+}
+
+export function obtenerRolNormalizado(payload) {
+  if (!payload) return null;
+  const rawRole = payload.role || payload.rol || payload.authorities;
+  const role = Array.isArray(rawRole) ? rawRole[0] : rawRole;
+  const value = String(role || "").toUpperCase();
+
+  if (value.includes("ADMIN")) return "ROLE_ADMIN";
+  if (value.includes("INSTRUCTOR")) return "ROLE_INSTRUCTOR";
+  return "ROLE_USER";
+}</pre>
+
+  <h2 class="page-break">5. Paso 3 — Contexto de autenticación</h2>
+  <p>Crear <code>frontend/src/context/AuthContext.jsx</code>:</p>
+  <pre>import { createContext, useContext, useState } from "react";
+import { parseJWT, obtenerRolNormalizado } from "../utils/auth";
+
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
+  const [currentUserRole, setCurrentUserRole] = useState(() =&gt; {
+    const token = sessionStorage.getItem("token");
+    return token ? obtenerRolNormalizado(parseJWT(token)) : null;
+  });
+
+  function login(token) {
+    sessionStorage.setItem("token", token);
+    setCurrentUserRole(obtenerRolNormalizado(parseJWT(token)));
+  }
+
+  function logout() {
+    sessionStorage.removeItem("token");
+    setCurrentUserRole(null);
+  }
+
+  return (
+    &lt;AuthContext.Provider value={{ currentUserRole, login, logout }}&gt;
+      {children}
+    &lt;/AuthContext.Provider&gt;
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}</pre>
+
+  <h3>Envolver la aplicación</h3>
+  <p>En <code>App.jsx</code>, importar el proveedor y envolver el contenido:</p>
+  <pre>import { AuthProvider } from "./context/AuthContext";
+
+function App() {
+  return (
+    &lt;AuthProvider&gt;
+      {/* Toaster, Routes y demás contenido */}
+    &lt;/AuthProvider&gt;
+  );
+}</pre>
+
+  <h2>6. Paso 4 — Conectar el login</h2>
+  <p>El componente de login debe obtener <code>login</code> desde el contexto:</p>
+  <pre>import { useAuth } from "../context/AuthContext";
+
+function InicioSesion() {
+  const { login } = useAuth();
+
+  async function ingresar(event) {
+    event.preventDefault();
+
+    // En producción, este token debe venir del backend.
+    const respuesta = await autenticar(usuario, password);
+    login(respuesta.token);
+    navigate("/inicio");
+  }
+}</pre>
+
+  <div class="warning">
+    La rama analizada genera un JWT simulado y decide el rol mirando si el usuario contiene “admin” o “instructor”. Eso sirve únicamente para demostrar la interfaz. No debe copiarse como autenticación real.
+  </div>
+
+  <h2 class="page-break">7. Paso 5 — Pasar el rol al Navbar</h2>
+  <p>En <code>Navbar.jsx</code>:</p>
+  <pre>import { useAuth } from "../context/AuthContext";
+
+function Navbar() {
+  const { currentUserRole, logout } = useAuth();
+
+  return (
+    &lt;&gt;
+      &lt;DesktopNav currentUserRole={currentUserRole} /&gt;
+      &lt;MobileDrawer currentUserRole={currentUserRole} /&gt;
+    &lt;/&gt;
+  );
+}</pre>
+
+  <h2>8. Paso 6 — Filtrar el menú de escritorio</h2>
+  <p>En <code>DesktopNav.jsx</code>:</p>
+  <pre>import { hasPermission } from "../utils/authHelper";
+
+export default function DesktopNav({ currentUserRole }) {
+  return (
+    &lt;nav&gt;
+      {hasPermission(currentUserRole, "leer") &amp;&amp; (
+        &lt;button onClick={() =&gt; navigate("/config-documentos")}&gt;
+          Configuración / Catálogos
+        &lt;/button&gt;
+      )}
+
+      {hasPermission(currentUserRole, "crear") &amp;&amp; (
+        &lt;button onClick={() =&gt; navigate("/crearLegajo")}&gt;
+          Nuevo Legajo
+        &lt;/button&gt;
+      )}
+    &lt;/nav&gt;
+  );
+}</pre>
+
+  <p>El mismo patrón se repite para Planes, Personas, Asignaturas y cualquier otra opción:</p>
+  <pre>{hasPermission(currentUserRole, "crear") &amp;&amp; (
+  &lt;button onClick={() =&gt; navigate("/planes/alta")}&gt;
+    Nuevo Plan de Estudio
+  &lt;/button&gt;
+)}</pre>
+
+  <h2>9. Paso 7 — Repetirlo en móvil</h2>
+  <p>En <code>MobileDrawer.jsx</code> se utiliza la misma matriz:</p>
+  <pre>import { hasPermission } from "../utils/authHelper";
+
+{hasPermission(currentUserRole, "crear") &amp;&amp; (
+  &lt;button onClick={() =&gt; navigate("/alta-persona")}&gt;
+    Registrar Persona
+  &lt;/button&gt;
+)}</pre>
+
+  <div class="info">
+    Es importante actualizar ambos componentes. Si solo se modifica <code>DesktopNav</code>, las opciones continuarían visibles desde un teléfono.
+  </div>
+
+  <h2 class="page-break">10. Recomendación: permisos por recurso</h2>
+  <p>Para que los roles controlen realmente qué secciones aparecen, conviene reemplazar los permisos genéricos por permisos específicos:</p>
+  <pre>export const PERMISSIONS_MAP = {
+  ROLE_ADMIN: ["*"],
+
+  ROLE_INSTRUCTOR: [
+    "personas.leer",
+    "planes.leer",
+    "asignaturas.leer",
+    "notas.editar",
+  ],
+
+  ROLE_USER: [
+    "personas.leer",
+  ],
+};
+
+export function hasPermission(role, permission) {
+  const permissions = PERMISSIONS_MAP[role] || [];
+  return permissions.includes("*") || permissions.includes(permission);
+}</pre>
+
+  <p>Entonces cada menú puede decidirse de forma independiente:</p>
+  <pre>{hasPermission(currentUserRole, "personas.leer") &amp;&amp; (
+  &lt;button onClick={() =&gt; navigate("/personas")}&gt;Personas&lt;/button&gt;
+)}
+
+{hasPermission(currentUserRole, "planes.crear") &amp;&amp; (
+  &lt;button onClick={() =&gt; navigate("/planes/alta")}&gt;Nuevo plan&lt;/button&gt;
+)}</pre>
+
+  <h2>11. Pruebas manuales</h2>
+  <table>
+    <thead><tr><th>Caso</th><th>Resultado esperado</th></tr></thead>
+    <tbody>
+      <tr><td>Sin sesión</td><td>No deberían mostrarse opciones privadas.</td></tr>
+      <tr><td>ROLE_ADMIN</td><td>Ve lectura, altas, edición y eliminación.</td></tr>
+      <tr><td>ROLE_INSTRUCTOR</td><td>Ve consultas y la edición específica de notas.</td></tr>
+      <tr><td>ROLE_USER</td><td>Ve solamente las opciones de lectura autorizadas.</td></tr>
+      <tr><td>Cerrar sesión</td><td>Se elimina el token y desaparece el rol.</td></tr>
+      <tr><td>Vista móvil</td><td>Respeta exactamente los mismos permisos que escritorio.</td></tr>
+      <tr><td>Recargar página</td><td>El rol se recupera desde <code>sessionStorage</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12. Lista de verificación</h2>
+  <ul>
+    <li>Crear <code>authHelper.js</code> y definir roles.</li>
+    <li>Crear <code>auth.js</code> para extraer el rol.</li>
+    <li>Crear <code>AuthContext.jsx</code>.</li>
+    <li>Envolver la aplicación con <code>AuthProvider</code>.</li>
+    <li>Conectar el token del login con <code>login(token)</code>.</li>
+    <li>Entregar <code>currentUserRole</code> al Navbar.</li>
+    <li>Filtrar <code>DesktopNav</code>.</li>
+    <li>Filtrar <code>MobileDrawer</code>.</li>
+    <li>Probar todos los roles en escritorio y móvil.</li>
+    <li>No utilizar el token simulado en producción.</li>
+    <li>Agregar posteriormente protección de rutas React.</li>
+    <li>Agregar posteriormente autorización en los endpoints Flask.</li>
+  </ul>
+
+  <div class="ok">
+    <strong>Resultado esperado:</strong> cada usuario ve solamente las opciones de navegación correspondientes a su rol. La protección del backend debe implementarse como una etapa separada y obligatoria.
+  </div>
+
+  <p class="small">Documento generado a partir del análisis en modo lectura de la rama feature/frontend-infraestructura. No se realizaron cambios funcionales en el frontend.</p>
+</body>
+</html>

@@ -12,7 +12,6 @@ def obtener_todos():
 def obtener_por_id(id):
     return Asignaturas.query.filter_by(id=id, estado=1).first()
 
-
 def crear(datos):
     nueva_asignatura = asignatura_schema.load(datos)
 
@@ -21,16 +20,13 @@ def crear(datos):
 
     return nueva_asignatura
 
-
 def actualizar(asignatura, datos):
     schema = AsignaturasSchema(partial=True)
-
     schema.load(datos, instance=asignatura, partial=True)
 
     db.session.commit()
 
     return asignatura
-
 
 def eliminar(asignatura):
     asignatura.estado = 0
