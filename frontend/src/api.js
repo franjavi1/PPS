@@ -1,7 +1,7 @@
 
 import toast from "react-hot-toast";
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/planes";
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/g1";
 
 
 export async function apiRequest(path, options = {}) {

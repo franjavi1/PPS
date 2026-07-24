@@ -7,5 +7,3 @@ python-dotenv
 marshmallow
 flask-marshmallow
 marshmallow-sqlalchemy
-PyYAML
-requests
