@@ -20,18 +20,6 @@ def obtener_modalidad(modalidad):
 def obtener_todos():
     return ComisionAsignatura.query.all()
 
-#def obtener_detalle_por_id(id):
-    #plan = (
-    #    legajo = db.session.query(Legajo).filter(Legajo.id == id).first()
-        
-    #    if not legajo:
-    #        return None
-        
-        
-    #    db.session.query(ComisionAsignatura)
-    #    .join(Comision, Comision.id_comision == ComisionAsignatura.comision_id)
-    #)
-    #return ComisionAsignatura.query.filter_
 
 def obtener_por_id(id_comision_asignatura):
     return ComisionAsignatura.query.filter_by(

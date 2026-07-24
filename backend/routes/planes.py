@@ -23,6 +23,7 @@ def get_planes():
 
     return respuesta_api(True, data, "Lista de planes obtenida")
 
+
 @planes_bp.route("/<int:id>", methods=["GET"])
 def get_plan(id):
     plan = obtener_por_id(id)
@@ -33,6 +34,7 @@ def get_plan(id):
     data = plan_schema.dump(plan)
 
     return respuesta_api(True, data, "Plan obtenido correctamente")
+
 
 @planes_bp.route("", methods=["POST"])
 def crear_planes():

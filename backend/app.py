@@ -11,7 +11,6 @@ from utils.errores import APIError
 from marshmallow import ValidationError 
 from utils.utilidades import respuesta_api
 import traceback
-from utils.auth import registrar_acciones 
 
 from models.persona import Persona
 from models.tipo_documento import TipoDocumento
@@ -159,7 +158,6 @@ app.register_blueprint(personas_relaciones_bp)
 
 with app.app_context():
     db.create_all()
-    registrar_acciones() #Leo el YML de roles y acciones y lo envio al endpoint de auth
 
 
 if __name__ == "__main__":
