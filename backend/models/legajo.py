@@ -27,7 +27,8 @@ class Legajo(db.Model):
     # Numero identificador del legajo.
     numero: Mapped[str] = mapped_column(
         String(45),
-        nullable=False
+        nullable=False,
+        unique=True
     )
 
     # Estado del registro dentro del sistema
