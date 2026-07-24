@@ -10,7 +10,7 @@ Python
 Flask
 SQLAlchemy
 Marshmallow
-PostgreSQL / SQLite
+PostgreSQL 17
 Flask-CORS
 Frontend
 React

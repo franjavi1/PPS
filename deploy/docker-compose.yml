@@ -39,7 +39,7 @@ services:
       - /app/node_modules
 
   postgres:
-    image: postgres:16
+    image: postgres:17
     container_name: bomberos_postgres
     restart: always
     environment:

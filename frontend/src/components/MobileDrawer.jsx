@@ -84,7 +84,7 @@ export default function MobileDrawer({
               </button>
               {hasPermission(currentUserRole, 'crear') && (
                 <>
-                  <button onClick={() => { navigate("/config-documentos?tab=persona&action=nuevo"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <button onClick={() => { navigate("/alta-persona"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
                     <UserPlus size={16} className="text-slate-400" />Registrar Persona
                   </button>
                   <button onClick={() => { navigate("/crearLegajo"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">

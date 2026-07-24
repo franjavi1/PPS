@@ -149,7 +149,7 @@ export default function DesktopNav({
                 <button
                   type="button"
                   onClick={() => {
-                    navigate("/config-documentos?tab=persona&action=nuevo");
+                    navigate("/alta-persona");
                     setDropdownAbierto(null);
                   }}
                   className={dropdownItemClass}

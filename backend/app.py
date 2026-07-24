@@ -26,6 +26,8 @@ from models.legajo import Legajo
 from models.rangos_institucionales import RangosInstitucionales
 from models.legajo_rangos import LegajoRangos
 from models.legajo_sedes import LegajoSedes
+from models.tipo_legajo import TipoLegajo
+from models.legajo_tipos_legajo import LegajoTiposLegajo
 
 from routes.personas import personas_bp
 from routes.tipos_documentos import tipos_documentos_bp
@@ -49,6 +51,8 @@ from routes.datos_medicos import datos_medicos_bp
 from routes.tipos_contacto import tipos_contacto_bp
 from routes.contactos import contactos_bp
 from routes.personas_relaciones import personas_relaciones_bp
+from routes.tipos_legajo import tipos_legajo_bp
+from routes.legajo_tipos_legajo import legajo_tipos_legajo_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -89,9 +93,21 @@ app.register_blueprint(datos_medicos_bp)
 app.register_blueprint(tipos_contacto_bp)
 app.register_blueprint(contactos_bp)
 app.register_blueprint(personas_relaciones_bp)
+app.register_blueprint(tipos_legajo_bp)
+app.register_blueprint(legajo_tipos_legajo_bp)
 
 with app.app_context():
     db.create_all()
+    # Semillado automático de tipos de legajo si no existen
+    from models.tipo_legajo import TipoLegajo
+    if not TipoLegajo.query.first():
+        db.session.add_all([
+            TipoLegajo(descripcion="Bombero Activo", usuario_accion=1),
+            TipoLegajo(descripcion="Aspirante", usuario_accion=1),
+            TipoLegajo(descripcion="Retirado", usuario_accion=1),
+            TipoLegajo(descripcion="Auxiliar", usuario_accion=1)
+        ])
+        db.session.commit()
 
 
 if __name__ == "__main__":

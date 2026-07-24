@@ -16,6 +16,16 @@ class LegajoSchema(ma.SQLAlchemySchema):
     # Campo de solo lectura para las respuestas.
     id = ma.auto_field(dump_only=True)
 
+    # Tipos de legajo asociados (calculado de solo lectura)
+    tipos_legajo = ma.Method("get_tipos_legajo", dump_only=True)
+
+    def get_tipos_legajo(self, obj):
+        return [
+            {"id": item.tipo_legajo.id, "descripcion": item.tipo_legajo.descripcion}
+            for item in getattr(obj, "legajo_tipos_items", [])
+            if item.tipo_legajo
+        ]
+
     # Persona asociada al legajo.
     persona_id = ma.auto_field(
         required=True,
