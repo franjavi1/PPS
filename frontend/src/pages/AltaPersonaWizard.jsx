@@ -50,6 +50,8 @@ export default function AltaPersonaWizard() {
   const [tiposDocumento, setTiposDocumento] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [sedes, setSedes] = useState([]);
+  const [tiposLegajo, setTiposLegajo] = useState([]);
+  const [tiposLegajoSeleccionados, setTiposLegajoSeleccionados] = useState([]);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
   const [resultadoUsuario, setResultadoUsuario] = useState(null);
@@ -60,15 +62,25 @@ export default function AltaPersonaWizard() {
 
   async function cargarCombos() {
     try {
-      const [respuestaTipos, respuestaRangos, respuestaSedes] = await Promise.all([
-        apiRequest("/tipos-documentos"), rangoService.obtenerTodos(), sedeService.obtenerTodas(),
+      const [respuestaTipos, respuestaRangos, respuestaSedes, respuestaTLegajos] = await Promise.all([
+        apiRequest("/tipos-documentos"),
+        rangoService.obtenerTodos(),
+        sedeService.obtenerTodas(),
+        apiRequest("/tipos-legajo"),
       ]);
       setTiposDocumento(respuestaTipos.data || []);
       setRangos(respuestaRangos.data || []);
       setSedes(respuestaSedes.data || []);
+      setTiposLegajo(respuestaTLegajos.data || []);
     } catch (err) {
       console.error(err);
     }
+  }
+
+  function handleTipoLegajoChange(id) {
+    setTiposLegajoSeleccionados((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
   }
 
   const personaResumen = useMemo(() => `${persona.apellido}, ${persona.nombre}`, [persona]);
@@ -92,10 +104,17 @@ export default function AltaPersonaWizard() {
   async function guardarLegajo(e) {
     e.preventDefault();
     if (!legajo.numero) return setError("El número de legajo es obligatorio");
+    if (tiposLegajoSeleccionados.length === 0) return setError("Debe seleccionar al menos un tipo de legajo");
     try {
       setGuardando(true); setError("");
       const res = await apiRequest("/legajos", {
-        method: "POST", body: JSON.stringify({ persona_id: Number(personaId), numero: String(legajo.numero).trim(), usuario_accion: 1 }),
+        method: "POST",
+        body: JSON.stringify({
+          persona_id: Number(personaId),
+          numero: String(legajo.numero).trim(),
+          usuario_accion: 1,
+          tipo_legajo_ids: tiposLegajoSeleccionados
+        }),
       });
       setLegajoId(res.data.id); setPaso(3);
     } catch (err) {
@@ -192,7 +211,20 @@ export default function AltaPersonaWizard() {
           {/* Cuerpo del Formulario Activo */}
           <div className="space-y-6">
             {paso === 1 && <StepPersona persona={persona} cambiarPersona={(e) => setPersona({ ...persona, [e.target.name]: e.target.value })} tiposDocumento={tiposDocumento} guardando={guardando} guardarPersona={guardarPersona} />}
-            {paso === 2 && <StepLegajo personaResumen={personaResumen} personaId={personaId} legajo={legajo} cambiarLegajo={(e) => setLegajo({ ...legajo, [e.target.name]: e.target.value })} guardando={guardando} guardarLegajo={guardarLegajo} onBack={() => setPaso(1)} />}
+            {paso === 2 && (
+              <StepLegajo
+                personaResumen={personaResumen}
+                personaId={personaId}
+                legajo={legajo}
+                cambiarLegajo={(e) => setLegajo({ ...legajo, [e.target.name]: e.target.value })}
+                guardando={guardando}
+                guardarLegajo={guardarLegajo}
+                onBack={() => setPaso(1)}
+                tiposLegajo={tiposLegajo}
+                tiposLegajoSeleccionados={tiposLegajoSeleccionados}
+                onTipoLegajoChange={handleTipoLegajoChange}
+              />
+            )}
             {paso === 3 && <StepDatosLegajo datosMedicos={datosMedicos} cambiarDatosMedicos={(e) => setDatosMedicos({ ...datosMedicos, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} contactos={contactos} cambiarContactos={(e) => setContactos({ ...contactos, [e.target.name]: e.target.value })} datosLegajo={datosLegajo} cambiarDatosLegajo={(e) => setDatosLegajo({ ...datosLegajo, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} rangos={rangos} sedes={sedes} guardando={guardando} guardarDatosDelLegajo={guardarDatosDelLegajo} onBack={() => setPaso(2)} />}
             {paso === 4 && <StepUsuario usuario={usuario} cambiarUsuario={(e) => setUsuario({ ...usuario, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} guardarUsuario={guardarUsuario} onBack={() => setPaso(3)} />}
             {paso === 5 && <StepResumen personaResumen={personaResumen} personaId={personaId} legajo={legajo} legajoId={legajoId} datosMedicos={datosMedicos} contactos={contactos} resultadoUsuario={resultadoUsuario} />}

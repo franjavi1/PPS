@@ -15,6 +15,8 @@ export default function NuevoLegajo() {
   // Declaramos el estado de control numérico para el wizard
   const [paso, setPaso] = useState(1);
   const [personas, setPersonas] = useState([]);
+  const [tiposLegajo, setTiposLegajo] = useState([]);
+  const [tiposLegajoSeleccionados, setTiposLegajoSeleccionados] = useState([]);
   const [guardando, setGuardando] = useState(false);
   const [errorGeneral, setErrorGeneral] = useState("");
   const [errores, setErrores] = useState({});
@@ -32,8 +34,12 @@ export default function NuevoLegajo() {
   async function cargarDatos() {
     try {
       setErrorGeneral("");
-      const respuestaPersonas = await apiRequest("/personas");
+      const [respuestaPersonas, respuestaTLegajos] = await Promise.all([
+        apiRequest("/personas"),
+        apiRequest("/tipos-legajo"),
+      ]);
       setPersonas(respuestaPersonas.data || []);
+      setTiposLegajo(respuestaTLegajos.data || []);
 
       if (editando) {
         const legajo = await apiRequest(`/legajos/${id}`);
@@ -42,6 +48,7 @@ export default function NuevoLegajo() {
           numero: legajo.data.numero || "",
           usuario_accion: legajo.data.usuario_accion || 1,
         });
+        setTiposLegajoSeleccionados((legajo.data.tipos_legajo || []).map(t => t.id));
       }
     } catch (err) {
       setErrorGeneral(err.message || "No se pudieron cargar los datos");
@@ -53,6 +60,12 @@ export default function NuevoLegajo() {
     setFormulario({ ...formulario, [name]: value });
   }
 
+  function handleTipoLegajoChange(tid) {
+    setTiposLegajoSeleccionados((prev) =>
+      prev.includes(tid) ? prev.filter((id) => id !== tid) : [...prev, tid]
+    );
+  }
+
   // Validación preventiva local por paso
   function avanzarPaso() {
     const nuevosErrores = {};
@@ -60,6 +73,7 @@ export default function NuevoLegajo() {
       if (!formulario.persona_id) nuevosErrores.persona_id = "Selecciona una persona";
     } else if (paso === 2) {
       if (String(formulario.numero).trim() === "") nuevosErrores.numero = "El numero de legajo es obligatorio";
+      if (tiposLegajoSeleccionados.length === 0) nuevosErrores.tipos_legajo = "Debe seleccionar al menos un tipo de legajo";
     }
 
     if (Object.keys(nuevosErrores).length > 0) {
@@ -81,6 +95,7 @@ export default function NuevoLegajo() {
       persona_id: Number(formulario.persona_id),
       numero: String(formulario.numero).trim(),
       usuario_accion: Number(formulario.usuario_accion) || 1,
+      tipo_legajo_ids: tiposLegajoSeleccionados,
     };
 
     try {
@@ -152,16 +167,49 @@ export default function NuevoLegajo() {
             )}
 
             {paso === 2 && (
-              <CampoTexto
-                label="Numero de legajo"
-                name="numero"
-                value={formulario.numero}
-                onChange={manejarCambio}
-                error={errores.numero}
-                placeholder="Ej: 1001"
-                icon={<Hash size={22} />}
-                disabled={esVer}
-              />
+              <div className="space-y-6">
+                <CampoTexto
+                  label="Numero de legajo"
+                  name="numero"
+                  value={formulario.numero}
+                  onChange={manejarCambio}
+                  error={errores.numero}
+                  placeholder="Ej: 1001"
+                  icon={<Hash size={22} />}
+                  disabled={esVer}
+                />
+
+                <div className="border-t border-slate-100 pt-6">
+                  <h3 className="text-base font-extrabold text-slate-800 mb-3">Tipos de Legajo *</h3>
+                  {errores.tipos_legajo && <p className="text-red-500 text-xs font-bold mb-2">{errores.tipos_legajo}</p>}
+                  {tiposLegajo.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {tiposLegajo.map((tipo) => {
+                        const checked = tiposLegajoSeleccionados.includes(tipo.id);
+                        return (
+                          <label
+                            key={tipo.id}
+                            className={`flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer hover:bg-slate-50/50 transition-all ${
+                              checked ? "border-red-500 bg-red-50/30 font-bold text-red-900 shadow-xs" : "border-slate-200 text-slate-700 bg-white"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              disabled={esVer}
+                              onChange={() => handleTipoLegajoChange(tipo.id)}
+                              className="w-5 h-5 rounded text-red-600 border-slate-300 focus:ring-red-500 cursor-pointer"
+                            />
+                            <span className="text-sm select-none">{tipo.descripcion}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-400 italic">No hay tipos de legajo configurados en el sistema.</p>
+                  )}
+                </div>
+              </div>
             )}
 
             {paso === 3 && (
@@ -174,6 +222,15 @@ export default function NuevoLegajo() {
                 <div>
                   <span className="text-slate-400 font-bold block">Número de Legajo:</span>
                   <span className="text-slate-800 font-extrabold">Legajo #{formulario.numero}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 font-bold block">Tipos de Legajo:</span>
+                  <span className="text-slate-800 font-extrabold">
+                    {tiposLegajo
+                      .filter(t => tiposLegajoSeleccionados.includes(t.id))
+                      .map(t => t.descripcion)
+                      .join(", ") || "-"}
+                  </span>
                 </div>
               </div>
             )}

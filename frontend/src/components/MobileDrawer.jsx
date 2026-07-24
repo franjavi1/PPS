@@ -1,5 +1,4 @@
-import React from "react";
-import { X, Settings, ChevronDown, Users, GraduationCap, BookOpen, LogOut, FileText, UserPlus, FilePlus, CalendarPlus, BookPlus } from "lucide-react";
+import { X, Settings, ChevronDown, Users, GraduationCap, BookOpen, LogOut, FileText, UserPlus, FilePlus, CalendarPlus, BookPlus, Shield, Layout, Building2 } from "lucide-react";
 import { hasPermission } from "../utils/authHelper";
 
 // Renderizamos el Drawer colapsable para pantallas pequeñas (móvil).
@@ -7,6 +6,8 @@ export default function MobileDrawer({
   drawerAbierto,
   setDrawerAbierto,
   currentUserRole,
+  mobileGeneralAbierto,
+  setMobileGeneralAbierto,
   mobilePersonasAbierto,
   setMobilePersonasAbierto,
   mobilePlanesAbierto,
@@ -30,21 +31,44 @@ export default function MobileDrawer({
 
       {/* Drawer Content */}
       <div className="flex-1 overflow-y-auto p-5 space-y-4">
-        {/* Enlace directo a Configuración */}
+        {/* Acordeón: CONFIGURACIÓN / CATÁLOGOS */}
         {hasPermission(currentUserRole, 'leer') && (
-          <button
-            onClick={() => {
-              navigate("/config-documentos");
-              setDrawerAbierto(false);
-            }}
-            className="w-full flex items-center justify-between p-4 font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-sm transition-colors"
-            type="button"
-          >
-            <div className="flex items-center gap-2">
-              <Settings size={18} className="text-red-700" />
-              <span>Configuración / Catálogos</span>
-            </div>
-          </button>
+          <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+            <button onClick={() => setMobileGeneralAbierto(!mobileGeneralAbierto)} className="w-full flex items-center justify-between p-4 font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition-colors" type="button">
+              <div className="flex items-center gap-2"><Settings size={18} className="text-red-700" /><span>Configuración / Catálogos</span></div>
+              <ChevronDown size={16} className={`transform transition-transform ${mobileGeneralAbierto ? "rotate-180" : ""}`} />
+            </button>
+            {mobileGeneralAbierto && (
+              <div className="p-2 bg-white border-t border-slate-100 flex flex-col gap-1">
+                <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Configuración General</div>
+                <button onClick={() => { navigate("/config-documentos?tab=tipo_documento"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <FileText size={16} className="text-slate-400" />Tipos de Documento
+                </button>
+                <button onClick={() => { navigate("/config-documentos?tab=rango_institucional"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <Shield size={16} className="text-slate-400" />Rangos Jerárquicos
+                </button>
+                <button onClick={() => { navigate("/config-documentos?tab=tipo_legajo"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <FileText size={16} className="text-slate-400" />Tipos de Legajo
+                </button>
+
+                <div className="border-t border-slate-100 my-1 mx-2"></div>
+
+                <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Infraestructura</div>
+                <button onClick={() => { navigate("/config-documentos?tab=tipo_sede"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <Layout size={16} className="text-slate-400" />Tipos de Sedes
+                </button>
+                <button onClick={() => { navigate("/config-documentos?tab=sedes"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <Building2 size={16} className="text-slate-400" />Sedes
+                </button>
+                <button onClick={() => { navigate("/config-documentos?tab=aulas"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <Shield size={16} className="text-slate-400" />Aulas
+                </button>
+                <button onClick={() => { navigate("/config-documentos?tab=comisiones"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <Users size={16} className="text-slate-400" />Comisiones
+                </button>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Acordeón: PERSONAS */}

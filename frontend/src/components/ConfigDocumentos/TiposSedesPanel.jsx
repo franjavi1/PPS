@@ -50,7 +50,18 @@ export default function TiposSedesPanel({ currentUserRole }) {
   function avanzarPaso() {
     const nuevosErrores = {};
     if (paso === 1) {
-      if (!form.descripcion.trim()) nuevosErrores.descripcion = "La descripción es requerida.";
+      if (!form.descripcion.trim()) {
+        nuevosErrores.descripcion = "La descripción es requerida.";
+      } else {
+        const duplicado = tiposSedes.some(
+          (t) =>
+            t.descripcion.toLowerCase() === form.descripcion.trim().toLowerCase() &&
+            t.id !== form.id
+        );
+        if (duplicado) {
+          nuevosErrores.descripcion = "Ya existe un tipo de sede con esa descripción.";
+        }
+      }
     }
 
     if (Object.keys(nuevosErrores).length > 0) {
@@ -70,7 +81,7 @@ export default function TiposSedesPanel({ currentUserRole }) {
     e.preventDefault();
     try {
       let response;
-      const payload = { descripcion: form.descripcion, usuario_accion: 1 };
+      const payload = { descripcion: form.descripcion.trim(), usuario_accion: 1 };
       if (modoEdicion) {
         response = await tipoSedeService.actualizar(form.id, payload);
       } else {
@@ -87,7 +98,10 @@ export default function TiposSedesPanel({ currentUserRole }) {
       setMostrarModal(false);
     } catch (err) {
       console.error("Error al guardar tipo de sede:", err);
-      alert("Error al procesar la solicitud.");
+      if (err && err.errors) {
+        setError(err.errors);
+      }
+      alert((err && err.message) || "Error al procesar la solicitud.");
     }
   }
 
@@ -118,6 +132,13 @@ export default function TiposSedesPanel({ currentUserRole }) {
     setForm({ id: null, descripcion: "" });
     setError({});
     setModoEdicion(false);
+  }
+
+  function editar(tipo) {
+    setForm({ id: tipo.id, descripcion: tipo.descripcion });
+    setModoEdicion(true);
+    setError({});
+    setMostrarModal(true);
   }
 
   const tieneSedesAsociadas = (id) => sedes.some((s) => s.tipo_sede_id === id);

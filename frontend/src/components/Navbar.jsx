@@ -15,6 +15,7 @@ function Navbar() {
   const [dropdownAbierto, setDropdownAbierto] = useState(null); // 'general' | 'personas' | 'planes' | null
   
   // Controles de estados locales de los colapsables del Drawer móvil
+  const [mobileGeneralAbierto, setMobileGeneralAbierto] = useState(false);
   const [mobilePersonasAbierto, setMobilePersonasAbierto] = useState(false);
   const [mobilePlanesAbierto, setMobilePlanesAbierto] = useState(false);
 
@@ -70,6 +71,8 @@ function Navbar() {
         drawerAbierto={drawerAbierto}
         setDrawerAbierto={setDrawerAbierto}
         currentUserRole={currentUserRole}
+        mobileGeneralAbierto={mobileGeneralAbierto}
+        setMobileGeneralAbierto={setMobileGeneralAbierto}
         mobilePersonasAbierto={mobilePersonasAbierto}
         setMobilePersonasAbierto={setMobilePersonasAbierto}
         mobilePlanesAbierto={mobilePlanesAbierto}

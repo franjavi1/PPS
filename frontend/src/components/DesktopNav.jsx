@@ -1,5 +1,4 @@
-import React from "react";
-import { Settings, ChevronDown, Users, GraduationCap, BookOpen, LogOut, FileText, UserPlus, FilePlus, CalendarPlus, BookPlus } from "lucide-react";
+import { Settings, ChevronDown, Users, GraduationCap, BookOpen, LogOut, FileText, UserPlus, FilePlus, CalendarPlus, BookPlus, Shield, Layout, Building2 } from "lucide-react";
 import { hasPermission } from "../utils/authHelper";
 
 // Renderizamos la botonera de navegación para pantallas grandes (Desktop).
@@ -17,19 +16,106 @@ export default function DesktopNav({
 
   return (
     <nav className="hidden md:flex items-center gap-4 relative z-50">
-      {/* Botón directo a Configuración / Catálogos */}
+      {/* Dropdown: Configuración / Catálogos */}
       {hasPermission(currentUserRole, 'leer') && (
-        <button
-          onClick={() => {
-            navigate("/config-documentos");
-            setDropdownAbierto(null);
-          }}
-          className={`${navItemClass} ${dropdownAbierto === "general" ? "bg-red-800" : ""}`}
-          type="button"
-        >
-          <Settings size={16} />
-          <span>Configuración / Catálogos</span>
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => toggleDropdown("general")}
+            className={`${navItemClass} ${dropdownAbierto === "general" ? "bg-red-800" : ""}`}
+            type="button"
+          >
+            <Settings size={16} />
+            <span>Configuración / Catálogos</span>
+            <ChevronDown size={14} className={`transform transition-transform duration-200 ${dropdownAbierto === "general" ? "rotate-180" : ""}`} />
+          </button>
+
+          {dropdownAbierto === "general" && (
+            <div className={dropdownMenuClass}>
+              <div className="px-4 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Configuración General</div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/config-documentos?tab=tipo_documento");
+                  setDropdownAbierto(null);
+                }}
+                className={dropdownItemClass}
+              >
+                <FileText size={16} className="text-slate-400" />
+                <span>Tipos de Documento</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/config-documentos?tab=rango_institucional");
+                  setDropdownAbierto(null);
+                }}
+                className={dropdownItemClass}
+              >
+                <Shield size={16} className="text-slate-400" />
+                <span>Rangos Jerárquicos</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/config-documentos?tab=tipo_legajo");
+                  setDropdownAbierto(null);
+                }}
+                className={dropdownItemClass}
+              >
+                <FileText size={16} className="text-slate-400" />
+                <span>Tipos de Legajo</span>
+              </button>
+
+              <div className="border-t border-slate-100 my-1"></div>
+
+              <div className="px-4 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Infraestructura</div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/config-documentos?tab=tipo_sede");
+                  setDropdownAbierto(null);
+                }}
+                className={dropdownItemClass}
+              >
+                <Layout size={16} className="text-slate-400" />
+                <span>Tipos de Sedes</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/config-documentos?tab=sedes");
+                  setDropdownAbierto(null);
+                }}
+                className={dropdownItemClass}
+              >
+                <Building2 size={16} className="text-slate-400" />
+                <span>Sedes</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/config-documentos?tab=aulas");
+                  setDropdownAbierto(null);
+                }}
+                className={dropdownItemClass}
+              >
+                <Shield size={16} className="text-slate-400" />
+                <span>Aulas</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/config-documentos?tab=comisiones");
+                  setDropdownAbierto(null);
+                }}
+                className={dropdownItemClass}
+              >
+                <Users size={16} className="text-slate-400" />
+                <span>Comisiones</span>
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Dropdown: Personas */}

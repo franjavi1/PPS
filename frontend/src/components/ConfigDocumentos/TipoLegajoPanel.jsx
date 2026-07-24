@@ -1,20 +1,18 @@
 import { useState, useEffect } from "react";
 import { PlusCircle, Pencil, Trash2, X, ChevronLeft, ChevronRight, FileText, CheckCircle2 } from "lucide-react";
 import { CampoTexto, TituloPaso } from "../FormHelpers";
-import { tipoDocumentoService } from "../../services/tipoDocumentoService";
-import { personaService } from "../../services/personaService";
+import { tipoLegajoService } from "../../services/tipoLegajoService";
 import { hasPermission } from "../../utils/authHelper";
 import TablaPrincipal from "../TablaPrincipal/TablaPrincipal";
 
-export default function TipoDocumentoPanel({ currentUserRole }) {
-  const [tiposDocumento, setTiposDocumento] = useState([]);
-  const [personas, setPersonas] = useState([]);
+export default function TipoLegajoPanel({ currentUserRole }) {
+  const [tiposLegajo, setTiposLegajo] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [form, setForm] = useState({ id: null, descripcion: "" });
   const [error, setError] = useState({});
 
-  // Control numérico para el wizard del modal simple
+  // Control numérico para el wizard
   const [paso, setPaso] = useState(1);
   const [erroresLocales, setErroresLocales] = useState({});
 
@@ -31,14 +29,10 @@ export default function TipoDocumentoPanel({ currentUserRole }) {
 
   async function cargarDatos() {
     try {
-      const [resTDocs, resPers] = await Promise.all([
-        tipoDocumentoService.obtenerTodos(),
-        personaService.obtenerTodas(),
-      ]);
-      setTiposDocumento(resTDocs.data || []);
-      setPersonas(resPers.data || []);
+      const res = await tipoLegajoService.obtenerTodos();
+      setTiposLegajo(res.data || []);
     } catch (err) {
-      console.error("Error al cargar datos en TipoDocumentoPanel:", err);
+      console.error("Error al cargar datos en TipoLegajoPanel:", err);
     }
   }
 
@@ -53,13 +47,13 @@ export default function TipoDocumentoPanel({ currentUserRole }) {
       if (!form.descripcion.trim()) {
         nuevosErrores.descripcion = "La descripción es requerida.";
       } else {
-        const duplicado = tiposDocumento.some(
-          (td) =>
-            td.descripcion.toLowerCase() === form.descripcion.trim().toLowerCase() &&
-            td.id !== form.id
+        const duplicado = tiposLegajo.some(
+          (tl) =>
+            tl.descripcion.toLowerCase() === form.descripcion.trim().toLowerCase() &&
+            tl.id !== form.id
         );
         if (duplicado) {
-          nuevosErrores.descripcion = "Ya existe un tipo de documento con esa descripción.";
+          nuevosErrores.descripcion = "Ya existe un tipo de legajo con esa descripción.";
         }
       }
     }
@@ -83,21 +77,21 @@ export default function TipoDocumentoPanel({ currentUserRole }) {
       let response;
       const payload = { descripcion: form.descripcion.trim(), usuario_accion: 1 };
       if (modoEdicion) {
-        response = await tipoDocumentoService.actualizar(form.id, payload);
+        response = await tipoLegajoService.actualizar(form.id, payload);
       } else {
-        response = await tipoDocumentoService.crear(payload);
+        response = await tipoLegajoService.crear(payload);
       }
       if (response.status === "error") {
         setError(response.errors || {});
-        alert(response.message || "Error al procesar tipo de documento.");
+        alert(response.message || "Error al procesar tipo de legajo.");
         return;
       }
-      alert(response.message || "Tipo de documento guardado con éxito.");
+      alert(response.message || "Tipo de legajo guardado con éxito.");
       cargarDatos();
       limpiarForm();
       setMostrarModal(false);
     } catch (err) {
-      console.error("Error al guardar tipo de documento:", err);
+      console.error("Error al guardar tipo de legajo:", err);
       if (err && err.errors) {
         setError(err.errors);
       }
@@ -106,24 +100,19 @@ export default function TipoDocumentoPanel({ currentUserRole }) {
   }
 
   async function eliminar(id) {
-    const enUso = personas.some((p) => p.td_id === id || p.tipoDocumentoId === id);
-    if (enUso) {
-      alert("No es posible eliminar el tipo de documento. Existen personas registradas asociadas al mismo.");
-      return;
-    }
-    if (confirm("¿Confirma la eliminación de este registro de tipo de documento?")) {
+    if (confirm("¿Confirma la eliminación de este registro de tipo de legajo?")) {
       try {
-        const response = await tipoDocumentoService.eliminar(id);
+        const response = await tipoLegajoService.eliminar(id);
         if (response.status === "error") {
           alert(response.message);
           return;
         }
-        alert(response.message || "Tipo de documento eliminado con éxito.");
+        alert(response.message || "Tipo de legajo eliminado con éxito.");
         cargarDatos();
         if (form.id === id) limpiarForm();
       } catch (err) {
-        console.error("Error al eliminar tipo de documento:", err);
-        alert("Error al intentar eliminar el registro.");
+        console.error("Error al eliminar tipo de legajo:", err);
+        alert("Error al intentar eliminar el registro. Puede estar asociado a legajos activos.");
       }
     }
   }
@@ -134,32 +123,29 @@ export default function TipoDocumentoPanel({ currentUserRole }) {
     setModoEdicion(false);
   }
 
-  function editar(td) {
-    setForm({ id: td.id, descripcion: td.descripcion });
+  function editar(tl) {
+    setForm({ id: tl.id, descripcion: tl.descripcion });
     setModoEdicion(true);
     setError({});
     setMostrarModal(true);
   }
 
-  const estaAsociado = (id) => personas.some((p) => p.td_id === id || p.tipoDocumentoId === id);
-
   const columnasConfig = [
     { clave: "descripcion", titulo: "Descripción" },
   ];
 
-  const accionesPorFila = (td) => (
+  const accionesPorFila = (tl) => (
     <div className="flex items-center justify-center gap-3">
-      <button onClick={() => editar(td)} disabled={!hasPermission(currentUserRole, "editar")} className="text-blue-600 hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-sm flex items-center gap-1">
+      <button onClick={() => editar(tl)} disabled={!hasPermission(currentUserRole, "editar")} className="text-blue-600 hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-sm flex items-center gap-1">
         <Pencil size={16} /> Editar
       </button>
-      <button onClick={() => eliminar(td.id)} disabled={!hasPermission(currentUserRole, "eliminar") || estaAsociado(td.id)} className="text-red-600 hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-sm flex items-center gap-1" title={estaAsociado(td.id) ? "No se puede eliminar: tiene personas asociadas" : "Eliminar Tipo de Doc."}>
+      <button onClick={() => eliminar(tl.id)} disabled={!hasPermission(currentUserRole, "eliminar")} className="text-red-600 hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-sm flex items-center gap-1" title="Eliminar Tipo de Legajo">
         <Trash2 size={16} /> Eliminar
       </button>
     </div>
   );
 
   const errorCombinado = { ...error, ...erroresLocales };
-  const pasos = [{ id: 1, label: "Formulario" }, { id: 2, label: "Confirmación" }];
 
   if (mostrarModal) {
     const wizardPasos = [
@@ -177,10 +163,10 @@ export default function TipoDocumentoPanel({ currentUserRole }) {
             <div>
               <span className="text-red-600 text-xs font-bold tracking-wider uppercase block">Alta Guiada</span>
               <h1 className="text-3xl font-extrabold text-slate-900">
-                {modoEdicion ? "Editar Tipo de Doc." : "Alta de Nuevo Tipo de Doc."}
+                {modoEdicion ? "Editar Tipo de Legajo" : "Alta de Nuevo Tipo de Legajo"}
               </h1>
               <p className="text-slate-500 text-sm mt-1">
-                {modoEdicion ? "Modifica la descripción del tipo de documento." : "Registra un nuevo tipo de documento en el sistema completando los pasos."}
+                {modoEdicion ? "Modifica la descripción del tipo de legajo." : "Registra un nuevo tipo de legajo en el sistema."}
               </p>
             </div>
           </div>
@@ -222,14 +208,14 @@ export default function TipoDocumentoPanel({ currentUserRole }) {
           {/* Paso 1: Formulario */}
           {paso === 1 && (
             <div className="space-y-6">
-              <TituloPaso icono={<FileText size={26} />} titulo="Datos del Tipo de Documento" />
+              <TituloPaso icono={<FileText size={26} />} titulo="Datos del Tipo de Legajo" />
               <div>
                 <CampoTexto
                   label="Descripción *"
                   name="descripcion"
                   value={form.descripcion}
                   onChange={manejarCambio}
-                  placeholder="Ej: DNI, Pasaporte"
+                  placeholder="Ej: Bombero Activo, Aspirante, Auxiliar"
                   error={errorCombinado.descripcion}
                 />
               </div>
@@ -298,15 +284,15 @@ export default function TipoDocumentoPanel({ currentUserRole }) {
   return (
     <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-        <h2 className="text-xl font-bold text-slate-800">Registros de Tipos de Documento</h2>
+        <h2 className="text-xl font-bold text-slate-800">Registros de Tipos de Legajo</h2>
         {hasPermission(currentUserRole, "crear") && (
           <button onClick={() => { limpiarForm(); setMostrarModal(true); }} className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm">
-            <PlusCircle size={16} /> Agregar Tipo de Doc.
+            <PlusCircle size={16} /> Agregar Tipo de Legajo
           </button>
         )}
       </div>
 
-      <TablaPrincipal data={tiposDocumento} columnas={columnasConfig} accionesPorFila={accionesPorFila} propiedadKey="id" placeholderBusqueda="Buscar tipos de documento..." />
+      <TablaPrincipal data={tiposLegajo} columnas={columnasConfig} accionesPorFila={accionesPorFila} propiedadKey="id" placeholderBusqueda="Buscar tipos de legajo..." />
     </div>
   );
 }

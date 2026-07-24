@@ -7,10 +7,10 @@ import { ChevronRight, Bell } from "lucide-react";
 // - color: color clave (red, green, yellow, blue) para estilizar la tarjeta.
 export function TarjetaResumen({ icono, titulo, valor, color }) {
   const colores = {
-    red: "bg-red-100 text-red-700",
-    green: "bg-green-100 text-green-700",
-    yellow: "bg-yellow-100 text-yellow-700",
-    blue: "bg-blue-100 text-blue-700",
+    red: "bg-red-50 text-red-600",
+    green: "bg-green-50 text-green-600",
+    yellow: "bg-yellow-50 text-yellow-600",
+    blue: "bg-blue-50 text-blue-600",
   };
 
   const coloresValor = {
@@ -21,13 +21,13 @@ export function TarjetaResumen({ icono, titulo, valor, color }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex items-center gap-5">
-      <div className={`w-20 h-20 rounded-full flex items-center justify-center ${colores[color]}`}>
+    <div className="bg-white rounded-2xl border border-slate-200/80 p-5 flex items-center gap-4 hover:shadow-sm transition-all duration-300">
+      <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 ${colores[color]}`}>
         {icono}
       </div>
       <div>
-        <p className="text-slate-500 font-medium">{titulo}</p>
-        <p className={`text-4xl font-extrabold mt-1 ${coloresValor[color]}`}>{valor}</p>
+        <p className="text-slate-500 font-semibold text-xs md:text-sm tracking-wide">{titulo}</p>
+        <p className={`text-3xl font-extrabold mt-0.5 leading-none ${coloresValor[color]}`}>{valor}</p>
       </div>
     </div>
   );
@@ -43,18 +43,18 @@ export function AccesoRapido({ icono, titulo, descripcion, onClick }) {
     // Dispara el callback de click definido por el componente principal
     <button
       onClick={onClick}
-      className="border border-slate-200 rounded-xl p-6 text-left hover:bg-slate-50 hover:shadow transition flex items-center justify-between gap-4 w-full"
+      className="border border-slate-200 rounded-xl p-5 text-left hover:bg-slate-50 hover:shadow-sm transition flex items-center justify-between gap-4 w-full cursor-pointer"
     >
-      <div className="flex items-center gap-5">
-        <div className="w-20 h-20 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
+      <div className="flex items-center gap-4">
+        <div className="w-14 h-14 rounded-full bg-red-50 text-red-700 flex items-center justify-center shrink-0">
           {icono}
         </div>
         <div>
-          <h3 className="text-xl font-bold text-slate-800">{titulo}</h3>
-          <p className="text-slate-500 mt-2">{descripcion}</p>
+          <h3 className="text-lg font-bold text-slate-800 leading-snug">{titulo}</h3>
+          <p className="text-slate-500 text-sm mt-1">{descripcion}</p>
         </div>
       </div>
-      <ChevronRight className="text-slate-500" size={28} />
+      <ChevronRight className="text-slate-400" size={24} />
     </button>
   );
 }
