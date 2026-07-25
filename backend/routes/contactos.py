@@ -69,6 +69,7 @@ def editar_contacto(id):
 
 
 @contactos_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.contactos.eliminar")
 def eliminar_contacto(id):
     contacto = obtener_por_id(id)
 
