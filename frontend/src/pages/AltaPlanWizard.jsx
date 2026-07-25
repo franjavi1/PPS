@@ -147,13 +147,12 @@ function AltaPlanWizard() {
     setNuevaCorrelativa({ ...nuevaCorrelativa, [name]: value });
   }
 
-  async function guardarPlan(e) {
+  function guardarPlan(e) {
     e.preventDefault();
 
     const tipoPlanId = Number(plan.tipo_planes_id_tipo_planes);
     const resolucionMinisterial = Number(plan.resolucion_ministerial);
     const nombre = plan.nombre.trim();
-    const descrip = plan.descrip.trim();
 
     if (!tipoPlanId) {
       setError("Debe seleccionar un tipo de plan");
@@ -180,25 +179,8 @@ function AltaPlanWizard() {
       return;
     }
 
-    try {
-      setGuardando(true);
-      setError("");
-      const respuesta = await planService.crear({
-        tipo_planes_id_tipo_planes: tipoPlanId,
-        resolucion_ministerial: resolucionMinisterial,
-        nombre,
-        descrip: descrip || null,
-        vigencia_dde: `${plan.vigencia_dde}T00:00:00`,
-        vigencia_hta: `${plan.vigencia_hta}T00:00:00`,
-        usuario_accion: 1,
-      });
-      setPlanId(obtenerIdRespuesta(respuesta));
-      setPasoActual(2);
-    } catch (err) {
-      setError(obtenerMensajeError(err));
-    } finally {
-      setGuardando(false);
-    }
+    setError("");
+    setPasoActual(2);
   }
 
   function guardarDatosAsignatura(e) {
@@ -223,17 +205,11 @@ function AltaPlanWizard() {
     setPasoActual(3);
   }
 
-  async function guardarCondiciones(e) {
+  function guardarCondiciones(e) {
     e.preventDefault();
-
-    if (!planId) {
-      setError("Primero tenes que crear el plan");
-      return;
-    }
 
     const payload = {
       asignatura_id: Number(asignaturaPlan.asignatura_id),
-      plan_id: Number(planId),
       rango_minimo_id: Number(asignaturaPlan.rango_minimo_id),
       sedes_id: Number(asignaturaPlan.sedes_id),
       presentismo_porc: Number(asignaturaPlan.presentismo_porc),
@@ -252,44 +228,28 @@ function AltaPlanWizard() {
       return;
     }
 
-    try {
-      setGuardando(true);
-      setError("");
-      const respuesta = await planAsignaturaService.crear(payload);
-      const nuevoPlanAsignaturaId = obtenerIdRespuesta(respuesta);
+    const idTemporal = Date.now();
 
-      setPlanAsignaturaId(nuevoPlanAsignaturaId);
-      setAsignaturasCargadas([
-        ...asignaturasCargadas,
-        {
-          id: nuevoPlanAsignaturaId,
-          asignatura_id: payload.asignatura_id,
-          asignatura: resumen.asignatura,
-          rango: resumen.rango,
-          sede: resumen.sede,
-          presentismo_porc: payload.presentismo_porc,
-          regularizacion_prom: payload.regularizacion_prom,
-          final_aprobacion: payload.final_aprobacion,
-          duracion: payload.duracion,
-          regimen: payload.regimen,
-          modalidad: payload.modalidad,
-        },
-      ]);
-      setPasoActual(4);
-    } catch (err) {
-      setError(obtenerMensajeError(err));
-    } finally {
-      setGuardando(false);
-    }
+    setAsignaturasCargadas([
+      ...asignaturasCargadas,
+      {
+        id: idTemporal,
+        ...payload,
+        asignatura: resumen.asignatura,
+        rango: resumen.rango,
+        sede: resumen.sede,
+      },
+    ]);
+    setError("");
+    setPasoActual(4);
   }
 
-  async function guardarCorrelativa(e) {
+  function guardarCorrelativa(e) {
     e.preventDefault();
 
     const payload = {
       pa_id: Number(nuevaCorrelativa.pa_id),
       asignatura_id: Number(nuevaCorrelativa.asignatura_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarCorrelativa(
@@ -303,56 +263,38 @@ function AltaPlanWizard() {
       return;
     }
 
-    try {
-      setGuardando(true);
-      setError("");
-      const respuesta = await paCorrelativaService.crear(payload);
-      const asignaturaQueRequiere = asignaturasCargadas.find(
-        (item) => Number(item.id) === Number(payload.pa_id),
-      );
-      const asignaturaRequerida = asignaturasCargadas.find(
-        (item) => Number(item.asignatura_id) === Number(payload.asignatura_id),
-      );
+    const asignaturaQueRequiere = asignaturasCargadas.find(
+      (item) => Number(item.id) === Number(payload.pa_id),
+    );
+    const asignaturaRequerida = asignaturasCargadas.find(
+      (item) => Number(item.asignatura_id) === Number(payload.asignatura_id),
+    );
 
-      setCorrelativasCargadas([
-        ...correlativasCargadas,
-        {
-          id: obtenerIdRespuesta(respuesta),
-          pa_id: payload.pa_id,
-          asignatura_id: payload.asignatura_id,
-          asignaturaQueRequiere: asignaturaQueRequiere?.asignatura || "-",
-          asignaturaRequerida: asignaturaRequerida?.asignatura || "-",
-        },
-      ]);
-      setNuevaCorrelativa(correlativaInicial);
-    } catch (err) {
-      setError(obtenerMensajeError(err));
-    } finally {
-      setGuardando(false);
-    }
+    setCorrelativasCargadas([
+      ...correlativasCargadas,
+      {
+        id: Date.now(),
+        ...payload,
+        asignaturaQueRequiere: asignaturaQueRequiere?.asignatura || "-",
+        asignaturaRequerida: asignaturaRequerida?.asignatura || "-",
+      },
+    ]);
+    setNuevaCorrelativa(correlativaInicial);
+    setError("");
   }
 
-  async function eliminarCorrelativa(correlativaId) {
+  function eliminarCorrelativa(correlativaId) {
     const confirmar = confirm("Seguro que queres eliminar esta correlativa?");
 
     if (!confirmar) {
       return;
     }
 
-    try {
-      setGuardando(true);
-      setError("");
-      await paCorrelativaService.eliminar(correlativaId);
-      setCorrelativasCargadas(
-        correlativasCargadas.filter(
-          (item) => Number(item.id) !== Number(correlativaId),
-        ),
-      );
-    } catch (err) {
-      setError(obtenerMensajeError(err));
-    } finally {
-      setGuardando(false);
-    }
+    setCorrelativasCargadas(
+      correlativasCargadas.filter(
+        (item) => Number(item.id) !== Number(correlativaId),
+      ),
+    );
   }
 
   function agregarOtraAsignatura() {
@@ -362,16 +304,75 @@ function AltaPlanWizard() {
     setPasoActual(2);
   }
 
-  function cargarOtroPlan() {
-    setPasoActual(1);
-    setPlanId(null);
-    setPlanAsignaturaId(null);
-    setPlan(planInicial);
-    setAsignaturaPlan(asignaturaPlanInicial);
-    setAsignaturasCargadas([]);
-    setNuevaCorrelativa(correlativaInicial);
-    setCorrelativasCargadas([]);
-    setError("");
+  async function confirmarPlan() {
+    if (guardando || planId) {
+      return;
+    }
+
+    try {
+      setGuardando(true);
+      setError("");
+
+      const respuestaPlan = await planService.crear({
+        tipo_planes_id_tipo_planes: Number(
+          plan.tipo_planes_id_tipo_planes,
+        ),
+        resolucion_ministerial: Number(plan.resolucion_ministerial),
+        nombre: plan.nombre.trim(),
+        descrip: plan.descrip.trim() || null,
+        vigencia_dde: `${plan.vigencia_dde}T00:00:00`,
+        vigencia_hta: `${plan.vigencia_hta}T00:00:00`,
+        usuario_accion: 1,
+      });
+
+      const nuevoPlanId = obtenerIdRespuesta(respuestaPlan);
+
+      if (!nuevoPlanId) {
+        throw new Error("No se recibio el ID del plan creado.");
+      }
+
+      const idsReales = {};
+
+      for (const item of asignaturasCargadas) {
+        const respuesta = await planAsignaturaService.crear({
+          asignatura_id: item.asignatura_id,
+          plan_id: nuevoPlanId,
+          rango_minimo_id: item.rango_minimo_id,
+          sedes_id: item.sedes_id,
+          presentismo_porc: item.presentismo_porc,
+          regularizacion_prom: item.regularizacion_prom,
+          final_aprobacion: item.final_aprobacion,
+          duracion: item.duracion,
+          regimen: item.regimen,
+          modalidad: item.modalidad,
+          usuario_accion: 1,
+        });
+
+        const idReal = obtenerIdRespuesta(respuesta);
+
+        if (!idReal) {
+          throw new Error("No se recibio el ID de una asignatura del plan.");
+        }
+
+        idsReales[item.id] = idReal;
+      }
+
+      for (const item of correlativasCargadas) {
+        await paCorrelativaService.crear({
+          pa_id: idsReales[item.pa_id],
+          asignatura_id: item.asignatura_id,
+          usuario_accion: 1,
+        });
+      }
+
+      setPlanId(nuevoPlanId);
+      alert("Plan guardado correctamente.");
+      navigate("/planes");
+    } catch (err) {
+      setError(obtenerMensajeError(err));
+    } finally {
+      setGuardando(false);
+    }
   }
 
   return (
@@ -393,7 +394,8 @@ function AltaPlanWizard() {
                   Plan y asignaturas
                 </h1>
                 <p className="text-slate-500 mt-2">
-                  Crea un plan por pasos y asocia una o varias asignaturas.
+                  Completa todos los pasos. El plan se guarda al confirmar el
+                  resumen.
                 </p>
               </div>
             </div>
@@ -475,7 +477,7 @@ function AltaPlanWizard() {
 
                   <Acciones
                     guardando={guardando}
-                    texto="Crear plan y seguir"
+                    texto="Continuar"
                     onCancel={() => navigate("/planes")}
                   />
                 </form>
@@ -490,8 +492,8 @@ function AltaPlanWizard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <CampoSoloLectura
-                      label="Plan creado"
-                      value={`${plan.nombre || "-"} - ID ${planId || "-"}`}
+                      label="Plan cargado"
+                      value={plan.nombre || "-"}
                     />
                     <CampoSelect label="Asignatura" name="asignatura_id" value={asignaturaPlan.asignatura_id} onChange={cambiarAsignaturaPlan} opciones={asignaturas} getValue={(asignatura) => asignatura.id} getLabel={(asignatura) => asignatura.nombre} />
                     <CampoSelect label="Rango minimo" name="rango_minimo_id" value={asignaturaPlan.rango_minimo_id} onChange={cambiarAsignaturaPlan} opciones={rangos} getValue={(rango) => rango.id} getLabel={(rango) => rango.descripcion} />
@@ -680,7 +682,7 @@ function AltaPlanWizard() {
                     <ResumenItem
                       icono={<BookOpen size={24} />}
                       titulo="Plan"
-                      texto={`${plan.nombre || "-"} - ID ${planId || "-"}`}
+                      texto={`${plan.nombre || "-"} - ID ${planId || "pendiente de guardar"}`}
                     />
                     <ResumenItem
                       icono={<FileText size={24} />}
@@ -747,11 +749,16 @@ function AltaPlanWizard() {
 
                     <button
                       type="button"
-                      onClick={cargarOtroPlan}
-                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800"
+                      onClick={confirmarPlan}
+                      disabled={guardando || Boolean(planId)}
+                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
                     >
                       <Save size={22} />
-                      Cargar otro plan
+                      {guardando
+                        ? "Guardando..."
+                        : planId
+                          ? "Plan guardado"
+                          : "Confirmar y guardar"}
                     </button>
                   </div>
                 </section>

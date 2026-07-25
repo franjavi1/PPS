@@ -145,7 +145,7 @@ function AltaPersonaWizard() {
     });
   }
 
-  async function guardarPersona(e) {
+  function guardarPersona(e) {
     e.preventDefault();
 
     if (
@@ -158,68 +158,24 @@ function AltaPersonaWizard() {
       return;
     }
 
-    const payload = {
-      td_id: Number(persona.td_id),
-      numero_doc: Number(persona.numero_doc),
-      nombre: persona.nombre.trim(),
-      apellido: persona.apellido.trim(),
-      usuario_accion: 1,
-    };
-
-    try {
-      setGuardando(true);
-      setError("");
-      const respuesta = await personasService.crear(payload);
-      setPersonaId(obtenerIdRespuesta(respuesta));
-      setPasoActual(2);
-    } catch (err) {
-      setError(obtenerMensajeError(err));
-    } finally {
-      setGuardando(false);
-    }
+    setError("");
+    setPasoActual(2);
   }
 
-  async function guardarLegajo(e) {
+  function guardarLegajo(e) {
     e.preventDefault();
-
-    if (!personaId) {
-      setError("Primero tenes que crear la persona.");
-      return;
-    }
 
     if (!legajo.numero.trim()) {
       setError("El numero de legajo es obligatorio.");
       return;
     }
 
-    const payload = {
-      numero: legajo.numero.trim(),
-      usuario_accion: 1,
-    };
-
-    try {
-      setGuardando(true);
-      setError("");
-      const respuesta = await apiRequest(`/personas/${personaId}/legajo`, {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-      setLegajoId(obtenerIdRespuesta(respuesta));
-      setPasoActual(3);
-    } catch (err) {
-      setError(obtenerMensajeError(err));
-    } finally {
-      setGuardando(false);
-    }
+    setError("");
+    setPasoActual(3);
   }
 
-  async function guardarDatosDelLegajo(e) {
+  function guardarDatosDelLegajo(e) {
     e.preventDefault();
-
-    if (!personaId || !legajoId) {
-      setError("Primero tenes que crear persona y legajo.");
-      return;
-    }
 
     const mensajeContactos = validarContactos(contactos);
 
@@ -228,19 +184,85 @@ function AltaPersonaWizard() {
       return;
     }
 
+    if (
+      (datosMedicos.grupo_sanguineo && !datosMedicos.seguro.trim()) ||
+      (!datosMedicos.grupo_sanguineo && datosMedicos.seguro.trim())
+    ) {
+      setError(
+        "Para guardar datos medicos completa grupo sanguineo y seguro.",
+      );
+      return;
+    }
+
+    if (
+      contactos.email.trim() &&
+      !obtenerTipoContacto(tiposContacto, "email")
+    ) {
+      setError("No existe el tipo de contacto Email en la base.");
+      return;
+    }
+
+    if (
+      contactos.celular.trim() &&
+      !obtenerTipoContacto(tiposContacto, "celular")
+    ) {
+      setError("No existe el tipo de contacto Celular en la base.");
+      return;
+    }
+
+    setError("");
+    setPasoActual(4);
+  }
+
+  function guardarUsuario(e) {
+    e.preventDefault();
+
+    setError("");
+    setPasoActual(5);
+  }
+
+  async function confirmarAltaPersona() {
+    if (guardando || personaId) {
+      return;
+    }
+
     try {
       setGuardando(true);
       setError("");
 
-      if (datosMedicos.grupo_sanguineo || datosMedicos.seguro) {
-        if (!datosMedicos.grupo_sanguineo || !datosMedicos.seguro.trim()) {
-          setError(
-            "Para guardar datos medicos completa grupo sanguineo y seguro.",
-          );
-          return;
-        }
+      const respuestaPersona = await personasService.crear({
+        td_id: Number(persona.td_id),
+        numero_doc: Number(persona.numero_doc),
+        nombre: persona.nombre.trim(),
+        apellido: persona.apellido.trim(),
+        usuario_accion: 1,
+      });
 
-        await apiRequest(`/personas/${personaId}/datos-medicos`, {
+      const nuevaPersonaId = obtenerIdRespuesta(respuestaPersona);
+
+      if (!nuevaPersonaId) {
+        throw new Error("No se recibio el ID de la persona creada.");
+      }
+
+      const respuestaLegajo = await apiRequest(
+        `/personas/${nuevaPersonaId}/legajo`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            numero: legajo.numero.trim(),
+            usuario_accion: 1,
+          }),
+        },
+      );
+
+      const nuevoLegajoId = obtenerIdRespuesta(respuestaLegajo);
+
+      if (!nuevoLegajoId) {
+        throw new Error("No se recibio el ID del legajo creado.");
+      }
+
+      if (datosMedicos.grupo_sanguineo && datosMedicos.seguro.trim()) {
+        await apiRequest(`/personas/${nuevaPersonaId}/datos-medicos`, {
           method: "POST",
           body: JSON.stringify({
             grupo_sanguineo: datosMedicos.grupo_sanguineo,
@@ -253,7 +275,7 @@ function AltaPersonaWizard() {
       }
 
       if (datosLegajo.rangos_institucionales_id) {
-        await apiRequest(`/legajos/${legajoId}/rangos`, {
+        await apiRequest(`/legajos/${nuevoLegajoId}/rangos`, {
           method: "POST",
           body: JSON.stringify({
             rangos_institucionales_id: Number(
@@ -265,7 +287,7 @@ function AltaPersonaWizard() {
       }
 
       if (datosLegajo.sede_id) {
-        await apiRequest(`/legajos/${legajoId}/sedes`, {
+        await apiRequest(`/legajos/${nuevoLegajoId}/sedes`, {
           method: "POST",
           body: JSON.stringify({
             sede_id: Number(datosLegajo.sede_id),
@@ -276,18 +298,11 @@ function AltaPersonaWizard() {
         });
       }
 
-      const tipoEmail = obtenerTipoContacto(tiposContacto, "email");
-      const tipoCelular = obtenerTipoContacto(tiposContacto, "celular");
-      const contactosAGuardar = [];
-
       if (contactos.email.trim()) {
-        if (!tipoEmail) {
-          setError("No existe el tipo de contacto Email en la base.");
-          return;
-        }
+        const tipoEmail = obtenerTipoContacto(tiposContacto, "email");
 
-        contactosAGuardar.push({
-          persona_id: Number(personaId),
+        await contactosService.crear({
+          persona_id: Number(nuevaPersonaId),
           tipo_contacto_id: Number(tipoEmail.id),
           principal: true,
           contacto: contactos.email.trim(),
@@ -296,13 +311,10 @@ function AltaPersonaWizard() {
       }
 
       if (contactos.celular.trim()) {
-        if (!tipoCelular) {
-          setError("No existe el tipo de contacto Celular en la base.");
-          return;
-        }
+        const tipoCelular = obtenerTipoContacto(tiposContacto, "celular");
 
-        contactosAGuardar.push({
-          persona_id: Number(personaId),
+        await contactosService.crear({
+          persona_id: Number(nuevaPersonaId),
           tipo_contacto_id: Number(tipoCelular.id),
           principal: false,
           contacto: contactos.celular.trim(),
@@ -310,32 +322,20 @@ function AltaPersonaWizard() {
         });
       }
 
-      await Promise.all(
-        contactosAGuardar.map((contacto) => contactosService.crear(contacto)),
-      );
+      setPersonaId(nuevaPersonaId);
+      setLegajoId(nuevoLegajoId);
+      setResultadoUsuario({
+        mensaje: usuario.crear_usuario
+          ? "Pendiente de conectar Login"
+          : "No solicitado",
+      });
 
-      setPasoActual(4);
+      alert("Persona guardada correctamente.");
     } catch (err) {
       setError(obtenerMensajeError(err));
     } finally {
       setGuardando(false);
     }
-  }
-
-  async function guardarUsuario(e) {
-    e.preventDefault();
-
-    const respuesta = await apiRequest(`/personas/${personaId}/usuario`, {
-      method: "POST",
-      body: JSON.stringify({
-        legajo_id: Number(legajoId),
-        dni: persona.numero_doc,
-        email: contactos.email.trim() || null,
-        rol: usuario.rol,
-      }),
-    });
-
-    setPasoActual(5);
   }
 
   const personaResumen = useMemo(() => {
@@ -357,8 +357,8 @@ function AltaPersonaWizard() {
                 Persona, legajo y usuario
               </h1>
               <p className="text-slate-500 mt-2">
-                Carga una persona por pasos y usa los IDs generados para
-                continuar.
+                Completa todos los pasos. Los datos se guardan al confirmar el
+                resumen.
               </p>
             </div>
 
@@ -436,7 +436,7 @@ function AltaPersonaWizard() {
                   placeholder="Ej: Perez"
                 />
               </div>
-              <Acciones guardando={guardando} texto="Crear persona y seguir" />
+              <Acciones guardando={guardando} texto="Continuar" />
             </form>
           )}
 
@@ -448,8 +448,8 @@ function AltaPersonaWizard() {
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <CampoSoloLectura
-                  label="Persona creada"
-                  value={`${personaResumen} - ID ${personaId}`}
+                  label="Persona cargada"
+                  value={personaResumen}
                 />
                 <CampoTexto
                   label="Numero de legajo"
@@ -461,7 +461,7 @@ function AltaPersonaWizard() {
               </div>
               <Acciones
                 guardando={guardando}
-                texto="Crear legajo y seguir"
+                texto="Continuar"
                 onBack={() => setPasoActual(1)}
               />
             </form>
@@ -583,7 +583,7 @@ function AltaPersonaWizard() {
 
               <Acciones
                 guardando={guardando}
-                texto="Guardar datos y seguir"
+                texto="Continuar"
                 onBack={() => setPasoActual(2)}
               />
             </form>
@@ -616,7 +616,7 @@ function AltaPersonaWizard() {
               </div>
               <Acciones
                 guardando={false}
-                texto="Finalizar alta"
+                texto="Ir al resumen"
                 onBack={() => setPasoActual(3)}
               />
             </form>
@@ -632,12 +632,12 @@ function AltaPersonaWizard() {
                 <ResumenItem
                   icono={<User size={24} />}
                   titulo="Persona"
-                  texto={`${personaResumen} - ID ${personaId}`}
+                  texto={`${personaResumen} - ID ${personaId || "pendiente de guardar"}`}
                 />
                 <ResumenItem
                   icono={<IdCard size={24} />}
                   titulo="Legajo"
-                  texto={`Numero ${legajo.numero} - ID ${legajoId}`}
+                  texto={`Numero ${legajo.numero} - ID ${legajoId || "pendiente de guardar"}`}
                 />
                 <ResumenItem
                   icono={<HeartPulse size={24} />}
@@ -651,7 +651,7 @@ function AltaPersonaWizard() {
                 <ResumenItem
                   icono={<MapPinned size={24} />}
                   titulo="Rango y sede"
-                  texto="Guardados si fueron seleccionados"
+                  texto="Se guardaran si fueron seleccionados"
                 />
                 <ResumenItem
                   icono={<Phone size={24} />}
@@ -671,10 +671,15 @@ function AltaPersonaWizard() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => window.location.reload()}
-                  className="px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800"
+                  onClick={confirmarAltaPersona}
+                  disabled={guardando || Boolean(personaId)}
+                  className="px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
                 >
-                  Cargar otra persona
+                  {guardando
+                    ? "Guardando..."
+                    : personaId
+                      ? "Alta guardada"
+                      : "Confirmar y guardar"}
                 </button>
               </div>
             </section>

@@ -35,7 +35,7 @@ services:
       - AUTH_COMMON_REDIS_URL=redis://redis:6379/0
       - AUTH_COMMON_SESSION_TTL=900
     depends_on:
-      - postgres
+      - postgres-planes
       - redis
 
   frontend:
@@ -50,7 +50,7 @@ services:
       - /app/node_modules
 
   postgres:
-    image: postgres:16
+    image: postgres:17
     container_name: bomberos_postgres
     restart: always
     environment:
