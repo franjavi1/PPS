@@ -34,7 +34,7 @@ services:
       - PORT=5000
       - REDIS_HOST=172.10.10.50
     depends_on:
-      - postgres
+      - postgres-planes
       - redis
     networks:
       red_bomberos_estatica:
@@ -54,7 +54,7 @@ services:
       red_bomberos_estatica:
         ipv4_address: 172.10.10.30
 
-  postgres:
+  postgres-planes:
     image: postgres:17
     container_name: bomberos_postgres
     restart: always
