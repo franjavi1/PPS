@@ -4,4 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  base: '/planes/',
+  server: {
+    host: '0.0.0.0',
+  }
 })
