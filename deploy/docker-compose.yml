@@ -1,11 +1,11 @@
-#Estandarizacion de direcciones
-#NGINX:    172.10.10.10
-#Backs:    172.10.10.20 - 21 - 22
-#Front:    172.10.10.30 - 31 - 32
-#Postgres: 172.10.10.40 - 41 - 42
-#Redis:    172.10.10.50
+# Estandarizacion de direcciones
+# Backs:    172.10.10.20
+# Front:    172.10.10.30
+# Postgres: 172.10.10.40
+# Redis:    172.10.10.50
 
 services:
+<<<<<<< HEAD
   api_gateway:
     image: nginx:alpine
     container_name: bomberos_api_gateway
@@ -17,13 +17,20 @@ services:
       - backend
       - frontend
 
+=======
+>>>>>>> origin/develop
   backend:
     build:
       context: ../backend
       dockerfile: Dockerfile
     container_name: bomberos_backend
     restart: always
+<<<<<<< HEAD
     command: sh -c "pip install -e /auth-common --quiet && python app.py"
+=======
+    ports:
+      - "5000:5000"
+>>>>>>> origin/develop
     volumes:
       - ./planes/backend:/app
       - ./planes/auth-common:/auth-common
@@ -45,6 +52,8 @@ services:
     container_name: bomberos_frontend
     restart: always
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
     volumes:
       - ../frontend:/app
       - /app/node_modules
@@ -65,6 +74,25 @@ services:
   redis:
     image: redis:7-alpine
     container_name: bomberos_redis
+<<<<<<< HEAD
 
 volumes:
   postgres_data:
+=======
+    ports:
+      - "6379:6379"
+    networks:
+      red_bomberos_estatica:
+        ipv4_address: 172.10.10.50
+
+volumes:
+  postgres_data:
+
+# Rango de 254 direcciones disponibles
+networks:
+  red_bomberos_estatica:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.10.10.0/24
+>>>>>>> origin/develop
