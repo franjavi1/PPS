@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-
+from auth_common.decorador import requires_permission
 from schemas.autoridad_comision_schema import (
     autoridad_comision_schema,
     autoridades_comision_schema
@@ -22,6 +22,7 @@ autoridades_comision_bp = Blueprint(
 
 
 @autoridades_comision_bp.route("", methods=["GET"])
+@requires_permission("micro1.autoridades_comision.ver")
 def get_autoridades_comision():
     autoridades_comision = obtener_todos()
     data = autoridades_comision_schema.dump(autoridades_comision)
@@ -33,6 +34,7 @@ def get_autoridades_comision():
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.autoridades_comision.ver")
 def get_autoridad_comision(id):
     autoridad_comision = obtener_por_id(id)
 
@@ -46,6 +48,7 @@ def get_autoridad_comision(id):
 
 
 @autoridades_comision_bp.route("", methods=["POST"])
+@requires_permission("micro1.autoridades_comision.crear")
 def crear_autoridad_comision():
     req = request.get_json(silent=True) or {}
 
@@ -61,6 +64,7 @@ def crear_autoridad_comision():
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.autoridades_comision.editar")
 def editar_autoridad_comision(id):
     autoridad_comision = obtener_por_id(id)
 
@@ -80,6 +84,7 @@ def editar_autoridad_comision(id):
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.autoridades_comision.eliminar")
 def eliminar_autoridad_comision(id):
     autoridad_comision = obtener_por_id(id)
 

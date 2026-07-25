@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from schemas.planes_schema import plan_schema, planes_schema
 from utils.utilidades import respuesta_api
-
+from auth_common.decorador import requires_permission
+from utils.errores import APIError
 from services.planes_service import (
     obtener_todos,
     obtener_por_id,
@@ -14,6 +15,7 @@ planes_bp = Blueprint("planes_bp", __name__, url_prefix="/planes")
 
 
 @planes_bp.route("", methods=["GET"])
+@requires_permission("micro1.planes.ver")
 def get_planes():
     planes = obtener_todos()
     data = planes_schema.dump(planes)
@@ -25,6 +27,7 @@ def get_planes():
 
 
 @planes_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.planes.ver")
 def get_plan(id):
     plan = obtener_por_id(id)
 
@@ -37,6 +40,7 @@ def get_plan(id):
 
 
 @planes_bp.route("", methods=["POST"])
+@requires_permission("micro1.planes.crear")
 def crear_planes():
     req = request.get_json(silent=True) or {}
     nuevo_plan = crear(req)
@@ -46,6 +50,7 @@ def crear_planes():
 
 
 @planes_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.planes.editar")
 def editar_plan(id):
     plan = obtener_por_id(id)
 
@@ -60,6 +65,7 @@ def editar_plan(id):
 
 
 @planes_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.planes.eliminar")
 def eliminar_plan(id):
     plan = obtener_por_id(id)
 

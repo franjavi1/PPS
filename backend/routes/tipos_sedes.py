@@ -5,7 +5,7 @@ from models.sedes import Sedes
 from schemas.tipo_sede_schema import tipo_sede_schema, tipos_sedes_schema
 from utils.errores import APIError
 from utils.utilidades import respuesta_api
-
+from auth_common.decorador import requires_permission
 from services.tipo_sede_service import (
     obtener_todos,
     obtener_por_id,
@@ -20,6 +20,7 @@ tipos_sedes_bp = Blueprint(
 
 
 @tipos_sedes_bp.route("", methods=["GET"])
+@requires_permission("micro1.tipos_sedes.ver")
 def get_tipos_sedes():
     tipos_sedes = obtener_todos()
     data = tipos_sedes_schema.dump(tipos_sedes)
@@ -31,6 +32,7 @@ def get_tipos_sedes():
 
 
 @tipos_sedes_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.tipos_sedes.ver")
 def get_tipo_sede(id):
     tipo_sede = obtener_por_id(id)
 
@@ -43,6 +45,7 @@ def get_tipo_sede(id):
 
 
 @tipos_sedes_bp.route("", methods=["POST"])
+@requires_permission("micro1.tipos_sedes.crear")
 def crear_tipo_sede():
     req = request.get_json(silent=True) or {}
 
@@ -53,6 +56,7 @@ def crear_tipo_sede():
 
 
 @tipos_sedes_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.tipos_sedes.editar")
 def editar_tipo_sede(id):
     tipo_sede = obtener_por_id(id)
 
@@ -67,6 +71,7 @@ def editar_tipo_sede(id):
 
 
 @tipos_sedes_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.tipos_sedes.eliminar")
 def eliminar_tipo_sede(id):
     tipo_sede = obtener_por_id(id)
 

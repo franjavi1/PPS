@@ -24,7 +24,7 @@ def registrar_acciones():
         return
 
     # URL base del servicio de Auth
-    auth_url = os.environ.get("AUTH_URL", "http://backend:5000")
+    auth_url = os.environ.get("AUTH_URL", "http://auth:5000")
     
     # Endpoint exacto: auth/acciones
     endpoint = f"{auth_url.rstrip('/')}/acciones"

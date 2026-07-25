@@ -8,7 +8,7 @@ from models.legajo_sedes import LegajoSedes
 from schemas.legajo_schema import legajo_schema, legajos_schema
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
-
+from auth_common.decorador import requires_permission
 from services.legajo_service import (
     obtener_todos,
     obtener_por_id,
@@ -22,6 +22,7 @@ legajos_bp = Blueprint("legajos_bp", __name__, url_prefix="/legajos")
 
 
 @legajos_bp.route("", methods=["GET"])
+@requires_permission("micro1.legajos.ver")
 def get_legajos():
     estado = request.args.get("estado", default=1, type=int)
 
@@ -38,6 +39,7 @@ def get_legajos():
 
 
 @legajos_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.legajos.ver")
 def get_legajo(id):
     legajo = obtener_por_id(id)
 
@@ -50,6 +52,7 @@ def get_legajo(id):
 
 
 @legajos_bp.route("", methods=["POST"])
+@requires_permission("micro1.legajos.crear")
 def crear_legajo():
     req = request.get_json(silent=True) or {}
 
@@ -60,6 +63,7 @@ def crear_legajo():
 
 
 @legajos_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.legajos.editar")
 def editar_legajo(id):
     legajo = obtener_por_id(id)
 
@@ -74,6 +78,7 @@ def editar_legajo(id):
 
 
 @legajos_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.legajos.eliminar")
 def eliminar_legajo(id):
     legajo = obtener_por_id(id)
 

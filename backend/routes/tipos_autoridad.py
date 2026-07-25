@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from db import db
-
+from auth_common.decorador import requires_permission
 from models.autoridad_comision import AutoridadComision
 from schemas.tipo_autoridad_schema import tipo_autoridad_schema, tipos_autoridad_schema
 from services.tipo_autoridad_service import (
@@ -16,6 +16,7 @@ from utils.utilidades import respuesta_api
 tipos_autoridad_bp = Blueprint("tipos_autoridad_bp", __name__, url_prefix="/tipos-autoridad")
 
 @tipos_autoridad_bp.route("", methods=["GET"])
+@requires_permission("micro1.tipos_autoridad.ver")
 def get_tipos_autoridad():
     tipos = obtener_todos()
     data = tipos_autoridad_schema.dump(tipos)
@@ -26,6 +27,7 @@ def get_tipos_autoridad():
     return respuesta_api(True, data, "Lista de tipos de autoridad obtenida")
 
 @tipos_autoridad_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.tipos_autoridad.ver")
 def get_tipo_autoridad(id):
     tipo = obtener_por_id(id)
 
@@ -36,6 +38,7 @@ def get_tipo_autoridad(id):
     return respuesta_api(True, data, "Tipo de autoridad obtenido correctamente")
 
 @tipos_autoridad_bp.route("", methods=["POST"])
+@requires_permission("micro1.tipos_autoridad.crear")
 def crear_tipo_autoridad():
     req = request.get_json(silent=True) or {}
     nuevo_tipo = crear(req)
@@ -43,6 +46,7 @@ def crear_tipo_autoridad():
     return respuesta_api(True, {"id": data["id"]}, "Tipo de autoridad creado correctamente", 201)
 
 @tipos_autoridad_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.tipos_autoridad.editar")
 def editar_tipo_autoridad(id):
     tipo = obtener_por_id(id)
     
@@ -56,6 +60,7 @@ def editar_tipo_autoridad(id):
     return respuesta_api(True, {"id": data["id"]}, "Tipo de autoridad actualizado correctamente")
 
 @tipos_autoridad_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.tipos_autoridad.eliminar")
 def eliminar_tipo_autoridad(id):
     tipo = obtener_por_id(id)
     

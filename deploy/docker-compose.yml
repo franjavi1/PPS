@@ -26,13 +26,17 @@ services:
       dockerfile: Dockerfile
     container_name: bomberos_backend
     restart: always
+    command: sh -c "pip install -e /auth-common --quiet && python app.py"
     volumes:
-      - ../backend:/app
+      - ./planes/backend:/app
+      - ./planes/auth-common:/auth-common
     env_file:
       - ../backend/.env
     environment:
       - PORT=5000
       - REDIS_HOST=172.10.10.50
+      - AUTH_COMMON_REDIS_URL=redis://redis:6379/0
+      - AUTH_COMMON_SESSION_TTL=900
     depends_on:
       - postgres
       - redis
