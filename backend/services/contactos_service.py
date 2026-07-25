@@ -44,3 +44,11 @@ def eliminar(contacto):
     db.session.commit()
 
     return contacto
+
+# Obtener PersonaID a partir del mail
+def obtener_personaid_por_email(email: str):
+    contacto = Contactos.query.filter_by(contacto=email).first()
+
+    if contacto:
+        return contacto.persona_id
+    return None
