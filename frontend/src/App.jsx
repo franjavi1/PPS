@@ -1,51 +1,56 @@
 import { Routes, Route, Navigate } from "react-router";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import InicioSesion from "./pages/Login";
-import Inicio from "./pages/Inicio";
-import Legajos from "./pages/Legajos";
-import ConfigDocumentos from "./pages/ConfigDocumentos";
-import Asignaturas from "./pages/Asignaturas";
-import Comisiones from "./pages/Comisiones";
-import AltaComisionWizard from "./pages/AltaComisionWizard";
-import VerComision from "./pages/VerComision";
-import EditarComision from "./pages/EditarComision";
-import Planes from "./pages/Planes";
-import PlanesAsignaturas from "./pages/PlanesAsignaturas";
-import Aulas from "./pages/Aulas";
-import ComisionesAsignaturas from "./pages/ComisionesAsignaturas";
-import AutoridadesComision from "./pages/AutoridadesComision";
-import PACorrelativas from "./pages/PACorrelativas";
-import DatosMedicos from "./pages/DatosMedicos";
-import Contactos from "./pages/Contactos";
-import Personas from "./pages/Personas";
-import EditarPersona from "./pages/EditarPersona";
-import EditarPlan from "./pages/EditarPlan";
-import VerPlan from "./pages/VerPlan";
-import AltaPersonaWizard from "./pages/AltaPersonaWizard";
-import AltaPlanWizard from "./pages/AltaPlanWizard";
-import LegajoRangos from "./pages/LegajoRangos";
-import LegajoSedes from "./pages/LegajoSedes";
-import Sedes from "./pages/Sedes";
-import TiposSedes from "./pages/TiposSedes";
-import TipoRangos from "./pages/TipoRangos";
-import TiposDocumentos from "./pages/TiposDocumentos";
 import { AuthProvider } from "./context/AuthContext";
+import InicioSesion from "./pages/Login";
+
+// Importaciones dinámicas mediante React.lazy
+const Inicio = lazy(() => import("./pages/Inicio"));
+const Legajos = lazy(() => import("./pages/Legajos"));
+const NuevoLegajo = lazy(() => import("./pages/crearLegajo"));
+const ConfigDocumentos = lazy(() => import("./pages/ConfigDocumentos"));
+const Asignaturas = lazy(() => import("./pages/Asignaturas"));
+const Comisiones = lazy(() => import("./pages/Comisiones"));
+const AltaComisionWizard = lazy(() => import("./pages/AltaComisionWizard"));
+const VerComision = lazy(() => import("./pages/VerComision"));
+const EditarComision = lazy(() => import("./pages/EditarComision"));
+const Planes = lazy(() => import("./pages/Planes"));
+const PlanesAsignaturas = lazy(() => import("./pages/PlanesAsignaturas"));
+const Aulas = lazy(() => import("./pages/Aulas"));
+const ComisionesAsignaturas = lazy(() => import("./pages/ComisionesAsignaturas"));
+const AutoridadesComision = lazy(() => import("./pages/AutoridadesComision"));
+const PACorrelativas = lazy(() => import("./pages/PACorrelativas"));
+const DatosMedicos = lazy(() => import("./pages/DatosMedicos"));
+const Contactos = lazy(() => import("./pages/Contactos"));
+const Personas = lazy(() => import("./pages/Personas"));
+const EditarPersona = lazy(() => import("./pages/EditarPersona"));
+const EditarPlan = lazy(() => import("./pages/EditarPlan"));
+const VerPlan = lazy(() => import("./pages/VerPlan"));
+const AltaPersonaWizard = lazy(() => import("./pages/AltaPersonaWizard"));
+const AltaPlanWizard = lazy(() => import("./pages/AltaPlanWizard"));
+const LegajoRangos = lazy(() => import("./pages/LegajoRangos"));
+const LegajoSedes = lazy(() => import("./pages/LegajoSedes"));
+const Sedes = lazy(() => import("./pages/Sedes"));
+const TiposSedes = lazy(() => import("./pages/TiposSedes"));
+const TipoRangos = lazy(() => import("./pages/TipoRangos"));
+const TiposDocumentos = lazy(() => import("./pages/TiposDocumentos"));
+const TiposPlanes = lazy(() => import("./pages/TiposPlanes"));
+
 
 function App() {
+  // Redefinimos los alerts clásicos del navegador para inyectar notificaciones toast estilizadas.
   useEffect(() => {
     const alertOriginal = window.alert;
-
     window.alert = (mensaje) => {
       toast(String(mensaje || "Operacion realizada"));
     };
-
     return () => {
       window.alert = alertOriginal;
     };
   }, []);
 
   return (
+    // Envolvemos toda la aplicación en nuestro AuthProvider para dar soporte de sesión a cada página.
     <AuthProvider>
       <div className="relative min-h-screen">
         {/* Contenedor flexible para centrar la marca de agua de forma 100% responsiva */}
@@ -80,46 +85,51 @@ function App() {
               },
             }}
           />
-          <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<InicioSesion />} />
-            <Route path="/inicio" element={<Inicio />} />
-            <Route path="/legajos" element={<Legajos />} />
-            <Route path="/config-documentos" element={<ConfigDocumentos />} />
-            <Route path="/sedes" element={<Sedes />} />
-            <Route path="/tipos-sedes" element={<TiposSedes />} />
-            <Route path="/tipo-rangos" element={<TipoRangos />} />
-            <Route path="/tipos-documentos" element={<TiposDocumentos />} />
-            <Route path="/asignaturas" element={<Asignaturas />} />
-            <Route path="/comisiones" element={<Comisiones />} />
-            <Route path="/comisiones/alta" element={<AltaComisionWizard />} />
-            <Route path="/comisiones/:id" element={<VerComision />} />
-            <Route path="/comisiones/:id/editar" element={<EditarComision />} />
-            <Route path="/planes" element={<Planes />} />
-            <Route path="/planes-asignaturas" element={<PlanesAsignaturas />} />
-            <Route path="/aulas" element={<Aulas />} />
-            <Route
-              path="/comisiones-asignaturas"
-              element={<ComisionesAsignaturas />}
-            />
-            <Route
-              path="/autoridades-comision"
-              element={<AutoridadesComision />}
-            />
-            <Route path="/pa-correlativas" element={<PACorrelativas />} />
-            <Route path="/datos-medicos" element={<DatosMedicos />} />
-            <Route path="/legajo-rangos" element={<LegajoRangos />} />
-            <Route path="/legajo-sedes" element={<LegajoSedes />} />
-            <Route path="/contactos" element={<Contactos />} />
-            <Route path="/personas" element={<Personas />} />
-            <Route path="/alta-persona" element={<AltaPersonaWizard />} />
-            <Route path="/personas/:id"element={<EditarPersona soloLectura />}/>
-            <Route path="/personas/:id/editar" element={<EditarPersona />} />
-            <Route path="/planes/alta" element={<AltaPlanWizard />} />
-            <Route path="/planes/:id" element={<VerPlan />} />
-            <Route path="/planes/:id/editar" element={<EditarPlan />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
+          <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[300px] text-slate-500 font-semibold text-sm">
+              Cargando sección...
+            </div>
+          }>
+            <Routes>
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/login" element={<InicioSesion />} />
+              <Route path="/inicio" element={<Inicio />} />
+              <Route path="/legajos" element={<Legajos />} />
+              <Route path="/legajos/:id" element={<NuevoLegajo />} />
+              <Route path="/legajos/:id/editar" element={<NuevoLegajo />} />
+              <Route path="/crearLegajo" element={<NuevoLegajo />} />
+              <Route path="/crearLegajo/:id" element={<NuevoLegajo />} />
+              <Route path="/config-documentos" element={<ConfigDocumentos />} />
+              <Route path="/sedes" element={<Sedes />} />
+              <Route path="/tipos-sedes" element={<TiposSedes />} />
+              <Route path="/tipo-rangos" element={<TipoRangos />} />
+              <Route path="/tipos-documentos" element={<TiposDocumentos />} />
+              <Route path="/asignaturas" element={<Asignaturas />} />
+              <Route path="/comisiones" element={<Comisiones />} />
+              <Route path="/comisiones/alta" element={<AltaComisionWizard />} />
+              <Route path="/comisiones/:id" element={<VerComision />} />
+              <Route path="/comisiones/:id/editar" element={<EditarComision />} />
+              <Route path="/planes" element={<Planes />} />
+              <Route path="/planes-asignaturas" element={<PlanesAsignaturas />} />
+              <Route path="/tipos-planes" element={<TiposPlanes />} />
+              <Route path="/aulas" element={<Aulas />} />
+              <Route path="/comisiones-asignaturas" element={<ComisionesAsignaturas />} />
+              <Route path="/autoridades-comision" element={<AutoridadesComision />} />
+              <Route path="/pa-correlativas" element={<PACorrelativas />} />
+              <Route path="/datos-medicos" element={<DatosMedicos />} />
+              <Route path="/legajo-rangos" element={<LegajoRangos />} />
+              <Route path="/legajo-sedes" element={<LegajoSedes />} />
+              <Route path="/contactos" element={<Contactos />} />
+              <Route path="/personas" element={<Personas />} />
+              <Route path="/alta-persona" element={<AltaPersonaWizard />} />
+              <Route path="/personas/:id" element={<EditarPersona />} />
+              <Route path="/personas/:id/editar" element={<EditarPersona />} />
+              <Route path="/planes/alta" element={<AltaPlanWizard />} />
+              <Route path="/planes/:id" element={<VerPlan />} />
+              <Route path="/planes/:id/editar" element={<EditarPlan />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </Suspense>
         </div>
       </div>
     </AuthProvider>

@@ -1,15 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import {
-  ArrowLeft,
-  BookOpenCheck,
-  DoorOpen,
-  GraduationCap,
-  Pencil,
-  ShieldUser,
-  Trash2,
-  UserRound,
-} from "lucide-react";
+import { ArrowLeft, BookOpenCheck, DoorOpen, GraduationCap, Pencil, ShieldUser, UserRound } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
 import { asignaturaService } from "../services/asignaturaService";
@@ -21,8 +12,12 @@ import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
+import { Dato } from "../components/FormHelpers";
 
-function VerComision() {
+const EstadoVacio = ({ texto }) => <div className="border border-slate-200 rounded-xl bg-slate-50 p-5 text-center text-slate-500 font-semibold">{texto}</div>;
+const crearMapa = (items, idKey, valueKey) => (items || []).reduce((acc, item) => ({ ...acc, [item[idKey]]: item[valueKey] }), {});
+
+export default function VerComision() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [comision, setComision] = useState(null);
@@ -45,18 +40,7 @@ function VerComision() {
   async function cargarDatos() {
     try {
       setCargando(true);
-      const [
-        resComision,
-        resComisionesAsignaturas,
-        resAutoridades,
-        resPlanesAsignaturas,
-        resAsignaturas,
-        resPlanes,
-        resSedes,
-        resAulas,
-        resTiposAutoridad,
-        resLegajos,
-      ] = await Promise.all([
+      const [resCom, resComAsig, resAut, resPlanAsig, resAsig, resPlanes, resSedes, resAulas, resTipos, resLeg] = await Promise.all([
         comisionService.obtenerPorId(id),
         comisionAsignaturaService.obtenerTodos(),
         autoridadComisionService.obtenerTodos(),
@@ -69,49 +53,42 @@ function VerComision() {
         apiRequest("/legajos"),
       ]);
 
-      const comisionesDeEsta = (resComisionesAsignaturas.data || []).filter(
-        (item) => Number(item.comision_id) === Number(id),
-      );
-      const idsComisionesAsignaturas = comisionesDeEsta.map((item) =>
-        Number(item.id_comision_asignatura),
-      );
+      const comisionesDeEsta = (resComAsig.data || []).filter((x) => Number(x.comision_id) === Number(id));
+      const idsComisionesAsignaturas = comisionesDeEsta.map((x) => Number(x.id_comision_asignatura));
 
-      setComision(resComision.data || null);
+      setComision(resCom.data || null);
       setComisionesAsignaturas(comisionesDeEsta);
-      setAutoridades(
-        (resAutoridades.data || []).filter((item) =>
-          idsComisionesAsignaturas.includes(Number(item.comision_id)),
-        ),
-      );
-      setPlanesAsignaturas(resPlanesAsignaturas.data || []);
-      setAsignaturas(resAsignaturas.data || []);
+      setAutoridades((resAut.data || []).filter((x) => idsComisionesAsignaturas.includes(Number(x.comision_id))));
+      setPlanesAsignaturas(resPlanAsig.data || []);
+      setAsignaturas(resAsig.data || []);
       setPlanes(resPlanes.data || []);
       setSedes(resSedes.data || []);
       setAulas(resAulas.data || []);
-      setTiposAutoridad(resTiposAutoridad.data || []);
-      setLegajos(resLegajos.data || []);
-      setError("");
+      setTiposAutoridad(resTipos.data || []);
+      setLegajos(resLeg.data || []);
     } catch (err) {
-      setError(obtenerMensajeError(err));
+      setError(err.message || "Error al cargar datos");
     } finally {
       setCargando(false);
     }
   }
 
   const mapas = useMemo(() => {
+    const labelPlanAsig = (pa) => {
+      const asig = asignaturas.find((x) => x.id === pa.asignatura_id);
+      const pl = planes.find((x) => x.id === pa.plan_id);
+      const se = sedes.find((x) => x.id === pa.sedes_id);
+      return [asig?.nombre, pl?.nombre, se?.nombre].filter(Boolean).join(" - ") || `Plan asignatura #${pa.id}`;
+    };
     return {
-      planesAsignaturas: planesAsignaturas.reduce((acc, item) => {
-        acc[item.id] = obtenerEtiquetaPlanAsignatura(item, asignaturas, planes, sedes);
-        return acc;
-      }, {}),
+      planesAsignaturas: planesAsignaturas.reduce((acc, x) => ({ ...acc, [x.id]: labelPlanAsig(x) }), {}),
       aulas: crearMapa(aulas, "id_aula", "aula"),
       tiposAutoridad: crearMapa(tiposAutoridad, "id", "descripcion"),
-      legajos: legajos.reduce((acc, item) => {
-        acc[item.id] = obtenerEtiquetaLegajo(item);
-        return acc;
-      }, {}),
+      legajos: legajos.reduce((acc, x) => ({ ...acc, [x.id]: x.numero ? `Nro. ${x.numero}` : `Legajo #${x.id}` }), {}),
     };
   }, [planesAsignaturas, asignaturas, planes, sedes, aulas, tiposAutoridad, legajos]);
+
+  const nombreComisionAsig = (cId) => comisionesAsignaturas.find((x) => Number(x.id_comision_asignatura) === Number(cId))?.nombre || `Comisión asignatura #${cId}`;
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -124,30 +101,20 @@ function VerComision() {
                 <GraduationCap size={28} />
               </div>
               <div>
-                <p className="text-sm font-bold text-red-700 uppercase">Comision</p>
-                <h1 className="text-3xl font-extrabold text-slate-800 mt-1">
-                  {comision?.descripcion || "Detalle de comision"}
-                </h1>
-                <p className="text-slate-500 mt-2">
-                  Consulta asignaturas, aulas y autoridades asociadas.
-                </p>
+                <p className="text-sm font-bold text-red-700 uppercase">Comisión</p>
+                <h1 className="text-3xl font-extrabold text-slate-800 mt-1">{comision?.descripcion || "Detalle"}</h1>
+                <p className="text-slate-500 mt-2">Consulta asignaturas, aulas y autoridades asociadas.</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
-              <button type="button" onClick={() => navigate("/comisiones")} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100">
-                <ArrowLeft size={20} />Volver
-              </button>
-              <button type="button" onClick={() => navigate(`/comisiones/${id}/editar`)} className="flex items-center justify-center gap-2 bg-red-700 text-white px-5 py-3 rounded-lg font-bold hover:bg-red-800">
-                <Pencil size={20} />Editar
-              </button>
+              <button type="button" onClick={() => navigate("/comisiones")} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"><ArrowLeft size={20} />Volver</button>
+              <button type="button" onClick={() => navigate(`/comisiones/${id}/editar`)} className="flex items-center justify-center gap-2 bg-red-700 text-white px-5 py-3 rounded-lg font-bold hover:bg-red-800"><Pencil size={20} />Editar</button>
             </div>
           </div>
 
           {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">{error}</div>}
 
-          {cargando ? (
-            <EstadoVacio texto="Cargando comision..." />
-          ) : (
+          {cargando ? <EstadoVacio texto="Cargando comisión..." /> : (
             <div className="space-y-8">
               <section>
                 <h2 className="text-2xl font-extrabold text-slate-800 mb-4">Asignaturas</h2>
@@ -165,15 +132,13 @@ function VerComision() {
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 text-sm">
                             <Dato label="Modalidad" value={item.modalidad} />
                             <Dato label="Cupo" value={item.cupo_maximo} />
-                            <Dato label="Estado" value={item.estado} />
+                            <Dato label="Estado" value={item.estado === 1 || item.estado === true ? "Activo" : "Inactivo"} />
                           </div>
                         </div>
                       </article>
                     ))}
                   </div>
-                ) : (
-                  <EstadoVacio texto="Esta comision no tiene asignaturas asociadas." />
-                )}
+                ) : <EstadoVacio texto="Esta comisión no tiene asignaturas asociadas." />}
               </section>
 
               <section>
@@ -187,14 +152,12 @@ function VerComision() {
                             <p className="flex items-center gap-2 text-lg font-extrabold text-slate-800"><ShieldUser size={22} />{mapas.tiposAutoridad[item.tipo_autoridad_id] || "-"}</p>
                             <p className="flex items-center gap-2 text-slate-600 font-semibold mt-1"><UserRound size={18} />{mapas.legajos[item.legajo_id] || "-"}</p>
                           </div>
-                          <Dato label="Comision asignatura" value={obtenerNombreComisionAsignatura(item.comision_id, comisionesAsignaturas)} />
+                          <Dato label="Comisión asignatura" value={nombreComisionAsig(item.comision_id)} />
                         </div>
                       </article>
                     ))}
                   </div>
-                ) : (
-                  <EstadoVacio texto="Esta comision no tiene autoridades asociadas." />
-                )}
+                ) : <EstadoVacio texto="Esta comisión no tiene autoridades asociadas." />}
               </section>
             </div>
           )}
@@ -203,49 +166,3 @@ function VerComision() {
     </div>
   );
 }
-
-function Dato({ label, value }) {
-  return (
-    <div>
-      <p className="text-slate-400 font-bold">{label}</p>
-      <p className="text-slate-800 font-semibold">{value || "-"}</p>
-    </div>
-  );
-}
-
-function EstadoVacio({ texto }) {
-  return <div className="border border-slate-200 rounded-xl bg-slate-50 p-5 text-center text-slate-500 font-semibold">{texto}</div>;
-}
-
-function crearMapa(items, idKey, valueKey) {
-  return items.reduce((acc, item) => {
-    acc[item[idKey]] = item[valueKey];
-    return acc;
-  }, {});
-}
-
-function obtenerEtiquetaPlanAsignatura(planAsignatura, asignaturas, planes, sedes) {
-  const asignatura = asignaturas.find((item) => item.id === planAsignatura.asignatura_id);
-  const plan = planes.find((item) => item.id === planAsignatura.plan_id);
-  const sede = sedes.find((item) => item.id === planAsignatura.sedes_id);
-  const partes = [asignatura?.nombre, plan?.nombre, sede?.nombre].filter(Boolean);
-  return partes.length ? partes.join(" - ") : `Plan asignatura #${planAsignatura.id}`;
-}
-
-function obtenerEtiquetaLegajo(legajo) {
-  return legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
-}
-
-function obtenerNombreComisionAsignatura(id, items) {
-  const item = items.find((registro) => Number(registro.id_comision_asignatura) === Number(id));
-  return item?.nombre || `Comision asignatura #${id}`;
-}
-
-function obtenerMensajeError(err) {
-  const errores = err.errors || {};
-  const primerCampo = Object.keys(errores)[0];
-  if (primerCampo && Array.isArray(errores[primerCampo])) return errores[primerCampo][0];
-  return err.message || "No se pudo obtener la comision";
-}
-
-export default VerComision;

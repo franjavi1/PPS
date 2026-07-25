@@ -14,8 +14,11 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 
-function Inicio() {
+export default function Inicio() {
+  const { currentUserRole } = useAuth();
   const navigate = useNavigate();
   const [resumen, setResumen] = useState({
     legajos: 0,
@@ -80,32 +83,38 @@ function Inicio() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mt-7">
-                <button
-                  type="button"
-                  onClick={() => navigate("/alta-persona")}
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
-                >
-                  <PlusCircle size={22} />
-                  Nueva persona
-                </button>
+                {hasPermission(currentUserRole, 'crear') && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/alta-persona")}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
+                  >
+                    <PlusCircle size={22} />
+                    Nueva persona
+                  </button>
+                )}
 
-                <button
-                  type="button"
-                  onClick={() => navigate("/planes/alta")}
-                  className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition"
-                >
-                  <BookOpen size={22} />
-                  Nuevo plan
-                </button>
+                {hasPermission(currentUserRole, 'crear') && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/planes/alta")}
+                    className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
+                  >
+                    <BookOpen size={22} />
+                    Nuevo plan
+                  </button>
+                )}
 
-                <button
-                  type="button"
-                  onClick={() => navigate("/comisiones/alta")}
-                  className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition"
-                >
-                  <CalendarCheck size={22} />
-                  Nueva comision
-                </button>
+                {hasPermission(currentUserRole, 'crear') && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/comisiones/alta")}
+                    className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
+                  >
+                    <CalendarCheck size={22} />
+                    Nueva comision
+                  </button>
+                )}
               </div>
             </div>
 
@@ -137,11 +146,11 @@ function Inicio() {
         </section>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 mb-8">
-          <TarjetaResumen icono={<Users size={30} />} titulo="Personas" valor={resumen.personas} tono="red" />
-          <TarjetaResumen icono={<FileText size={30} />} titulo="Legajos" valor={resumen.legajos} tono="blue" />
-          <TarjetaResumen icono={<BookOpen size={30} />} titulo="Planes" valor={resumen.planes} tono="green" />
-          <TarjetaResumen icono={<GraduationCap size={30} />} titulo="Comisiones" valor={resumen.comisiones} tono="amber" />
-          <TarjetaResumen icono={<ClipboardList size={30} />} titulo="Tipos doc." valor={resumen.tiposDocumento} tono="slate" />
+          <TarjetaResumen icono={<Users size={26} />} titulo="Personas" valor={resumen.personas} tono="red" />
+          <TarjetaResumen icono={<FileText size={26} />} titulo="Legajos" valor={resumen.legajos} tono="blue" />
+          <TarjetaResumen icono={<BookOpen size={26} />} titulo="Planes" valor={resumen.planes} tono="green" />
+          <TarjetaResumen icono={<GraduationCap size={26} />} titulo="Comisiones" valor={resumen.comisiones} tono="amber" />
+          <TarjetaResumen icono={<ClipboardList size={26} />} titulo="Tipos doc." valor={resumen.tiposDocumento} tono="slate" />
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-8">
@@ -160,19 +169,19 @@ function Inicio() {
 
             <div className="space-y-3">
               <AccesoRapido
-                icono={<Users size={28} />}
+                icono={<Users size={26} />}
                 titulo="Personas"
                 descripcion="Alta guiada, listado y edicion de personas."
                 onClick={() => navigate("/personas")}
               />
               <AccesoRapido
-                icono={<BookOpen size={28} />}
+                icono={<BookOpen size={26} />}
                 titulo="Planes"
                 descripcion="Planes, asignaturas y correlativas."
                 onClick={() => navigate("/planes")}
               />
               <AccesoRapido
-                icono={<GraduationCap size={28} />}
+                icono={<GraduationCap size={26} />}
                 titulo="Comisiones"
                 descripcion="Alta guiada, consulta y edicion de comisiones."
                 onClick={() => navigate("/comisiones")}
@@ -229,20 +238,30 @@ function Inicio() {
 
 function TarjetaResumen({ icono, titulo, valor, tono }) {
   const tonos = {
-    red: "text-red-700 bg-red-50 border-red-100",
-    blue: "text-blue-700 bg-blue-50 border-blue-100",
-    green: "text-green-700 bg-green-50 border-green-100",
-    amber: "text-amber-700 bg-amber-50 border-amber-100",
-    slate: "text-slate-700 bg-slate-50 border-slate-200",
+    red: "text-red-600 bg-red-50 border-red-100",
+    blue: "text-blue-600 bg-blue-50 border-blue-100",
+    green: "text-green-600 bg-green-50 border-green-100",
+    amber: "text-amber-600 bg-amber-50 border-amber-100",
+    slate: "text-slate-600 bg-slate-50 border-slate-200",
+  };
+
+  const tonosValor = {
+    red: "text-red-700",
+    blue: "text-blue-700",
+    green: "text-green-700",
+    amber: "text-amber-700",
+    slate: "text-slate-700",
   };
 
   return (
-    <article className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
-      <div className={`w-12 h-12 rounded-xl border flex items-center justify-center ${tonos[tono]}`}>
+    <article className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center gap-4 hover:shadow-sm transition-all duration-300">
+      <div className={`w-14 h-14 rounded-full border flex items-center justify-center shrink-0 ${tonos[tono]}`}>
         {icono}
       </div>
-      <p className="text-slate-500 font-bold mt-4">{titulo}</p>
-      <p className="text-4xl font-extrabold text-slate-900 mt-1">{valor}</p>
+      <div>
+        <p className="text-slate-500 font-semibold text-xs md:text-sm tracking-wide">{titulo}</p>
+        <p className={`text-3xl font-extrabold mt-0.5 leading-none ${tonosValor[tono]}`}>{valor}</p>
+      </div>
     </article>
   );
 }
@@ -252,15 +271,15 @@ function AccesoRapido({ icono, titulo, descripcion, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full border border-slate-200 rounded-xl p-4 text-left hover:bg-slate-50 hover:shadow-sm transition flex items-center justify-between gap-4"
+      className="w-full border border-slate-200 rounded-xl p-5 text-left hover:bg-slate-50 hover:shadow-sm transition flex items-center justify-between gap-4 cursor-pointer"
     >
       <div className="flex items-center gap-4">
-        <div className="w-11 h-11 rounded-lg bg-red-50 text-red-700 flex items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-red-50 text-red-700 flex items-center justify-center shrink-0">
           {icono}
         </div>
 
         <div>
-          <h3 className="text-lg font-extrabold text-slate-800">{titulo}</h3>
+          <h3 className="text-lg font-bold text-slate-800 leading-snug">{titulo}</h3>
           <p className="text-slate-500 text-sm mt-1">{descripcion}</p>
         </div>
       </div>
@@ -289,5 +308,3 @@ function IndicadorOperativo({ titulo, descripcion, valor }) {
 function obtenerLista(respuesta) {
   return Array.isArray(respuesta?.data) ? respuesta.data : [];
 }
-
-export default Inicio;
