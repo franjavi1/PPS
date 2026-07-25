@@ -71,21 +71,11 @@ export default function AltaPlanWizard() {
     sedes: sedes.reduce((acc, x) => ({ ...acc, [x.id]: x.nombre }), {}),
   }), [asignaturas, rangos, sedes]);
 
-  async function guardarPlan(e) {
+  function guardarPlan(e) {
     e.preventDefault();
     if (!plan.tipo_planes_id_tipo_planes || !plan.resolucion_ministerial || !plan.nombre.trim()) return setError("Complete los campos obligatorios");
-    try {
-      setGuardando(true); setError("");
-      const res = await planService.crear({
-        tipo_planes_id_tipo_planes: Number(plan.tipo_planes_id_tipo_planes), resolucion_ministerial: Number(plan.resolucion_ministerial),
-        nombre: plan.nombre.trim(), descrip: plan.descrip.trim(), vigencia_dde: plan.vigencia_dde || null, vigencia_hta: plan.vigencia_hta || null, usuario_accion: 1,
-      });
-      setPlanId(res.data.id); setPaso(2);
-    } catch (err) {
-      setError(err.message || "Error al crear plan");
-    } finally {
-      setGuardando(false);
-    }
+    setError("");
+    setPaso(2);
   }
 
   async function guardarAsignatura(e) {
@@ -95,50 +85,107 @@ export default function AltaPlanWizard() {
     setPaso(3);
   }
 
-  async function guardarCondiciones(e) {
+  function guardarCondiciones(e) {
     e.preventDefault();
+    const tempId = Date.now();
     const payload = {
-      plan_id: Number(planId), asignatura_id: Number(asignaturaPlan.asignatura_id), rango_minimo_id: Number(asignaturaPlan.rango_minimo_id),
-      sedes_id: Number(asignaturaPlan.sedes_id), presentismo_porc: Number(asignaturaPlan.presentismo_porc) || 0, regularizacion_prom: Number(asignaturaPlan.regularizacion_prom) || 0,
-      final_aprobacion: Number(asignaturaPlan.final_aprobacion) || 0, duracion: Number(asignaturaPlan.duracion) || 0, regimen: asignaturaPlan.regimen.trim(), modalidad: asignaturaPlan.modalidad.trim(), usuario_accion: 1,
+      id: tempId,
+      asignatura_id: Number(asignaturaPlan.asignatura_id),
+      rango_minimo_id: Number(asignaturaPlan.rango_minimo_id),
+      sedes_id: Number(asignaturaPlan.sedes_id),
+      presentismo_porc: Number(asignaturaPlan.presentismo_porc) || 0,
+      regularizacion_prom: Number(asignaturaPlan.regularizacion_prom) || 0,
+      final_aprobacion: Number(asignaturaPlan.final_aprobacion) || 0,
+      duracion: Number(asignaturaPlan.duracion) || 0,
+      regimen: asignaturaPlan.regimen.trim(),
+      modalidad: asignaturaPlan.modalidad.trim(),
+      asignatura: mapas.asignaturas[asignaturaPlan.asignatura_id],
+      rango: mapas.rangos[asignaturaPlan.rango_minimo_id],
+      sede: mapas.sedes[asignaturaPlan.sedes_id]
     };
-    try {
-      setGuardando(true); setError("");
-      const res = await planAsignaturaService.crear(payload);
-      setAsignaturasCargadas([
-        ...asignaturasCargadas, { id: res.data.id, asignatura_id: payload.asignatura_id, asignatura: mapas.asignaturas[payload.asignatura_id], rango: mapas.rangos[payload.rango_minimo_id], sede: mapas.sedes[payload.sedes_id] },
-      ]);
-      setAsignaturaPlan(asignaturaPlanInicial); setPaso(2);
-    } catch (err) {
-      setError(err.message || "Error al guardar asignatura");
-    } finally {
-      setGuardando(false);
-    }
+    setAsignaturasCargadas([...asignaturasCargadas, payload]);
+    setAsignaturaPlan(asignaturaPlanInicial);
+    setPaso(2);
   }
 
-  async function agregarCorrelativa() {
+  function agregarCorrelativa() {
     if (!nuevaCorrelativa.pa_id || !nuevaCorrelativa.asignatura_id) return setError("Complete campos obligatorios");
-    const payload = { pa_id: Number(nuevaCorrelativa.pa_id), asignatura_id: Number(nuevaCorrelativa.asignatura_id), usuario_accion: 1 };
-    try {
-      setGuardando(true); setError("");
-      const res = await paCorrelativaService.crear(payload);
-      setCorrelativasCargadas([
-        ...correlativasCargadas, { id: res.data.id, pa_id: payload.pa_id, asignatura_id: payload.asignatura_id, asignaturaQueRequiere: asignaturasCargadas.find((x) => x.id === payload.pa_id)?.asignatura || "", asignaturaRequerida: asignaturasCargadas.find((x) => x.asignatura_id === payload.asignatura_id)?.asignatura || "" },
-      ]);
-      setNuevaCorrelativa(correlativaInicial);
-    } catch (err) {
-      setError(err.message || "Error al agregar correlativa");
-    } finally {
-      setGuardando(false);
-    }
+    const tempId = Date.now();
+    const payload = {
+      id: tempId,
+      pa_temp_id: Number(nuevaCorrelativa.pa_id),
+      asignatura_id: Number(nuevaCorrelativa.asignatura_id),
+      asignaturaQueRequiere: asignaturasCargadas.find((x) => x.id === Number(nuevaCorrelativa.pa_id))?.asignatura || "",
+      asignaturaRequerida: asignaturas.find((x) => x.id === Number(nuevaCorrelativa.asignatura_id))?.nombre || ""
+    };
+    setCorrelativasCargadas([...correlativasCargadas, payload]);
+    setNuevaCorrelativa(correlativaInicial);
+    setError("");
   }
 
-  async function eliminarCorrelativa(cId) {
+  function eliminarCorrelativa(cId) {
+    setCorrelativasCargadas(correlativasCargadas.filter((x) => x.id !== cId));
+  }
+
+  async function guardarTodoPlan() {
     try {
-      setGuardando(true); await paCorrelativaService.eliminar(cId);
-      setCorrelativasCargadas(correlativasCargadas.filter((x) => x.id !== cId));
+      setGuardando(true);
+      setError("");
+
+      // 1. Crear el Plan
+      const resPlan = await planService.crear({
+        tipo_planes_id_tipo_planes: Number(plan.tipo_planes_id_tipo_planes),
+        resolucion_ministerial: Number(plan.resolucion_ministerial),
+        nombre: plan.nombre.trim(),
+        descrip: plan.descrip.trim(),
+        vigencia_dde: plan.vigencia_dde || null,
+        vigencia_hta: plan.vigencia_hta || null,
+        usuario_accion: 1,
+      });
+      const realPlanId = resPlan.data.id;
+      setPlanId(realPlanId);
+
+      // 2. Crear las PlanAsignaturas y mapear tempId -> realId
+      const tempToRealIdMap = {};
+      const asignaturasFinales = [];
+      for (const pa of asignaturasCargadas) {
+        const payload = {
+          plan_id: Number(realPlanId),
+          asignatura_id: Number(pa.asignatura_id),
+          rango_minimo_id: Number(pa.rango_minimo_id),
+          sedes_id: Number(pa.sedes_id),
+          presentismo_porc: Number(pa.presentismo_porc) || 0,
+          regularizacion_prom: Number(pa.regularizacion_prom) || 0,
+          final_aprobacion: Number(pa.final_aprobacion) || 0,
+          duracion: Number(pa.duracion) || 0,
+          regimen: pa.regimen.trim(),
+          modalidad: pa.modalidad.trim(),
+          usuario_accion: 1,
+        };
+        const resPA = await planAsignaturaService.crear(payload);
+        const realPAId = resPA.data.id;
+        tempToRealIdMap[pa.id] = realPAId;
+        asignaturasFinales.push({ ...pa, id: realPAId });
+      }
+      setAsignaturasCargadas(asignaturasFinales);
+
+      // 3. Crear las Correlativas
+      const correlativasFinales = [];
+      for (const corr of correlativasCargadas) {
+        const realPAId = tempToRealIdMap[corr.pa_temp_id];
+        const payload = {
+          pa_id: Number(realPAId),
+          asignatura_id: Number(corr.asignatura_id),
+          usuario_accion: 1,
+        };
+        const resCorr = await paCorrelativaService.crear(payload);
+        correlativasFinales.push({ ...corr, id: resCorr.data.id });
+      }
+      setCorrelativasCargadas(correlativasFinales);
+
+      setPaso(5);
     } catch (err) {
-      setError(err.message || "Error al eliminar correlativa");
+      setError(err.message || "Error al guardar el plan de estudios y sus materias");
     } finally {
       setGuardando(false);
     }
@@ -207,7 +254,7 @@ export default function AltaPlanWizard() {
             {paso === 1 && <StepPlan plan={plan} cambiarPlan={(e) => setPlan({ ...plan, [e.target.name]: e.target.value })} tiposPlanes={tiposPlanes} guardando={guardando} guardarPlan={guardarPlan} />}
             {paso === 2 && <StepAsignatura asignaturaPlan={asignaturaPlan} cambiarAsignaturaPlan={(e) => setAsignaturaPlan({ ...asignaturaPlan, [e.target.name]: e.target.value })} asignaturas={asignaturas} rangos={rangos} sedes={sedes} guardando={guardando} guardarAsignatura={guardarAsignatura} asignaturasCargadas={asignaturasCargadas} onBack={() => setPaso(1)} />}
             {paso === 3 && <StepCondiciones asignaturaPlan={asignaturaPlan} cambiarAsignaturaPlan={(e) => setAsignaturaPlan({ ...asignaturaPlan, [e.target.name]: e.target.value })} guardando={guardando} guardarCondiciones={guardarCondiciones} onBack={() => setPaso(2)} />}
-            {paso === 4 && <StepCorrelativas asignaturasCargadas={asignaturasCargadas} nuevaCorrelativa={nuevaCorrelativa} cambiarCorrelativa={(e) => setNuevaCorrelativa({ ...nuevaCorrelativa, [e.target.name]: e.target.value })} agregarCorrelativa={agregarCorrelativa} correlativasCargadas={correlativasCargadas} eliminarCorrelativa={eliminarCorrelativa} guardando={guardando} onBack={() => setPaso(2)} onNext={() => setPaso(5)} />}
+            {paso === 4 && <StepCorrelativas asignaturasCargadas={asignaturasCargadas} nuevaCorrelativa={nuevaCorrelativa} cambiarCorrelativa={(e) => setNuevaCorrelativa({ ...nuevaCorrelativa, [e.target.name]: e.target.value })} agregarCorrelativa={agregarCorrelativa} correlativasCargadas={correlativasCargadas} eliminarCorrelativa={eliminarCorrelativa} guardando={guardando} onBack={() => setPaso(2)} onNext={guardarTodoPlan} />}
             {paso === 5 && <StepResumen plan={plan} asignaturasCargadas={asignaturasCargadas} correlativasCargadas={correlativasCargadas} volverPlanes={() => navigate("/planes")} cargarOtroPlan={cargarOtroPlan} />}
           </div>
 

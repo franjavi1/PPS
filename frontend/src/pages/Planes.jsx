@@ -5,6 +5,8 @@ import Navbar from "../components/Navbar";
 import { planService } from "../services/planesService";
 import { tipoPlanesService } from "../services/tipoPlanesService";
 import PlanModal from "../components/Planes/PlanModal";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 
 const formularioInicial = { tipo_planes_id_tipo_planes: "", resolucion_ministerial: "", nombre: "", descrip: "", vigencia_dde: "", vigencia_hta: "" };
 
@@ -15,6 +17,7 @@ const EstadoBadge = ({ estado }) => (
 );
 
 export default function Planes() {
+  const { currentUserRole } = useAuth();
   const navigate = useNavigate();
   const [planes, setPlanes] = useState([]);
   const [tiposPlanes, setTiposPlanes] = useState([]);
@@ -122,9 +125,11 @@ export default function Planes() {
               <button onClick={cargarDatos} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100">
                 <RefreshCcw size={22} /> Actualizar
               </button>
-              <button onClick={() => navigate("/planes/alta")} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800">
-                <PlusCircle size={22} /> Nuevo Plan
-              </button>
+              {hasPermission(currentUserRole, 'crear') && (
+                <button onClick={() => navigate("/planes/alta")} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800">
+                  <PlusCircle size={22} /> Nuevo Plan
+                </button>
+              )}
             </div>
           </div>
 
@@ -160,8 +165,12 @@ export default function Planes() {
                       <td className="px-5 py-5 text-center">
                         <div className="flex justify-center gap-3">
                           <button onClick={() => navigate(`/planes/${p.id}`)} className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"><Eye size={16} /> Ver</button>
-                          <button onClick={() => navigate(`/planes/${p.id}/editar`)} className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"><Pencil size={16} /> Editar</button>
-                          <button onClick={() => eliminarPlan(p.id)} className="text-red-600 hover:text-red-800 font-semibold flex items-center gap-1"><Trash2 size={16} /> Eliminar</button>
+                          {hasPermission(currentUserRole, 'editar') && (
+                            <button onClick={() => navigate(`/planes/${p.id}/editar`)} className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"><Pencil size={16} /> Editar</button>
+                          )}
+                          {hasPermission(currentUserRole, 'eliminar') && (
+                            <button onClick={() => eliminarPlan(p.id)} className="text-red-600 hover:text-red-800 font-semibold flex items-center gap-1"><Trash2 size={16} /> Eliminar</button>
+                          )}
                         </div>
                       </td>
                     </tr>

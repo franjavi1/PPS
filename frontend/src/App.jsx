@@ -122,6 +122,7 @@ function App() {
               <Route path="/contactos" element={<Contactos />} />
               <Route path="/personas" element={<Personas />} />
               <Route path="/alta-persona" element={<AltaPersonaWizard />} />
+              <Route path="/personas/:id" element={<EditarPersona />} />
               <Route path="/personas/:id/editar" element={<EditarPersona />} />
               <Route path="/planes/alta" element={<AltaPlanWizard />} />
               <Route path="/planes/:id" element={<VerPlan />} />

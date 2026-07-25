@@ -52,6 +52,7 @@ export function CampoSelect({
   onChange,
   opciones = [],
   getLabel = (opt) => opt.descripcion || `${opt.apellido}, ${opt.nombre} - DNI ${opt.numero_doc}`,
+  getValue = (opt) => opt.id,
   error,
   icon,
   disabled = false,
@@ -73,11 +74,14 @@ export function CampoSelect({
           {...props}
         >
           <option value="">Seleccione una opción</option>
-          {opciones.map((opt) => (
-            <option key={opt.id} value={opt.id}>
-              {getLabel(opt)}
-            </option>
-          ))}
+          {opciones.map((opt) => {
+            const val = getValue(opt);
+            return (
+              <option key={val} value={val}>
+                {getLabel(opt)}
+              </option>
+            );
+          })}
         </select>
       </div>
       {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
@@ -121,7 +125,7 @@ export function CampoSoloLectura({ label, value }) {
   );
 }
 
-export function CampoCheckbox({ label, name, checked, onChange }) {
+export function CampoCheckbox({ label, name, checked, onChange, disabled = false, ...props }) {
   return (
     <div className="flex items-center gap-3 h-14 pt-6">
       <input
@@ -130,7 +134,9 @@ export function CampoCheckbox({ label, name, checked, onChange }) {
         name={name}
         checked={!!checked}
         onChange={onChange}
-        className="w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500"
+        disabled={disabled}
+        className="w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500 disabled:opacity-50"
+        {...props}
       />
       <label htmlFor={name} className="text-sm font-bold text-slate-700 cursor-pointer">
         {label}
@@ -139,7 +145,8 @@ export function CampoCheckbox({ label, name, checked, onChange }) {
   );
 }
 
-export function Acciones({ guardando, texto, onBack }) {
+export function Acciones({ guardando, texto, onBack, onClick, onSubmit }) {
+  const handleClick = onClick || onSubmit;
   return (
     <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-slate-200">
       {onBack && (
@@ -153,7 +160,8 @@ export function Acciones({ guardando, texto, onBack }) {
         </button>
       )}
       <button
-        type="submit"
+        type={handleClick ? "button" : "submit"}
+        onClick={handleClick}
         disabled={guardando}
         className="flex items-center justify-center gap-2 bg-red-700 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-50"
       >

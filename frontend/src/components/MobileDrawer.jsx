@@ -111,6 +111,9 @@ export default function MobileDrawer({
                 <button onClick={() => { navigate("/asignaturas"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
                   <BookOpen size={16} className="text-slate-400" />Asignaturas
                 </button>
+                <button onClick={() => { navigate("/tipos-planes"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">
+                  <FileText size={16} className="text-slate-400" />Tipos de Planes
+                </button>
                 {hasPermission(currentUserRole, 'crear') && (
                   <>
                     <button onClick={() => { navigate("/planes/alta"); setDrawerAbierto(false); }} className="flex items-center gap-3 py-2.5 px-3 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-red-700 transition w-full text-left" type="button">

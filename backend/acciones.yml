@@ -1,0 +1,120 @@
+servicio: planes
+
+acciones:
+  # planes resource
+  - nombre: planes.leer
+    descripcion: Ver planes de estudio, asignaturas y correlatividades
+    activo: true
+  - nombre: planes.crear
+    descripcion: Crear planes de estudio y asignaturas
+    activo: true
+  - nombre: planes.editar
+    descripcion: Editar planes de estudio y asignaturas
+    activo: true
+  - nombre: planes.eliminar
+    descripcion: Eliminar planes de estudio y asignaturas
+    activo: true
+
+  # comisiones resource
+  - nombre: comisiones.leer
+    descripcion: Ver comisiones, comisiones-asignaturas, aulas y autoridades
+    activo: true
+  - nombre: comisiones.crear
+    descripcion: Crear comisiones, aulas y configurar comisiones-asignaturas
+    activo: true
+  - nombre: comisiones.editar
+    descripcion: Editar comisiones, aulas y comisiones-asignaturas
+    activo: true
+  - nombre: comisiones.eliminar
+    descripcion: Eliminar comisiones, aulas y comisiones-asignaturas
+    activo: true
+
+  # sedes resource
+  - nombre: sedes.leer
+    descripcion: Ver sedes y tipos de sedes
+    activo: true
+  - nombre: sedes.crear
+    descripcion: Crear sedes y tipos de sedes
+    activo: true
+  - nombre: sedes.editar
+    descripcion: Editar sedes y tipos de sedes
+    activo: true
+  - nombre: sedes.eliminar
+    descripcion: Eliminar sedes y tipos de sedes
+    activo: true
+
+  # legajos resource
+  - nombre: legajos.leer
+    descripcion: Ver legajos, rangos institucionales y tipos de legajos
+    activo: true
+  - nombre: legajos.crear
+    descripcion: Crear legajos de personal
+    activo: true
+  - nombre: legajos.editar
+    descripcion: Editar legajos de personal
+    activo: true
+  - nombre: legajos.eliminar
+    descripcion: Eliminar legajos de personal
+    activo: true
+
+  # personas resource
+  - nombre: personas.leer
+    descripcion: Ver datos personales, datos medicos, contactos e identidades
+    activo: true
+  - nombre: personas.crear
+    descripcion: Registrar nuevas personas
+    activo: true
+  - nombre: personas.editar
+    descripcion: Editar datos personales, contactos y datos medicos de personas
+    activo: true
+  - nombre: personas.eliminar
+    descripcion: Eliminar personas del sistema
+    activo: true
+
+roles:
+  - nombre: ROLE_ADMIN
+    descripcion: Administrador del sistema - Control total
+  - nombre: ROLE_INSTRUCTOR
+    descripcion: Instructor de la federación - Consulta de datos
+  - nombre: ROLE_USER
+    descripcion: Usuario general - Consulta de datos
+
+rol_accion:
+  - rol: ROLE_ADMIN
+    acciones:
+      - planes.leer
+      - planes.crear
+      - planes.editar
+      - planes.eliminar
+      - comisiones.leer
+      - comisiones.crear
+      - comisiones.editar
+      - comisiones.eliminar
+      - sedes.leer
+      - sedes.crear
+      - sedes.editar
+      - sedes.eliminar
+      - legajos.leer
+      - legajos.crear
+      - legajos.editar
+      - legajos.eliminar
+      - personas.leer
+      - personas.crear
+      - personas.editar
+      - personas.eliminar
+
+  - rol: ROLE_INSTRUCTOR
+    acciones:
+      - planes.leer
+      - comisiones.leer
+      - sedes.leer
+      - legajos.leer
+      - personas.leer
+
+  - rol: ROLE_USER
+    acciones:
+      - planes.leer
+      - comisiones.leer
+      - sedes.leer
+      - legajos.leer
+      - personas.leer

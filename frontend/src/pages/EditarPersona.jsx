@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import { ArrowLeft, ChevronDown, FileText, HeartPulse, MapPinned, Phone, Save, User } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
@@ -35,6 +35,8 @@ function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
 export default function EditarPersona() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const esVer = !location.pathname.endsWith("/editar");
   // Explicamos el inicio síncrono del componente y cómo consume el rol de sesión con el hook useAuth.
   const { currentUserRole } = useAuth();
 
@@ -142,8 +144,12 @@ export default function EditarPersona() {
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-full bg-red-100 text-red-700 flex items-center justify-center"><User size={28} /></div>
               <div>
-                <h1 className="text-4xl font-extrabold text-slate-800">Editar Persona</h1>
-                <p className="text-slate-500 mt-2">Modifica los datos personales, de legajo y contactos.</p>
+                <h1 className="text-4xl font-extrabold text-slate-800">
+                  {esVer ? "Ver Persona" : "Editar Persona"}
+                </h1>
+                <p className="text-slate-500 mt-2">
+                  {esVer ? "Consulta los datos personales, de legajo y contactos." : "Modifica los datos personales, de legajo y contactos."}
+                </p>
               </div>
             </div>
             <button type="button" onClick={() => navigate("/personas")} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"><ArrowLeft size={20} />Volver</button>
@@ -152,26 +158,29 @@ export default function EditarPersona() {
           {error && <div className="mb-6 border border-red-200 bg-red-50 text-red-700 rounded-xl px-5 py-4 font-semibold">{error}</div>}
 
           {cargando ? <div className="p-8 text-center text-slate-500">Cargando datos...</div> : (
-            <form onSubmit={guardarChanges || guardarCambios} className="space-y-6">
+            <form onSubmit={guardarCambios} className="space-y-6">
               <Seccion id="persona" icono={<User size={23} />} titulo="Datos personales" abierta={seccionAbierta === "persona"} onToggle={setSeccionAbierta}>
-                <SeccionPersona persona={persona} cambiarPersona={(e) => setPersona({ ...persona, [e.target.name]: e.target.value })} tiposDocumento={tiposDocumento} />
+                <SeccionPersona disabled={esVer} persona={persona} cambiarPersona={(e) => setPersona({ ...persona, [e.target.name]: e.target.value })} tiposDocumento={tiposDocumento} />
               </Seccion>
               <Seccion id="legajo" icono={<FileText size={23} />} titulo="Legajo" abierta={seccionAbierta === "legajo"} onToggle={setSeccionAbierta}>
-                <SeccionLegajo legajo={legajo} cambiarLegajo={(e) => setLegajo({ ...legajo, [e.target.name]: e.target.value })} />
+                <SeccionLegajo disabled={esVer} legajo={legajo} cambiarLegajo={(e) => setLegajo({ ...legajo, [e.target.name]: e.target.value })} />
               </Seccion>
               <Seccion id="datos-medicos" icono={<HeartPulse size={23} />} titulo="Datos médicos" abierta={seccionAbierta === "datos-medicos"} onToggle={setSeccionAbierta}>
-                <SeccionDatosMedicos datosMedicos={datosMedicos} cambiarDatosMedicos={(e) => setDatosMedicos({ ...datosMedicos, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} />
+                <SeccionDatosMedicos disabled={esVer} datosMedicos={datosMedicos} cambiarDatosMedicos={(e) => setDatosMedicos({ ...datosMedicos, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} />
               </Seccion>
               <Seccion id="contactos" icono={<Phone size={23} />} titulo="Contactos" abierta={seccionAbierta === "contactos"} onToggle={setSeccionAbierta}>
-                <SeccionContactos contactos={contactos} cambiarContactos={(e) => setContactos({ ...contactos, [e.target.name]: e.target.value })} />
+                <SeccionContactos disabled={esVer} contactos={contactos} cambiarContactos={(e) => setContactos({ ...contactos, [e.target.name]: e.target.value })} />
               </Seccion>
               <Seccion id="rango-sede" icono={<MapPinned size={23} />} titulo="Rango y sede" abierta={seccionAbierta === "rango-sede"} onToggle={setSeccionAbierta}>
-                <SeccionRangoSede rango={rango} cambiarRango={(e) => setRango({ ...rango, [e.target.name]: e.target.value })} sede={sede} cambiarSede={(e) => setSede({ ...sede, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} rangos={rangos} sedes={sedes} />
+                <SeccionRangoSede disabled={esVer} rango={rango} cambiarRango={(e) => setRango({ ...rango, [e.target.name]: e.target.value })} sede={sede} cambiarSede={(e) => setSede({ ...sede, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })} rangos={rangos} sedes={sedes} />
               </Seccion>
               <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-200 bg-white">
-                <button type="button" onClick={() => navigate("/personas")} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">Cancelar</button>
-                {/* Si no tiene permisos de rol, ocultamos/deshabilitamos el elemento para que no intente la llamada. */}
-                <button type="submit" disabled={guardando || !hasPermission(currentUserRole, "editar")} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"><Save size={22} />{guardando ? "Guardando..." : "Guardar cambios"}</button>
+                <button type="button" onClick={() => navigate("/personas")} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">
+                  {esVer ? "Volver" : "Cancelar"}
+                </button>
+                {!esVer && (
+                  <button type="submit" disabled={guardando || !hasPermission(currentUserRole, "editar")} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"><Save size={22} />{guardando ? "Guardando..." : "Guardar cambios"}</button>
+                )}
               </div>
             </form>
           )}

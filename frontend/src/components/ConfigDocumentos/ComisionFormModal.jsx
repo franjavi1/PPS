@@ -8,8 +8,9 @@ export default function ComisionFormModal({
   modoEdicion,
   form,
   error,
-  asignaturas,
+  planesAsignaturas,
   aulas,
+  baseComisiones,
   manejarCambio,
   guardar,
   limpiarForm
@@ -40,8 +41,10 @@ export default function ComisionFormModal({
         nuevosErrores.cupoMaximo = "Debe ingresar un cupo máximo válido.";
       }
     } else if (paso === 2) {
-      if (!form.asignaturaId) nuevosErrores.asignaturaId = "Debe seleccionar una asignatura académica.";
+      if (!form.planAsignaturasId) nuevosErrores.planAsignaturasId = "Debe seleccionar una asignatura académica.";
       if (!form.aulaId) nuevosErrores.aulaId = "Debe seleccionar un aula física asignada.";
+      if (!form.comisionId) nuevosErrores.comisionId = "Debe seleccionar una comisión base.";
+      if (!form.modalidad || !form.modalidad.trim()) nuevosErrores.modalidad = "La modalidad es obligatoria.";
     }
 
     if (Object.keys(nuevosErrores).length > 0) {
@@ -58,8 +61,16 @@ export default function ComisionFormModal({
   }
 
   const errorCombinado = { ...error, ...erroresLocales };
-  const nombreAsignatura = asignaturas.find(a => String(a.id) === String(form.asignaturaId))?.nombre || "-";
-  const nombreAula = aulas.find(a => String(a.id) === String(form.aulaId))?.nombre || "-";
+  const paSelected = planesAsignaturas.find(a => String(a.id) === String(form.planAsignaturasId));
+  const nombreAsignatura = paSelected ? `${paSelected.asignatura} - ${paSelected.plan} - ${paSelected.sede}` : "-";
+  const aSelected = aulas.find(a => String(a.id_aula) === String(form.aulaId));
+  const nombreAula = aSelected ? aSelected.aula : "-";
+  const bcSelected = baseComisiones.find(bc => String(bc.id_comision) === String(form.comisionId));
+  const nombreComisionBase = bcSelected ? bcSelected.descripcion : "-";
+
+  const aulasFiltradas = paSelected
+    ? aulas.filter((a) => String(a.sedes_id) === String(paSelected.sedes_id))
+    : [];
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
@@ -147,22 +158,42 @@ export default function ComisionFormModal({
             <TituloPaso icono={<Link size={26} />} titulo="Vinculación Académica" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <CampoSelect
-                label="Asignatura Académica *"
-                name="asignaturaId"
-                value={form.asignaturaId}
+                label="Materia Planificada *"
+                name="planAsignaturasId"
+                value={form.planAsignaturasId}
                 onChange={manejarCambio}
-                opciones={asignaturas}
-                getLabel={(a) => a.nombre}
-                error={errorCombinado.asignaturaId}
+                opciones={planesAsignaturas}
+                getLabel={(pa) => `${pa.asignatura} - ${pa.plan} - ${pa.sede}`}
+                error={errorCombinado.planAsignaturasId}
               />
               <CampoSelect
                 label="Aula Física Asignada *"
                 name="aulaId"
                 value={form.aulaId}
                 onChange={manejarCambio}
-                opciones={aulas}
-                getLabel={(a) => a.nombre || a.aula}
+                opciones={aulasFiltradas}
+                getLabel={(a) => a.aula}
+                getValue={(a) => a.id_aula}
+                disabled={!form.planAsignaturasId}
                 error={errorCombinado.aulaId}
+              />
+              <CampoSelect
+                label="Comisión Base *"
+                name="comisionId"
+                value={form.comisionId}
+                onChange={manejarCambio}
+                opciones={baseComisiones}
+                getLabel={(bc) => bc.descripcion}
+                getValue={(bc) => bc.id_comision}
+                error={errorCombinado.comisionId}
+              />
+              <CampoTexto
+                label="Modalidad *"
+                name="modalidad"
+                value={form.modalidad}
+                onChange={manejarCambio}
+                placeholder="Ej: Presencial"
+                error={errorCombinado.modalidad}
               />
             </div>
           </div>
@@ -180,12 +211,20 @@ export default function ComisionFormModal({
                   <p className="text-slate-800 font-extrabold mt-1 text-base">{form.nombre}</p>
                 </div>
                 <div className="border border-slate-200 rounded-xl bg-white p-4">
-                  <p className="text-xs font-bold text-slate-400 uppercase">Asignatura</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase">Materia</p>
                   <p className="text-slate-800 font-semibold mt-1 text-base">{nombreAsignatura}</p>
                 </div>
                 <div className="border border-slate-200 rounded-xl bg-white p-4">
                   <p className="text-xs font-bold text-slate-400 uppercase">Aula Física</p>
                   <p className="text-slate-800 font-semibold mt-1 text-base">{nombreAula}</p>
+                </div>
+                <div className="border border-slate-200 rounded-xl bg-white p-4">
+                  <p className="text-xs font-bold text-slate-400 uppercase">Comisión Base</p>
+                  <p className="text-slate-800 font-semibold mt-1 text-base">{nombreComisionBase}</p>
+                </div>
+                <div className="border border-slate-200 rounded-xl bg-white p-4">
+                  <p className="text-xs font-bold text-slate-400 uppercase">Modalidad</p>
+                  <p className="text-slate-800 font-semibold mt-1 text-base">{form.modalidad}</p>
                 </div>
                 <div className="border border-slate-200 rounded-xl bg-white p-4">
                   <p className="text-xs font-bold text-slate-400 uppercase">Cupo de Alumnos</p>

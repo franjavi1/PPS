@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -42,6 +43,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @autoridades_comision_bp.route("", methods=["GET"])
+@requires_permission("planes.comisiones.leer")
 def get_autoridades_comision():
     try:
         autoridades_comision = obtener_todos()
@@ -64,6 +66,7 @@ def get_autoridades_comision():
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.comisiones.leer")
 def get_autoridad_comision(id):
     try:
         autoridad_comision = obtener_por_id(id)
@@ -89,6 +92,7 @@ def get_autoridad_comision(id):
 
 
 @autoridades_comision_bp.route("", methods=["POST"])
+@requires_permission("planes.comisiones.crear")
 def crear_autoridad_comision():
     req = request.get_json(silent=True) or {}
 
@@ -122,6 +126,7 @@ def crear_autoridad_comision():
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.comisiones.editar")
 def editar_autoridad_comision(id):
     try:
         autoridad_comision = obtener_por_id(id)
@@ -160,6 +165,7 @@ def editar_autoridad_comision(id):
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.comisiones.eliminar")
 def eliminar_autoridad_comision(id):
     try:
         autoridad_comision = obtener_por_id(id)

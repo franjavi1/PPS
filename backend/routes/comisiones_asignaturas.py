@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -43,6 +44,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @comisiones_asignaturas_bp.route("", methods=["GET"])
+@requires_permission("planes.comisiones.leer")
 def get_comisiones_asignaturas():
     try:
         comisiones_asignaturas = obtener_todos()
@@ -65,6 +67,7 @@ def get_comisiones_asignaturas():
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.comisiones.leer")
 def get_comision_asignatura(id):
     try:
         comision_asignatura = obtener_por_id(id)
@@ -90,6 +93,7 @@ def get_comision_asignatura(id):
 
 
 @comisiones_asignaturas_bp.route("", methods=["POST"])
+@requires_permission("planes.comisiones.crear")
 def crear_comision_asignatura():
     req = request.get_json(silent=True) or {}
 
@@ -123,6 +127,7 @@ def crear_comision_asignatura():
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.comisiones.editar")
 def editar_comision_asignatura(id):
     try:
         comision_asignatura = obtener_por_id(id)
@@ -161,6 +166,7 @@ def editar_comision_asignatura(id):
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.comisiones.eliminar")
 def eliminar_comision_asignatura(id):
     try:
         comision_asignatura = obtener_por_id(id)

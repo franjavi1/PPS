@@ -88,71 +88,100 @@ export default function AltaPersonaWizard() {
   async function guardarPersona(e) {
     e.preventDefault();
     if (!persona.nombre || !persona.apellido || !persona.numero_doc || !persona.td_id) return setError("Complete los campos obligatorios");
-    try {
-      setGuardando(true); setError("");
-      const res = await personasService.crear({
-        td_id: Number(persona.td_id), numero_doc: persona.numero_doc, nombre: persona.nombre, apellido: persona.apellido, usuario_accion: 1,
-      });
-      setPersonaId(res.data.id); setPaso(2);
-    } catch (err) {
-      setError(err.message || "Error al crear persona");
-    } finally {
-      setGuardando(false);
-    }
+    setError("");
+    setPaso(2);
   }
 
   async function guardarLegajo(e) {
     e.preventDefault();
     if (!legajo.numero) return setError("El número de legajo es obligatorio");
     if (tiposLegajoSeleccionados.length === 0) return setError("Debe seleccionar al menos un tipo de legajo");
+    setError("");
+    setPaso(3);
+  }
+
+  async function guardarDatosDelLegajo(e) {
+    e.preventDefault();
+    setError("");
+    setPaso(4);
+  }
+
+  async function guardarUsuario(e) {
+    e.preventDefault();
     try {
       setGuardando(true); setError("");
-      const res = await apiRequest("/legajos", {
+      
+      // Step 1: Create Persona
+      const resPersona = await personasService.crear({
+        td_id: Number(persona.td_id),
+        numero_doc: persona.numero_doc,
+        nombre: persona.nombre,
+        apellido: persona.apellido,
+        usuario_accion: 1,
+      });
+      const createdPersonaId = resPersona.data.id;
+      setPersonaId(createdPersonaId);
+
+      // Step 2: Create Legajo
+      const resLegajo = await apiRequest("/legajos", {
         method: "POST",
         body: JSON.stringify({
-          persona_id: Number(personaId),
+          persona_id: Number(createdPersonaId),
           numero: String(legajo.numero).trim(),
           usuario_accion: 1,
           tipo_legajo_ids: tiposLegajoSeleccionados
         }),
       });
-      setLegajoId(res.data.id); setPaso(3);
-    } catch (err) {
-      setError(err.message || "Error al crear legajo");
-    } finally {
-      setGuardando(false);
-    }
-  }
+      const createdLegajoId = resLegajo.data.id;
+      setLegajoId(createdLegajoId);
 
-  async function guardarDatosDelLegajo(e) {
-    e.preventDefault();
-    try {
-      setGuardando(true); setError("");
+      // Step 3: Create associated records
       const promesas = [];
       if (datosMedicos.grupo_sanguineo) {
-        promesas.push(datosMedicosService.crear({ legajo_id: Number(legajoId), grupo_sanguineo: datosMedicos.grupo_sanguineo, alergias: datosMedicos.alergias, aptitud_fisica: datosMedicos.aptitud_fisica, seguro: datosMedicos.seguro, usuario_accion: 1 }));
+        promesas.push(datosMedicosService.crear({
+          legajo_id: Number(createdLegajoId),
+          grupo_sanguineo: datosMedicos.grupo_sanguineo,
+          alergias: datosMedicos.alergias,
+          aptitud_fisica: datosMedicos.aptitud_fisica,
+          seguro: datosMedicos.seguro,
+          usuario_accion: 1
+        }));
       }
       if (contactos.email || contactos.celular) {
-        promesas.push(contactosService.crear({ persona_id: Number(personaId), email: contactos.email, celular: contactos.celular, usuario_accion: 1 }));
+        promesas.push(contactosService.crear({
+          persona_id: Number(createdPersonaId),
+          email: contactos.email,
+          celular: contactos.celular,
+          usuario_accion: 1
+        }));
       }
       if (datosLegajo.rangos_institucionales_id) {
-        promesas.push(legajoRangosService.crear({ legajo_id: Number(legajoId), rangos_institucionales_id: Number(datosLegajo.rangos_institucionales_id), es_autoridad: datosLegajo.es_autoridad, usuario_accion: 1 }));
+        promesas.push(legajoRangosService.crear({
+          legajo_id: Number(createdLegajoId),
+          rangos_institucionales_id: Number(datosLegajo.rangos_institucionales_id),
+          es_autoridad: datosLegajo.es_autoridad,
+          usuario_accion: 1
+        }));
       }
       if (datosLegajo.sede_id) {
-        promesas.push(legajoSedesService.crear({ legajo_id: Number(legajoId), sede_id: Number(datosLegajo.sede_id), es_sede_base: datosLegajo.es_sede_base, usuario_accion: 1 }));
+        promesas.push(legajoSedesService.crear({
+          legajo_id: Number(createdLegajoId),
+          sede_id: Number(datosLegajo.sede_id),
+          es_sede_base: datosLegajo.es_sede_base,
+          usuario_accion: 1
+        }));
       }
-      await Promise.all(promesas); setPaso(4);
+      await Promise.all(promesas);
+
+      if (usuario.crear_usuario) {
+        setResultadoUsuario({ mensaje: "Usuario 'bombero' solicitado con éxito" });
+      }
+      setPaso(5);
     } catch (err) {
-      setError(err.message || "Error al guardar los datos asociados");
+      setError(err.message || "Error al registrar toda la información");
     } finally {
       setGuardando(false);
     }
-  }
-
-  async function guardarUsuario(e) {
-    e.preventDefault();
-    if (usuario.crear_usuario) setResultadoUsuario({ mensaje: "Usuario 'bombero' solicitado con éxito" });
-    setPaso(5);
   }
 
   return (

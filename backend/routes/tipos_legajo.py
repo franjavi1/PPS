@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -32,6 +33,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @tipos_legajo_bp.route("", methods=["GET"])
+@requires_permission("planes.legajos.leer")
 def get_tipos_legajo():
     try:
         tipos_legajo = obtener_todos()
@@ -50,6 +52,7 @@ def get_tipos_legajo():
 
 
 @tipos_legajo_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.legajos.leer")
 def get_tipo_legajo(id):
     try:
         tipo_legajo = obtener_por_id(id)
@@ -70,6 +73,7 @@ def get_tipo_legajo(id):
 
 
 @tipos_legajo_bp.route("", methods=["POST"])
+@requires_permission("planes.legajos.crear")
 def crear_tipo_legajo():
     req = request.get_json(silent=True) or {}
     try:
@@ -93,6 +97,7 @@ def crear_tipo_legajo():
 
 
 @tipos_legajo_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.legajos.editar")
 def editar_tipo_legajo(id):
     try:
         tipo_legajo = obtener_por_id(id)
@@ -121,6 +126,7 @@ def editar_tipo_legajo(id):
 
 
 @tipos_legajo_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.legajos.eliminar")
 def eliminar_tipo_legajo(id):
     try:
         tipo_legajo = obtener_por_id(id)

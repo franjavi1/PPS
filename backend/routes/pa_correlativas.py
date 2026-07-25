@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -32,6 +33,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
     return jsonify(response), status
 
 @pa_correlativas_bp.route("", methods=["GET"])
+@requires_permission("planes.planes.leer")
 def get_pa_correlativas():
     try:
         relaciones = obtener_todos()
@@ -52,6 +54,7 @@ def get_pa_correlativas():
         })
 
 @pa_correlativas_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.planes.leer")
 def get_pa_correlativa(id):
     try:
         relacion = obtener_por_id(id)
@@ -74,6 +77,7 @@ def get_pa_correlativa(id):
         })
 
 @pa_correlativas_bp.route("", methods=["POST"])
+@requires_permission("planes.planes.crear")
 def crear_pa_correlativa():
     req = request.get_json(silent=True) or {}
     try:
@@ -99,6 +103,7 @@ def crear_pa_correlativa():
         })
 
 @pa_correlativas_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.planes.editar")
 def editar_pa_correlativa(id):
     try:
         relacion = obtener_por_id(id)
@@ -132,6 +137,7 @@ def editar_pa_correlativa(id):
         })
 
 @pa_correlativas_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.planes.eliminar")
 def eliminar_pa_correlativa(id):
     try:
         relacion = obtener_por_id(id)

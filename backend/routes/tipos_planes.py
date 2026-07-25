@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -38,6 +39,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @tipos_planes_bp.route("", methods=["GET"])
+@requires_permission("planes.planes.leer")
 def get_tipos_planes():
     try:
         tipos_planes = obtener_todos()
@@ -60,6 +62,7 @@ def get_tipos_planes():
 
 
 @tipos_planes_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.planes.leer")
 def get_tipo_plan(id):
     try:
         tipo_plan = obtener_por_id(id)
@@ -85,6 +88,7 @@ def get_tipo_plan(id):
 
 
 @tipos_planes_bp.route("", methods=["POST"])
+@requires_permission("planes.planes.crear")
 def crear_tipo_plan():
     req = request.get_json(silent=True) or {}
 
@@ -113,6 +117,7 @@ def crear_tipo_plan():
 
 
 @tipos_planes_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.planes.editar")
 def editar_tipo_plan(id):
 
     try:
@@ -149,6 +154,7 @@ def editar_tipo_plan(id):
 
 
 @tipos_planes_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.planes.eliminar")
 def eliminar_tipo_planes(id):
     try:
         tipo_plan = obtener_por_id(id)

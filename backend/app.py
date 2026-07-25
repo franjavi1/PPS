@@ -1,5 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
+from auth_common import AuthCommon
+from flask_jwt_extended import JWTManager
 
 from db import db, ma
 from config.config import Config
@@ -57,6 +59,22 @@ from routes.legajo_tipos_legajo import legajo_tipos_legajo_bp
 app = Flask(__name__)
 app.config.from_object(Config)
 
+AuthCommon(app)
+JWTManager(app)
+
+def registrar_acciones():
+    import yaml
+    import requests
+    try:
+        with open("acciones.yml", encoding="utf-8") as f:
+            datos = yaml.safe_load(f)
+        response = requests.post("http://auth:5000/acciones", json=datos, timeout=5)
+        print(f"Registro de acciones exitoso: {response.status_code}")
+    except Exception as e:
+        print(f"Advertencia: No se pudo registrar las acciones contra el servicio de Auth ({e}). Esto es esperado si el servicio de Auth no está levantado en este momento.")
+
+registrar_acciones()
+
 db.init_app(app)
 ma.init_app(app)
 
@@ -68,6 +86,58 @@ def health():
     return {
         "status": "success",
         "message": "API funcionando"
+    }, 200
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    from flask import request
+    from flask_jwt_extended import create_access_token
+    req = request.get_json(silent=True) or {}
+    usuario = req.get("usuario", "admin")
+    rol = req.get("rol")
+    if not rol:
+        usuario_lower = usuario.lower()
+        if "admin" in usuario_lower:
+            rol = "ROLE_ADMIN"
+        elif "instructor" in usuario_lower or "docente" in usuario_lower:
+            rol = "ROLE_INSTRUCTOR"
+        else:
+            rol = "ROLE_USER"
+    
+    id_usuario = 1234567890
+    
+    token = create_access_token(identity=str(id_usuario), additional_claims={"rol": rol, "usuario": usuario})
+    
+    redis_client = app.extensions["auth_common"]["redis_client"]
+    ttl = app.extensions["auth_common"]["session_ttl"]
+    
+    acciones = []
+    if rol == "ROLE_ADMIN":
+        acciones = [
+            "planes.planes.leer", "planes.planes.crear", "planes.planes.editar", "planes.planes.eliminar",
+            "planes.comisiones.leer", "planes.comisiones.crear", "planes.comisiones.editar", "planes.comisiones.eliminar",
+            "planes.sedes.leer", "planes.sedes.crear", "planes.sedes.editar", "planes.sedes.eliminar",
+            "planes.legajos.leer", "planes.legajos.crear", "planes.legajos.editar", "planes.legajos.eliminar",
+            "planes.personas.leer", "planes.personas.crear", "planes.personas.editar", "planes.personas.eliminar"
+        ]
+    elif rol in ["ROLE_INSTRUCTOR", "ROLE_USER"]:
+        acciones = [
+            "planes.planes.leer", "planes.comisiones.leer", "planes.sedes.leer", "planes.legajos.leer", "planes.personas.leer"
+        ]
+        
+    import json
+    redis_client.hset(f"session:{id_usuario}", mapping={
+        "roles": json.dumps([rol]),
+        "acciones": json.dumps(acciones),
+        "refresh_jti": "mock_refresh_jti",
+        "id_persona": "1"
+    })
+    redis_client.expire(f"session:{id_usuario}", ttl)
+    
+    return {
+        "status": "success",
+        "token": token
     }, 200
 
 

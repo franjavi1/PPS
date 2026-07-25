@@ -212,6 +212,17 @@ export default function DesktopNav({
                 <BookOpen size={16} className="text-slate-400" />
                 <span>Asignaturas</span>
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/tipos-planes");
+                  setDropdownAbierto(null);
+                }}
+                className={dropdownItemClass}
+              >
+                <FileText size={16} className="text-slate-400" />
+                <span>Tipos de Planes</span>
+              </button>
               {hasPermission(currentUserRole, 'crear') && (
                 <>
                   <button

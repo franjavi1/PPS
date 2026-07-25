@@ -21,6 +21,7 @@ export default function StepPlan({ plan, cambiarPlan, tiposPlanes, guardando, gu
           onChange={cambiarPlan}
           opciones={tiposPlanes}
           getLabel={(t) => t.descripcion}
+          getValue={(t) => t.id_tipo_planes}
         />
         <CampoTexto
           label="Nombre del plan"

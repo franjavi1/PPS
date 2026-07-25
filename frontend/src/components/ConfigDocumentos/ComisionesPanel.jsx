@@ -1,19 +1,31 @@
 import { useState, useEffect } from "react";
 import { PlusCircle, Pencil, Trash2 } from "lucide-react";
-import { comisionService } from "../../services/comisionService";
-import { asignaturaService } from "../../services/asignaturaService";
+import { comisionAsignaturaService } from "../../services/comisionAsignaturaService";
+import { planAsignaturaService } from "../../services/planAsignaturaService";
 import { aulaService } from "../../services/aulaService";
+import { comisionService } from "../../services/comisionService";
 import { hasPermission } from "../../utils/authHelper";
 import ComisionFormModal from "./ComisionFormModal";
 import TablaPrincipal from "../TablaPrincipal/TablaPrincipal";
 
 export default function ComisionesPanel({ currentUserRole }) {
   const [comisiones, setComisiones] = useState([]);
-  const [asignaturas, setAsignaturas] = useState([]);
+  const [planesAsignaturas, setPlanesAsignaturas] = useState([]);
   const [aulas, setAulas] = useState([]);
+  const [baseComisiones, setBaseComisiones] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
-  const [form, setForm] = useState({ id: null, nombre: "", asignaturaId: "", aulaId: "", cupoMaximo: "", inscritos: 0 });
+  const [form, setForm] = useState({
+    id: null,
+    nombre: "",
+    planAsignaturasId: "",
+    aulaId: "",
+    comisionId: "",
+    modalidad: "Presencial",
+    cupoMaximo: "",
+    estado: "Activo",
+    inscritos: 0
+  });
   const [error, setError] = useState({});
 
   useEffect(() => {
@@ -32,15 +44,29 @@ export default function ComisionesPanel({ currentUserRole }) {
 
   async function cargarDatos() {
     try {
-      const [resComisiones, resAsignaturas, resAulas] = await Promise.all([
-        comisionService.obtenerTodas(), asignaturaService.obtenerTodas(), aulaService.obtenerTodas(),
+      const [resComisionesAsig, resPlanesAsignaturas, resAulas, resBaseComisiones] = await Promise.all([
+        comisionAsignaturaService.obtenerTodos(),
+        planAsignaturaService.obtenerTodos(),
+        aulaService.obtenerTodas(),
+        comisionService.obtenerTodas(),
       ]);
-      const comisionesMapeadas = (resComisiones.data || []).map((c) => ({
-        ...c, asignaturaId: c.asignatura_id, aulaId: c.aula_id, cupoMaximo: c.cupo_maximo,
+
+      const comisionesMapeadas = (resComisionesAsig.data || []).map((c) => ({
+        id: c.id_comision_asignatura,
+        nombre: c.nombre,
+        planAsignaturasId: c.plan_asignaturas_id,
+        aulaId: c.aula_id,
+        comisionId: c.comision_id,
+        modalidad: c.modalidad || "Presencial",
+        cupoMaximo: c.cupo_maximo,
+        estado: c.estado || "Activo",
+        inscritos: c.inscritos || 0,
       }));
+
       setComisiones(comisionesMapeadas);
-      setAsignaturas(resAsignaturas.data || []);
+      setPlanesAsignaturas(resPlanesAsignaturas.data || []);
       setAulas(resAulas.data || []);
+      setBaseComisiones(resBaseComisiones.data || []);
     } catch (err) {
       console.error("Error al cargar datos:", err);
     }
@@ -48,14 +74,20 @@ export default function ComisionesPanel({ currentUserRole }) {
 
   function manejarCambio(e) {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: name === "asignaturaId" || name === "aulaId" || name === "cupoMaximo" ? parseInt(value, 10) || "" : value });
+    setForm({
+      ...form,
+      [name]: name === "planAsignaturasId" || name === "aulaId" || name === "comisionId" || name === "cupoMaximo"
+        ? parseInt(value, 10) || ""
+        : value
+    });
   }
 
   function validar() {
     const errores = {};
     if (!form.nombre.trim()) errores.nombre = "El nombre de la comisión es requerido.";
-    if (!form.asignaturaId) errores.asignaturaId = "Debe seleccionar una asignatura.";
+    if (!form.planAsignaturasId) errores.planAsignaturasId = "Debe seleccionar una materia planificada.";
     if (!form.aulaId) errores.aulaId = "Debe seleccionar un aula.";
+    if (!form.comisionId) errores.comisionId = "Debe seleccionar una comisión base.";
     if (form.cupoMaximo === "" || isNaN(form.cupoMaximo) || form.cupoMaximo <= 0) errores.cupoMaximo = "Cupo máximo inválido.";
     setError(errores);
     return Object.keys(errores).length === 0;
@@ -66,11 +98,20 @@ export default function ComisionesPanel({ currentUserRole }) {
     if (!validar()) return;
     try {
       let response;
-      const payload = { nombre: form.nombre, asignatura_id: Number(form.asignaturaId), aula_id: Number(form.aulaId), cupo_maximo: Number(form.cupoMaximo), usuario_accion: 1 };
+      const payload = {
+        nombre: form.nombre,
+        plan_asignaturas_id: Number(form.planAsignaturasId),
+        aula_id: Number(form.aulaId),
+        comision_id: Number(form.comisionId),
+        modalidad: form.modalidad || "Presencial",
+        cupo_maximo: Number(form.cupoMaximo),
+        estado: form.estado || "Activo",
+        usuario_accion: 1
+      };
       if (modoEdicion) {
-        response = await comisionService.actualizar(form.id, payload);
+        response = await comisionAsignaturaService.actualizar(form.id, payload);
       } else {
-        response = await comisionService.crear(payload);
+        response = await comisionAsignaturaService.crear(payload);
       }
       if (response.status === "error") {
         setError(response.errors || {});
@@ -85,7 +126,18 @@ export default function ComisionesPanel({ currentUserRole }) {
   }
 
   function editar(comision) {
-    setForm(comision); setModoEdicion(true); setError({}); setMostrarModal(true);
+    setForm({
+      id: comision.id,
+      nombre: comision.nombre,
+      planAsignaturasId: comision.planAsignaturasId,
+      aulaId: comision.aulaId,
+      comisionId: comision.comisionId,
+      modalidad: comision.modalidad,
+      cupoMaximo: comision.cupoMaximo,
+      estado: comision.estado,
+      inscritos: comision.inscritos
+    });
+    setModoEdicion(true); setError({}); setMostrarModal(true);
   }
 
   async function eliminar(id) {
@@ -95,7 +147,7 @@ export default function ComisionesPanel({ currentUserRole }) {
     }
     if (!confirm("¿Confirma la eliminación de esta comisión?")) return;
     try {
-      const response = await comisionService.eliminar(id);
+      const response = await comisionAsignaturaService.eliminar(id);
       if (response.status === "error") return alert(response.message);
       alert(response.message || "Comisión eliminada con éxito.");
       cargarDatos();
@@ -106,15 +158,28 @@ export default function ComisionesPanel({ currentUserRole }) {
   }
 
   function limpiarForm() {
-    setForm({ id: null, nombre: "", asignaturaId: "", aulaId: "", cupoMaximo: "", inscritos: 0 });
+    setForm({
+      id: null,
+      nombre: "",
+      planAsignaturasId: "",
+      aulaId: "",
+      comisionId: "",
+      modalidad: "Presencial",
+      cupoMaximo: "",
+      estado: "Activo",
+      inscritos: 0
+    });
     setError({}); setModoEdicion(false);
   }
 
   const columnasConfig = [
     { clave: "nombre", titulo: "Comisión" },
     {
-      clave: "asignaturaId", titulo: "Materia",
-      renderizar: (c) => asignaturas.find((a) => a.id === c.asignaturaId)?.nombre || "-",
+      clave: "planAsignaturasId", titulo: "Materia",
+      renderizar: (c) => {
+        const pa = planesAsignaturas.find((p) => p.id === c.planAsignaturasId);
+        return pa ? `${pa.asignatura} - ${pa.plan}` : "-";
+      },
     },
     {
       clave: "aulaId", titulo: "Aula de dictado",
@@ -142,8 +207,9 @@ export default function ComisionesPanel({ currentUserRole }) {
         modoEdicion={modoEdicion}
         form={form}
         error={error}
-        asignaturas={asignaturas}
+        planesAsignaturas={planesAsignaturas}
         aulas={aulas}
+        baseComisiones={baseComisiones}
         manejarCambio={manejarCambio}
         guardar={guardar}
         limpiarForm={limpiarForm}

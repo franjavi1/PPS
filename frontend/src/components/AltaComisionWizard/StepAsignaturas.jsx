@@ -27,6 +27,14 @@ export default function StepAsignaturas({
   onBack,
   onNext,
 }) {
+  const selectedPlanAsig = planesAsignaturas.find(
+    (pa) => String(pa.id) === String(comisionAsignatura.plan_asignaturas_id)
+  );
+
+  const aulasFiltradas = selectedPlanAsig
+    ? aulas.filter((a) => String(a.sedes_id) === String(selectedPlanAsig.sedes_id))
+    : [];
+
   return (
     <section className="space-y-6">
       <TituloPaso icono={<BookOpenCheck size={26} />} titulo="Asignaturas de la comisión" />
@@ -45,8 +53,10 @@ export default function StepAsignaturas({
           name="aula_id"
           value={comisionAsignatura.aula_id}
           onChange={cambiarComisionAsignatura}
-          opciones={aulas}
+          opciones={aulasFiltradas}
           getLabel={(item) => item.aula}
+          getValue={(item) => item.id_aula}
+          disabled={!comisionAsignatura.plan_asignaturas_id}
         />
         <CampoTexto
           label="Nombre"

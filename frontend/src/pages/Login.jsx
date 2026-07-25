@@ -37,7 +37,7 @@ function InicioSesion() {
     return Object.keys(nuevosErrores).length === 0;
   }
 
-  function ingresar(e) {
+  async function ingresar(e) {
     e.preventDefault();
 
     if (!validarFormulario()) {
@@ -51,18 +51,38 @@ function InicioSesion() {
       rol = "ROLE_INSTRUCTOR";
     }
 
-    const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-    const payload = btoa(JSON.stringify({
-      sub: "1234567890",
-      usuario: usuario,
-      rol: rol,
-      exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
-    }));
-    const signature = "mock_signature_key";
-    const token = `${header}.${payload}.${signature}`;
+    try {
+      const response = await fetch("http://localhost:8000/api/g1/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ usuario, rol })
+      });
 
-    login(token);
-    navigate("/inicio");
+      if (!response.ok) {
+        throw new Error("No se pudo iniciar sesion en el backend");
+      }
+
+      const data = await response.json();
+      login(data.token);
+      navigate("/inicio");
+    } catch (err) {
+      console.error("Error iniciando sesion en backend:", err);
+      // Fallback local en caso de error
+      const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+      const payload = btoa(JSON.stringify({
+        sub: "1234567890",
+        usuario: usuario,
+        rol: rol,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
+      }));
+      const signature = "mock_signature_key";
+      const token = `${header}.${payload}.${signature}`;
+
+      login(token);
+      navigate("/inicio");
+    }
   }
 
   return (

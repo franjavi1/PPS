@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from db import db
@@ -32,6 +33,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
     return jsonify(response), status
 
 @tipos_autoridad_bp.route("", methods=["GET"])
+@requires_permission("planes.comisiones.leer")
 def get_tipos_autoridad():
     try:
         tipos = obtener_todos()
@@ -52,6 +54,7 @@ def get_tipos_autoridad():
         })
 
 @tipos_autoridad_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.comisiones.leer")
 def get_tipo_autoridad(id):
     try:
         tipo = obtener_por_id(id)
@@ -74,6 +77,7 @@ def get_tipo_autoridad(id):
         })
 
 @tipos_autoridad_bp.route("", methods=["POST"])
+@requires_permission("planes.comisiones.crear")
 def crear_tipo_autoridad():
     req = request.get_json(silent=True) or {}
     try:
@@ -99,6 +103,7 @@ def crear_tipo_autoridad():
         })
 
 @tipos_autoridad_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.comisiones.editar")
 def editar_tipo_autoridad(id):
     try:
         tipo = obtener_por_id(id)
@@ -132,6 +137,7 @@ def editar_tipo_autoridad(id):
         })
 
 @tipos_autoridad_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.comisiones.eliminar")
 def eliminar_tipo_autoridad(id):
     try:
         tipo = obtener_por_id(id)

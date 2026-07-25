@@ -14,8 +14,11 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 
 export default function Inicio() {
+  const { currentUserRole } = useAuth();
   const navigate = useNavigate();
   const [resumen, setResumen] = useState({
     legajos: 0,
@@ -80,32 +83,38 @@ export default function Inicio() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mt-7">
-                <button
-                  type="button"
-                  onClick={() => navigate("/alta-persona")}
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
-                >
-                  <PlusCircle size={22} />
-                  Nueva persona
-                </button>
+                {hasPermission(currentUserRole, 'crear') && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/alta-persona")}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
+                  >
+                    <PlusCircle size={22} />
+                    Nueva persona
+                  </button>
+                )}
 
-                <button
-                  type="button"
-                  onClick={() => navigate("/planes/alta")}
-                  className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
-                >
-                  <BookOpen size={22} />
-                  Nuevo plan
-                </button>
+                {hasPermission(currentUserRole, 'crear') && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/planes/alta")}
+                    className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
+                  >
+                    <BookOpen size={22} />
+                    Nuevo plan
+                  </button>
+                )}
 
-                <button
-                  type="button"
-                  onClick={() => navigate("/comisiones/alta")}
-                  className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
-                >
-                  <CalendarCheck size={22} />
-                  Nueva comision
-                </button>
+                {hasPermission(currentUserRole, 'crear') && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/comisiones/alta")}
+                    className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
+                  >
+                    <CalendarCheck size={22} />
+                    Nueva comision
+                  </button>
+                )}
               </div>
             </div>
 

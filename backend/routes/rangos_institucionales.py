@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -42,6 +43,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @rangos_institucionales_bp.route("", methods=["GET"])
+@requires_permission("planes.legajos.leer")
 def get_rangos_institucionales():
     try:
         rangos = obtener_todos()
@@ -64,6 +66,7 @@ def get_rangos_institucionales():
 
 
 @rangos_institucionales_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.legajos.leer")
 def get_rango_institucional(id):
     try:
         rango = obtener_por_id(id)
@@ -89,6 +92,7 @@ def get_rango_institucional(id):
 
 
 @rangos_institucionales_bp.route("", methods=["POST"])
+@requires_permission("planes.legajos.crear")
 def crear_rango_institucional():
     req = request.get_json(silent=True) or {}
 
@@ -117,6 +121,7 @@ def crear_rango_institucional():
 
 
 @rangos_institucionales_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.legajos.editar")
 def editar_rango_institucional(id):
     try:
         rango = obtener_por_id(id)
@@ -151,6 +156,7 @@ def editar_rango_institucional(id):
 
 
 @rangos_institucionales_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.legajos.eliminar")
 def eliminar_rango_institucional(id):
     try:
         rango = obtener_por_id(id)

@@ -7,3 +7,6 @@ python-dotenv
 marshmallow
 flask-marshmallow
 marshmallow-sqlalchemy
+git+https://github.com/ignacioaltamirano23/auth-common.git@v0.1.0
+pyyaml
+requests

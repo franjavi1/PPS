@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -36,6 +37,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @datos_medicos_bp.route("", methods=["GET"])
+@requires_permission("planes.personas.leer")
 def get_datos_medicos():
     try:
         datos_medicos = obtener_todos()
@@ -58,6 +60,7 @@ def get_datos_medicos():
 
 
 @datos_medicos_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.personas.leer")
 def get_datos_medicos_por_id(id):
     try:
         datos_medicos = obtener_por_id(id)
@@ -83,6 +86,7 @@ def get_datos_medicos_por_id(id):
 
 
 @datos_medicos_bp.route("", methods=["POST"])
+@requires_permission("planes.personas.crear")
 def crear_datos_medicos():
     req = request.get_json(silent=True) or {}
 
@@ -111,6 +115,7 @@ def crear_datos_medicos():
 
 
 @datos_medicos_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.personas.editar")
 def editar_datos_medicos(id):
     try:
         datos_medicos = obtener_por_id(id)
@@ -145,6 +150,7 @@ def editar_datos_medicos(id):
 
 
 @datos_medicos_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.personas.eliminar")
 def eliminar_datos_medicos(id):
     try:
         datos_medicos = obtener_por_id(id)

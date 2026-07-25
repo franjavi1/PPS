@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -36,6 +37,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @legajo_rangos_bp.route("", methods=["GET"])
+@requires_permission("planes.legajos.leer")
 def get_legajos_rangos():
     try:
         legajos_rangos = obtener_todos()
@@ -58,6 +60,7 @@ def get_legajos_rangos():
 
 
 @legajo_rangos_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.legajos.leer")
 def get_legajo_rangos(id):
     try:
         legajo_rangos = obtener_por_id(id)
@@ -83,6 +86,7 @@ def get_legajo_rangos(id):
 
 
 @legajo_rangos_bp.route("", methods=["POST"])
+@requires_permission("planes.legajos.crear")
 def crear_legajo_rangos():
     req = request.get_json(silent=True) or {}
 
@@ -111,6 +115,7 @@ def crear_legajo_rangos():
 
 
 @legajo_rangos_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.legajos.editar")
 def editar_legajo_rangos(id):
     try:
         legajo_rangos = obtener_por_id(id)
@@ -145,6 +150,7 @@ def editar_legajo_rangos(id):
 
 
 @legajo_rangos_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.legajos.eliminar")
 def eliminar_legajo_rangos(id):
     try:
         legajo_rangos = obtener_por_id(id)

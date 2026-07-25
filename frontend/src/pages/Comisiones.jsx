@@ -4,6 +4,8 @@ import { Eye, GraduationCap, Pencil, PlusCircle, RefreshCcw, Search, Trash2 } fr
 import Navbar from "../components/Navbar";
 import { comisionService } from "../services/comisionService";
 import ComisionModal from "../components/Comisiones/ComisionModal";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 
 const formularioInicial = { descripcion: "" };
 
@@ -14,6 +16,7 @@ const EstadoBadge = ({ estado }) => (
 );
 
 export default function Comisiones() {
+  const { currentUserRole } = useAuth();
   const navigate = useNavigate();
   const [comisiones, setComisiones] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -101,9 +104,11 @@ export default function Comisiones() {
               <button onClick={cargarComisiones} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100">
                 <RefreshCcw size={22} /> Actualizar
               </button>
-              <button onClick={() => { setFormulario(formularioInicial); setEditandoId(null); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800">
-                <PlusCircle size={22} /> Nueva comisión
-              </button>
+              {hasPermission(currentUserRole, 'crear') && (
+                <button onClick={() => { setFormulario(formularioInicial); setEditandoId(null); setMostrarModal(true); }} className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800">
+                  <PlusCircle size={22} /> Nueva comisión
+                </button>
+              )}
             </div>
           </div>
 
@@ -135,8 +140,12 @@ export default function Comisiones() {
                       <td className="px-5 py-5 text-center">
                         <div className="flex justify-center gap-3">
                           <button onClick={() => navigate(`/comisiones/${c.id_comision}`)} className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"><Eye size={16} /> Ver</button>
-                          <button onClick={() => { setFormulario({ descripcion: c.descripcion || "" }); setEditandoId(c.id_comision); setMostrarModal(true); }} className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"><Pencil size={16} /> Editar</button>
-                          <button onClick={() => eliminarComision(c.id_comision)} className="text-red-600 hover:text-red-800 font-semibold flex items-center gap-1"><Trash2 size={16} /> Eliminar</button>
+                          {hasPermission(currentUserRole, 'editar') && (
+                            <button onClick={() => { setFormulario({ descripcion: c.descripcion || "" }); setEditandoId(c.id_comision); setMostrarModal(true); }} className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"><Pencil size={16} /> Editar</button>
+                          )}
+                          {hasPermission(currentUserRole, 'eliminar') && (
+                            <button onClick={() => eliminarComision(c.id_comision)} className="text-red-600 hover:text-red-800 font-semibold flex items-center gap-1"><Trash2 size={16} /> Eliminar</button>
+                          )}
                         </div>
                       </td>
                     </tr>

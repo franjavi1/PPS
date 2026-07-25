@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -39,6 +40,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @asignaturas_bp.route("", methods=["GET"])
+@requires_permission("planes.planes.leer")
 def get_asignaturas():
     try:
         asignaturas = obtener_todos()
@@ -61,6 +63,7 @@ def get_asignaturas():
 
 
 @asignaturas_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.planes.leer")
 def get_asignatura(id):
     try:
         asignatura = obtener_por_id(id)
@@ -86,6 +89,7 @@ def get_asignatura(id):
 
 
 @asignaturas_bp.route("", methods=["POST"])
+@requires_permission("planes.planes.crear")
 def crear_asignatura():
     req = request.get_json(silent=True) or {}
 
@@ -114,6 +118,7 @@ def crear_asignatura():
 
 
 @asignaturas_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.planes.editar")
 def editar_asignatura(id):
     try:
         asignatura = obtener_por_id(id)
@@ -148,6 +153,7 @@ def editar_asignatura(id):
 
 
 @asignaturas_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.planes.eliminar")
 def eliminar_asignatura(id):
     try:
         asignatura = obtener_por_id(id)

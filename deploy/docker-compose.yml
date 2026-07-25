@@ -23,6 +23,8 @@ services:
     environment:
       - PORT=5000
       - REDIS_HOST=redis
+      - AUTH_COMMON_REDIS_URL=redis://redis:6379/0
+      - AUTH_COMMON_SESSION_TTL=900
     depends_on:
       - postgres
       - redis
@@ -39,7 +41,7 @@ services:
       - /app/node_modules
 
   postgres:
-    image: postgres:17
+    image: postgres:16
     container_name: bomberos_postgres
     restart: always
     environment:

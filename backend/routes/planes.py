@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -39,6 +40,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @planes_bp.route("", methods=["GET"])
+@requires_permission("planes.planes.leer")
 def get_planes():
     try:
         planes = obtener_todos()
@@ -62,6 +64,7 @@ def get_planes():
 
 
 @planes_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.planes.leer")
 def get_plan(id):
     try:
         plan = obtener_por_id(id)
@@ -88,6 +91,7 @@ def get_plan(id):
 
 
 @planes_bp.route("", methods=["POST"])
+@requires_permission("planes.planes.crear")
 def crear_planes():
     req = request.get_json(silent=True) or {}
     try:
@@ -115,6 +119,7 @@ def crear_planes():
 
 
 @planes_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.planes.editar")
 def editar_plan(id):
 
     try:
@@ -149,6 +154,7 @@ def editar_plan(id):
 
 
 @planes_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.planes.eliminar")
 def eliminar_plan(id):
     try:
         plan = obtener_por_id(id)

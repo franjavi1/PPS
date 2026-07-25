@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -31,6 +32,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @legajo_tipos_legajo_bp.route("", methods=["GET"])
+@requires_permission("planes.legajos.leer")
 def get_todas_relaciones():
     try:
         relaciones = obtener_todos()
@@ -43,6 +45,7 @@ def get_todas_relaciones():
 
 
 @legajo_tipos_legajo_bp.route("/legajo/<int:legajo_id>", methods=["GET"])
+@requires_permission("planes.legajos.leer")
 def get_relaciones_por_legajo(legajo_id):
     try:
         relaciones = obtener_por_legajo(legajo_id)
@@ -55,6 +58,7 @@ def get_relaciones_por_legajo(legajo_id):
 
 
 @legajo_tipos_legajo_bp.route("", methods=["POST"])
+@requires_permission("planes.legajos.crear")
 def crear_relacion():
     req = request.get_json(silent=True) or {}
     try:
@@ -72,6 +76,7 @@ def crear_relacion():
 
 
 @legajo_tipos_legajo_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.legajos.eliminar")
 def eliminar_relacion(id):
     try:
         relacion = obtener_por_id(id)

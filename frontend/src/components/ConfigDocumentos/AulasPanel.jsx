@@ -13,7 +13,7 @@ export default function AulasPanel({ currentUserRole }) {
   const [comisiones, setComisiones] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
-  const [form, setForm] = useState({ id: null, nombre: "", sedeId: "", capacidad: "" });
+  const [form, setForm] = useState({ id_aula: null, aula: "", sedes_id: "", es_virtual: "0" });
   const [error, setError] = useState({});
 
   useEffect(() => {
@@ -45,14 +45,13 @@ export default function AulasPanel({ currentUserRole }) {
 
   function manejarCambio(e) {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: name === "sedeId" || name === "capacidad" ? parseInt(value, 10) || "" : value });
+    setForm({ ...form, [name]: name === "sedes_id" || name === "es_virtual" ? parseInt(value, 10) || 0 : value });
   }
 
   function validar() {
     const errores = {};
-    if (!form.nombre.trim()) errores.nombre = "El nombre del aula es requerido.";
-    if (!form.sedeId) errores.sedeId = "Debe seleccionar una sede de la lista.";
-    if (form.capacidad === "" || isNaN(form.capacidad) || form.capacidad <= 0) errores.capacidad = "Capacidad física inválida.";
+    if (!form.aula.trim()) errores.aula = "El nombre del aula es requerido.";
+    if (!form.sedes_id) errores.sedes_id = "Debe seleccionar una sede de la lista.";
     setError(errores);
     return Object.keys(errores).length === 0;
   }
@@ -62,9 +61,9 @@ export default function AulasPanel({ currentUserRole }) {
     if (!validar()) return;
     try {
       let response;
-      const payload = { nombre: form.nombre, sede_id: Number(form.sedeId), capacidad: Number(form.capacidad), usuario_accion: 1 };
+      const payload = { aula: form.aula, sedes_id: Number(form.sedes_id), es_virtual: Number(form.es_virtual), usuario_accion: 1 };
       if (modoEdicion) {
-        response = await aulaService.actualizar(form.id, payload);
+        response = await aulaService.actualizar(form.id_aula, payload);
       } else {
         response = await aulaService.crear(payload);
       }
@@ -81,38 +80,42 @@ export default function AulasPanel({ currentUserRole }) {
   }
 
   function editar(aula) {
-    setForm({ id: aula.id, nombre: aula.nombre, sedeId: aula.sedeId || aula.sede_id, capacidad: aula.capacidad });
+    setForm({ id_aula: aula.id_aula, aula: aula.aula, sedes_id: aula.sedes_id, es_virtual: String(aula.es_virtual ?? 0) });
     setModoEdicion(true); setError({}); setMostrarModal(true);
   }
 
-  async function eliminar(id) {
-    if (comisiones.some((c) => c.aulaId === id || c.aula_id === id)) {
+  async function eliminar(id_aula) {
+    if (comisiones.some((c) => c.aulaId === id_aula || c.aula_id === id_aula)) {
       return alert("No es posible eliminar el aula. Existen comisiones asociadas.");
     }
     if (!confirm("¿Confirma la eliminación de esta aula?")) return;
     try {
-      const response = await aulaService.eliminar(id);
+      const response = await aulaService.eliminar(id_aula);
       if (response.status === "error") return alert(response.message);
       alert(response.message || "Aula eliminada con éxito.");
       cargarDatos();
-      if (form.id === id) limpiarForm();
+      if (form.id_aula === id_aula) limpiarForm();
     } catch (err) {
       console.error("Error al eliminar:", err);
     }
   }
 
   function limpiarForm() {
-    setForm({ id: null, nombre: "", sedeId: "", capacidad: "" });
+    setForm({ id_aula: null, aula: "", sedes_id: "", es_virtual: "0" });
     setError({}); setModoEdicion(false);
   }
 
   const columnasConfig = [
-    { clave: "nombre", titulo: "Nombre del Aula" },
+    { clave: "aula", titulo: "Nombre del Aula" },
     {
-      clave: "sedeId", titulo: "Sede de Ubicación",
-      renderizar: (a) => sedes.find((s) => s.id === (a.sedeId || a.sede_id))?.nombre || "-",
+      clave: "sedes_id", titulo: "Sede de Ubicación",
+      renderizar: (a) => sedes.find((s) => s.id === a.sedes_id)?.nombre || "-",
     },
-    { clave: "capacidad", titulo: "Capacidad Física", renderizar: (a) => `${a.capacidad} estudiantes` },
+    {
+      clave: "es_virtual",
+      titulo: "Tipo de Aula",
+      renderizar: (a) => a.es_virtual === 1 || a.es_virtual === true ? "Virtual" : "Presencial"
+    },
   ];
 
   const accionesPorFila = (a) => (
@@ -120,7 +123,7 @@ export default function AulasPanel({ currentUserRole }) {
       <button onClick={() => editar(a)} disabled={!hasPermission(currentUserRole, "editar")} className="text-blue-600 hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-sm flex items-center gap-1">
         <Pencil size={16} /> Editar
       </button>
-      <button onClick={() => eliminar(a.id)} disabled={!hasPermission(currentUserRole, "eliminar")} className="text-red-600 hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-sm flex items-center gap-1">
+      <button onClick={() => eliminar(a.id_aula)} disabled={!hasPermission(currentUserRole, "eliminar")} className="text-red-600 hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-sm flex items-center gap-1">
         <Trash2 size={16} /> Eliminar
       </button>
     </div>
@@ -153,7 +156,7 @@ export default function AulasPanel({ currentUserRole }) {
         )}
       </div>
 
-      <TablaPrincipal data={aulas} columnas={columnasConfig} accionesPorFila={accionesPorFila} propiedadKey="id" placeholderBusqueda="Buscar aulas..." />
+      <TablaPrincipal data={aulas} columnas={columnasConfig} accionesPorFila={accionesPorFila} propiedadKey="id_aula" placeholderBusqueda="Buscar aulas..." />
     </div>
   );
 }

@@ -4,6 +4,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -43,6 +44,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @personas_relaciones_bp.route("/personas/<int:persona_id>/legajo", methods=["POST"])
+@requires_permission("planes.personas.crear")
 def crear_legajo_de_persona(persona_id):
     req = request.get_json(silent=True) or {}
     req["persona_id"] = persona_id
@@ -95,6 +97,7 @@ def crear_legajo_de_persona(persona_id):
 
 
 @personas_relaciones_bp.route("/personas/<int:persona_id>/datos-medicos", methods=["POST"])
+@requires_permission("planes.personas.crear")
 def crear_datos_medicos_de_persona(persona_id):
     req = request.get_json(silent=True) or {}
     req["persona_id"] = persona_id
@@ -146,6 +149,7 @@ def crear_datos_medicos_de_persona(persona_id):
 
 
 @personas_relaciones_bp.route("/legajos/<int:legajo_id>/rangos", methods=["POST"])
+@requires_permission("planes.personas.crear")
 def crear_rango_de_legajo(legajo_id):
     req = request.get_json(silent=True) or {}
     req["legajo_id"] = legajo_id
@@ -197,6 +201,7 @@ def crear_rango_de_legajo(legajo_id):
 
 
 @personas_relaciones_bp.route("/legajos/<int:legajo_id>/sedes", methods=["POST"])
+@requires_permission("planes.personas.crear")
 def crear_sede_de_legajo(legajo_id):
     req = request.get_json(silent=True) or {}
     req["legajo_id"] = legajo_id
@@ -231,6 +236,7 @@ def crear_sede_de_legajo(legajo_id):
 
 
 @personas_relaciones_bp.route("/personas/<int:persona_id>/usuario", methods=["POST"])
+@requires_permission("planes.personas.crear")
 def solicitar_usuario_de_persona(persona_id):
     req = request.get_json(silent=True) or {}
     usuarios_service_url = os.getenv("USUARIOS_SERVICE_URL")

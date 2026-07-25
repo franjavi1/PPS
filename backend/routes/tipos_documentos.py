@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -40,6 +41,7 @@ def respuesta_api(success=True, data=None, message="",status=200, errors=None):
 
 
 @tipos_documentos_bp.route("",methods=["GET"])
+@requires_permission("planes.personas.leer")
 def get_tipos_documentos():
     try:
         tipos_documentos = obtener_todos()
@@ -64,6 +66,7 @@ def get_tipos_documentos():
 
 
 @tipos_documentos_bp.route("/<int:id>",methods=["GET"])
+@requires_permission("planes.personas.leer")
 def get_tipo_documento(id):
     try:
         tipo_documento = obtener_por_id(id)
@@ -91,6 +94,7 @@ def get_tipo_documento(id):
 
 
 @tipos_documentos_bp.route("",methods=["POST"])
+@requires_permission("planes.personas.crear")
 def crear_tipo_documento():
     req = request.get_json(silent=True) or {}
     try:
@@ -121,6 +125,7 @@ def crear_tipo_documento():
 
 
 @tipos_documentos_bp.route("/<int:id>",methods=["PUT"])
+@requires_permission("planes.personas.editar")
 def editar_tipo_documento(id):
 
     try:
@@ -159,6 +164,7 @@ def editar_tipo_documento(id):
 
 
 @tipos_documentos_bp.route("/<int:id>",methods=["DELETE"])
+@requires_permission("planes.personas.eliminar")
 def eliminar_tipo_documento(id):
 
     try:

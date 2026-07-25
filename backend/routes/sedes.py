@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from auth_common.decorador import requires_permission
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -39,6 +40,7 @@ def respuesta_api(success=True, data=None, message="", status=200, errors=None):
 
 
 @sedes_bp.route("", methods=["GET"])
+@requires_permission("planes.sedes.leer")
 def get_sedes():
     try:
         sedes = obtener_todos()
@@ -61,6 +63,7 @@ def get_sedes():
 
 
 @sedes_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.sedes.leer")
 def get_sede(id):
     try:
         sede = obtener_por_id(id)
@@ -86,6 +89,7 @@ def get_sede(id):
 
 
 @sedes_bp.route("", methods=["POST"])
+@requires_permission("planes.sedes.crear")
 def crear_sede():
     req = request.get_json(silent=True) or {}
 
@@ -114,6 +118,7 @@ def crear_sede():
 
 
 @sedes_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.sedes.editar")
 def editar_sede(id):
     try:
         sede = obtener_por_id(id)
@@ -148,6 +153,7 @@ def editar_sede(id):
 
 
 @sedes_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.sedes.eliminar")
 def eliminar_sede(id):
     try:
         sede = obtener_por_id(id)

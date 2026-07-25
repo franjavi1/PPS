@@ -85,69 +85,113 @@ export default function AltaComisionWizard() {
     };
   }, [planesAsignaturas, asignaturas, planes, sedes, aulas, tiposAutoridad, legajos]);
 
-  async function guardarComision(e) {
+  function guardarComision(e) {
     e.preventDefault();
     if (!comision.descripcion.trim()) return setError("La descripción es obligatoria");
-    try {
-      setGuardando(true); setError("");
-      const res = await comisionService.crear({ descripcion: comision.descripcion.trim(), usuario_accion: 1 });
-      setComisionId(res.data.id_comision);
-      setPaso(2);
-    } catch (err) {
-      setError(err.message || "Error al crear comisión");
-    } finally {
-      setGuardando(false);
-    }
+    setError("");
+    setPaso(2);
   }
 
-  async function agregarComisionAsignatura() {
+  function agregarComisionAsignatura() {
     if (!comisionAsignatura.plan_asignaturas_id || !comisionAsignatura.aula_id) return setError("Complete campos requeridos");
+    const tempId = Date.now();
     const payload = {
+      id_comision_asignatura: tempId,
       plan_asignaturas_id: Number(comisionAsignatura.plan_asignaturas_id),
       aula_id: Number(comisionAsignatura.aula_id),
-      comision_id: Number(comisionId),
       nombre: comisionAsignatura.nombre.trim(),
       modalidad: comisionAsignatura.modalidad.trim(),
       cupo_maximo: Number(comisionAsignatura.cupo_maximo),
       estado: comisionAsignatura.estado,
       usuario_accion: 1,
     };
-    try {
-      setGuardando(true); setError("");
-      const res = await comisionAsignaturaService.crear(payload);
-      setComisionesAsignaturasCargadas([
-        ...comisionesAsignaturasCargadas,
-        {
-          id_comision_asignatura: res.data.id || res.data.id_comision_asignatura, ...payload,
-          planAsignatura: mapas.planesAsignaturas[payload.plan_asignaturas_id], aula: mapas.aulas[payload.aula_id],
-        },
-      ]);
-      setComisionAsignatura(comisionAsignaturaInicial);
-    } catch (err) {
-      setError(err.message || "Error al agregar asignatura");
-    } finally {
-      setGuardando(false);
-    }
+    setComisionesAsignaturasCargadas([
+      ...comisionesAsignaturasCargadas,
+      {
+        ...payload,
+        planAsignatura: mapas.planesAsignaturas[payload.plan_asignaturas_id],
+        aula: mapas.aulas[payload.aula_id],
+      }
+    ]);
+    setComisionAsignatura(comisionAsignaturaInicial);
+    setError("");
   }
 
-  async function agregarAutoridad() {
+  function agregarAutoridad() {
     if (!autoridad.tipo_autoridad_id || !autoridad.legajo_id || !autoridad.comision_id) return setError("Complete campos obligatorios de autoridad");
+    const tempId = Date.now();
     const payload = {
-      tipo_autoridad_id: Number(autoridad.tipo_autoridad_id), legajo_id: Number(autoridad.legajo_id), comision_id: Number(autoridad.comision_id), usuario_accion: 1,
+      id: tempId,
+      tipo_autoridad_id: Number(autoridad.tipo_autoridad_id),
+      legajo_id: Number(autoridad.legajo_id),
+      comision_id: Number(autoridad.comision_id),
+      usuario_accion: 1,
     };
+    setAutoridadesCargadas([
+      ...autoridadesCargadas,
+      {
+        ...payload,
+        tipoAutoridad: mapas.tiposAutoridad[payload.tipo_autoridad_id],
+        legajo: mapas.legajos[payload.legajo_id],
+        comisionAsignatura: comisionesAsignaturasCargadas.find((x) => Number(x.id_comision_asignatura) === payload.comision_id)?.nombre || "",
+      }
+    ]);
+    setAutoridad(autoridadInicial);
+    setError("");
+  }
+
+  async function guardarTodoComision() {
     try {
-      setGuardando(true); setError("");
-      await autoridadComisionService.crear(payload);
-      setAutoridadesCargadas([
-        ...autoridadesCargadas,
-        {
-          ...payload, tipoAutoridad: mapas.tiposAutoridad[payload.tipo_autoridad_id], legajo: mapas.legajos[payload.legajo_id],
-          comisionAsignatura: comisionesAsignaturasCargadas.find((x) => Number(x.id_comision_asignatura) === payload.comision_id)?.nombre || "",
-        },
-      ]);
-      setAutoridad(autoridadInicial);
+      setGuardando(true);
+      setError("");
+
+      // 1. Crear Comisión base
+      const resComision = await comisionService.crear({
+        descripcion: comision.descripcion.trim(),
+        usuario_accion: 1
+      });
+      const realComisionId = resComision.data.id_comision;
+      setComisionId(realComisionId);
+
+      // 2. Crear cada Comisión-Asignatura y mapear IDs
+      const tempToRealIdMap = {};
+      const comisionesAsignaturasFinales = [];
+      for (const ca of comisionesAsignaturasCargadas) {
+        const payload = {
+          plan_asignaturas_id: Number(ca.plan_asignaturas_id),
+          aula_id: Number(ca.aula_id),
+          comision_id: Number(realComisionId),
+          nombre: ca.nombre.trim(),
+          modalidad: ca.modalidad.trim(),
+          cupo_maximo: Number(ca.cupo_maximo),
+          estado: ca.estado,
+          usuario_accion: 1,
+        };
+        const resCA = await comisionAsignaturaService.crear(payload);
+        const realCAId = resCA.data.id || resCA.data.id_comision_asignatura;
+        tempToRealIdMap[ca.id_comision_asignatura] = realCAId;
+        comisionesAsignaturasFinales.push({ ...ca, id_comision_asignatura: realCAId });
+      }
+      setComisionesAsignaturasCargadas(comisionesAsignaturasFinales);
+
+      // 3. Crear cada Autoridad
+      const autoridadesFinales = [];
+      for (const aut of autoridadesCargadas) {
+        const realCAId = tempToRealIdMap[aut.comision_id];
+        const payload = {
+          tipo_autoridad_id: Number(aut.tipo_autoridad_id),
+          legajo_id: Number(aut.legajo_id),
+          comision_id: Number(realCAId),
+          usuario_accion: 1,
+        };
+        const resAut = await autoridadComisionService.crear(payload);
+        autoridadesFinales.push({ ...aut, id: resAut.data.id || resAut.data.id_autoridad_comision, comision_id: realCAId });
+      }
+      setAutoridadesCargadas(autoridadesFinales);
+
+      setPaso(4);
     } catch (err) {
-      setError(err.message || "Error al agregar autoridad");
+      setError(err.message || "Error al registrar la comisión y sus asignaturas/autoridades");
     } finally {
       setGuardando(false);
     }
@@ -284,7 +328,7 @@ export default function AltaComisionWizard() {
               autoridadesCargadas={autoridadesCargadas} 
               guardando={guardando} 
               onBack={() => setPaso(2)} 
-              onNext={() => setPaso(4)} 
+              onNext={guardarTodoComision} 
             />
           )}
 

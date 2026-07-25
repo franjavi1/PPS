@@ -34,12 +34,9 @@ export default function AulaFormModal({
   function avanzarPaso() {
     const nuevosErrores = {};
     if (paso === 1) {
-      if (!form.nombre || !form.nombre.trim()) nuevosErrores.nombre = "El nombre del aula es requerido.";
-      if (form.capacidad === "" || isNaN(form.capacidad) || form.capacidad <= 0) {
-        nuevosErrores.capacidad = "Debe ingresar una capacidad válida.";
-      }
+      if (!form.aula || !form.aula.trim()) nuevosErrores.aula = "El nombre del aula es requerido.";
     } else if (paso === 2) {
-      if (!form.sedeId) nuevosErrores.sedeId = "Debe seleccionar una sede de ubicación.";
+      if (!form.sedes_id) nuevosErrores.sedes_id = "Debe seleccionar una sede de ubicación.";
     }
 
     if (Object.keys(nuevosErrores).length > 0) {
@@ -56,7 +53,7 @@ export default function AulaFormModal({
   }
 
   const errorCombinado = { ...error, ...erroresLocales };
-  const nombreSede = sedes.find(s => String(s.id) === String(form.sedeId))?.nombre || "-";
+  const nombreSede = sedes.find(s => String(s.id) === String(form.sedes_id))?.nombre || "-";
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
@@ -118,22 +115,26 @@ export default function AulaFormModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <CampoTexto
                 label="Nombre / Identificación del Aula *"
-                name="nombre"
-                value={form.nombre}
+                name="aula"
+                value={form.aula}
                 onChange={manejarCambio}
                 placeholder="Ej: Aula 102"
-                error={errorCombinado.nombre}
+                error={errorCombinado.aula}
               />
-              <CampoTexto
-                label="Capacidad (Alumnos Sentados) *"
-                name="capacidad"
-                type="number"
-                value={form.capacidad}
-                onChange={manejarCambio}
-                placeholder="Ej: 30"
-                min="1"
-                error={errorCombinado.capacidad}
-              />
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">
+                  Tipo de Aula *
+                </label>
+                <select
+                  name="es_virtual"
+                  value={form.es_virtual}
+                  onChange={manejarCambio}
+                  className="w-full h-14 px-4 border border-slate-300 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="0">Presencial</option>
+                  <option value="1">Virtual</option>
+                </select>
+              </div>
             </div>
           </div>
         )}
@@ -145,13 +146,13 @@ export default function AulaFormModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <CampoSelect
                 label="Sede de Ubicación *"
-                name="sedeId"
-                value={form.sedeId}
+                name="sedes_id"
+                value={form.sedes_id}
                 onChange={manejarCambio}
                 opciones={sedes}
                 getLabel={(s) => s.nombre}
                 icon={<MapPin size={18} />}
-                error={errorCombinado.sedeId}
+                error={errorCombinado.sedes_id}
               />
             </div>
           </div>
@@ -166,15 +167,17 @@ export default function AulaFormModal({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="border border-slate-200 rounded-xl bg-white p-4">
                   <p className="text-xs font-bold text-slate-400 uppercase">Nombre Aula</p>
-                  <p className="text-slate-800 font-extrabold mt-1 text-base">{form.nombre}</p>
+                  <p className="text-slate-800 font-extrabold mt-1 text-base">{form.aula}</p>
                 </div>
                 <div className="border border-slate-200 rounded-xl bg-white p-4">
                   <p className="text-xs font-bold text-slate-400 uppercase">Sede de Ubicación</p>
                   <p className="text-slate-800 font-semibold mt-1 text-base">{nombreSede}</p>
                 </div>
                 <div className="border border-slate-200 rounded-xl bg-white p-4">
-                  <p className="text-xs font-bold text-slate-400 uppercase">Capacidad Física</p>
-                  <p className="text-slate-800 font-semibold mt-1 text-base">{form.capacidad} Alumnos</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase">Tipo de Aula</p>
+                  <p className="text-slate-800 font-semibold mt-1 text-base">
+                    {form.es_virtual === 1 || form.es_virtual === "1" ? "Virtual" : "Presencial"}
+                  </p>
                 </div>
               </div>
             </div>
