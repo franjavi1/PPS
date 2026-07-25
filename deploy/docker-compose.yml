@@ -1,32 +1,17 @@
-#Estandarizacion de direcciones
-#NGINX:    172.10.10.10
-#Backs:    172.10.10.20 - 21 - 22
-#Front:    172.10.10.30 - 31 - 32
-#Postgres: 172.10.10.40 - 41 - 42
-#Redis:    172.10.10.50
+# Estandarizacion de direcciones
+# Backs:    172.10.10.20
+# Front:    172.10.10.30
+# Postgres: 172.10.10.40
+# Redis:    172.10.10.50
 
 services:
-  api_gateway:
-    image: nginx:alpine
-    container_name: bomberos_api_gateway
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro 
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      red_bomberos_estatica:
-        ipv4_address: 172.10.10.10
-
   backend:
     build:
       context: ../backend
       dockerfile: Dockerfile
     container_name: bomberos_backend
     restart: always
-    ports:         #Provisoriamente para probar
+    ports:
       - "5000:5000"
     volumes:
       - ../backend:/app
@@ -49,6 +34,8 @@ services:
     container_name: bomberos_frontend
     restart: always
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
     volumes:
       - ../frontend:/app
       - /app/node_modules
@@ -75,6 +62,8 @@ services:
   redis:
     image: redis:7-alpine
     container_name: bomberos_redis
+    ports:
+      - "6379:6379"
     networks:
       red_bomberos_estatica:
         ipv4_address: 172.10.10.50
@@ -82,7 +71,7 @@ services:
 volumes:
   postgres_data:
 
-#Rango de 254 direcciones disponbles
+# Rango de 254 direcciones disponibles
 networks:
   red_bomberos_estatica:
     driver: bridge

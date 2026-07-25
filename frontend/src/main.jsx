@@ -12,7 +12,7 @@ if (temaGuardado === "oscuro") {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/planes">
       <App />
     </BrowserRouter>
   </React.StrictMode>
