@@ -136,7 +136,7 @@ function AltaComisionWizard() {
     setAutoridad({ ...autoridad, [e.target.name]: e.target.value });
   }
 
-  async function guardarComision(e) {
+  function guardarComision(e) {
     e.preventDefault();
     const descripcion = comision.descripcion.trim();
 
@@ -145,29 +145,18 @@ function AltaComisionWizard() {
       return;
     }
 
-    try {
-      setGuardando(true);
-      setError("");
-      const respuesta = await comisionService.crear({ descripcion, usuario_accion: 1 });
-      setComisionId(obtenerIdRespuesta(respuesta));
-      setPasoActual(2);
-    } catch (err) {
-      setError(obtenerMensajeError(err));
-    } finally {
-      setGuardando(false);
-    }
+    setError("");
+    setPasoActual(2);
   }
 
-  async function agregarComisionAsignatura() {
+  function agregarComisionAsignatura() {
     const payload = {
       plan_asignaturas_id: Number(comisionAsignatura.plan_asignaturas_id),
       aula_id: Number(comisionAsignatura.aula_id),
-      comision_id: Number(comisionId),
       nombre: comisionAsignatura.nombre.trim(),
       modalidad: comisionAsignatura.modalidad.trim(),
       cupo_maximo: Number(comisionAsignatura.cupo_maximo),
       estado: Number(comisionAsignatura.estado),
-      usuario_accion: 1,
     };
     const mensaje = validarComisionAsignatura(payload);
 
@@ -176,34 +165,24 @@ function AltaComisionWizard() {
       return;
     }
 
-    try {
-      setGuardando(true);
-      setError("");
-      const respuesta = await comisionAsignaturaService.crear(payload);
-      const idCreado = obtenerIdRespuesta(respuesta);
-      setComisionesAsignaturasCargadas([
-        ...comisionesAsignaturasCargadas,
-        {
-          id_comision_asignatura: idCreado,
-          ...payload,
-          planAsignatura: mapas.planesAsignaturas[payload.plan_asignaturas_id],
-          aula: mapas.aulas[payload.aula_id],
-        },
-      ]);
-      setComisionAsignatura(comisionAsignaturaInicial);
-    } catch (err) {
-      setError(obtenerMensajeError(err));
-    } finally {
-      setGuardando(false);
-    }
+    setComisionesAsignaturasCargadas([
+      ...comisionesAsignaturasCargadas,
+      {
+        id_comision_asignatura: Date.now(),
+        ...payload,
+        planAsignatura: mapas.planesAsignaturas[payload.plan_asignaturas_id],
+        aula: mapas.aulas[payload.aula_id],
+      },
+    ]);
+    setComisionAsignatura(comisionAsignaturaInicial);
+    setError("");
   }
 
-  async function agregarAutoridad() {
+  function agregarAutoridad() {
     const payload = {
       tipo_autoridad_id: Number(autoridad.tipo_autoridad_id),
       legajo_id: Number(autoridad.legajo_id),
       comision_id: Number(autoridad.comision_id),
-      usuario_accion: 1,
     };
     const mensaje = validarAutoridad(payload);
 
@@ -212,39 +191,82 @@ function AltaComisionWizard() {
       return;
     }
 
+    setAutoridadesCargadas([
+      ...autoridadesCargadas,
+      {
+        ...payload,
+        tipoAutoridad: mapas.tiposAutoridad[payload.tipo_autoridad_id],
+        legajo: mapas.legajos[payload.legajo_id],
+        comisionAsignatura: obtenerEtiquetaComisionAsignaturaCargada(
+          payload.comision_id,
+          comisionesAsignaturasCargadas,
+        ),
+      },
+    ]);
+    setAutoridad(autoridadInicial);
+    setError("");
+  }
+
+  async function confirmarComision() {
+    if (guardando || comisionId) {
+      return;
+    }
+
     try {
       setGuardando(true);
       setError("");
-      await autoridadComisionService.crear(payload);
-      setAutoridadesCargadas([
-        ...autoridadesCargadas,
-        {
-          ...payload,
-          tipoAutoridad: mapas.tiposAutoridad[payload.tipo_autoridad_id],
-          legajo: mapas.legajos[payload.legajo_id],
-          comisionAsignatura: obtenerEtiquetaComisionAsignaturaCargada(
-            payload.comision_id,
-            comisionesAsignaturasCargadas,
-          ),
-        },
-      ]);
-      setAutoridad(autoridadInicial);
+
+      const respuestaComision = await comisionService.crear({
+        descripcion: comision.descripcion.trim(),
+        usuario_accion: 1,
+      });
+
+      const nuevaComisionId = obtenerIdRespuesta(respuestaComision);
+
+      if (!nuevaComisionId) {
+        throw new Error("No se recibio el ID de la comision creada.");
+      }
+
+      const idsReales = {};
+
+      for (const item of comisionesAsignaturasCargadas) {
+        const respuesta = await comisionAsignaturaService.crear({
+          plan_asignaturas_id: item.plan_asignaturas_id,
+          aula_id: item.aula_id,
+          comision_id: nuevaComisionId,
+          nombre: item.nombre,
+          modalidad: item.modalidad,
+          cupo_maximo: item.cupo_maximo,
+          estado: item.estado,
+          usuario_accion: 1,
+        });
+
+        const idReal = obtenerIdRespuesta(respuesta);
+
+        if (!idReal) {
+          throw new Error("No se recibio el ID de una asignatura de la comision.");
+        }
+
+        idsReales[item.id_comision_asignatura] = idReal;
+      }
+
+      for (const item of autoridadesCargadas) {
+        await autoridadComisionService.crear({
+          tipo_autoridad_id: item.tipo_autoridad_id,
+          legajo_id: item.legajo_id,
+          comision_id: idsReales[item.comision_id],
+          usuario_accion: 1,
+        });
+      }
+
+      setComisionId(nuevaComisionId);
+      alert("Comision guardada correctamente.");
+      navigate("/comisiones");
     } catch (err) {
       setError(obtenerMensajeError(err));
     } finally {
       setGuardando(false);
     }
-  }
-
-  function cargarOtraComision() {
-    setPasoActual(1);
-    setComisionId(null);
-    setComision(comisionInicial);
-    setComisionAsignatura(comisionAsignaturaInicial);
-    setAutoridad(autoridadInicial);
-    setComisionesAsignaturasCargadas([]);
-    setAutoridadesCargadas([]);
-    setError("");
   }
 
   return (
@@ -263,7 +285,8 @@ function AltaComisionWizard() {
                   Comision
                 </h1>
                 <p className="text-slate-500 mt-2">
-                  Crea una comision, agrega asignaturas y asigna autoridades.
+                  Completa todos los pasos. La comision se guarda al confirmar
+                  el resumen.
                 </p>
               </div>
             </div>
@@ -310,7 +333,7 @@ function AltaComisionWizard() {
                     placeholder="Ej: Comision A"
                     icono={<GraduationCap size={20} />}
                   />
-                  <Acciones guardando={guardando} texto="Crear comision y seguir" />
+                  <Acciones guardando={guardando} texto="Continuar" />
                 </form>
               )}
 
@@ -367,13 +390,20 @@ function AltaComisionWizard() {
                 <section className="space-y-6">
                   <TituloPaso icono={<CheckCircle2 size={26} />} titulo="Resumen" />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <ResumenItem titulo="Comision" texto={`${comision.descripcion || "-"} - ID ${comisionId || "-"}`} />
+                    <ResumenItem titulo="Comision" texto={`${comision.descripcion || "-"} - ID ${comisionId || "pendiente de guardar"}`} />
                     <ResumenItem titulo="Asignaturas" texto={comisionesAsignaturasCargadas.length} />
                     <ResumenItem titulo="Autoridades" texto={autoridadesCargadas.length} />
                   </div>
                   <div className="flex flex-col sm:flex-row justify-end gap-3">
                     <button type="button" onClick={() => navigate("/comisiones")} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">Volver a comisiones</button>
-                    <button type="button" onClick={cargarOtraComision} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800"><Save size={22} />Cargar otra comision</button>
+                    <button type="button" onClick={confirmarComision} disabled={guardando || Boolean(comisionId)} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60">
+                      <Save size={22} />
+                      {guardando
+                        ? "Guardando..."
+                        : comisionId
+                          ? "Comision guardada"
+                          : "Confirmar y guardar"}
+                    </button>
                   </div>
                 </section>
               )}
