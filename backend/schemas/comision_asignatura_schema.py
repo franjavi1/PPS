@@ -5,7 +5,7 @@ from models.plan_asignatura import PlanAsignatura
 
 from db import ma
 from marshmallow import ValidationError, validates, validates_schema, pre_load
-from marshmallow.validate import Length
+from marshmallow.validate import Length, OneOf
 
 
 class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
@@ -18,7 +18,6 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
     plan_asignaturas_id = ma.auto_field(required=True, allow_none=False)
     aula_id = ma.auto_field(required=True, allow_none=False)
     comision_id = ma.auto_field(required=True, allow_none=False)
-
     nombre = ma.auto_field(
         required=True,
         allow_none=False,
@@ -40,9 +39,7 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
     estado = ma.auto_field(
         required=True,
         allow_none=False,
-        validate=[
-            Length(min=1, max=45, error="El estado debe tener entre 1 y 45 caracteres")
-        ]
+        validate=[OneOf([0, 1], error="El estado debe ser 0 o 1")]
     )
 
     usuario_accion = ma.auto_field(required=False, allow_none=True)

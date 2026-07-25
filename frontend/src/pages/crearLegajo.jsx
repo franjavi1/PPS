@@ -143,11 +143,13 @@ function NuevoLegajo() {
           </button>
 
           <h1 className="text-4xl font-extrabold text-slate-800">
-            {editando ? "Editar legajo" : "Nuevo legajo"}
+            {esVer ? "Ver legajo" : editando ? "Editar legajo" : "Nuevo legajo"}
           </h1>
 
           <p className="text-slate-500 mt-2">
-            Selecciona una persona y asignale un numero de legajo.
+            {esVer
+              ? "Información del legajo seleccionado."
+              : "Seleccioná una persona y asignale un número de legajo."}
           </p>
         </div>
 
@@ -175,6 +177,7 @@ function NuevoLegajo() {
                 error={errores.persona_id}
                 icono={<User size={22} />}
                 opciones={personas}
+                disabled={esVer}
               />
 
               <CampoTexto
@@ -185,6 +188,7 @@ function NuevoLegajo() {
                 error={errores.numero}
                 placeholder="Ej: 1001"
                 icono={<Hash size={22} />}
+                disabled={esVer}
               />
             </div>
           </section>
@@ -198,14 +202,16 @@ function NuevoLegajo() {
               {esVer ? "Volver" : "Cancelar"}
             </button>
 
-            <button
-              type="submit"
-              disabled={guardando}
-              className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-60"
-            >
-              <Save size={22} />
-              {guardando ? "Guardando..." : "Guardar legajo"}
-            </button>
+            {!esVer && (
+              <button
+                type="submit"
+                disabled={guardando}
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-60"
+              >
+                <Save size={22} />
+                {guardando ? "Guardando..." : "Guardar legajo"}
+              </button>
+            )}
           </div>
         </form>
       </main>

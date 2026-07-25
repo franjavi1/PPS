@@ -82,8 +82,7 @@ class PlanAsignatura(db.Model):
     )
 
     estado: Mapped[int] = mapped_column(
-        "estado",
-        Integer, # TINYINT
+        Integer,
         nullable=False,
         default=1
     )

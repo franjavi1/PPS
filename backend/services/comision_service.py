@@ -1,4 +1,6 @@
 from models.comision import Comision
+from models.autoridad_comision import AutoridadComision
+from models.comision_asignatura import ComisionAsignatura
 from schemas.comision_schema import ComisionSchema, comision_schema
 from db import db
 
@@ -28,6 +30,21 @@ def actualizar(comision, datos):
     return comision
 
 def eliminar(comision):
-    db.session.delete(comision)
+    comisiones_asignaturas = ComisionAsignatura.query.filter_by(
+        comision_id=comision.id_comision
+    ).all()
+
+    for comision_asignatura in comisiones_asignaturas:
+        autoridades = AutoridadComision.query.filter_by(
+            comision_id=comision_asignatura.id_comision_asignatura
+        ).all()
+
+        for autoridad in autoridades:
+            autoridad.estado = 0
+
+        comision_asignatura.estado = 0
+
+    comision.estado = 0
+
     db.session.commit()
     return comision

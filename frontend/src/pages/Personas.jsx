@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import {
+  Eye,
   Pencil,
   PlusCircle,
   RefreshCcw,
@@ -12,6 +14,8 @@ import {
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
 import { personasService } from "../services/personasService";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 
 const formularioInicial = {
   td_id: "",
@@ -22,6 +26,7 @@ const formularioInicial = {
 
 function Personas() {
   const [personas, setPersonas] = useState([]);
+  const [legajos, setLegajos] = useState([]);
   const [tiposDocumento, setTiposDocumento] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -29,23 +34,28 @@ function Personas() {
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
+  const [estadoListado, setEstadoListado] = useState(1);
+  const navigate = useNavigate();
+  const { currentUserRole } = useAuth();
 
   useEffect(() => {
     cargarDatos();
-  }, []);
+  }, [estadoListado]);
 
   async function cargarDatos() {
     try {
       setCargando(true);
       setError("");
 
-      const [respuestaPersonas, respuestaTiposDocumento] = await Promise.all([
-        personasService.obtenerTodas(),
+      const [respuestaPersonas, respuestaTiposDocumento, respuestaLegajos] = await Promise.all([
+        personasService.obtenerTodas(estadoListado),
         apiRequest("/tipos-documentos"),
+        apiRequest(`/legajos?estado=${estadoListado}`),
       ]);
 
       setPersonas(respuestaPersonas.data || []);
       setTiposDocumento(respuestaTiposDocumento.data || []);
+      setLegajos(respuestaLegajos.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron obtener las personas");
     } finally {
@@ -138,17 +148,34 @@ function Personas() {
   }
 
   async function eliminarPersona(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta persona?");
+    const confirmar = confirm("Seguro que queres dar de baja esta persona?");
 
     if (!confirmar) {
       return;
     }
 
     try {
-      await personasService.eliminar(id);
+      const respuesta = await personasService.eliminar(id);
+      alert(respuesta.message || "Persona dada de baja correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la persona");
+    }
+  }
+
+  async function reactivarPersona(id) {
+    const confirmar = confirm("Seguro que queres reactivar esta persona?");
+
+    if (!confirmar) {
+      return;
+    }
+
+    try {
+      const respuesta = await personasService.reactivar(id);
+      alert(respuesta.message || "Persona reactivada correctamente");
+      await cargarDatos();
+    } catch (err) {
+      setError(err.message || "No se pudo reactivar la persona");
     }
   }
 
@@ -161,17 +188,22 @@ function Personas() {
     return tipo ? tipo.descripcion : "Tipo no definido";
   }
 
+  function obtenerNumeroLegajo(personaId) {
+    const legajo = legajos.find((item) => item.persona_id === personaId);
+    return legajo ? legajo.numero : "Sin legajo";
+  }
+
   const personasFiltradas = personas.filter((persona) => {
     const textoBusqueda = busqueda.toLowerCase();
-    const tipoDocumento = obtenerTipoDocumento(persona.td_id);
-    const tipo = tipoDocumento ? tipoDocumento.descripcion.toLowerCase() : "";
-    const nombreCompleto = `${persona.nombre || ""} ${persona.apellido || ""}`.toLowerCase();
+    const numeroLegajo = String(obtenerNumeroLegajo(persona.id)).toLowerCase();
+    const nombreCompleto =
+      `${persona.nombre || ""} ${persona.apellido || ""}`.toLowerCase();
     const documento = String(persona.numero_doc || "");
 
     return (
       nombreCompleto.includes(textoBusqueda) ||
       documento.includes(textoBusqueda) ||
-      tipo.includes(textoBusqueda)
+      numeroLegajo.includes(textoBusqueda)
     );
   });
 
@@ -208,14 +240,48 @@ function Personas() {
               </button>
 
               <button
-                onClick={abrirNuevaPersona}
-                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
+                type="button"
+                onClick={() => navigate("/alta-persona")}
+                disabled={!hasPermission(currentUserRole, "crear")}
+                title={
+                  hasPermission(currentUserRole, "crear")
+                    ? "Registrar una persona"
+                    : "No tenés permiso para crear personas"
+                }
+                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-700"
               >
                 <PlusCircle size={22} />
                 Nueva persona
               </button>
             </div>
           </div>
+
+          {currentUserRole === "ROLE_ADMIN" && (
+            <div className="flex gap-2 mb-5">
+              <button
+                type="button"
+                onClick={() => setEstadoListado(1)}
+                className={`px-5 py-2 rounded-lg font-bold border transition ${
+                  estadoListado === 1
+                    ? "bg-red-700 text-white border-red-700"
+                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                Activas
+              </button>
+              <button
+                type="button"
+                onClick={() => setEstadoListado(0)}
+                className={`px-5 py-2 rounded-lg font-bold border transition ${
+                  estadoListado === 0
+                    ? "bg-red-700 text-white border-red-700"
+                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                Inactivas
+              </button>
+            </div>
+          )}
 
           <div className="relative w-full md:w-96 mb-8">
             <Search
@@ -227,7 +293,7 @@ function Personas() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar por persona, documento o tipo"
+              placeholder="Buscar por persona, documento o legajo"
               className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-lg text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
           </div>
@@ -258,42 +324,65 @@ function Personas() {
 
                   <div className="space-y-3 text-sm">
                     <div>
-                      <p className="text-slate-400 font-bold">Tipo doc.</p>
+                      <p className="text-slate-400 font-bold">Nro. de legajo</p>
                       <p className="text-slate-800 font-semibold">
-                        {obtenerNombreTipoDocumento(persona.td_id)}
+                        {obtenerNumeroLegajo(persona.id)}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-slate-400 font-bold">Documento</p>
-                      <p className="text-slate-700">
-                        {persona.numero_doc}
-                      </p>
+                      <p className="text-slate-400 font-bold">Número de documento</p>
+                      <p className="text-slate-700">{persona.numero_doc}</p>
                     </div>
                   </div>
+                  {estadoListado === 0 ? (
+                    <div className="grid grid-cols-1 gap-2 mt-5 pt-4 border-t border-slate-200">
+                      <button
+                        type="button"
+                        onClick={() => reactivarPersona(persona.id)}
+                        className="h-10 flex items-center justify-center gap-1 text-green-700 font-semibold border border-green-200 rounded-lg hover:bg-green-50"
+                      >
+                        <RefreshCcw size={16} />
+                        Reactivar
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/personas/${persona.id}`)}
+                        className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                      >
+                        <Eye size={16} />
+                        Ver
+                      </button>
 
-                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
-                    <button
-                      onClick={() => editarPersona(persona)}
-                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
-                    >
-                      <Pencil size={16} />
-                      Editar
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/personas/${persona.id}/editar`)}
+                        disabled={!hasPermission(currentUserRole, "editar")}
+                        className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Pencil size={16} />
+                        Editar
+                      </button>
 
-                    <button
-                      onClick={() => eliminarPersona(persona.id)}
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
-                    >
-                      <Trash2 size={16} />
-                      Eliminar
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => eliminarPersona(persona.id)}
+                        disabled={!hasPermission(currentUserRole, "eliminar")}
+                        className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Trash2 size={16} />
+                        Dar de baja
+                      </button>
+                    </div>
+                  )}
                 </article>
               ))
             ) : (
               <div className="border border-slate-200 rounded-xl bg-white p-5 text-center text-slate-500">
-                No hay personas cargadas.
+                No hay personas {estadoListado === 0 ? "inactivas" : "activas"}.
               </div>
             )}
           </div>
@@ -302,25 +391,39 @@ function Personas() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <th className="px-5 py-4 text-slate-700 font-bold">Apellido</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">
+                    Apellido
+                  </th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Nombre</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Tipo doc.</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Documento</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">
+                    Nro. de legajo
+                  </th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">
+                    Número de documento
+                  </th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Estado</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Acciones</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="6" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="6"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       Cargando personas...
                     </td>
                   </tr>
                 ) : personasFiltradas.length > 0 ? (
                   personasFiltradas.map((persona) => (
-                    <tr key={persona.id} className="border-b border-slate-200 hover:bg-slate-50">
+                    <tr
+                      key={persona.id}
+                      className="border-b border-slate-200 hover:bg-slate-50"
+                    >
                       <td className="px-5 py-5 text-slate-700 font-semibold">
                         {persona.apellido}
                       </td>
@@ -328,7 +431,7 @@ function Personas() {
                         {persona.nombre}
                       </td>
                       <td className="px-5 py-5 text-slate-700">
-                        {obtenerNombreTipoDocumento(persona.td_id)}
+                        {obtenerNumeroLegajo(persona.id)}
                       </td>
                       <td className="px-5 py-5 text-slate-700 font-semibold">
                         {persona.numero_doc}
@@ -337,30 +440,64 @@ function Personas() {
                         <EstadoBadge estado={persona.estado} />
                       </td>
                       <td className="px-5 py-5">
-                        <div className="flex items-center gap-4">
+                        {estadoListado === 0 ? (
                           <button
-                            onClick={() => editarPersona(persona)}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
+                            type="button"
+                            onClick={() => reactivarPersona(persona.id)}
+                            className="flex items-center gap-1 text-green-700 font-semibold hover:text-green-900"
+                          >
+                            <RefreshCcw size={18} />
+                            Reactivar
+                          </button>
+                        ) : (
+                        <div className="flex items-center gap-4">
+                          {/* Todos los roles pueden consultar */}
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/personas/${persona.id}`)}
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                          >
+                            <Eye size={18} />
+                            Ver
+                          </button>
+
+                          {/* Se habilita solamente con permiso de edición */}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(`/personas/${persona.id}/editar`)
+                            }
+                            disabled={!hasPermission(currentUserRole, "editar")}
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Pencil size={18} />
                             Editar
                           </button>
 
+                          {/* Se habilita solamente con permiso de eliminación */}
                           <button
+                            type="button"
                             onClick={() => eliminarPersona(persona.id)}
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
+                            disabled={
+                              !hasPermission(currentUserRole, "eliminar")
+                            }
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Trash2 size={18} />
-                            Eliminar
+                            Dar de baja
                           </button>
                         </div>
+                        )}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center px-5 py-10 text-slate-500">
-                      No hay personas cargadas.
+                    <td
+                      colSpan="6"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
+                      No hay personas {estadoListado === 0 ? "inactivas" : "activas"}.
                     </td>
                   </tr>
                 )}
@@ -450,9 +587,7 @@ function Personas() {
                   </div>
 
                   {error && (
-                    <p className="text-red-600 font-semibold">
-                      {error}
-                    </p>
+                    <p className="text-red-600 font-semibold">{error}</p>
                   )}
 
                   <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">

@@ -21,6 +21,7 @@ import { comisionService } from "../services/comisionService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
+import { modalidadService } from "../services/modalidadService";
 
 const formularioInicial = {
   plan_asignaturas_id: "",
@@ -29,7 +30,7 @@ const formularioInicial = {
   nombre: "",
   modalidad: "",
   cupo_maximo: "",
-  estado: "Activo",
+  estado: "1",
 };
 
 function ComisionesAsignaturas() {
@@ -40,6 +41,7 @@ function ComisionesAsignaturas() {
   const [aulas, setAulas] = useState([]);
   const [comisiones, setComisiones] = useState([]);
   const [sedes, setSedes] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -65,6 +67,7 @@ function ComisionesAsignaturas() {
         resAulas,
         resComisiones,
         resSedes,
+        resModalidades,
       ] =
         await Promise.all([
           comisionAsignaturaService.obtenerTodos(),
@@ -74,6 +77,7 @@ function ComisionesAsignaturas() {
           aulaService.obtenerTodas(),
           comisionService.obtenerTodas(),
           sedeService.obtenerTodas(),
+          modalidadService.obtenerTodas(),
         ]);
 
       setRegistros(resRegistros.data || []);
@@ -83,6 +87,7 @@ function ComisionesAsignaturas() {
       setAulas(resAulas.data || []);
       setComisiones(resComisiones.data || []);
       setSedes(resSedes.data || []);
+      setModalidades(resModalidades.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron obtener las comisiones asignaturas");
     } finally {
@@ -145,7 +150,7 @@ function ComisionesAsignaturas() {
       nombre: registro.nombre || "",
       modalidad: registro.modalidad || "",
       cupo_maximo: String(registro.cupo_maximo || ""),
-      estado: registro.estado || "Activo",
+      estado: String(registro.estado ?? 1),
     });
     setEditandoId(registro.id_comision_asignatura);
     setErrorFormulario("");
@@ -162,7 +167,7 @@ function ComisionesAsignaturas() {
       nombre: formulario.nombre.trim(),
       modalidad: formulario.modalidad.trim(),
       cupo_maximo: Number(formulario.cupo_maximo),
-      estado: formulario.estado.trim(),
+      estado: Number(formulario.estado),
       usuario_accion: 1,
     };
 
@@ -197,7 +202,8 @@ function ComisionesAsignaturas() {
     }
 
     try {
-      await comisionAsignaturaService.eliminar(id);
+      const respuesta = await comisionAsignaturaService.eliminar(id);
+      alert(respuesta.message || "Comision asignatura eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la comision asignatura");
@@ -449,15 +455,23 @@ function ComisionesAsignaturas() {
                       icon={<Tag size={20} />}
                     />
 
-                    <CampoInput
+                    <CampoSelect
                       label="Modalidad"
                       name="modalidad"
                       value={formulario.modalidad}
                       onChange={manejarCambio}
-                      placeholder="Ej: Presencial"
-                      maxLength={45}
                       icon={<BookOpenCheck size={20} />}
-                    />
+                    >
+                      <option value="">Seleccione</option>
+                      {modalidades.map((modalidad) => (
+                        <option
+                          key={modalidad.modalidadesid}
+                          value={modalidad.descripcion}
+                        >
+                          {modalidad.descripcion}
+                        </option>
+                      ))}
+                    </CampoSelect>
 
                     <CampoInput
                       label="Cupo maximo"
@@ -476,8 +490,8 @@ function ComisionesAsignaturas() {
                       onChange={manejarCambio}
                       icon={<Tag size={20} />}
                     >
-                      <option value="Activo">Activo</option>
-                      <option value="Inactivo">Inactivo</option>
+                      <option value="1">Activo</option>
+                      <option value="0">Inactivo</option>
                     </CampoSelect>
                   </div>
 
@@ -583,7 +597,7 @@ function Dato({ label, value }) {
 }
 
 function EstadoBadge({ estado }) {
-  const activo = String(estado || "").toLowerCase() === "activo";
+  const activo = Number(estado) === 1;
 
   return (
     <span

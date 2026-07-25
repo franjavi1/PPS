@@ -40,7 +40,7 @@ def actualizar(tipo_documento, datos):
 
 
 def eliminar(tipo_documento):
-    db.session.delete(tipo_documento)
+    tipo_documento.estado = 0
     db.session.commit()
 
     return tipo_documento

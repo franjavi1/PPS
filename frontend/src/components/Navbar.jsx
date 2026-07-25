@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
+import { useAuth } from "../context/AuthContext";
+import { hasPermission } from "../utils/authHelper";
 import {
   BookOpen,
   BookMarked,
@@ -16,6 +18,7 @@ import {
   GitBranch,
   GraduationCap,
   Home,
+  IdCard,
   LogOut,
   MapPinned,
   Menu,
@@ -31,6 +34,7 @@ import {
 
 function Navbar() {
   const navigate = useNavigate();
+  const { currentUserRole, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
@@ -42,6 +46,11 @@ function Navbar() {
   const closeMenus = () => {
     setOpenMenu(null);
     setMobileOpen(false);
+  };
+  const handleLogout = () => {
+    logout();
+    closeMenus();
+    navigate("/login");
   };
 
   useEffect(() => {
@@ -63,16 +72,16 @@ function Navbar() {
 
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md relative z-50">
-      <div className="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
         <button
           onClick={() => navigate("/inicio")}
           className="flex items-center gap-3 text-left"
         >
-          <div className="w-12 h-12 rounded-full bg-white border-2 border-yellow-400 flex items-center justify-center overflow-hidden shadow-sm">
+          <div className="w-20 h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
               src="/logo.jpeg"
               alt="Logo bomberos"
-              className="w-full h-full object-contain p-1"
+              className="w-full h-full object-cover"
             />
           </div>
 
@@ -108,224 +117,209 @@ function Navbar() {
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
-            <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
-              <ClipboardList  size={18} />
-              <span>
-                <strong>Ver legajos</strong>
-                <small className="block text-slate-500">
-                  Buscar y consultar legajos
-                </small>
-              </span>
-            </NavLink>
+            {hasPermission(currentUserRole, "crear") && (
+              <NavLink
+                to="/alta-persona"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <Plus size={18} />
 
-            <NavLink
-              to="/personas"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <User size={18} />
-              <span>
-                <strong>Personas</strong>
-                <small className="block text-slate-500">
-                  Alta de persona 
-                </small>
-              </span>
-            </NavLink>
+                <span>
+                  <strong>Nueva persona</strong>
 
-            <NavLink
-              to="/contactos"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <Phone size={18} />
-              <span>
-                <strong>Contactos</strong>
-                <small className="block text-slate-500">
-                  Telefonos, emails y Whatsapp
-                </small>
-              </span>
-            </NavLink>
-
-            <NavLink
-              to="/datos-medicos"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <ClipboardPlus size={18} />
-              <span>
-                <strong>Datos medicos</strong>
-                <small className="block text-slate-500">
-                  Informacion medica asociada
-                </small>
-              </span>
-            </NavLink>
-            <NavLink
-              to="/legajo-rangos"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <ChevronsUp size={18} />
-              <span>
-                <strong>Rangos</strong>
-                <small className="block text-slate-500">
-                  Rangos de Legajos
-                </small>
-              </span>
-            </NavLink>
-
-            <NavLink
-              to="/legajo-sedes"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <MapPinned size={18} />
-              <span>
-                <strong>Legajos por sede</strong>
-                <small className="block text-slate-500">
-                  Legajos asignados a sede
-                </small>
-              </span>
-            </NavLink>
+                  <small className="block text-slate-500">
+                    Alta guiada de persona
+                  </small>
+                </span>
+              </NavLink>
+            )}
+            {hasPermission(currentUserRole, "leer") && (
+              <NavLink
+                to="/personas"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <User size={18} />
+                <span>
+                  <strong>Personas</strong>
+                  <small className="block text-slate-500">
+                    Buscar y editar personas
+                  </small>
+                </span>
+              </NavLink>
+            )}
+            {hasPermission(currentUserRole, "leer") && (
+              <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
+                <ClipboardList size={18} />
+                <span>
+                  <strong>Ver legajos</strong>
+                  <small className="block text-slate-500">
+                    Buscar y consultar legajos
+                  </small>
+                </span>
+              </NavLink>
+            )}
           </Dropdown>
 
           <Dropdown
             id="planes"
             title="Gestion educativa"
-            icon={<GraduationCap  size={17} />}
+            icon={<GraduationCap size={17} />}
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
-            <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
-              <BookOpen size={18} />
-              <span>
-                <strong>Planes</strong>
-                <small className="block text-slate-500">
-                  Resolucion y vigencia
-                </small>
-              </span>
-            </NavLink>
-
-            <NavLink
-              to="/asignaturas"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <FileText size={18} />
-              <span>
-                <strong>Asignaturas</strong>
-                <small className="block text-slate-500">
-                  Materias del sistema
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/comisiones" className={linkClass} onClick={closeMenus}>
-              <Users size={18} />
-              <span>
-                <strong>Comisiones</strong>
-                <small className="block text-slate-500">
-                  Creacion de comisiones
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/planes-asignaturas" className={linkClass} onClick={closeMenus}>
-              <BookMarked size={18} />
-              <span>
-                <strong>Plan asignaturas</strong>
-                <small className="block text-slate-500">
-                  Creacion de planes asignatura
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/pa-correlativas" className={linkClass} onClick={closeMenus}>
-              <GitBranch size={18} />
-              <span>
-                <strong>Correlativas</strong>
-                <small className="block text-slate-500">
-                  Plan de Asignaturas Correlativas
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/comisiones-asignaturas" className={linkClass} onClick={closeMenus}>
-              <BookOpenCheck size={18} />
-              <span>
-                <strong>Comision Asignaturas</strong>
-                <small className="block text-slate-500">
-                  Creacion de comision Asignatura
-                </small>
-              </span>
-            </NavLink>
-            <NavLink to="/autoridades-comision" className={linkClass} onClick={closeMenus}>
-              <ShieldUser size={18} />
-              <span>
-                <strong>Autoridades comision</strong>
-                <small className="block text-slate-500">
-                  Creacion de autoridad Comision
-                </small>
-              </span>
-            </NavLink>
+            {hasPermission(currentUserRole, "crear") && (
+              <NavLink
+                to="/planes/alta"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <Plus size={18} />
+                <span>
+                  <strong>Nuevo plan</strong>
+                  <small className="block text-slate-500">
+                    Alta guiada de plan
+                  </small>
+                </span>
+              </NavLink>
+            )}
+            {hasPermission(currentUserRole, "leer") && (
+              <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
+                <BookOpen size={18} />
+                <span>
+                  <strong>Planes</strong>
+                  <small className="block text-slate-500">Ver planes</small>
+                </span>
+              </NavLink>
+            )}
+            {hasPermission(currentUserRole, "leer") && (
+              <NavLink
+                to="/asignaturas"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <FileText size={18} />
+                <span>
+                  <strong>Asignaturas</strong>
+                  <small className="block text-slate-500">
+                    Materias del sistema
+                  </small>
+                </span>
+              </NavLink>
+            )}
+            {hasPermission(currentUserRole, "crear") && (
+              <NavLink
+                to="/comisiones/alta"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <Plus size={18} />
+                <span>
+                  <strong>Nueva Comision</strong>
+                  <small className="block text-slate-500">
+                    Alta guiada de Comision
+                  </small>
+                </span>
+              </NavLink>
+            )}
+            {hasPermission(currentUserRole, "leer") && (
+              <NavLink
+                to="/comisiones"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <Users size={18} />
+                <span>
+                  <strong>Comisiones</strong>
+                  <small className="block text-slate-500">Ver comisiones</small>
+                </span>
+              </NavLink>
+            )}
           </Dropdown>
-
-          <Dropdown
-            id="config"
-            title="Configuracion"
-            icon={<Settings size={17} />}
-            openMenu={openMenu}
-            toggleMenu={toggleMenu}
-          >
-            <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
-              SEDES E INFRAESTRUCTURA
-            </p>
-
-            <NavLink
-              to="/sedes"
-              className={linkClass}
-              onClick={closeMenus}
+          {currentUserRole === "ROLE_ADMIN" && (
+            <Dropdown
+              id="config"
+              title="Configuracion"
+              icon={<Settings size={17} />}
+              openMenu={openMenu}
+              toggleMenu={toggleMenu}
             >
-              <Building2 size={18} />
-              <span>
-                <strong>Sedes</strong>
-                <small className="block text-slate-500">
-                  Alta, edicion y tipos de sede
-                </small>
-              </span>
-            </NavLink>
+              <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
+                SEDES E INFRAESTRUCTURA
+              </p>
 
-            <NavLink
-              to="/tipos-sedes"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <Building size={18} />
-              <span>
-                <strong>Tipo de Sedes</strong>
-                <small className="block text-slate-500">
-                  Categorias para clasificar sedes
-                </small>
-              </span>
-            </NavLink>
-            <NavLink
-              to="/aulas"
-              className={linkClass}
-              onClick={closeMenus}
-            >
-              <DoorOpen size={18} />
-              <span>
-                <strong>Aulas</strong>
-                <small className="block text-slate-500">
-                  Alta de Aulas
-                </small>
-              </span>
-            </NavLink>
-      
-          </Dropdown>
+              <NavLink to="/sedes" className={linkClass} onClick={closeMenus}>
+                <Building2 size={18} />
+                <span>
+                  <strong>Sedes</strong>
+                  <small className="block text-slate-500">
+                    Alta, edicion y tipos de sede
+                  </small>
+                </span>
+              </NavLink>
 
-          <NavLink
-            to="/login"
+              <NavLink
+                to="/tipos-sedes"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <Building size={18} />
+                <span>
+                  <strong>Tipo de Sedes</strong>
+                  <small className="block text-slate-500">
+                    Categorias para clasificar sedes
+                  </small>
+                </span>
+              </NavLink>
+              <NavLink to="/aulas" className={linkClass} onClick={closeMenus}>
+                <DoorOpen size={18} />
+                <span>
+                  <strong>Aulas</strong>
+                  <small className="block text-slate-500">Alta de Aulas</small>
+                </span>
+              </NavLink>
+
+              <p className="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wide text-slate-400 font-semibold opacity-70">
+                PERSONAL
+              </p>
+              <NavLink
+                to="/tipos-documentos"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <IdCard size={18} />
+                <span>
+                  <strong>Tipo de documentos</strong>
+                  <small className="block text-slate-500">
+                    Catalogo de documentos
+                  </small>
+                </span>
+              </NavLink>
+
+              <NavLink
+                to="/tipo-rangos"
+                className={linkClass}
+                onClick={closeMenus}
+              >
+                <ChevronsUp size={18} />
+                <span>
+                  <strong>Tipo de rangos</strong>
+                  <small className="block text-slate-500">
+                    Catalogo de rangos
+                  </small>
+                </span>
+              </NavLink>
+            </Dropdown>
+          )}
+          <button
+            type="button"
+            onClick={handleLogout}
             className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2"
           >
             <LogOut size={17} />
-            Cerrar sesion
-          </NavLink>
+            Cerrar sesión
+          </button>
         </nav>
       </div>
 
@@ -351,15 +345,15 @@ function Navbar() {
             >
               Inicio
             </MobileLink>
-
-            <MobileLink
-              to="/legajos"
-              icon={<Folder size={20} />}
-              onClick={closeMenus}
-            >
-            Legajos
-            </MobileLink>
-
+            {hasPermission(currentUserRole, "crear") && (
+              <MobileLink
+                to="/alta-persona"
+                icon={<Plus size={20} />}
+                onClick={closeMenus}
+              >
+                Nueva persona
+              </MobileLink>
+            )}
             <MobileLink
               to="/personas"
               icon={<User size={20} />}
@@ -369,37 +363,22 @@ function Navbar() {
             </MobileLink>
 
             <MobileLink
-              to="/contactos"
-              icon={<Phone size={20} />}
+              to="/legajos"
+              icon={<Folder size={20} />}
               onClick={closeMenus}
             >
-              Contactos
+              Legajos
             </MobileLink>
 
-            <MobileLink
-              to="/datos-medicos"
-              icon={<ClipboardPlus size={20} />}
-              onClick={closeMenus}
-            >
-              Datos medicos
-            </MobileLink>
-
-            <MobileLink
-              to="/legajo-rangos"
-              icon={<ChevronsUp size={20} />}
-              onClick={closeMenus}
-            >
-              Rangos
-            </MobileLink>
-
-            <MobileLink
-              to="/legajo-sedes"
-              icon={<MapPinned size={20} />}
-              onClick={closeMenus}
-            >
-              Legajos por sede
-            </MobileLink>
-
+            {hasPermission(currentUserRole, "crear") && (
+              <MobileLink
+                to="/planes/alta"
+                icon={<Plus size={20} />}
+                onClick={closeMenus}
+              >
+                Nuevo plan
+              </MobileLink>
+            )}
             <MobileLink
               to="/planes"
               icon={<BookOpen size={20} />}
@@ -415,6 +394,15 @@ function Navbar() {
             >
               Asignaturas
             </MobileLink>
+            {hasPermission(currentUserRole, "crear") && (
+              <MobileLink
+                to="/comisiones/alta"
+                icon={<Plus size={20} />}
+                onClick={closeMenus}
+              >
+                Nueva comisión
+              </MobileLink>
+            )}
 
             <MobileLink
               to="/comisiones"
@@ -423,70 +411,42 @@ function Navbar() {
             >
               Comisiones
             </MobileLink>
+            {currentUserRole === "ROLE_ADMIN" && (
+              <>
+                <MobileLink
+                  to="/sedes"
+                  icon={<Building2 size={20} />}
+                  onClick={closeMenus}
+                >
+                  Sedes
+                </MobileLink>
 
-            <MobileLink
-              to="/planes-asignaturas"
-              icon={<BookMarked size={20} />}
-              onClick={closeMenus}
-            >
-              Plan asignaturas
-            </MobileLink>
+                <MobileLink
+                  to="/tipos-sedes"
+                  icon={<Building size={20} />}
+                  onClick={closeMenus}
+                >
+                  Tipo de sedes
+                </MobileLink>
 
-            <MobileLink
-              to="/pa-correlativas"
-              icon={<GitBranch size={20} />}
-              onClick={closeMenus}
-            >
-              Correlativas
-            </MobileLink>
+                
+                <MobileLink
+                  to="/tipos-documentos"
+                  icon={<IdCard size={20} />}
+                  onClick={closeMenus}
+                >
+                  Tipo de documentos
+                </MobileLink>
 
-            <MobileLink
-              to="/comisiones-asignaturas"
-              icon={<BookOpenCheck size={20} />}
-              onClick={closeMenus}
-            >
-              Comision asignaturas
-            </MobileLink>
-
-            <MobileLink
-              to="/autoridades-comision"
-              icon={<ShieldUser size={20} />}
-              onClick={closeMenus}
-            >
-              Autoridades comision
-            </MobileLink>
-
-            <MobileLink
-              to="/sedes"
-              icon={<Building2 size={20} />}
-              onClick={closeMenus}
-            >
-              Sedes
-            </MobileLink>
-
-            <MobileLink
-              to="/tipos-sedes"
-              icon={<Building size={20} />}
-              onClick={closeMenus}
-            >
-              Tipo de sedes
-            </MobileLink>
-
-            <MobileLink
-              to="/config-documentos"
-              icon={<Settings size={20} />}
-              onClick={closeMenus}
-            >
-              Configuracion
-            </MobileLink>
-
-            <MobileLink
-              to="/login"
-              icon={<LogOut size={20} />}
-              onClick={closeMenus}
-            >
-              Cerrar sesion
-            </MobileLink>
+                <MobileLink
+                  to="/tipo-rangos"
+                  icon={<ChevronsUp size={20} />}
+                  onClick={closeMenus}
+                >
+                  Tipo de rangos
+                </MobileLink>
+              </>
+            )}
           </div>
         </div>
       )}

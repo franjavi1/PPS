@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import {
+  Eye,
   GraduationCap,
   Pencil,
   PlusCircle,
@@ -11,12 +13,16 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { comisionService } from "../services/comisionService";
+import { useAuth } from "../context/AuthContext";
 
 const formularioInicial = {
   descripcion: "",
 };
 
 function Comisiones() {
+  const navigate = useNavigate();
+  const { currentUserRole } = useAuth();
+  const esAdministrador = currentUserRole === "ROLE_ADMIN";
   const [comisiones, setComisiones] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -122,7 +128,8 @@ function Comisiones() {
     }
 
     try {
-      await comisionService.eliminar(id);
+      const respuesta = await comisionService.eliminar(id);
+      alert(respuesta.message || "Comision eliminada correctamente");
       await cargarComisiones();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la comision");
@@ -168,8 +175,10 @@ function Comisiones() {
               </button>
 
               <button
-                onClick={abrirNuevaComision}
-                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
+                onClick={() => navigate("/comisiones/alta")}
+                disabled={!esAdministrador}
+                title={esAdministrador ? "Crear comisión" : "Solo los administradores pueden crear comisiones"}
+                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-700"
               >
                 <PlusCircle size={22} />
                 Nueva comision
@@ -218,10 +227,20 @@ function Comisiones() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
+                  <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
-                      onClick={() => editarComision(comision)}
-                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                      onClick={() => navigate(`/comisiones/${comision.id_comision}`)}
+                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                    >
+                      <Eye size={16} />
+                      Ver
+                    </button>
+
+                    <button
+                      onClick={() => navigate(`/comisiones/${comision.id_comision}/editar`)}
+                      disabled={!esAdministrador}
+                      title={esAdministrador ? "Editar comisión" : "Solo los administradores pueden editar"}
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
                       <Pencil size={16} />
                       Editar
@@ -229,7 +248,9 @@ function Comisiones() {
 
                     <button
                       onClick={() => eliminarComision(comision.id_comision)}
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                      disabled={!esAdministrador}
+                      title={esAdministrador ? "Eliminar comisión" : "Solo los administradores pueden eliminar"}
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
                       <Trash2 size={16} />
                       Eliminar
@@ -272,8 +293,18 @@ function Comisiones() {
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => editarComision(comision)}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
+                            onClick={() => navigate(`/comisiones/${comision.id_comision}`)}
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                          >
+                            <Eye size={18} />
+                            Ver
+                          </button>
+
+                          <button
+                            onClick={() => navigate(`/comisiones/${comision.id_comision}/editar`)}
+                            disabled={!esAdministrador}
+                            title={esAdministrador ? "Editar comisión" : "Solo los administradores pueden editar"}
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Pencil size={18} />
                             Editar
@@ -281,7 +312,9 @@ function Comisiones() {
 
                           <button
                             onClick={() => eliminarComision(comision.id_comision)}
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
+                            disabled={!esAdministrador}
+                            title={esAdministrador ? "Eliminar comisión" : "Solo los administradores pueden eliminar"}
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Trash2 size={18} />
                             Eliminar

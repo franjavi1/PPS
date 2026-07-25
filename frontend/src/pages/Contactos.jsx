@@ -144,7 +144,8 @@ function Contactos() {
     }
 
     try {
-      await contactosService.eliminar(id);
+      const respuesta = await contactosService.eliminar(id);
+      alert(respuesta.message || "Contacto eliminado correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el contacto");

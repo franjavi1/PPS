@@ -33,6 +33,13 @@ class LegajoRangos(db.Model):
         nullable=True
     )
 
+    estado: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
+
     # Usuario que realizo la ultima accion sobre el registro
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",

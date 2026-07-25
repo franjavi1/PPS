@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   BookOpen,
   CalendarDays,
@@ -10,11 +11,13 @@ import {
   Save,
   Search,
   Trash2,
+  Eye,
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { planService } from "../services/planesService";
 import { tipoPlanesService } from "../services/tipoPlanesService";
+import { useAuth } from "../context/AuthContext";
 
 const formularioInicial = {
   tipo_planes_id_tipo_planes: "",
@@ -26,6 +29,9 @@ const formularioInicial = {
 };
 
 function Planes() {
+  const navigate = useNavigate();
+  const { currentUserRole } = useAuth();
+  const esAdministrador = currentUserRole === "ROLE_ADMIN";
   const [planes, setPlanes] = useState([]);
   const [tiposPlanes, setTiposPlanes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -72,11 +78,6 @@ function Planes() {
     setErrorFormulario("");
   }
 
-  function abrirNuevoPlan() {
-    limpiarFormulario();
-    setMostrarModal(true);
-  }
-
   function cerrarModal() {
     limpiarFormulario();
     setMostrarModal(false);
@@ -92,17 +93,7 @@ function Planes() {
   }
 
   function editarPlan(plan) {
-    setFormulario({
-      tipo_planes_id_tipo_planes: String(plan.tipo_planes_id_tipo_planes || ""),
-      resolucion_ministerial: String(plan.resolucion_ministerial || ""),
-      nombre: plan.nombre || "",
-      descrip: plan.descrip || "",
-      vigencia_dde: formatearFechaInput(plan.vigencia_dde),
-      vigencia_hta: formatearFechaInput(plan.vigencia_hta),
-    });
-    setEditandoId(plan.id);
-    setErrorFormulario("");
-    setMostrarModal(true);
+    navigate(`/planes/${plan.id}/editar`);
   }
 
   async function guardarPlan(e) {
@@ -165,17 +156,18 @@ function Planes() {
   }
 
   async function eliminarPlan(id) {
-    const confirmar = confirm("Seguro que queres eliminar este plan?");
+    const confirmar = confirm("Seguro que queres dar de baja este plan y quitar sus asignaturas asociadas?");
 
     if (!confirmar) {
       return;
     }
 
     try {
-      await planService.eliminar(id);
+      const respuesta = await planService.eliminar(id);
+      alert(respuesta.message || "Plan dado de baja correctamente");
       await cargarDatos();
     } catch (err) {
-      setError(err.message || "No se pudo eliminar el plan");
+      setError(err.message || "No se pudo dar de baja el plan");
     }
   }
 
@@ -223,7 +215,7 @@ function Planes() {
               </button>
 
               <button
-                onClick={abrirNuevoPlan}
+                onClick={() => navigate("/planes/alta")}
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
               >
                 <PlusCircle size={22} />
@@ -289,10 +281,20 @@ function Planes() {
                     </p>
                   )}
 
-                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
+                  <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
+                    <button
+                      onClick={() => navigate(`/planes/${plan.id}`)}
+                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                    >
+                      <Eye size={16} />
+                      Ver
+                    </button>
+
                     <button
                       onClick={() => editarPlan(plan)}
-                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                      disabled={!esAdministrador}
+                      title={esAdministrador ? "Editar plan" : "Solo los administradores pueden editar"}
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
                       <Pencil size={16} />
                       Editar
@@ -300,10 +302,12 @@ function Planes() {
 
                     <button
                       onClick={() => eliminarPlan(plan.id)}
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                      disabled={!esAdministrador}
+                      title={esAdministrador ? "Dar de baja el plan" : "Solo los administradores pueden dar de baja"}
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
                       <Trash2 size={16} />
-                      Eliminar
+                      Dar de baja
                     </button>
                   </div>
                 </article>
@@ -356,8 +360,18 @@ function Planes() {
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
+                            onClick={() => navigate(`/planes/${plan.id}`)}
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                          >
+                            <Eye size={18} />
+                            Ver
+                          </button>
+
+                          <button
                             onClick={() => editarPlan(plan)}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
+                            disabled={!esAdministrador}
+                            title={esAdministrador ? "Editar plan" : "Solo los administradores pueden editar"}
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Pencil size={18} />
                             Editar
@@ -365,10 +379,12 @@ function Planes() {
 
                           <button
                             onClick={() => eliminarPlan(plan.id)}
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
+                            disabled={!esAdministrador}
+                            title={esAdministrador ? "Dar de baja el plan" : "Solo los administradores pueden dar de baja"}
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Trash2 size={18} />
-                            Eliminar
+                            Dar de baja
                           </button>
                         </div>
                       </td>

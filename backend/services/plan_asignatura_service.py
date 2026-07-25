@@ -1,12 +1,16 @@
 from models.plan_asignatura import PlanAsignatura
 from schemas.plan_asignatura_schema import PlanAsignaturaSchema, plan_asignatura_schema
 from db import db
+from utils.errores import APIError
 
 def obtener_todos():
-    return PlanAsignatura.query.all()
+    return PlanAsignatura.query.filter_by(estado=1).all()
 
 def obtener_por_id(id_plan_asignatura):
-    return PlanAsignatura.query.filter_by(id=id_plan_asignatura).first()
+    plan = PlanAsignatura.query.filter_by(id=id_plan_asignatura, estado=1).first()
+    if not plan:
+        raise APIError("Registro no encontrado.", status=404)
+    return plan
 
 def crear(datos):
     nuevo_plan = plan_asignatura_schema.load(datos)
@@ -22,6 +26,6 @@ def actualizar(plan, datos):
     return plan
 
 def eliminar(plan):
-    db.session.delete(plan)
+    plan.estado = 0
     db.session.commit()
     return plan
