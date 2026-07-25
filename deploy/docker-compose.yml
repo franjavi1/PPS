@@ -26,6 +26,8 @@ services:
       dockerfile: Dockerfile
     container_name: bomberos_backend
     restart: always
+    ports:         #Provisoriamente para probar
+      - "5000:5000"
     volumes:
       - ../backend:/app
     env_file:

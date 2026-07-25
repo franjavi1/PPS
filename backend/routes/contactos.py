@@ -9,7 +9,8 @@ from services.contactos_service import (
     obtener_por_id,
     crear,
     actualizar,
-    eliminar
+    eliminar,
+    obtener_personaid_por_email
 )
 
 
@@ -73,3 +74,17 @@ def eliminar_contacto(id):
     eliminar(contacto)
 
     return respuesta_api(True, {"id": id}, "Contacto eliminado correctamente")
+
+@contactos_bp.route("/GetPersonaIDFromMail", methods=["GET"])
+def get_persona_id_from_mail():
+    email = request.args.get("email")
+
+    if not email:
+        raise APIError("El parametro 'email' es requerido.", status=400)
+
+    personaid = obtener_personaid_por_email(email)
+
+    if not personaid:
+        raise APIError("No se encontro ningun contacto con ese email.", status=404)
+
+    return respuesta_api(True, {"personaid": personaid}, "Persona ID encontrada")

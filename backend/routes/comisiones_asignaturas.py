@@ -21,6 +21,18 @@ comisiones_asignaturas_bp = Blueprint(
     url_prefix="/comisiones-asignaturas"
 )
 
+#Devuelve el detalle de comisiones asignaturas para el idpersona indicado
+@comisiones_asignaturas_bp.route("/detalle/<int:id>", methods=["GET"])
+def get_detalle_comision_asignatura(id):
+    comision_asignatura = obtener_por_id(id)
+
+    if not comision_asignatura:
+        raise APIError("Comision asignatura no encontrada", status=404)
+
+    data = comision_asignatura_schema.dump(comision_asignatura)
+
+    return respuesta_api(success=True, data=data, message="Comision asignatura obtenida correctamente", status=200)
+
 
 @comisiones_asignaturas_bp.route("", methods=["GET"])
 def get_comisiones_asignaturas():
