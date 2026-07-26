@@ -1,13 +1,16 @@
 from models.plan_asignatura import PlanAsignatura
 from db import ma
-from marshmallow import ValidationError, validates, pre_load
+from marshmallow import ValidationError, validates, pre_load, fields
 from marshmallow.validate import Length
+from schemas.pa_correlativa_schema import PACorrelativaSchema
 
 class PlanAsignaturaSchema(ma.SQLAlchemySchema):
     class Meta:
         model = PlanAsignatura
         load_instance = True
 
+    correlativas = fields.Nested(PACorrelativaSchema, many=True)
+    
     id = ma.auto_field(dump_only=True)
 
     asignatura_id = ma.auto_field(required=True)

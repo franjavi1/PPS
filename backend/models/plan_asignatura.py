@@ -1,6 +1,6 @@
 from datetime import datetime
 from db import db
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Float, DateTime, ForeignKey, func
 
 class PlanAsignatura(db.Model):
@@ -106,4 +106,11 @@ class PlanAsignatura(db.Model):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
+    )
+    
+    correlativas = relationship(
+        "PACorrelativa",
+        backref="plan_asignatura",
+        primaryjoin="and_(PlanAsignatura.id == PACorrelativa.pa_id, PACorrelativa.estado == 1)",
+        lazy="joined"
     )

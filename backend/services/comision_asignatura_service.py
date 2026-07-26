@@ -76,12 +76,12 @@ def eliminar(comision_asignatura):
     return comision_asignatura
 
 def obtener_comisiones_por_legajo(legajo_id: int):
-    # 1. Verificar si el Legajo existe y esta activo
+    # 1. Validar legajo activo
     legajo = Legajo.query.filter_by(id=legajo_id, estado=1).first()
     if not legajo:
         raise APIError(f"Legajo con ID {legajo_id} no encontrado.", status=404)
 
-    # 2. Obtener el ultimo rango registrado del legajo (el mas reciente por ID o ts_creacion)
+    # 2. Obtener el rango más reciente del legajo
     ultimo_legajo_rango = (
         LegajoRangos.query
         .filter_by(legajo_id=legajo_id, estado=1)
@@ -92,10 +92,9 @@ def obtener_comisiones_por_legajo(legajo_id: int):
     if not ultimo_legajo_rango or not ultimo_legajo_rango.rangos_institucionales:
         raise APIError("El legajo no tiene un rango institucional asignado.", status=400)
 
-    # Nivel de jerarquia actual de la persona
     nivel_jerarquia_legajo = ultimo_legajo_rango.rangos_institucionales.nivel_jerarquia
 
-    # 3. Filtrar ComisionAsignatura comparando el nivelJerarquia del rango mínimo con el del legajo
+    # 3. Filtrar comisiones habilitadas por el nivel de jerarquía
     comisiones = (
         ComisionAsignatura.query
         .join(PlanAsignatura, ComisionAsignatura.plan_asignaturas_id == PlanAsignatura.id)
