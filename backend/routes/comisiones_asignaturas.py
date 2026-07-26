@@ -22,19 +22,11 @@ comisiones_asignaturas_bp = Blueprint(
     url_prefix="/comisiones-asignaturas"
 )
 
-<<<<<<< HEAD
 #Devuelve el detalle de comisiones asignaturas para el idlegajo indicado
 @comisiones_asignaturas_bp.route("/GetDetalleFromLegajoID", methods=["GET"])
 def get_detalle_comision_asignatura():
     legajoid_param = request.args.get("id") or request.args.get("legajoid")
     legajoid = None
-=======
-#Devuelve el detalle de comisiones asignaturas para el idpersona indicado
-@comisiones_asignaturas_bp.route("/detalle/<int:id>", methods=["GET"])
-@requires_permission("micro1.comisiones_asignaturas.ver")
-def get_detalle_comision_asignatura(id):
-    comision_asignatura = obtener_por_id(id)
->>>>>>> origin/feature/auth-common
 
     if legajoid_param:
         try:
