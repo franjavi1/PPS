@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
+import { modalidadService } from "../services/modalidadService";
 import { paCorrelativaService } from "../services/paCorrelativaService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
@@ -62,6 +63,7 @@ function EditarPlan() {
   const [asignaturas, setAsignaturas] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [sedes, setSedes] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
@@ -85,6 +87,7 @@ function EditarPlan() {
         respuestaAsignaturas,
         respuestaRangos,
         respuestaSedes,
+        respuestaModalidades,
       ] = await Promise.all([
         planService.obtenerPorId(id),
         tipoPlanesService.obtenerTodos(),
@@ -93,6 +96,7 @@ function EditarPlan() {
         asignaturaService.obtenerTodas(),
         rangoService.obtenerTodos(),
         sedeService.obtenerTodas(),
+        modalidadService.obtenerTodas(),
       ]);
 
       const planData = respuestaPlan.data || {};
@@ -124,6 +128,7 @@ function EditarPlan() {
       setAsignaturas(respuestaAsignaturas.data || []);
       setRangos(respuestaRangos.data || []);
       setSedes(respuestaSedes.data || []);
+      setModalidades(respuestaModalidades.data || []);
     } catch (err) {
       setError(obtenerMensajeError(err));
     } finally {
@@ -557,13 +562,14 @@ function EditarPlan() {
                       placeholder="Ej: Anual"
                       icono={<BookMarked size={20} />}
                     />
-                    <CampoTexto
+                    <CampoSelect
                       label="Modalidad"
                       name="modalidad"
                       value={nuevaAsignatura.modalidad}
                       onChange={cambiarNuevaAsignatura}
-                      placeholder="Ej: Presencial"
-                      icono={<BookOpen size={20} />}
+                      opciones={modalidades}
+                      getValue={(modalidad) => modalidad.descripcion}
+                      getLabel={(modalidad) => modalidad.descripcion}
                     />
                   </div>
 

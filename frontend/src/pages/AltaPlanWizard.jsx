@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   BookMarked,
   BookOpen,
-  Building2,
   CalendarDays,
   CheckCircle2,
   ClipboardList,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
+import { modalidadService } from "../services/modalidadService";
 import { paCorrelativaService } from "../services/paCorrelativaService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
@@ -73,6 +73,7 @@ function AltaPlanWizard() {
   const [asignaturas, setAsignaturas] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [sedes, setSedes] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [guardando, setGuardando] = useState(false);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
@@ -91,17 +92,20 @@ function AltaPlanWizard() {
         respuestaAsignaturas,
         respuestaRangos,
         respuestaSedes,
+        respuestaModalidades,
       ] = await Promise.all([
         tipoPlanesService.obtenerTodos(),
         asignaturaService.obtenerTodas(),
         rangoService.obtenerTodos(),
         sedeService.obtenerTodas(),
+        modalidadService.obtenerTodas(),
       ]);
 
       setTiposPlanes(obtenerLista(respuestaTiposPlanes));
       setAsignaturas(obtenerLista(respuestaAsignaturas));
       setRangos(obtenerLista(respuestaRangos));
       setSedes(obtenerLista(respuestaSedes));
+      setModalidades(obtenerLista(respuestaModalidades));
     } catch (err) {
       setError(err.message || "No se pudieron cargar los datos iniciales");
     } finally {
@@ -522,7 +526,15 @@ function AltaPlanWizard() {
                     <CampoTexto label="Final aprobacion" name="final_aprobacion" type="number" value={asignaturaPlan.final_aprobacion} onChange={cambiarAsignaturaPlan} placeholder="Ej: 7" icono={<Hash size={20} />} />
                     <CampoTexto label="Duracion" name="duracion" type="number" step="0.01" value={asignaturaPlan.duracion} onChange={cambiarAsignaturaPlan} placeholder="Ej: 120" icono={<Hash size={20} />} />
                     <CampoTexto label="Regimen" name="regimen" value={asignaturaPlan.regimen} onChange={cambiarAsignaturaPlan} placeholder="Ej: Anual" icono={<BookMarked size={20} />} />
-                    <CampoTexto label="Modalidad" name="modalidad" value={asignaturaPlan.modalidad} onChange={cambiarAsignaturaPlan} placeholder="Ej: Presencial" icono={<Building2 size={20} />} />
+                    <CampoSelect
+                      label="Modalidad"
+                      name="modalidad"
+                      value={asignaturaPlan.modalidad}
+                      onChange={cambiarAsignaturaPlan}
+                      opciones={modalidades}
+                      getValue={(modalidad) => modalidad.descripcion}
+                      getLabel={(modalidad) => modalidad.descripcion}
+                    />
                   </div>
 
                   <Acciones

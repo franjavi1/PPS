@@ -47,7 +47,7 @@ function TiposDocumentos() {
     }
 
     const payload = {
-      descripcion,
+      descripcion: descripcion.trim().toUpperCase(),
       usuario_accion: 1,
     };
 
@@ -126,7 +126,7 @@ function TiposDocumentos() {
               <input
                 type="text"
                 value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
+                onChange={(e) => setDescripcion(e.target.value.toUpperCase())}
                 placeholder="Ej: DNI"
                 className="flex-1 h-14 border border-slate-300 rounded-xl px-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
               />

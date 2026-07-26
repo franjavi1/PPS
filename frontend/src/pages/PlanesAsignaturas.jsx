@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
+import { modalidadService } from "../services/modalidadService";
 import { planService } from "../services/planesService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { rangoService } from "../services/rangoService";
@@ -43,6 +44,7 @@ function PlanesAsignaturas() {
   const [planes, setPlanes] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [sedes, setSedes] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -66,12 +68,14 @@ function PlanesAsignaturas() {
         resPlanes,
         resRangos,
         resSedes,
+        resModalidades,
       ] = await Promise.all([
         planAsignaturaService.obtenerTodos(),
         asignaturaService.obtenerTodas(),
         planService.obtenerTodos(),
         rangoService.obtenerTodos(),
         sedeService.obtenerTodas(),
+        modalidadService.obtenerTodas(),
       ]);
 
       setRegistros(resRegistros.data || []);
@@ -79,6 +83,7 @@ function PlanesAsignaturas() {
       setPlanes(resPlanes.data || []);
       setRangos(resRangos.data || []);
       setSedes(resSedes.data || []);
+      setModalidades(resModalidades.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron obtener los planes asignaturas");
     } finally {
@@ -483,14 +488,23 @@ function PlanesAsignaturas() {
                       placeholder="Ej: Anual"
                       icon={<BookMarked size={20} />}
                     />
-                    <CampoInput
+                    <CampoSelect
                       label="Modalidad"
                       name="modalidad"
                       value={formulario.modalidad}
                       onChange={manejarCambio}
-                      placeholder="Ej: Presencial"
                       icon={<BookMarked size={20} />}
-                    />
+                    >
+                      <option value="">Seleccione una modalidad</option>
+                      {modalidades.map((modalidad) => (
+                        <option
+                          key={modalidad.modalidadesid}
+                          value={modalidad.descripcion}
+                        >
+                          {modalidad.descripcion}
+                        </option>
+                      ))}
+                    </CampoSelect>
                   </div>
 
                   {errorFormulario && (
