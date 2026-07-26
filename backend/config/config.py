@@ -14,3 +14,7 @@ class Config:
     
     # endpoints publicos que no requieren sesion
     AUTH_COMMON_ENDPOINTS_EXCEPTUADOS = ["/health"]
+    
+    JWT_TOKEN_LOCATION = ["headers"]
+    JWT_HEADER_NAME = "Authorization"
+    JWT_HEADER_TYPE = "Bearer"

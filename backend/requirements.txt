@@ -9,3 +9,4 @@ flask-marshmallow
 marshmallow-sqlalchemy
 PyYAML
 requests
+redis
