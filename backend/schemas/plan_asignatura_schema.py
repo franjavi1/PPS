@@ -3,6 +3,7 @@ from db import ma
 from marshmallow import ValidationError, validates, pre_load, fields
 from marshmallow.validate import Length
 from schemas.pa_correlativa_schema import PACorrelativaSchema
+from schemas.planes_schema import PlanesSchema
 
 class PlanAsignaturaSchema(ma.SQLAlchemySchema):
     class Meta:
@@ -10,6 +11,7 @@ class PlanAsignaturaSchema(ma.SQLAlchemySchema):
         load_instance = True
 
     correlativas = fields.Nested(PACorrelativaSchema, many=True)
+    plan = fields.Nested(PlanesSchema, dump_only=True)
     
     id = ma.auto_field(dump_only=True)
 

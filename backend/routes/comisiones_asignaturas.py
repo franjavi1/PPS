@@ -25,16 +25,15 @@ comisiones_asignaturas_bp = Blueprint(
 #Devuelve el detalle de comisiones asignaturas para el idlegajo indicado
 @comisiones_asignaturas_bp.route("/GetDetalleFromLegajoID", methods=["GET"])
 def get_detalle_comision_asignatura():
-    legajoid = request.args.get("id") or request.args.get("legajoid")
+    legajoid_param = request.args.get("id") or request.args.get("legajoid")
+    legajoid = None
 
-    if not legajoid:
-        raise APIError("El parámetro 'id' del legajo es requerido.", status=400)
-
-    try:
-        legajoid = int(legajoid)
-    except ValueError:
-        raise APIError("El ID del legajo debe ser un número entero válido.", status=400)
-
+    if legajoid_param:
+        try:
+            legajoid=int(legajoid_param)
+        except ValueError:
+            raise APIError("El ID del legajo debe ser un numero valido.", status=400)
+    
     comisiones = obtener_comisiones_por_legajo(legajoid)
 
     if not comisiones:
