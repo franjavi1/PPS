@@ -47,6 +47,11 @@ services:
     image: postgres:17
     container_name: bomberos_postgres
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bomberos_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
     environment:
       POSTGRES_DB: bomberos_db
       POSTGRES_USER: postgres
