@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import { planService } from "../services/planesService";
 import { tipoPlanesService } from "../services/tipoPlanesService";
 import { useAuth } from "../context/AuthContext";
@@ -187,6 +188,7 @@ function Planes() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+         <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -208,7 +210,7 @@ function Planes() {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={cargarDatos}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
+                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
               >
                 <RefreshCcw size={22} />
                 Actualizar
@@ -216,7 +218,7 @@ function Planes() {
 
               <button
                 onClick={() => navigate("/planes/alta")}
-                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
+                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
                 Nuevo plan
