@@ -79,7 +79,7 @@ function Navbar() {
         >
           <div className="w-20 h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
-              src="/logo.jpeg"
+              src="./logo.jpeg"
               alt="Logo bomberos"
               className="w-full h-full object-cover"
             />
