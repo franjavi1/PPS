@@ -14,18 +14,18 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ../backend:/app
+      - ./planes/backend:/app
+      - ./planes/auth-common:/auth-common
     env_file:
       - ../backend/.env
     environment:
       - PORT=5000
       - REDIS_HOST=172.10.10.50
+      - AUTH_COMMON_REDIS_URL=redis://redis:6379/0
+      - AUTH_COMMON_SESSION_TTL=900
     depends_on:
       - postgres-planes
       - redis
-    networks:
-      red_bomberos_estatica:
-        ipv4_address: 172.10.10.20
 
   frontend:
     build:
@@ -39,11 +39,8 @@ services:
     volumes:
       - ../frontend:/app
       - /app/node_modules
-    networks:
-      red_bomberos_estatica:
-        ipv4_address: 172.10.10.30
 
-  postgres-planes:
+  postgres:
     image: postgres:17
     container_name: bomberos_postgres
     restart: always
@@ -58,9 +55,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432" 
-    networks:
-      red_bomberos_estatica:
-        ipv4_address: 172.10.10.40
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
