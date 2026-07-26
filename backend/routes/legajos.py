@@ -14,12 +14,29 @@ from services.legajo_service import (
     obtener_por_id,
     crear,
     actualizar,
-    eliminar
+    eliminar,
+    obtener_por_numero
 )
 
 
 legajos_bp = Blueprint("legajos_bp", __name__, url_prefix="/legajos")
 
+#Se obtiene la Persona a partir del numero de legajo
+@legajos_bp.route("/GetPersonaFromLegajoNum", methods=["GET"])
+def get_legajo_por_numero():
+    numero = request.args.get("numero") or request.args.get("legajo")
+
+    if not numero or not numero.strip():
+        raise APIError("Debe incluir el 'numero' de legajo en la URL", status=400)
+
+    legajo = obtener_por_numero(numero)
+
+    if not legajo:
+        raise APIError(f"No se encontró un legajo activo con el numero '{numero}'", status=404)
+
+    data = legajo_schema.dump(legajo)
+
+    return respuesta_api(True, data, "Legajo y persona obtenidos correctamente")
 
 @legajos_bp.route("", methods=["GET"])
 def get_legajos():
