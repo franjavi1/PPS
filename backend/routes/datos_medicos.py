@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
-
+from auth_common.decorador import requires_permission
 from schemas.datos_medicos_schema import datos_medicos_schema, datos_medicos_lista_schema
 
 from services.datos_medicos_service import (
@@ -17,6 +17,7 @@ datos_medicos_bp = Blueprint("datos_medicos_bp", __name__, url_prefix="/datos-me
 
 
 @datos_medicos_bp.route("", methods=["GET"])
+@requires_permission("micro1.datos_medicos.ver")
 def get_datos_medicos():
     datos_medicos = obtener_todos()
     data = datos_medicos_lista_schema.dump(datos_medicos)
@@ -28,6 +29,7 @@ def get_datos_medicos():
 
 
 @datos_medicos_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.datos_medicos.ver")
 def get_datos_medicos_por_id(id):
     datos_medicos = obtener_por_id(id)
 
@@ -40,6 +42,7 @@ def get_datos_medicos_por_id(id):
 
 
 @datos_medicos_bp.route("", methods=["POST"])
+@requires_permission("micro1.datos_medicos.crear")
 def crear_datos_medicos():
     req = request.get_json(silent=True) or {}
 
@@ -50,6 +53,7 @@ def crear_datos_medicos():
 
 
 @datos_medicos_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.datos_medicos.editar")
 def editar_datos_medicos(id):
     datos_medicos = obtener_por_id(id)
 
@@ -64,6 +68,7 @@ def editar_datos_medicos(id):
 
 
 @datos_medicos_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.datos_medicos.eliminar")
 def eliminar_datos_medicos(id):
     datos_medicos = obtener_por_id(id)
 

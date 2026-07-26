@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
 from schemas.persona_schema import persona_schema, personas_schema
-
+from auth_common.decorador import requires_permission
 from services.persona_service import (
     obtener_todos,
     obtener_por_id,
@@ -18,6 +18,7 @@ personas_bp = Blueprint("personas_bp", __name__, url_prefix="/personas")
 
 
 @personas_bp.route("", methods=["GET"])
+@requires_permission("micro1.personas.ver")
 def get_personas():
     estado = request.args.get("estado", default=1, type=int)
 
@@ -34,6 +35,7 @@ def get_personas():
 
 
 @personas_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.personas.ver")
 def get_persona(id):
     persona = obtener_por_id(id)
 
@@ -46,6 +48,7 @@ def get_persona(id):
 
 
 @personas_bp.route("", methods=["POST"])
+@requires_permission("micro1.personas.crear")
 def crear_persona():
     req = request.get_json(silent=True) or {}
     nueva_persona = crear(req)
@@ -54,6 +57,7 @@ def crear_persona():
 
 
 @personas_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.personas.editar")
 def editar_persona(id):
     persona = obtener_por_id(id)
     
@@ -68,6 +72,7 @@ def editar_persona(id):
 
 
 @personas_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.personas.eliminar")
 def eliminar_persona(id):
     persona = obtener_por_id(id)
     

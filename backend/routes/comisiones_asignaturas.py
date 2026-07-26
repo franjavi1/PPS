@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
-
+from auth_common.decorador import requires_permission
 from models.autoridad_comision import AutoridadComision
 from schemas.comision_asignatura_schema import (
     comision_asignatura_schema,
@@ -22,11 +22,19 @@ comisiones_asignaturas_bp = Blueprint(
     url_prefix="/comisiones-asignaturas"
 )
 
+<<<<<<< HEAD
 #Devuelve el detalle de comisiones asignaturas para el idlegajo indicado
 @comisiones_asignaturas_bp.route("/GetDetalleFromLegajoID", methods=["GET"])
 def get_detalle_comision_asignatura():
     legajoid_param = request.args.get("id") or request.args.get("legajoid")
     legajoid = None
+=======
+#Devuelve el detalle de comisiones asignaturas para el idpersona indicado
+@comisiones_asignaturas_bp.route("/detalle/<int:id>", methods=["GET"])
+@requires_permission("micro1.comisiones_asignaturas.ver")
+def get_detalle_comision_asignatura(id):
+    comision_asignatura = obtener_por_id(id)
+>>>>>>> origin/feature/auth-common
 
     if legajoid_param:
         try:
@@ -55,6 +63,7 @@ def get_detalle_comision_asignatura():
 
 
 @comisiones_asignaturas_bp.route("", methods=["GET"])
+@requires_permission("micro1.comisiones_asignaturas.ver")
 def get_comisiones_asignaturas():
     comisiones_asignaturas = obtener_todos()
     data = comisiones_asignaturas_schema.dump(comisiones_asignaturas)
@@ -66,6 +75,7 @@ def get_comisiones_asignaturas():
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.comisiones_asignaturas.ver")
 def get_comision_asignatura(id):
     comision_asignatura = obtener_por_id(id)
 
@@ -78,6 +88,7 @@ def get_comision_asignatura(id):
 
 
 @comisiones_asignaturas_bp.route("", methods=["POST"])
+@requires_permission("micro1.comisiones_asignaturas.crear")
 def crear_comision_asignatura():
     req = request.get_json(silent=True) or {}
 
@@ -93,6 +104,7 @@ def crear_comision_asignatura():
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.comisiones_asignaturas.editar")
 def editar_comision_asignatura(id):
     comision_asignatura = obtener_por_id(id)
 
@@ -112,6 +124,7 @@ def editar_comision_asignatura(id):
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.comisiones_asignaturas.eliminar")
 def eliminar_comision_asignatura(id):
     comision_asignatura = obtener_por_id(id)
 

@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
-
+from auth_common.decorador import requires_permission
 from schemas.contactos_schema import contacto_schema, contactos_schema
 
 from services.contactos_service import (
@@ -18,6 +18,7 @@ contactos_bp = Blueprint("contactos_bp", __name__, url_prefix="/contactos")
 
 
 @contactos_bp.route("", methods=["GET"])
+@requires_permission("micro1.contactos.ver")
 def get_contactos():
     contactos = obtener_todos()
     data = contactos_schema.dump(contactos)
@@ -29,6 +30,7 @@ def get_contactos():
 
 
 @contactos_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("micro1.contactos.ver")
 def get_contacto(id):
     contacto = obtener_por_id(id)
 
@@ -41,6 +43,7 @@ def get_contacto(id):
 
 
 @contactos_bp.route("", methods=["POST"])
+@requires_permission("micro1.contactos.crear")
 def crear_contacto():
     req = request.get_json(silent=True) or {}
 
@@ -51,6 +54,7 @@ def crear_contacto():
 
 
 @contactos_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("micro1.contactos.editar")
 def editar_contacto(id):
     contacto = obtener_por_id(id)
 
@@ -65,6 +69,7 @@ def editar_contacto(id):
 
 
 @contactos_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("micro1.contactos.eliminar")
 def eliminar_contacto(id):
     contacto = obtener_por_id(id)
 

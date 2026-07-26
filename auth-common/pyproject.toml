@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "auth-common"
+version = "0.1.0"
+description = "Sesión en Redis, validación antes de cada request y autorización por endpoint, compartido entre microservicios"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "Flask>=3.1",
+    "Flask-JWT-Extended>=4.7",
+    "redis>=8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/auth_common"]

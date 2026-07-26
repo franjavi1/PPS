@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from auth_common import AuthCommon
 
 from db import db, ma
 from config.config import Config
@@ -69,6 +70,11 @@ ma.init_app(app)
 
 CORS(app)
 
+AuthCommon(app)
+
+app.config["AUTH_COMMON_ENDPOINTS_EXCEPTUADOS"] = [
+    "contactos_bp.get_persona_id_from_mail",
+]
 
 @app.route("/health", methods=["GET"])
 def health():
