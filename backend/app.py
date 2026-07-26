@@ -31,6 +31,7 @@ from models.plan_asignatura import PlanAsignatura
 from models.datos_medicos import DatosMedicos
 from models.tipo_contacto import TipoContacto
 from models.contactos import Contactos
+from models.tipo_sede import TipoSede
 
 from models.legajo import Legajo
 from models.rangos_institucionales import RangosInstitucionales
@@ -156,6 +157,70 @@ app.register_blueprint(datos_medicos_bp)
 app.register_blueprint(tipos_contacto_bp)
 app.register_blueprint(contactos_bp)
 app.register_blueprint(personas_relaciones_bp)
+
+def seed_datos_iniciales():
+    if TipoSede.query.first() is None:
+        print("Generando datos tipo sede")
+        
+        tipo_sede = TipoSede(
+            id=1,
+            descripcion='Cuartel',
+            estado=1,
+            usuario_accion=1
+        )
+        db.session.add(tipo_sede)
+        
+        sedes_iniciales = [
+            Sedes(
+                id=1,
+                tipo_sede_id=1,
+                nombre='Sede Central',
+                direccion='Brandsen 567',
+                estado=1,
+                usuario_accion=1
+            ),
+            Sedes(
+                id=2,
+                tipo_sede_id=1,
+                nombre='Bomberos Voluntarios De Nueva Pompeya Y Barracas Sur',
+                direccion='Iriarte 3520',
+                estado=1,
+                usuario_accion=1
+            ),
+            Sedes(
+                id=3,
+                tipo_sede_id=1,
+                nombre='Bomberos Voluntarios De San Telmo',
+                direccion='Balcarce 1249',
+                estado=1,
+                usuario_accion=1
+            ),
+            Sedes(
+                id=4,
+                tipo_sede_id=1,
+                nombre='Bomberos Voluntarios De Villa Soldati',
+                direccion='Tabare 3294',
+                estado=1,
+                usuario_accion=1
+            ),
+            Sedes(
+                id=5,
+                tipo_sede_id=1,
+                nombre='Bomberos Voluntarios De Vuelta De Rocha',
+                direccion='Garibaldi 2042/48',
+                estado=1,
+                usuario_accion=1
+            ),
+        ]
+        
+        db.session.add_all(sedes_iniciales)
+        
+        
+        
+        db.session.commit()
+        print("Datos iniciales cargados exitosamente")
+    else:
+        print("La base ya contiene informacion. Se omite el seeding.")
 
 with app.app_context():
     db.create_all()
