@@ -286,7 +286,7 @@ function Planes() {
                   <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => navigate(`/planes/${plan.id}`)}
-                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer"
                     >
                       <Eye size={16} />
                       Ver
@@ -296,7 +296,7 @@ function Planes() {
                       onClick={() => editarPlan(plan)}
                       disabled={!esAdministrador}
                       title={esAdministrador ? "Editar plan" : "Solo los administradores pueden editar"}
-                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Pencil size={16} />
                       Editar
@@ -306,7 +306,7 @@ function Planes() {
                       onClick={() => eliminarPlan(plan.id)}
                       disabled={!esAdministrador}
                       title={esAdministrador ? "Dar de baja el plan" : "Solo los administradores pueden dar de baja"}
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Trash2 size={16} />
                       Dar de baja
@@ -363,7 +363,7 @@ function Planes() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => navigate(`/planes/${plan.id}`)}
-                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
                           >
                             <Eye size={18} />
                             Ver
@@ -373,7 +373,7 @@ function Planes() {
                             onClick={() => editarPlan(plan)}
                             disabled={!esAdministrador}
                             title={esAdministrador ? "Editar plan" : "Solo los administradores pueden editar"}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Pencil size={18} />
                             Editar
@@ -383,7 +383,7 @@ function Planes() {
                             onClick={() => eliminarPlan(plan.id)}
                             disabled={!esAdministrador}
                             title={esAdministrador ? "Dar de baja el plan" : "Solo los administradores pueden dar de baja"}
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Trash2 size={18} />
                             Dar de baja
@@ -408,7 +408,7 @@ function Planes() {
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-2xl relative">
                 <button
                   onClick={cerrarModal}
-                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                   title="Cerrar modal"
                 >
                   <X size={20} />
@@ -501,7 +501,7 @@ function Planes() {
                     <button
                       type="button"
                       onClick={cerrarModal}
-                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <X size={20} />
                       Cancelar
@@ -509,7 +509,7 @@ function Planes() {
 
                     <button
                       type="submit"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
                     >
                       <Save size={22} />
                       Guardar

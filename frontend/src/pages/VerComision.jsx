@@ -134,10 +134,10 @@ function VerComision() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
-              <button type="button" onClick={() => navigate("/comisiones")} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100">
+              <button type="button" onClick={() => navigate("/comisiones")} className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer">
                 <ArrowLeft size={20} />Volver
               </button>
-              <button type="button" onClick={() => navigate(`/comisiones/${id}/editar`)} className="flex items-center justify-center gap-2 bg-red-700 text-white px-5 py-3 rounded-lg font-bold hover:bg-red-800">
+              <button type="button" onClick={() => navigate(`/comisiones/${id}/editar`)} className="flex items-center justify-center gap-2 bg-red-700 text-white px-5 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer">
                 <Pencil size={20} />Editar
               </button>
             </div>

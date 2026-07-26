@@ -585,7 +585,7 @@ function AltaPlanWizard() {
                         <button
                           type="submit"
                           disabled={guardando}
-                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                         >
                           <PlusCircle size={22} />
                           {guardando ? "Guardando..." : "Agregar correlativa"}
@@ -622,7 +622,7 @@ function AltaPlanWizard() {
                               type="button"
                               onClick={() => eliminarCorrelativa(item.id)}
                               disabled={guardando}
-                              className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60"
+                              className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60 transition cursor-pointer"
                             >
                               <Trash2 size={18} />
                               Eliminar
@@ -668,7 +668,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={agregarOtraAsignatura}
-                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50"
+                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar otra asignatura
@@ -677,7 +677,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={() => setPasoActual(5)}
-                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800"
+                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
                     >
                       <CheckCircle2 size={22} />
                       Ir al resumen
@@ -748,7 +748,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={() => navigate("/planes")}
-                      className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                      className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       Volver a planes
                     </button>
@@ -756,7 +756,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={agregarOtraAsignatura}
-                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50"
+                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar otra asignatura
@@ -766,7 +766,7 @@ function AltaPlanWizard() {
                       type="button"
                       onClick={confirmarPlan}
                       disabled={guardando || Boolean(planId)}
-                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                     >
                       <Save size={22} />
                       {guardando

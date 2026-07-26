@@ -120,7 +120,7 @@ function VerPlan() {
             <button
               type="button"
               onClick={() => navigate("/planes")}
-              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"
+              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
             >
               <ArrowLeft size={20} />
               Volver

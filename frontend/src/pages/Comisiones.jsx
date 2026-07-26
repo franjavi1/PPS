@@ -140,7 +140,9 @@ function Comisiones() {
   const comisionesFiltradas = comisiones.filter((comision) => {
     const textoBusqueda = busqueda.toLowerCase();
 
-    return String(comision.descripcion || "").toLowerCase().includes(textoBusqueda);
+    return String(comision.descripcion || "")
+      .toLowerCase()
+      .includes(textoBusqueda);
   });
 
   return (
@@ -148,7 +150,7 @@ function Comisiones() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
-         <BotonVolver />
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -179,7 +181,11 @@ function Comisiones() {
               <button
                 onClick={() => navigate("/comisiones/alta")}
                 disabled={!esAdministrador}
-                title={esAdministrador ? "Crear comisión" : "Solo los administradores pueden crear comisiones"}
+                title={
+                  esAdministrador
+                    ? "Crear comisión"
+                    : "Solo los administradores pueden crear comisiones"
+                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-700"
               >
                 <PlusCircle size={22} />
@@ -231,18 +237,26 @@ function Comisiones() {
 
                   <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
-                      onClick={() => navigate(`/comisiones/${comision.id_comision}`)}
-                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                      onClick={() =>
+                        navigate(`/comisiones/${comision.id_comision}`)
+                      }
+                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer "
                     >
                       <Eye size={16} />
                       Ver
                     </button>
 
                     <button
-                      onClick={() => navigate(`/comisiones/${comision.id_comision}/editar`)}
+                      onClick={() =>
+                        navigate(`/comisiones/${comision.id_comision}/editar`)
+                      }
                       disabled={!esAdministrador}
-                      title={esAdministrador ? "Editar comisión" : "Solo los administradores pueden editar"}
-                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                      title={
+                        esAdministrador
+                          ? "Editar comisión"
+                          : "Solo los administradores pueden editar"
+                      }
+                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Pencil size={16} />
                       Editar
@@ -251,8 +265,12 @@ function Comisiones() {
                     <button
                       onClick={() => eliminarComision(comision.id_comision)}
                       disabled={!esAdministrador}
-                      title={esAdministrador ? "Eliminar comisión" : "Solo los administradores pueden eliminar"}
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                      title={
+                        esAdministrador
+                          ? "Eliminar comisión"
+                          : "Solo los administradores pueden eliminar"
+                      }
+                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Trash2 size={16} />
                       Eliminar
@@ -271,15 +289,22 @@ function Comisiones() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <th className="px-5 py-4 text-slate-700 font-bold">Descripcion</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Acciones</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">
+                    Descripcion
+                  </th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="2" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="2"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       Cargando comisiones...
                     </td>
                   </tr>
@@ -295,28 +320,44 @@ function Comisiones() {
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => navigate(`/comisiones/${comision.id_comision}`)}
-                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                            onClick={() =>
+                              navigate(`/comisiones/${comision.id_comision}`)
+                            }
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
                           >
                             <Eye size={18} />
                             Ver
                           </button>
 
                           <button
-                            onClick={() => navigate(`/comisiones/${comision.id_comision}/editar`)}
+                            onClick={() =>
+                              navigate(
+                                `/comisiones/${comision.id_comision}/editar`,
+                              )
+                            }
                             disabled={!esAdministrador}
-                            title={esAdministrador ? "Editar comisión" : "Solo los administradores pueden editar"}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                            title={
+                              esAdministrador
+                                ? "Editar comisión"
+                                : "Solo los administradores pueden editar"
+                            }
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Pencil size={18} />
                             Editar
                           </button>
 
                           <button
-                            onClick={() => eliminarComision(comision.id_comision)}
+                            onClick={() =>
+                              eliminarComision(comision.id_comision)
+                            }
                             disabled={!esAdministrador}
-                            title={esAdministrador ? "Eliminar comisión" : "Solo los administradores pueden eliminar"}
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                            title={
+                              esAdministrador
+                                ? "Eliminar comisión"
+                                : "Solo los administradores pueden eliminar"
+                            }
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Trash2 size={18} />
                             Eliminar
@@ -327,7 +368,10 @@ function Comisiones() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="2" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="2"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       No se encontraron comisiones.
                     </td>
                   </tr>
@@ -341,7 +385,7 @@ function Comisiones() {
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-xl relative">
                 <button
                   onClick={cerrarModal}
-                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                   title="Cerrar modal"
                 >
                   <X size={20} />
@@ -383,7 +427,7 @@ function Comisiones() {
                     <button
                       type="button"
                       onClick={cerrarModal}
-                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <X size={20} />
                       Cancelar
@@ -391,7 +435,7 @@ function Comisiones() {
 
                     <button
                       type="submit"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
                     >
                       <Save size={22} />
                       Guardar

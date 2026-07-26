@@ -170,7 +170,7 @@ function TipoRangos() {
               <button
                 type="button"
                 onClick={cargarRangos}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
+                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
               >
                 <RefreshCcw size={22} />
                 Actualizar
@@ -179,7 +179,7 @@ function TipoRangos() {
               <button
                 type="button"
                 onClick={abrirNuevoRango}
-                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
+                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
                 Nuevo tipo
@@ -255,7 +255,7 @@ function TipoRangos() {
                           <button
                             type="button"
                             onClick={() => editarRango(rango)}
-                            className="h-10 px-3 flex items-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+                            className="h-10 px-3 flex items-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
                           >
                             <Pencil size={16} />
                             Editar
@@ -264,7 +264,7 @@ function TipoRangos() {
                           <button
                             type="button"
                             onClick={() => eliminarRango(rango.id)}
-                            className="h-10 px-3 flex items-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+                            className="h-10 px-3 flex items-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
                           >
                             <Trash2 size={16} />
                             Eliminar
@@ -292,7 +292,7 @@ function TipoRangos() {
             <button
               type="button"
               onClick={cerrarModal}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition cursor-pointer"
               aria-label="Cerrar modal"
             >
               <X size={24} />
@@ -330,14 +330,14 @@ function TipoRangos() {
                 <button
                   type="button"
                   onClick={cerrarModal}
-                  className="px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                  className="px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                 >
                   Cancelar
                 </button>
 
                 <button
                   type="submit"
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
                 >
                   <Save size={20} />
                   Guardar
@@ -366,7 +366,7 @@ function TarjetaRango({ rango, onEdit, onDelete }) {
         <button
           type="button"
           onClick={() => onEdit(rango)}
-          className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50"
+          className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
         >
           <Pencil size={16} />
           Editar
@@ -375,7 +375,7 @@ function TarjetaRango({ rango, onEdit, onDelete }) {
         <button
           type="button"
           onClick={() => onDelete(rango.id)}
-          className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50"
+          className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
         >
           <Trash2 size={16} />
           Eliminar

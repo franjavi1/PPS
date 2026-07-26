@@ -344,7 +344,7 @@ function EditarComision() {
             <button
               type="button"
               onClick={() => navigate(`/comisiones/${id}`)}
-              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"
+              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
             >
               <ArrowLeft size={20} />
               Volver
@@ -470,7 +470,7 @@ function EditarComision() {
                       type="button"
                       onClick={agregarComisionAsignatura}
                       disabled={guardando}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar asignatura
@@ -522,7 +522,7 @@ function EditarComision() {
                               )
                             }
                             disabled={guardando}
-                            className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60"
+                            className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
                             Eliminar
@@ -583,7 +583,7 @@ function EditarComision() {
                       type="button"
                       onClick={agregarAutoridad}
                       disabled={guardando}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar autoridad
@@ -624,7 +624,7 @@ function EditarComision() {
                             type="button"
                             onClick={() => eliminarAutoridad(item.id)}
                             disabled={guardando}
-                            className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60"
+                            className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
                             Eliminar
@@ -642,7 +642,7 @@ function EditarComision() {
                 <button
                   type="button"
                   onClick={() => navigate(`/comisiones/${id}`)}
-                  className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                  className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -650,7 +650,7 @@ function EditarComision() {
                 <button
                   type="submit"
                   disabled={guardando}
-                  className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                  className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                 >
                   <Save size={22} />
                   {guardando ? "Guardando..." : "Guardar cambios"}
@@ -670,7 +670,7 @@ function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
       <button
         type="button"
         onClick={() => onToggle(abierta ? "" : id)}
-        className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-slate-50"
+        className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-slate-50 transition cursor-pointer"
       >
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-red-100 text-red-700 flex items-center justify-center">

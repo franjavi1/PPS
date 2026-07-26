@@ -695,7 +695,7 @@ function AltaPersonaWizard() {
                   type="button"
                   onClick={confirmarAltaPersona}
                   disabled={guardando || Boolean(personaId)}
-                  className="px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                  className="px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                 >
                   {guardando
                     ? "Guardando..."

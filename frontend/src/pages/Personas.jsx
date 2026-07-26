@@ -265,8 +265,8 @@ function Personas() {
                 onClick={() => setEstadoListado(1)}
                 className={`px-5 py-2 rounded-lg font-bold border transition ${
                   estadoListado === 1
-                    ? "bg-red-700 text-white border-red-700"
-                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                    ? "bg-red-700 text-white border-red-700 transition cursor-pointer"
+                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 transition cursor-pointer"
                 }`}
               >
                 Activas
@@ -276,8 +276,8 @@ function Personas() {
                 onClick={() => setEstadoListado(0)}
                 className={`px-5 py-2 rounded-lg font-bold border transition ${
                   estadoListado === 0
-                    ? "bg-red-700 text-white border-red-700"
-                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                    ? "bg-red-700 text-white border-red-700 transition cursor-pointer"
+                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 transition cursor-pointer"
                 }`}
               >
                 Inactivas
@@ -342,7 +342,7 @@ function Personas() {
                       <button
                         type="button"
                         onClick={() => reactivarPersona(persona.id)}
-                        className="h-10 flex items-center justify-center gap-1 text-green-700 font-semibold border border-green-200 rounded-lg hover:bg-green-50"
+                        className="h-10 flex items-center justify-center gap-1 text-green-700 font-semibold border border-green-200 rounded-lg hover:bg-green-50 transition cursor-pointer"
                       >
                         <RefreshCcw size={16} />
                         Reactivar
@@ -353,7 +353,7 @@ function Personas() {
                       <button
                         type="button"
                         onClick={() => navigate(`/personas/${persona.id}`)}
-                        className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                        className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer"
                       >
                         <Eye size={16} />
                         Ver
@@ -363,7 +363,7 @@ function Personas() {
                         type="button"
                         onClick={() => navigate(`/personas/${persona.id}/editar`)}
                         disabled={!hasPermission(currentUserRole, "editar")}
-                        className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                       >
                         <Pencil size={16} />
                         Editar
@@ -373,7 +373,7 @@ function Personas() {
                         type="button"
                         onClick={() => eliminarPersona(persona.id)}
                         disabled={!hasPermission(currentUserRole, "eliminar")}
-                        className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                       >
                         <Trash2 size={16} />
                         Dar de baja
@@ -446,7 +446,7 @@ function Personas() {
                           <button
                             type="button"
                             onClick={() => reactivarPersona(persona.id)}
-                            className="flex items-center gap-1 text-green-700 font-semibold hover:text-green-900"
+                            className="flex items-center gap-1 text-green-700 font-semibold hover:text-green-900 transition cursor-pointer"
                           >
                             <RefreshCcw size={18} />
                             Reactivar
@@ -457,7 +457,7 @@ function Personas() {
                           <button
                             type="button"
                             onClick={() => navigate(`/personas/${persona.id}`)}
-                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
                           >
                             <Eye size={18} />
                             Ver
@@ -470,7 +470,7 @@ function Personas() {
                               navigate(`/personas/${persona.id}/editar`)
                             }
                             disabled={!hasPermission(currentUserRole, "editar")}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Pencil size={18} />
                             Editar
@@ -483,7 +483,7 @@ function Personas() {
                             disabled={
                               !hasPermission(currentUserRole, "eliminar")
                             }
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Trash2 size={18} />
                             Dar de baja
@@ -512,7 +512,7 @@ function Personas() {
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-2xl relative">
                 <button
                   onClick={cerrarModal}
-                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                   title="Cerrar modal"
                 >
                   <X size={20} />
@@ -596,7 +596,7 @@ function Personas() {
                     <button
                       type="button"
                       onClick={cerrarModal}
-                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <X size={20} />
                       Cancelar
@@ -604,7 +604,7 @@ function Personas() {
 
                     <button
                       type="submit"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
                     >
                       <Save size={22} />
                       Guardar

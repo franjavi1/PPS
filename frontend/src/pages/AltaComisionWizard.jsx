@@ -498,7 +498,7 @@ function AltaComisionWizard() {
                       type="button"
                       onClick={agregarAutoridad}
                       disabled={guardando}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar autoridad
@@ -545,7 +545,7 @@ function AltaComisionWizard() {
                     <button
                       type="button"
                       onClick={() => navigate("/comisiones")}
-                      className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                      className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       Volver a comisiones
                     </button>
@@ -553,7 +553,7 @@ function AltaComisionWizard() {
                       type="button"
                       onClick={confirmarComision}
                       disabled={guardando || Boolean(comisionId)}
-                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                     >
                       <Save size={22} />
                       {guardando
