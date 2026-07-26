@@ -12,7 +12,8 @@ from services.comision_asignatura_service import (
     crear,
     eliminar,
     obtener_por_id,
-    obtener_todos
+    obtener_todos,
+    obtener_comisiones_por_legajo
 )
 
 comisiones_asignaturas_bp = Blueprint(
@@ -21,17 +22,37 @@ comisiones_asignaturas_bp = Blueprint(
     url_prefix="/comisiones-asignaturas"
 )
 
-#Devuelve el detalle de comisiones asignaturas para el idpersona indicado
-@comisiones_asignaturas_bp.route("/detalle/<int:id>", methods=["GET"])
-def get_detalle_comision_asignatura(id):
-    comision_asignatura = obtener_por_id(id)
+#Devuelve el detalle de comisiones asignaturas para el idlegajo indicado
+@comisiones_asignaturas_bp.route("/GetDetalleFromLegajoID", methods=["GET"])
+def get_detalle_comision_asignatura():
+    legajoid = request.args.get("id") or request.args.get("legajoid")
 
-    if not comision_asignatura:
-        raise APIError("Comision asignatura no encontrada", status=404)
+    if not legajoid:
+        raise APIError("El parámetro 'id' del legajo es requerido.", status=400)
 
-    data = comision_asignatura_schema.dump(comision_asignatura)
+    try:
+        legajoid = int(legajoid)
+    except ValueError:
+        raise APIError("El ID del legajo debe ser un número entero válido.", status=400)
 
-    return respuesta_api(success=True, data=data, message="Comision asignatura obtenida correctamente", status=200)
+    comisiones = obtener_comisiones_por_legajo(legajoid)
+
+    if not comisiones:
+        return respuesta_api(
+            success=True,
+            data=[],
+            message="No se encontraron comisiones habilitadas para el rango de este legajo",
+            status=200
+        )
+
+    data = comisiones_asignaturas_schema.dump(comisiones)
+
+    return respuesta_api(
+        success=True,
+        data=data,
+        message="Comisiones asignaturas habilitadas obtenidas correctamente",
+        status=200
+    )
 
 
 @comisiones_asignaturas_bp.route("", methods=["GET"])
