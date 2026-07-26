@@ -3,10 +3,10 @@ from models.persona import Persona
 
 from db import ma
 
-from marshmallow import ValidationError, validates, validates_schema, pre_load, post_dump
+from marshmallow import ValidationError, validates, validates_schema, pre_load, post_dump, fields
 from marshmallow.validate import Length
 
-
+from schemas.persona_schema import PersonaSchema
 class LegajoSchema(ma.SQLAlchemySchema):
     # Configuracion del schema asociado al modelo.
     class Meta:
@@ -16,6 +16,8 @@ class LegajoSchema(ma.SQLAlchemySchema):
     # Campo de solo lectura para las respuestas.
     id = ma.auto_field(dump_only=True)
 
+    persona = fields.Nested(PersonaSchema, dump_only=True)
+    
     # Persona asociada al legajo.
     persona_id = ma.auto_field(
         required=True,

@@ -44,3 +44,6 @@ def eliminar(legajo):
     db.session.commit()
 
     return legajo
+
+def obtener_por_numero(numero: str):
+    return Legajo.query.filter_by(numero=str(numero).strip(), estado=1).first()
