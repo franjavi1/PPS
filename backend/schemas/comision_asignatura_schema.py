@@ -7,6 +7,7 @@ from db import ma
 from marshmallow import ValidationError, validates, validates_schema, pre_load, fields
 from marshmallow.validate import Length, OneOf
 from schemas.plan_asignatura_schema import PlanAsignaturaSchema
+from schemas.comision_schema import ComisionSchema 
 
 
 class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
@@ -14,7 +15,9 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         model = ComisionAsignatura
         load_instance = True
 
-    plan_asignaturas = fields.Nested(PlanAsignaturaSchema)
+    # Objetos anidados para respuestas de lectura (dump_only)
+    plan_asignaturas = fields.Nested(PlanAsignaturaSchema, dump_only=True)
+    comision = fields.Nested(ComisionSchema, dump_only=True) 
     
     id_comision_asignatura = ma.auto_field(dump_only=True)
 

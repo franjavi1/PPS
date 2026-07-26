@@ -4,6 +4,8 @@ from models.legajo import Legajo
 from models.legajo_rangos import LegajoRangos
 from models.rangos_institucionales import RangosInstitucionales
 from models.plan_asignatura import PlanAsignatura
+from models.planes import Planes
+from models.comision import Comision
 from utils.errores import APIError
 
 from schemas.comision_asignatura_schema import (
@@ -75,37 +77,45 @@ def eliminar(comision_asignatura):
 
     return comision_asignatura
 
-def obtener_comisiones_por_legajo(legajo_id: int):
-    # 1. Validar legajo activo
-    legajo = Legajo.query.filter_by(id=legajo_id, estado=1).first()
-    if not legajo:
-        raise APIError(f"Legajo con ID {legajo_id} no encontrado.", status=404)
+def obtener_comisiones_por_legajo(legajo_id: int | None = None):
+    nivel_jerarquia_legajo = None
 
-    # 2. Obtener el rango más reciente del legajo
-    ultimo_legajo_rango = (
-        LegajoRangos.query
-        .filter_by(legajo_id=legajo_id, estado=1)
-        .order_by(LegajoRangos.id.desc())
-        .first()
-    )
+    # Si tenemos el ID del legajo, obtenemos su nivel de jerarquía actual
+    if legajo_id is not None:
+        legajo = Legajo.query.filter_by(id=legajo_id, estado=1).first()
+        if not legajo:
+            raise APIError(f"Legajo con ID {legajo_id} no encontrado.", status=404)
 
-    if not ultimo_legajo_rango or not ultimo_legajo_rango.rangos_institucionales:
-        raise APIError("El legajo no tiene un rango institucional asignado.", status=400)
+        ultimo_legajo_rango = (
+            LegajoRangos.query
+            .filter_by(legajo_id=legajo_id, estado=1)
+            .order_by(LegajoRangos.id.desc())
+            .first()
+        )
 
-    nivel_jerarquia_legajo = ultimo_legajo_rango.rangos_institucionales.nivel_jerarquia
+        if not ultimo_legajo_rango or not ultimo_legajo_rango.rangos_institucionales:
+            raise APIError("El legajo no tiene un rango institucional asignado.", status=400)
 
-    # 3. Filtrar comisiones habilitadas por el nivel de jerarquía
-    comisiones = (
+        nivel_jerarquia_legajo = ultimo_legajo_rango.rangos_institucionales.nivel_jerarquia
+
+    # Busco la ComisionAsignatura uniendo Comision, PlanAsignatura, Planes y RangosInstitucionales
+    query = (
         ComisionAsignatura.query
+        .join(Comision, ComisionAsignatura.comision_id == Comision.id_comision)
         .join(PlanAsignatura, ComisionAsignatura.plan_asignaturas_id == PlanAsignatura.id)
+        .join(Planes, PlanAsignatura.plan_id == Planes.id)
         .join(RangosInstitucionales, PlanAsignatura.rango_minimo_id == RangosInstitucionales.id)
         .filter(
             ComisionAsignatura.estado == 1,
+            Comision.estado == 1,
             PlanAsignatura.estado == 1,
-            RangosInstitucionales.estado == 1,
-            RangosInstitucionales.nivel_jerarquia <= nivel_jerarquia_legajo
+            Planes.estado == 1,
+            RangosInstitucionales.estado == 1
         )
-        .all()
     )
 
-    return comisiones
+    # Filtro de jerarquía únicamente si se envió un legajo
+    if nivel_jerarquia_legajo is not None:
+        query = query.filter(RangosInstitucionales.nivel_jerarquia <= nivel_jerarquia_legajo)
+
+    return query.all()

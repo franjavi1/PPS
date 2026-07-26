@@ -108,6 +108,8 @@ class PlanAsignatura(db.Model):
         nullable=False
     )
     
+    plan = relationship("Planes", backref="plan_asignaturas_items")
+    
     correlativas = relationship(
         "PACorrelativa",
         backref="plan_asignatura",
