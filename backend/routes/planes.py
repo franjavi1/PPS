@@ -15,7 +15,7 @@ planes_bp = Blueprint("planes_bp", __name__, url_prefix="/planes")
 
 
 @planes_bp.route("", methods=["GET"])
-@requires_permission("micro1.planes.ver")
+@requires_permission("planes.planes.ver")
 def get_planes():
     planes = obtener_todos()
     data = planes_schema.dump(planes)
@@ -27,7 +27,7 @@ def get_planes():
 
 
 @planes_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.planes.ver")
+@requires_permission("planes.planes.ver")
 def get_plan(id):
     plan = obtener_por_id(id)
 
@@ -40,7 +40,7 @@ def get_plan(id):
 
 
 @planes_bp.route("", methods=["POST"])
-@requires_permission("micro1.planes.crear")
+@requires_permission("planes.planes.crear")
 def crear_planes():
     req = request.get_json(silent=True) or {}
     nuevo_plan = crear(req)
@@ -50,7 +50,7 @@ def crear_planes():
 
 
 @planes_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.planes.editar")
+@requires_permission("planes.planes.editar")
 def editar_plan(id):
     plan = obtener_por_id(id)
 
@@ -65,7 +65,7 @@ def editar_plan(id):
 
 
 @planes_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.planes.eliminar")
+@requires_permission("planes.planes.eliminar")
 def eliminar_plan(id):
     plan = obtener_por_id(id)
 

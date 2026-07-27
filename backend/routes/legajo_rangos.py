@@ -17,7 +17,7 @@ legajo_rangos_bp = Blueprint("legajo_rangos_bp", __name__, url_prefix="/legajo-r
 
 
 @legajo_rangos_bp.route("", methods=["GET"])
-@requires_permission("micro1.legajo_rangos.ver")
+@requires_permission("planes.legajo_rangos.ver")
 def get_legajos_rangos():
     legajos_rangos = obtener_todos()
     data = legajos_rangos_schema.dump(legajos_rangos)
@@ -29,7 +29,7 @@ def get_legajos_rangos():
 
 
 @legajo_rangos_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.legajo_rangos.ver")
+@requires_permission("planes.legajo_rangos.ver")
 def get_legajo_rangos(id):
     legajo_rangos = obtener_por_id(id)
 
@@ -42,7 +42,7 @@ def get_legajo_rangos(id):
 
 
 @legajo_rangos_bp.route("", methods=["POST"])
-@requires_permission("micro1.legajo_rangos.crear")
+@requires_permission("planes.legajo_rangos.crear")
 def crear_legajo_rangos():
     req = request.get_json(silent=True) or {}
 
@@ -53,7 +53,7 @@ def crear_legajo_rangos():
 
 
 @legajo_rangos_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.legajo_rangos.editar")
+@requires_permission("planes.legajo_rangos.editar")
 def editar_legajo_rangos(id):
     legajo_rangos = obtener_por_id(id)
 
@@ -68,7 +68,7 @@ def editar_legajo_rangos(id):
 
 
 @legajo_rangos_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.legajo_rangos.eliminar")
+@requires_permission("planes.legajo_rangos.eliminar")
 def eliminar_legajo_rangos(id):
     legajo_rangos = obtener_por_id(id)
 

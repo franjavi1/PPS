@@ -20,7 +20,7 @@ tipos_sedes_bp = Blueprint(
 
 
 @tipos_sedes_bp.route("", methods=["GET"])
-@requires_permission("micro1.tipos_sedes.ver")
+@requires_permission("planes.tipos_sedes.ver")
 def get_tipos_sedes():
     tipos_sedes = obtener_todos()
     data = tipos_sedes_schema.dump(tipos_sedes)
@@ -32,7 +32,7 @@ def get_tipos_sedes():
 
 
 @tipos_sedes_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.tipos_sedes.ver")
+@requires_permission("planes.tipos_sedes.ver")
 def get_tipo_sede(id):
     tipo_sede = obtener_por_id(id)
 
@@ -45,7 +45,7 @@ def get_tipo_sede(id):
 
 
 @tipos_sedes_bp.route("", methods=["POST"])
-@requires_permission("micro1.tipos_sedes.crear")
+@requires_permission("planes.tipos_sedes.crear")
 def crear_tipo_sede():
     req = request.get_json(silent=True) or {}
 
@@ -56,7 +56,7 @@ def crear_tipo_sede():
 
 
 @tipos_sedes_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.tipos_sedes.editar")
+@requires_permission("planes.tipos_sedes.editar")
 def editar_tipo_sede(id):
     tipo_sede = obtener_por_id(id)
 
@@ -71,7 +71,7 @@ def editar_tipo_sede(id):
 
 
 @tipos_sedes_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.tipos_sedes.eliminar")
+@requires_permission("planes.tipos_sedes.eliminar")
 def eliminar_tipo_sede(id):
     tipo_sede = obtener_por_id(id)
 

@@ -13,4 +13,13 @@ class Config:
     AUTH_COMMON_SESSION_TTL = int(os.getenv("AUTH_COMMON_SESSION_TTL", 900)) 
     
     # endpoints publicos que no requieren sesion
-    AUTH_COMMON_ENDPOINTS_EXCEPTUADOS = ["/health"]
+    AUTH_COMMON_ENDPOINTS_EXCEPTUADOS = [
+        "/health",
+        "contactos_bp.get_persona_id_from_mail"
+        ]
+
+    AUTH_COMMON_SERVICIOS_PERMITIDOS = [
+        ip.strip()
+        for ip in os.environ.get("AUTH_COMMON_SERVICIOS_PERMITIDOS", "").split(",")
+        if ip.strip()
+        ]

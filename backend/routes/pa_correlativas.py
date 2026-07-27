@@ -14,7 +14,7 @@ from services.pa_correlativa_service import (
 pa_correlativas_bp = Blueprint("pa_correlativas_bp", __name__, url_prefix="/pa-correlativas")
 
 @pa_correlativas_bp.route("", methods=["GET"])
-@requires_permission("micro1.pa_correlativas.ver")
+@requires_permission("planes.pa_correlativas.ver")
 def get_pa_correlativas():
     relaciones = obtener_todos()
     data = pa_correlativas_schema.dump(relaciones)
@@ -25,7 +25,7 @@ def get_pa_correlativas():
     return respuesta_api(True, data, "Lista de PA Correlativas obtenida")
 
 @pa_correlativas_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.pa_correlativas.ver")
+@requires_permission("planes.pa_correlativas.ver")
 def get_pa_correlativa(id):
     relacion = obtener_por_id(id)
 
@@ -36,7 +36,7 @@ def get_pa_correlativa(id):
     return respuesta_api(True, data, "Registro obtenido correctamente")
 
 @pa_correlativas_bp.route("", methods=["POST"])
-@requires_permission("micro1.pa_correlativas.crear")
+@requires_permission("planes.pa_correlativas.crear")
 def crear_pa_correlativa():
     req = request.get_json(silent=True) or {}
     nueva_relacion = crear(req)
@@ -44,7 +44,7 @@ def crear_pa_correlativa():
     return respuesta_api(True, {"id": data["id"]}, "Registro creado correctamente", 201)
 
 @pa_correlativas_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.pa_correlativas.editar")
+@requires_permission("planes.pa_correlativas.editar")
 def editar_pa_correlativa(id):
     relacion = obtener_por_id(id)
     
@@ -58,7 +58,7 @@ def editar_pa_correlativa(id):
     return respuesta_api(True, {"id": data["id"]}, "Registro actualizado correctamente")
 
 @pa_correlativas_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.pa_correlativas.eliminar")
+@requires_permission("planes.pa_correlativas.eliminar")
 def eliminar_pa_correlativa(id):
     relacion = obtener_por_id(id)
     

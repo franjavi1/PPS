@@ -2,7 +2,17 @@
 validar_sesion(): before_request registrado por AuthCommon.init_app()
 (ver extension.py).
 
-requires_permission(): decorador de autorizacion por endpoint.
+requires_permission(): decorador de autorizacion por endpoint. Cubre dos
+casos distintos:
+
+- Autorizacion de usuario (default): el llamador ya paso por
+  validar_sesion, tiene flask.g.acciones cargado, y se chequea si esas
+  acciones alcanzan segun policy ALL/ANY.
+- Autenticacion de servicio (only_services=True): pensado para endpoints
+  internos llamados por otros microservicios, no por usuarios logueados. 
+  No hay sesion ni flask.g.acciones, en cambio, se valida la IP de origen del request contra
+  AUTH_COMMON_SERVICIOS_PERMITIDOS. 
+  El endpoint que use esta variante tiene que estar tambien en AUTH_COMMON_ENDPOINTS_EXCEPTUADOS, si no, validar_sesion lo va a rechazar con 401 antes de llegar a este chequeo.
 """
 
 from functools import wraps
@@ -45,22 +55,44 @@ def validar_sesion():
     return None
 
 
-def requires_permission(*acciones, policy="ALL"):
+def requires_permission(*acciones, policy="ALL", only_services=False):
     """
     Uso y politica ALL/ANY documentados en el README (seccion 5).
+    only_services documentado en el README (seccion 5.1).
 
     Valida los argumentos al declarar el decorador, no en cada request.
     """
 
-    if not acciones:
-        raise ValueError("requires_permission necesita al menos una accion")
+    if only_services:
+        if acciones:
+            raise ValueError(
+                "requires_permission(only_services=True) no acepta acciones: "
+                "es un chequeo de identidad de servicio, no de permisos de "
+                "usuario."
+            )
+    else:
+        if not acciones:
+            raise ValueError("requires_permission necesita al menos una accion")
 
-    if policy not in ("ALL", "ANY"):
-        raise ValueError(f"politica invalida: {policy}. Debe ser 'ALL' o 'ANY'")
+        if policy not in ("ALL", "ANY"):
+            raise ValueError(f"politica invalida: {policy}. Debe ser 'ALL' o 'ANY'")
 
     def decorador(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
+            if only_services:
+                estado = obtener_estado()
+                ip_origen = request.remote_addr
+
+                if ip_origen not in estado["servicios_permitidos"]:
+                    return respuesta_api(
+                        False, [],
+                        "Este endpoint es exclusivo para microservicios internos",
+                        403,
+                    )
+
+                return fn(*args, **kwargs)
+
             acciones_usuario = getattr(g, "acciones", set())
 
             if policy == "ALL":

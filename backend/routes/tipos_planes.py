@@ -19,7 +19,7 @@ tipos_planes_bp = Blueprint(
 
 
 @tipos_planes_bp.route("", methods=["GET"])
-@requires_permission("micro1.tipos_planes.ver")
+@requires_permission("planes.tipos_planes.ver")
 def get_tipos_planes():
     tipos_planes = obtener_todos()
     data = tipos_planes_schema.dump(tipos_planes)
@@ -31,7 +31,7 @@ def get_tipos_planes():
 
 
 @tipos_planes_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.tipos_planes.ver")
+@requires_permission("planes.tipos_planes.ver")
 def get_tipo_plan(id):
     tipo_plan = obtener_por_id(id)
 
@@ -44,7 +44,7 @@ def get_tipo_plan(id):
 
 
 @tipos_planes_bp.route("", methods=["POST"])
-@requires_permission("micro1.tipos_planes.crear")
+@requires_permission("planes.tipos_planes.crear")
 def crear_tipo_plan():
     req = request.get_json(silent=True) or {}
 
@@ -55,7 +55,7 @@ def crear_tipo_plan():
 
 
 @tipos_planes_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.tipos_planes.editar")
+@requires_permission("planes.tipos_planes.editar")
 def editar_tipo_plan(id):
     tipo_plan = obtener_por_id(id)
 
@@ -70,7 +70,7 @@ def editar_tipo_plan(id):
 
 
 @tipos_planes_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.tipos_planes.eliminar")
+@requires_permission("planes.tipos_planes.eliminar")
 def eliminar_tipo_planes(id):
     tipo_plan = obtener_por_id(id)
     if not tipo_plan:

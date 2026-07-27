@@ -4,6 +4,7 @@ endpoint (ver decorador.py). Uso y config keys documentados en el README.
 """
 
 import redis
+from flask_jwt_extended import JWTManager
 
 from auth_common.decorador import validar_sesion
 
@@ -14,6 +15,9 @@ class AuthCommon:
             self.init_app(app)
 
     def init_app(self, app):
+        if "flask-jwt-extended" not in app.extensions:
+            JWTManager(app)
+
         redis_url = app.config.get("AUTH_COMMON_REDIS_URL")
         if not redis_url:
             raise RuntimeError(
@@ -30,6 +34,10 @@ class AuthCommon:
             app.config.get("AUTH_COMMON_ENDPOINTS_EXCEPTUADOS", [])
         )
 
+        servicios_permitidos = set(
+            app.config.get("AUTH_COMMON_SERVICIOS_PERMITIDOS", [])
+        )
+
         if not hasattr(app, "extensions"):
             app.extensions = {}
 
@@ -37,6 +45,7 @@ class AuthCommon:
             "redis_client": redis.from_url(redis_url, decode_responses=True),
             "session_ttl": session_ttl,
             "endpoints_exceptuados": endpoints_exceptuados,
+            "servicios_permitidos": servicios_permitidos,
         }
 
         app.before_request(validar_sesion)

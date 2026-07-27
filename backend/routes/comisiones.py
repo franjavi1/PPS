@@ -14,7 +14,7 @@ from services.comision_service import (
 comisiones_bp = Blueprint("comisiones_bp", __name__, url_prefix="/comisiones")
 
 @comisiones_bp.route("", methods=["GET"])
-@requires_permission("micro1.comisiones.ver")
+@requires_permission("planes.comisiones.ver")
 def get_comisiones():
     comisiones = obtener_todos()
     data = comisiones_schema.dump(comisiones)
@@ -25,7 +25,7 @@ def get_comisiones():
     return respuesta_api(True, data, "Lista de comisiones obtenida")
 
 @comisiones_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.comisiones.ver")
+@requires_permission("planes.comisiones.ver")
 def get_comision(id):
     comision = obtener_por_id(id)
 
@@ -36,7 +36,7 @@ def get_comision(id):
     return respuesta_api(True, data, "Comisión obtenida correctamente")
 
 @comisiones_bp.route("", methods=["POST"])
-@requires_permission("micro1.comisiones.crear")
+@requires_permission("planes.comisiones.crear")
 def crear_comision():
     req = request.get_json(silent=True) or {}
     nueva_comision = crear(req)
@@ -44,7 +44,7 @@ def crear_comision():
     return respuesta_api(True, {"id_comision": data["id_comision"]}, "Comisión creada correctamente", 201)
 
 @comisiones_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.comisiones.editar")
+@requires_permission("planes.comisiones.editar")
 def editar_comision(id):
     comision = obtener_por_id(id)
     
@@ -58,7 +58,7 @@ def editar_comision(id):
     return respuesta_api(True, {"id_comision": data["id_comision"]}, "Comisión actualizada correctamente")
 
 @comisiones_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.comisiones.eliminar")
+@requires_permission("planes.comisiones.eliminar")
 def eliminar_comision(id):
     comision = obtener_por_id(id)
     

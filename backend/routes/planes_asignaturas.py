@@ -16,7 +16,7 @@ from services.plan_asignatura_service import (
 planes_asignaturas_bp = Blueprint("planes_asignaturas_bp", __name__, url_prefix="/planes-asignaturas")
 
 @planes_asignaturas_bp.route("", methods=["GET"])
-@requires_permission("micro1.planes_asignaturas.ver")
+@requires_permission("planes.planes_asignaturas.ver")
 def get_planes():
     planes = obtener_todos()
     data = planes_asignaturas_schema.dump(planes)
@@ -25,7 +25,7 @@ def get_planes():
     return respuesta_api(True, data, "Lista de planes de asignaturas obtenida")
 
 @planes_asignaturas_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.planes_asignaturas.ver")
+@requires_permission("planes.planes_asignaturas.ver")
 def get_plan(id):
     plan = obtener_por_id(id)
     if not plan:
@@ -34,7 +34,7 @@ def get_plan(id):
     return respuesta_api(True, data, "Registro obtenido correctamente")
 
 @planes_asignaturas_bp.route("", methods=["POST"])
-@requires_permission("micro1.planes_asignaturas.crear")
+@requires_permission("planes.planes_asignaturas.crear")
 def crear_plan():
     req = request.get_json(silent=True) or {}
     nuevo_plan = crear(req)
@@ -42,7 +42,7 @@ def crear_plan():
     return respuesta_api(True, {"id": data["id"]}, "Registro creado correctamente", 201)
 
 @planes_asignaturas_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.planes_asignaturas.editar")
+@requires_permission("planes.planes_asignaturas.editar")
 def editar_plan(id):
     plan = obtener_por_id(id)
     if not plan:
@@ -54,7 +54,7 @@ def editar_plan(id):
     return respuesta_api(True, {"id": data["id"]}, "Registro actualizado correctamente")
 
 @planes_asignaturas_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.planes_asignaturas.eliminar")
+@requires_permission("planes.planes_asignaturas.eliminar")
 def eliminar_plan(id):
     plan = obtener_por_id(id)
     if not plan:

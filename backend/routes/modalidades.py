@@ -12,7 +12,7 @@ modalidades_bp = Blueprint(
 
 
 @modalidades_bp.route("", methods=["GET"])
-@requires_permission("micro1.modalidades.ver")
+@requires_permission("planes.modalidades.ver")
 def get_modalidades():
     modalidades = [
         {

@@ -22,7 +22,7 @@ autoridades_comision_bp = Blueprint(
 
 
 @autoridades_comision_bp.route("", methods=["GET"])
-@requires_permission("micro1.autoridades_comision.ver")
+@requires_permission("planes.autoridades_comision.ver")
 def get_autoridades_comision():
     autoridades_comision = obtener_todos()
     data = autoridades_comision_schema.dump(autoridades_comision)
@@ -34,7 +34,7 @@ def get_autoridades_comision():
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.autoridades_comision.ver")
+@requires_permission("planes.autoridades_comision.ver")
 def get_autoridad_comision(id):
     autoridad_comision = obtener_por_id(id)
 
@@ -48,7 +48,7 @@ def get_autoridad_comision(id):
 
 
 @autoridades_comision_bp.route("", methods=["POST"])
-@requires_permission("micro1.autoridades_comision.crear")
+@requires_permission("planes.autoridades_comision.crear")
 def crear_autoridad_comision():
     req = request.get_json(silent=True) or {}
 
@@ -64,7 +64,7 @@ def crear_autoridad_comision():
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.autoridades_comision.editar")
+@requires_permission("planes.autoridades_comision.editar")
 def editar_autoridad_comision(id):
     autoridad_comision = obtener_por_id(id)
 
@@ -84,7 +84,7 @@ def editar_autoridad_comision(id):
 
 
 @autoridades_comision_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.autoridades_comision.eliminar")
+@requires_permission("planes.autoridades_comision.eliminar")
 def eliminar_autoridad_comision(id):
     autoridad_comision = obtener_por_id(id)
 

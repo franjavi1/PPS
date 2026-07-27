@@ -1,4 +1,4 @@
-servicio: micro1
+servicio: planes
 
 acciones:
   # -------------------------
@@ -323,6 +323,8 @@ roles:
     descripcion: Administrador con acceso total al microservicio
   - nombre: GESTION_PERSONAS
     descripcion: Encargado de la gestión de personas, sus datos médicos, contactos y relaciones
+  - nombre: ALUMNO
+    descripcion: Solo acciones de lectura
 
 rol_accion:
   - rol: ADMIN
@@ -437,3 +439,8 @@ rol_accion:
       - personas_relaciones.crear
       - personas_relaciones.editar
       - personas_relaciones.eliminar
+  - rol: ALUMNO
+    acciones:
+      - personas.ver
+      - datos.medicos.ver
+      - contactos.ver

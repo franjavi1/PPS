@@ -19,7 +19,7 @@ asignaturas_bp = Blueprint("asignaturas_bp", __name__, url_prefix="/asignaturas"
 
 
 @asignaturas_bp.route("", methods=["GET"])
-@requires_permission("micro1.asignaturas.ver")
+@requires_permission("planes.asignaturas.ver")
 def get_asignaturas():
     asignaturas = obtener_todos()
     data = asignaturas_schema.dump(asignaturas)
@@ -31,7 +31,7 @@ def get_asignaturas():
 
 
 @asignaturas_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.asignaturas.ver")
+@requires_permission("planes.asignaturas.ver")
 def get_asignatura(id):
     asignatura = obtener_por_id(id)
 
@@ -43,7 +43,7 @@ def get_asignatura(id):
 
 
 @asignaturas_bp.route("", methods=["POST"])
-@requires_permission("micro1.asignaturas.crear")
+@requires_permission("planes.asignaturas.crear")
 def crear_asignatura():
     req = request.get_json(silent=True) or {}
     nueva_asignatura = crear(req)
@@ -53,7 +53,7 @@ def crear_asignatura():
 
 
 @asignaturas_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.asignaturas.editar")
+@requires_permission("planes.asignaturas.editar")
 def editar_asignatura(id):
     asignatura = obtener_por_id(id)
 
@@ -68,7 +68,7 @@ def editar_asignatura(id):
 
 
 @asignaturas_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.asignaturas.eliminar")
+@requires_permission("planes.asignaturas.eliminar")
 def eliminar_asignatura(id):
     asignatura = obtener_por_id(id)
 

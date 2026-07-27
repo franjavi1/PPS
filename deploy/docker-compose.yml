@@ -11,8 +11,7 @@ services:
       dockerfile: Dockerfile
     container_name: bomberos_backend
     restart: always
-    ports:
-      - "5000:5000"
+    command: sh -c "pip install -e /auth-common --quiet && python app.py"
     volumes:
       - ./planes/backend:/app
       - ./planes/auth-common:/auth-common

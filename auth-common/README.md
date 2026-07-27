@@ -60,13 +60,13 @@ La ruta `../../auth-common` asume que tu repo y `auth-common` son carpetas herma
 Si tu equipo solo usa `auth_common` pero no lo edita, no hace falta clonarlo aparte ni el bind mount de la sección 2.2. Alcanza con agregar esta línea a tu `requirements.txt`:
 
 ```
-git+https://github.com/ignacioaltamirano23/auth-common.git@v0.1.0
+git+https://github.com/ignacioaltamirano23/auth-common.git@v0.3.0
 ```
 
 Esta misma línea sirve para dos casos:
 
 - **Instalar por primera vez**: agregala a tu `requirements.txt` si todavía no está.
-- **Actualizar a una versión nueva**: cambiá el tag (`@v0.1.0` → `@v0.2.0`, por ejemplo) en esa misma línea, y volvé a buildear tu imagen.
+- **Actualizar a una versión nueva**: cambiá el tag (`@v0.3.0` → `@v0.4.0`, por ejemplo) en esa misma línea, y volvé a buildear tu imagen.
 
 Apuntá siempre a un tag, no a `@main`. Con `@main`, cualquier commit nuevo del lado de Auth te puede cambiar el comportamiento sin aviso, y Docker puede no darse cuenta de que hay algo nuevo para instalar.
 
@@ -81,6 +81,7 @@ Necesitás 3 config keys en tu `app.config` (podés ponerlas directo en tu clase
 | `AUTH_COMMON_REDIS_URL`             | Sí                | El mismo Redis que usa Auth. Ej: `redis://redis:6379/0`                                 |
 | `AUTH_COMMON_SESSION_TTL`           | Sí                | TTL de sesión en segundos (el mismo valor que usa Auth, para que ambos lados coincidan) |
 | `AUTH_COMMON_ENDPOINTS_EXCEPTUADOS` | No (default `[]`) | Lista de tus propios endpoints públicos que no requieren sesión                         |
+| `AUTH_COMMON_SERVICIOS_PERMITIDOS`  | No (default `[]`) | IPs de microservicios internos autorizados a llamar tus endpoints `only_services=True`  |
 
 Y en tu `app.py` o dentro de tu `create_app()`:
 
@@ -99,6 +100,12 @@ app.config["AUTH_COMMON_SESSION_TTL"] = int(
 )
 app.config["AUTH_COMMON_ENDPOINTS_EXCEPTUADOS"] = []
 
+app.config["AUTH_COMMON_SERVICIOS_PERMITIDOS"] = [
+    ip.strip()
+    for ip in os.environ.get("AUTH_COMMON_SERVICIOS_PERMITIDOS", "").split(",")
+    if ip.strip()
+]
+
 AuthCommon(app)
 ```
 
@@ -112,7 +119,7 @@ environment:
 
 `AUTH_COMMON_ENDPOINTS_EXCEPTUADOS` queda como lista fija en el código (no como variable de entorno).
 
-Con esa única línea (`AuthCommon(app)`) ya queda registrada automáticamente la validación de sesión en cada request. No necesitás llamar a nada más a mano.
+Con esa única línea (`AuthCommon(app)`) ya queda registrada automáticamente la validación de sesión en cada request. No necesitás llamar a nada más a mano, esto incluye `JWTManager`.
 
 ---
 
@@ -193,6 +200,26 @@ def dashboard():
 - `policy="ALL"` (default): el usuario necesita **todas** las acciones listadas.
 - `policy="ANY"`: alcanza con **una** de las acciones listadas, útil cuando un mismo endpoint sirve a más de un flujo.
 - No hace falta poner `@jwt_required()` en tus rutas, la validación del token ya la hace `AuthCommon` en el `before_request`, antes de que tu endpoint se ejecute.
+
+### 5.1 Endpoints exclusivos para microservicios (`only_services`)
+
+Para endpoints que no los llama un usuario logueado sino otro microservicio, usá `only_services=True` en vez de una lista de acciones:
+
+```python
+@app.route("/acciones", methods=["POST"])
+@requires_permission(only_services=True)
+def registrar():
+...
+```
+
+- No se combina con acciones: es un chequeo de identidad de servicio, no de
+  permisos de usuario. `requires_permission(only_services=True)` no acepta
+  ningún string de acción como argumento.
+- Valida la IP de origen del request contra `AUTH_COMMON_SERVICIOS_PERMITIDOS`,
+  no contra `flask.g.acciones`, no hace falta que el llamador tenga JWT.
+- **El endpoint también tiene que estar en `AUTH_COMMON_ENDPOINTS_EXCEPTUADOS`.**
+  Si no, `validar_sesion` lo rechaza con 401 (por falta de JWT) antes de que
+  este decorador llegue a ejecutarse.
 
 ### Convención de nombres
 

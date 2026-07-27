@@ -24,6 +24,7 @@ comisiones_asignaturas_bp = Blueprint(
 
 #Devuelve el detalle de comisiones asignaturas para el idlegajo indicado
 @comisiones_asignaturas_bp.route("/GetDetalleFromLegajoID", methods=["GET"])
+@requires_permission("planes.comisiones_asignaturas.ver")
 def get_detalle_comision_asignatura():
     legajoid_param = request.args.get("id") or request.args.get("legajoid")
     legajoid = None
@@ -55,7 +56,7 @@ def get_detalle_comision_asignatura():
 
 
 @comisiones_asignaturas_bp.route("", methods=["GET"])
-@requires_permission("micro1.comisiones_asignaturas.ver")
+@requires_permission("planes.comisiones_asignaturas.ver")
 def get_comisiones_asignaturas():
     comisiones_asignaturas = obtener_todos()
     data = comisiones_asignaturas_schema.dump(comisiones_asignaturas)
@@ -67,7 +68,7 @@ def get_comisiones_asignaturas():
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.comisiones_asignaturas.ver")
+@requires_permission("planes.comisiones_asignaturas.ver")
 def get_comision_asignatura(id):
     comision_asignatura = obtener_por_id(id)
 
@@ -80,7 +81,7 @@ def get_comision_asignatura(id):
 
 
 @comisiones_asignaturas_bp.route("", methods=["POST"])
-@requires_permission("micro1.comisiones_asignaturas.crear")
+@requires_permission("planes.comisiones_asignaturas.crear")
 def crear_comision_asignatura():
     req = request.get_json(silent=True) or {}
 
@@ -96,7 +97,7 @@ def crear_comision_asignatura():
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.comisiones_asignaturas.editar")
+@requires_permission("planes.comisiones_asignaturas.editar")
 def editar_comision_asignatura(id):
     comision_asignatura = obtener_por_id(id)
 
@@ -116,7 +117,7 @@ def editar_comision_asignatura(id):
 
 
 @comisiones_asignaturas_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.comisiones_asignaturas.eliminar")
+@requires_permission("planes.comisiones_asignaturas.eliminar")
 def eliminar_comision_asignatura(id):
     comision_asignatura = obtener_por_id(id)
 

@@ -72,10 +72,6 @@ CORS(app)
 
 AuthCommon(app)
 
-app.config["AUTH_COMMON_ENDPOINTS_EXCEPTUADOS"] = [
-    "contactos_bp.get_persona_id_from_mail",
-]
-
 @app.route("/health", methods=["GET"])
 def health():
     return {

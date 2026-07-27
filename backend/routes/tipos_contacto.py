@@ -21,7 +21,7 @@ tipos_contacto_bp = Blueprint(
 
 
 @tipos_contacto_bp.route("", methods=["GET"])
-@requires_permission("micro1.tipos_contacto.ver")
+@requires_permission("planes.tipos_contacto.ver")
 def get_tipos_contacto():
     tipos_contacto = obtener_todos()
     data = tipos_contacto_schema.dump(tipos_contacto)
@@ -33,7 +33,7 @@ def get_tipos_contacto():
 
 
 @tipos_contacto_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.tipos_contacto.ver")
+@requires_permission("planes.tipos_contacto.ver")
 def get_tipo_contacto(id):
     tipo_contacto = obtener_por_id(id)
 
@@ -46,7 +46,7 @@ def get_tipo_contacto(id):
 
 
 @tipos_contacto_bp.route("", methods=["POST"])
-@requires_permission("micro1.tipos_contacto.crear")
+@requires_permission("planes.tipos_contacto.crear")
 def crear_tipo_contacto():
     req = request.get_json(silent=True) or {}
 
@@ -57,7 +57,7 @@ def crear_tipo_contacto():
 
 
 @tipos_contacto_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.tipos_contacto.editar")
+@requires_permission("planes.tipos_contacto.editar")
 def editar_tipo_contacto(id):
     tipo_contacto = obtener_por_id(id)
 
@@ -72,7 +72,7 @@ def editar_tipo_contacto(id):
 
 
 @tipos_contacto_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.tipos_contacto.eliminar")
+@requires_permission("planes.tipos_contacto.eliminar")
 def eliminar_tipo_contacto(id):
     tipo_contacto = obtener_por_id(id)
 

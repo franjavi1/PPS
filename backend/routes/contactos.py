@@ -18,7 +18,7 @@ contactos_bp = Blueprint("contactos_bp", __name__, url_prefix="/contactos")
 
 
 @contactos_bp.route("", methods=["GET"])
-@requires_permission("micro1.contactos.ver")
+@requires_permission("planes.contactos.ver")
 def get_contactos():
     contactos = obtener_todos()
     data = contactos_schema.dump(contactos)
@@ -30,7 +30,7 @@ def get_contactos():
 
 
 @contactos_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.contactos.ver")
+@requires_permission("planes.contactos.ver")
 def get_contacto(id):
     contacto = obtener_por_id(id)
 
@@ -43,7 +43,7 @@ def get_contacto(id):
 
 
 @contactos_bp.route("", methods=["POST"])
-@requires_permission("micro1.contactos.crear")
+@requires_permission("planes.contactos.crear")
 def crear_contacto():
     req = request.get_json(silent=True) or {}
 
@@ -54,7 +54,7 @@ def crear_contacto():
 
 
 @contactos_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.contactos.editar")
+@requires_permission("planes.contactos.editar")
 def editar_contacto(id):
     contacto = obtener_por_id(id)
 
@@ -69,7 +69,7 @@ def editar_contacto(id):
 
 
 @contactos_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.contactos.eliminar")
+@requires_permission("planes.contactos.eliminar")
 def eliminar_contacto(id):
     contacto = obtener_por_id(id)
 
@@ -81,6 +81,7 @@ def eliminar_contacto(id):
     return respuesta_api(True, {"id": id}, "Contacto eliminado correctamente")
 
 @contactos_bp.route("/GetPersonaIDFromMail", methods=["GET"])
+@requires_permission(only_services=True)
 def get_persona_id_from_mail():
     email = request.args.get("email")
 

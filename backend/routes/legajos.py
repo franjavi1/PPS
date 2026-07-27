@@ -39,7 +39,7 @@ def get_legajo_por_numero():
     return respuesta_api(True, data, "Legajo y persona obtenidos correctamente")
 
 @legajos_bp.route("", methods=["GET"])
-@requires_permission("micro1.legajos.ver")
+@requires_permission("planes.legajos.ver")
 def get_legajos():
     estado = request.args.get("estado", default=1, type=int)
 
@@ -56,7 +56,7 @@ def get_legajos():
 
 
 @legajos_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("micro1.legajos.ver")
+@requires_permission("planes.legajos.ver")
 def get_legajo(id):
     legajo = obtener_por_id(id)
 
@@ -69,7 +69,7 @@ def get_legajo(id):
 
 
 @legajos_bp.route("", methods=["POST"])
-@requires_permission("micro1.legajos.crear")
+@requires_permission("planes.legajos.crear")
 def crear_legajo():
     req = request.get_json(silent=True) or {}
 
@@ -80,7 +80,7 @@ def crear_legajo():
 
 
 @legajos_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("micro1.legajos.editar")
+@requires_permission("planes.legajos.editar")
 def editar_legajo(id):
     legajo = obtener_por_id(id)
 
@@ -95,7 +95,7 @@ def editar_legajo(id):
 
 
 @legajos_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("micro1.legajos.eliminar")
+@requires_permission("planes.legajos.eliminar")
 def eliminar_legajo(id):
     legajo = obtener_por_id(id)
 
