@@ -93,7 +93,7 @@ function Legajos() {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={cargarLegajos}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
+                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
               >
                 <RefreshCcw size={22} />
                 Actualizar
@@ -167,7 +167,7 @@ function Legajos() {
                     <button
                       type="button"
                       onClick={() => navigate(`/personas/${legajo.persona_id}`)}
-                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50"
+                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer"
                     >
                       <Eye size={16} />
                       Ver persona
@@ -218,7 +218,7 @@ function Legajos() {
                           <button
                             type="button"
                             onClick={() => navigate(`/personas/${legajo.persona_id}`)}
-                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800"
+                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
                           >
                             <Eye size={18} />
                             Ver persona
@@ -243,15 +243,15 @@ function Legajos() {
               </p>
 
               <div className="flex items-center gap-2">
-                <button className="w-10 h-10 border border-slate-300 rounded-lg flex items-center justify-center text-slate-400">
+                <button className="w-10 h-10 border border-slate-300 rounded-lg flex items-center justify-center text-slate-400 transition cursor-pointer">
                   <ChevronLeft size={20} />
                 </button>
 
-                <button className="w-10 h-10 bg-red-700 text-white rounded-lg font-bold">
+                <button className="w-10 h-10 bg-red-700 text-white rounded-lg font-bold transition cursor-pointer">
                   1
                 </button>
 
-                <button className="w-10 h-10 border border-slate-300 rounded-lg flex items-center justify-center text-slate-400">
+                <button className="w-10 h-10 border border-slate-300 rounded-lg flex items-center justify-center text-slate-400 transition cursor-pointer">
                   <ChevronRight size={20} />
                 </button>
               </div>

@@ -404,7 +404,7 @@ function EditarPersona({ soloLectura = false }) {
             <button
               type="button"
               onClick={() => navigate("/personas")}
-              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"
+              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
             >
               <ArrowLeft size={20} />
               Volver
@@ -594,7 +594,7 @@ function EditarPersona({ soloLectura = false }) {
                 <button
                   type="button"
                   onClick={() => navigate("/personas")}
-                  className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                  className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -602,7 +602,7 @@ function EditarPersona({ soloLectura = false }) {
                   <button
                     type="submit"
                     disabled={guardando}
-                    className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                    className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                   >
                     <Save size={22} />
 
@@ -632,7 +632,7 @@ function Seccion({
       <button
         type="button"
         onClick={() => onToggle(abierta ? "" : id)}
-        className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-slate-50"
+        className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-slate-50 transition cursor-pointer"
       >
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-red-100 text-red-700 flex items-center justify-center">

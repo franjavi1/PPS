@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
+import { modalidadService } from "../services/modalidadService";
 import { planService } from "../services/planesService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { rangoService } from "../services/rangoService";
@@ -43,6 +44,7 @@ function PlanesAsignaturas() {
   const [planes, setPlanes] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [sedes, setSedes] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -66,12 +68,14 @@ function PlanesAsignaturas() {
         resPlanes,
         resRangos,
         resSedes,
+        resModalidades,
       ] = await Promise.all([
         planAsignaturaService.obtenerTodos(),
         asignaturaService.obtenerTodas(),
         planService.obtenerTodos(),
         rangoService.obtenerTodos(),
         sedeService.obtenerTodas(),
+        modalidadService.obtenerTodas(),
       ]);
 
       setRegistros(resRegistros.data || []);
@@ -79,6 +83,7 @@ function PlanesAsignaturas() {
       setPlanes(resPlanes.data || []);
       setRangos(resRangos.data || []);
       setSedes(resSedes.data || []);
+      setModalidades(resModalidades.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron obtener los planes asignaturas");
     } finally {
@@ -235,7 +240,7 @@ function PlanesAsignaturas() {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={cargarDatos}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
+                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
               >
                 <RefreshCcw size={22} />
                 Actualizar
@@ -245,7 +250,7 @@ function PlanesAsignaturas() {
                 onClick={abrirNuevoRegistro}
                 disabled={!esAdministrador}
                 title={esAdministrador ? "Agregar una asignatura a un plan" : "Solo los administradores pueden agregar asignaturas"}
-                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-700"
+                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-700 cursor-pointer"
               >
                 <PlusCircle size={22} />
                 Nuevo registro
@@ -363,7 +368,7 @@ function PlanesAsignaturas() {
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-4xl relative max-h-[92vh] overflow-y-auto">
                 <button
                   onClick={cerrarModal}
-                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                   title="Cerrar modal"
                 >
                   <X size={20} />
@@ -483,14 +488,23 @@ function PlanesAsignaturas() {
                       placeholder="Ej: Anual"
                       icon={<BookMarked size={20} />}
                     />
-                    <CampoInput
+                    <CampoSelect
                       label="Modalidad"
                       name="modalidad"
                       value={formulario.modalidad}
                       onChange={manejarCambio}
-                      placeholder="Ej: Presencial"
                       icon={<BookMarked size={20} />}
-                    />
+                    >
+                      <option value="">Seleccione una modalidad</option>
+                      {modalidades.map((modalidad) => (
+                        <option
+                          key={modalidad.modalidadesid}
+                          value={modalidad.descripcion}
+                        >
+                          {modalidad.descripcion}
+                        </option>
+                      ))}
+                    </CampoSelect>
                   </div>
 
                   {errorFormulario && (
@@ -503,7 +517,7 @@ function PlanesAsignaturas() {
                     <button
                       type="button"
                       onClick={cerrarModal}
-                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <X size={20} />
                       Cancelar
@@ -511,7 +525,7 @@ function PlanesAsignaturas() {
 
                     <button
                       type="submit"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
                     >
                       <Save size={22} />
                       Guardar
@@ -585,7 +599,7 @@ function BotonAccion({ onClick, tipo, disabled = false }) {
         esEditar
           ? "text-blue-600 hover:text-blue-800"
           : "text-red-600 hover:text-red-800"
-      } disabled:opacity-40 disabled:cursor-not-allowed`}
+      } disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer`}
     >
       {esEditar ? <Pencil size={18} /> : <Trash2 size={18} />}
       {esEditar ? "Editar" : "Quitar del plan"}

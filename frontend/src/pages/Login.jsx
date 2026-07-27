@@ -159,7 +159,7 @@ function ingresar(event) {
                 <button
                   type="button"
                   onClick={() => setVerPassword(!verPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                 >
                   {verPassword ? <EyeOff size={24} /> : <Eye size={24} />}
                 </button>
@@ -174,7 +174,7 @@ function ingresar(event) {
 
             <button
               type="submit"
-              className="w-full h-16 bg-red-600 text-white text-xl font-bold rounded-xl shadow-lg hover:bg-red-700 transition"
+              className="w-full h-16 bg-red-600 text-white text-xl font-bold rounded-xl shadow-lg hover:bg-red-700 transition cursor-pointer"
             >
               Ingresar
             </button>

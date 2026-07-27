@@ -68,18 +68,18 @@ function Navbar() {
   }, []);
 
   const linkClass =
-    "flex items-start gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-red-50 hover:text-red-700";
+    "flex items-start gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-red-50 hover:text-red-700 cursor-pointer";
 
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md relative z-50">
       <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
         <button
           onClick={() => navigate("/inicio")}
-          className="flex items-center gap-3 text-left"
+          className="flex items-center gap-3 text-left cursor-pointer"
         >
           <div className="w-20 h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
-              src="/logo.jpeg"
+              src="./logo.jpeg"
               alt="Logo bomberos"
               className="w-full h-full object-cover"
             />
@@ -95,8 +95,8 @@ function Navbar() {
 
         <button
           onClick={() => setMobileOpen(true)}
-          className="lg:hidden w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center"
-          aria-label="Abrir menu"
+          className="lg:hidden w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center cursor-pointer"
+          aria-label="Abrir menú"
         >
           <Menu size={22} />
         </button>
@@ -104,7 +104,7 @@ function Navbar() {
         <nav ref={navRef} className="hidden lg:flex items-center gap-1">
           <NavLink
             to="/inicio"
-            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2"
+            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
           >
             <Home size={17} />
             Inicio
@@ -164,7 +164,7 @@ function Navbar() {
 
           <Dropdown
             id="planes"
-            title="Gestion educativa"
+            title="Gestión educativa"
             icon={<GraduationCap size={17} />}
             openMenu={openMenu}
             toggleMenu={toggleMenu}
@@ -216,9 +216,9 @@ function Navbar() {
               >
                 <Plus size={18} />
                 <span>
-                  <strong>Nueva Comision</strong>
+                  <strong>Nueva comisión</strong>
                   <small className="block text-slate-500">
-                    Alta guiada de Comision
+                    Alta guiada de comisión
                   </small>
                 </span>
               </NavLink>
@@ -240,7 +240,7 @@ function Navbar() {
           {currentUserRole === "ROLE_ADMIN" && (
             <Dropdown
               id="config"
-              title="Configuracion"
+              title="Configuración"
               icon={<Settings size={17} />}
               openMenu={openMenu}
               toggleMenu={toggleMenu}
@@ -254,7 +254,7 @@ function Navbar() {
                 <span>
                   <strong>Sedes</strong>
                   <small className="block text-slate-500">
-                    Alta, edicion y tipos de sede
+                    Alta, edición y tipos de sede
                   </small>
                 </span>
               </NavLink>
@@ -266,9 +266,9 @@ function Navbar() {
               >
                 <Building size={18} />
                 <span>
-                  <strong>Tipo de Sedes</strong>
+                  <strong>Tipos de sedes</strong>
                   <small className="block text-slate-500">
-                    Categorias para clasificar sedes
+                    Categorías para clasificar sedes
                   </small>
                 </span>
               </NavLink>
@@ -276,7 +276,7 @@ function Navbar() {
                 <DoorOpen size={18} />
                 <span>
                   <strong>Aulas</strong>
-                  <small className="block text-slate-500">Alta de Aulas</small>
+                  <small className="block text-slate-500">Alta de aulas</small>
                 </span>
               </NavLink>
 
@@ -292,7 +292,7 @@ function Navbar() {
                 <span>
                   <strong>Tipo de documentos</strong>
                   <small className="block text-slate-500">
-                    Catalogo de documentos
+                    Catálogo de documentos
                   </small>
                 </span>
               </NavLink>
@@ -306,7 +306,7 @@ function Navbar() {
                 <span>
                   <strong>Tipo de rangos</strong>
                   <small className="block text-slate-500">
-                    Catalogo de rangos
+                    Catálogo de rangos
                   </small>
                 </span>
               </NavLink>
@@ -315,7 +315,7 @@ function Navbar() {
           <button
             type="button"
             onClick={handleLogout}
-            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2"
+            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
           >
             <LogOut size={17} />
             Cerrar sesión
@@ -327,14 +327,14 @@ function Navbar() {
         <div className="fixed inset-0 bg-slate-50 text-slate-800 z-[100] p-5 lg:hidden overflow-y-auto">
           <button
             onClick={closeMenus}
-            className="fixed top-4 right-4 w-11 h-11 rounded-full bg-white border border-slate-200 shadow flex items-center justify-center text-red-700"
-            aria-label="Cerrar menu"
+            className="fixed top-4 right-4 w-11 h-11 rounded-full bg-white border border-slate-200 shadow flex items-center justify-center text-red-700 cursor-pointer"
+            aria-label="Cerrar menú"
           >
             <X size={22} />
           </button>
 
           <p className="text-xs font-bold uppercase text-slate-500 mb-4">
-            Menu principal
+            Menú principal
           </p>
 
           <div className="space-y-3 pt-12">
@@ -366,6 +366,7 @@ function Navbar() {
               to="/legajos"
               icon={<Folder size={20} />}
               onClick={closeMenus}
+              iconoSinFondo
             >
               Legajos
             </MobileLink>
@@ -383,6 +384,7 @@ function Navbar() {
               to="/planes"
               icon={<BookOpen size={20} />}
               onClick={closeMenus}
+              iconoSinFondo
             >
               Planes
             </MobileLink>
@@ -408,6 +410,7 @@ function Navbar() {
               to="/comisiones"
               icon={<Users size={20} />}
               onClick={closeMenus}
+              iconoSinFondo
             >
               Comisiones
             </MobileLink>
@@ -461,7 +464,7 @@ function Dropdown({ id, title, icon, openMenu, toggleMenu, children }) {
     <div className="relative">
       <button
         onClick={() => toggleMenu(id)}
-        className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2"
+        className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
       >
         {icon}
         {title}
@@ -477,14 +480,18 @@ function Dropdown({ id, title, icon, openMenu, toggleMenu, children }) {
   );
 }
 
-function MobileLink({ to, icon, children, onClick }) {
+function MobileLink({ to, icon, children, onClick, iconoSinFondo = false }) {
   return (
     <NavLink
       to={to}
       onClick={onClick}
-      className="flex items-center gap-4 rounded-2xl bg-white border border-slate-200 px-4 py-4 font-bold text-slate-700 shadow-sm"
+      className="flex items-center gap-4 rounded-2xl bg-white border border-slate-200 px-4 py-4 font-bold text-slate-700 shadow-sm cursor-pointer"
     >
-      <span className="w-10 h-10 rounded-xl bg-red-50 text-red-700 flex items-center justify-center">
+      <span
+        className={`w-10 h-10 text-red-700 flex items-center justify-center ${
+          iconoSinFondo ? "" : "rounded-xl bg-red-50"
+        }`}
+      >
         {icon}
       </span>
       {children}

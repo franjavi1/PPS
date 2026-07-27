@@ -1028,7 +1028,7 @@ function ConfigDocumentos() {
               pestanaActiva === "tipo_documento"
                 ? "bg-red-700 text-white shadow"
                 : "text-slate-600 hover:bg-slate-50"
-            }`}
+            } cursor-pointer`}
           >
             <FileText size={20} />
             Tipos de Documento
@@ -1042,7 +1042,7 @@ function ConfigDocumentos() {
               pestanaActiva === "rango_institucional"
                 ? "bg-red-700 text-white shadow"
                 : "text-slate-600 hover:bg-slate-50"
-            }`}
+            } cursor-pointer`}
           >
             <Shield size={20} />
             Rangos Institucionales
@@ -1054,7 +1054,7 @@ function ConfigDocumentos() {
               pestanaActiva === "infraestructura"
                 ? "bg-red-700 text-white shadow"
                 : "text-slate-600 hover:bg-slate-50"
-            }`}
+            } cursor-pointer`}
           >
             <Building2 size={20} />
             Infraestructura
@@ -1078,7 +1078,7 @@ function ConfigDocumentos() {
                       limpiarFormTipoDoc();
                       setMostrarModalTipoDoc(true);
                     }}
-                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm cursor-pointer"
                   >
                     <PlusCircle size={16} />
                     Agregar Tipo de Doc.
@@ -1101,14 +1101,14 @@ function ConfigDocumentos() {
                               <div className="flex items-center justify-center gap-3">
                                 <button
                                   onClick={() => editarTipoDoc(td)}
-                                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                 >
                                   <Pencil size={16} />
                                   Editar
                                 </button>
                                 <button
                                   onClick={() => eliminarTipoDoc(td.id)}
-                                  className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                  className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                 >
                                   <Trash2 size={16} />
                                   Eliminar
@@ -1138,7 +1138,7 @@ function ConfigDocumentos() {
                         limpiarFormTipoDoc();
                         setMostrarModalTipoDoc(false);
                       }}
-                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                       title="Cerrar modal"
                     >
                       <X size={20} />
@@ -1208,13 +1208,13 @@ function ConfigDocumentos() {
                             limpiarFormTipoDoc();
                             setMostrarModalTipoDoc(false);
                           }}
-                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition cursor-pointer"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
-                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <PlusCircle size={18} />
                           {modoEdicionTipoDoc ? "Guardar" : "Agregar"}
@@ -1242,7 +1242,7 @@ function ConfigDocumentos() {
                       limpiarFormPersona();
                       setMostrarModalPersona(true);
                     }}
-                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm cursor-pointer"
                   >
                     <PlusCircle size={16} />
                     Agregar Persona
@@ -1271,14 +1271,14 @@ function ConfigDocumentos() {
                         <div className="flex items-center gap-4 border-t border-slate-200 pt-3">
                           <button
                             onClick={() => editarPersona(p)}
-                            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                           >
                             <Pencil size={16} />
                             Editar
                           </button>
                           <button
                             onClick={() => eliminarPersona(p.id)}
-                            className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                            className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                           >
                             <Trash2 size={16} />
                             Eliminar
@@ -1320,14 +1320,14 @@ function ConfigDocumentos() {
                               <div className="flex items-center justify-center gap-3">
                                 <button
                                   onClick={() => editarPersona(p)}
-                                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                 >
                                   <Pencil size={16} />
                                   Editar
                                 </button>
                                 <button
                                   onClick={() => eliminarPersona(p.id)}
-                                  className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                  className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                 >
                                   <Trash2 size={16} />
                                   Eliminar
@@ -1357,7 +1357,7 @@ function ConfigDocumentos() {
                         limpiarFormPersona();
                         setMostrarModalPersona(false);
                       }}
-                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                       title="Cerrar modal"
                     >
                       <X size={20} />
@@ -1496,13 +1496,13 @@ function ConfigDocumentos() {
                             limpiarFormPersona();
                             setMostrarModalPersona(false);
                           }}
-                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition cursor-pointer"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
-                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <PlusCircle size={18} />
                           {modoEdicionPersona ? "Guardar" : "Agregar"}
@@ -1530,7 +1530,7 @@ function ConfigDocumentos() {
                       limpiarFormRango();
                       setMostrarModalRango(true);
                     }}
-                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                    className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm cursor-pointer"
                   >
                     <PlusCircle size={16} />
                     Agregar Rango
@@ -1561,14 +1561,14 @@ function ConfigDocumentos() {
                                 <div className="flex items-center justify-center gap-3">
                                   <button
                                     onClick={() => editarRango(rg)}
-                                    className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                    className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                   >
                                     <Pencil size={16} />
                                     Editar
                                   </button>
                                   <button
                                     onClick={() => eliminarRango(rg.id)}
-                                    className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                    className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                   >
                                     <Trash2 size={16} />
                                     Eliminar
@@ -1598,7 +1598,7 @@ function ConfigDocumentos() {
                         limpiarFormRango();
                         setMostrarModalRango(false);
                       }}
-                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                       title="Cerrar modal"
                     >
                       <X size={20} />
@@ -1668,13 +1668,13 @@ function ConfigDocumentos() {
                             limpiarFormRango();
                             setMostrarModalRango(false);
                           }}
-                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                          className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition cursor-pointer"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
-                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                          className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <PlusCircle size={18} />
                           {modoEdicionRango ? "Guardar" : "Agregar"}
@@ -1699,7 +1699,7 @@ function ConfigDocumentos() {
                       subPestanaActiva === "tipos_sedes"
                         ? "bg-red-700 text-white shadow"
                         : "text-slate-600 hover:bg-slate-50"
-                    }`}
+                    } cursor-pointer`}
                   >
                     <Building2 size={18} />
                     Tipos de Sede
@@ -1710,7 +1710,7 @@ function ConfigDocumentos() {
                       subPestanaActiva === "sedes"
                         ? "bg-red-700 text-white shadow"
                         : "text-slate-600 hover:bg-slate-50"
-                    }`}
+                    } cursor-pointer`}
                   >
                     <Building2 size={18} />
                     Sedes
@@ -1721,7 +1721,7 @@ function ConfigDocumentos() {
                       subPestanaActiva === "aulas"
                         ? "bg-red-700 text-white shadow"
                         : "text-slate-600 hover:bg-slate-50"
-                    }`}
+                    } cursor-pointer`}
                   >
                     <Building2 size={18} />
                     Aulas
@@ -1732,7 +1732,7 @@ function ConfigDocumentos() {
                       subPestanaActiva === "comisiones"
                         ? "bg-red-700 text-white shadow"
                         : "text-slate-600 hover:bg-slate-50"
-                    }`}
+                    } cursor-pointer`}
                   >
                     <Building2 size={18} />
                     Comisiones
@@ -1753,7 +1753,7 @@ function ConfigDocumentos() {
                           limpiarFormTipoSede();
                           setMostrarModalTipoSede(true);
                         }}
-                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm cursor-pointer"
                       >
                         <PlusCircle size={16} />
                         Agregar Tipo
@@ -1776,14 +1776,14 @@ function ConfigDocumentos() {
                                   <div className="flex items-center justify-center gap-3">
                                     <button
                                       onClick={() => editarTipoSede(tipo)}
-                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                     >
                                       <Pencil size={16} />
                                       Editar
                                     </button>
                                     <button
                                       onClick={() => eliminarTipoSede(tipo.id)}
-                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                     >
                                       <Trash2 size={16} />
                                       Eliminar
@@ -1812,7 +1812,7 @@ function ConfigDocumentos() {
                             limpiarFormTipoSede();
                             setMostrarModalTipoSede(false);
                           }}
-                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                           title="Cerrar modal"
                         >
                           <X size={20} />
@@ -1856,13 +1856,13 @@ function ConfigDocumentos() {
                                 limpiarFormTipoSede();
                                 setMostrarModalTipoSede(false);
                               }}
-                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition cursor-pointer"
                             >
                               Cancelar
                             </button>
                             <button
                               type="submit"
-                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 cursor-pointer"
                             >
                               <PlusCircle size={18} />
                               {modoEdicionTipoSede ? "Guardar" : "Agregar"}
@@ -1890,7 +1890,7 @@ function ConfigDocumentos() {
                           limpiarFormSede();
                           setMostrarModalSede(true);
                         }}
-                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm cursor-pointer"
                       >
                         <PlusCircle size={16} />
                         Agregar Sede
@@ -1915,14 +1915,14 @@ function ConfigDocumentos() {
                                   <div className="flex items-center justify-center gap-3">
                                     <button
                                       onClick={() => editarSede(s)}
-                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                     >
                                       <Pencil size={16} />
                                       Editar
                                     </button>
                                     <button
                                       onClick={() => eliminarSede(s.id)}
-                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                     >
                                       <Trash2 size={16} />
                                       Eliminar
@@ -1952,7 +1952,7 @@ function ConfigDocumentos() {
                             limpiarFormSede();
                             setMostrarModalSede(false);
                           }}
-                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                           title="Cerrar modal"
                         >
                           <X size={20} />
@@ -2042,13 +2042,13 @@ function ConfigDocumentos() {
                                 limpiarFormSede();
                                 setMostrarModalSede(false);
                               }}
-                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition cursor-pointer"
                             >
                               Cancelar
                             </button>
                             <button
                               type="submit"
-                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 cursor-pointer"
                             >
                               <PlusCircle size={18} />
                               {modoEdicionSede ? "Guardar" : "Agregar"}
@@ -2076,7 +2076,7 @@ function ConfigDocumentos() {
                           limpiarFormAula();
                           setMostrarModalAula(true);
                         }}
-                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm cursor-pointer"
                       >
                         <PlusCircle size={16} />
                         Agregar Aula
@@ -2107,14 +2107,14 @@ function ConfigDocumentos() {
                                   <div className="flex items-center justify-center gap-3">
                                     <button
                                       onClick={() => editarAula(a)}
-                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                     >
                                       <Pencil size={16} />
                                       Editar
                                     </button>
                                     <button
                                       onClick={() => eliminarAula(a.id)}
-                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                     >
                                       <Trash2 size={16} />
                                       Eliminar
@@ -2144,7 +2144,7 @@ function ConfigDocumentos() {
                             limpiarFormAula();
                             setMostrarModalAula(false);
                           }}
-                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                           title="Cerrar modal"
                         >
                           <X size={20} />
@@ -2243,13 +2243,13 @@ function ConfigDocumentos() {
                                 limpiarFormAula();
                                 setMostrarModalAula(false);
                               }}
-                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition cursor-pointer"
                             >
                               Cancelar
                             </button>
                             <button
                               type="submit"
-                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 cursor-pointer"
                             >
                               <PlusCircle size={18} />
                               {modoEdicionAula ? "Guardar" : "Agregar"}
@@ -2277,7 +2277,7 @@ function ConfigDocumentos() {
                           limpiarFormComision();
                           setMostrarModalComision(true);
                         }}
-                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm"
+                        className="h-10 bg-red-700 hover:bg-red-800 text-white px-4 rounded-lg font-bold transition flex items-center gap-2 text-sm shadow-sm cursor-pointer"
                       >
                         <PlusCircle size={16} />
                         Agregar Comisión
@@ -2310,14 +2310,14 @@ function ConfigDocumentos() {
                                   <div className="flex items-center justify-center gap-3">
                                     <button
                                       onClick={() => editarComision(c)}
-                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm"
+                                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                     >
                                       <Pencil size={16} />
                                       Editar
                                     </button>
                                     <button
                                       onClick={() => eliminarComision(c.id)}
-                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm"
+                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold text-sm transition cursor-pointer"
                                     >
                                       <Trash2 size={16} />
                                       Eliminar
@@ -2347,7 +2347,7 @@ function ConfigDocumentos() {
                             limpiarFormComision();
                             setMostrarModalComision(false);
                           }}
-                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                           title="Cerrar modal"
                         >
                           <X size={20} />
@@ -2501,13 +2501,13 @@ function ConfigDocumentos() {
                                 limpiarFormComision();
                                 setMostrarModalComision(false);
                               }}
-                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition"
+                              className="w-1/2 h-11 border border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-50 transition cursor-pointer"
                             >
                               Cancelar
                             </button>
                             <button
                               type="submit"
-                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2"
+                              className="w-1/2 h-11 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition flex items-center justify-center gap-2 cursor-pointer"
                             >
                               <PlusCircle size={18} />
                               {modoEdicionComision ? "Guardar" : "Agregar"}

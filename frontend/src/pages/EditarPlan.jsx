@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
+import { modalidadService } from "../services/modalidadService";
 import { paCorrelativaService } from "../services/paCorrelativaService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
@@ -62,6 +63,7 @@ function EditarPlan() {
   const [asignaturas, setAsignaturas] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [sedes, setSedes] = useState([]);
+  const [modalidades, setModalidades] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
@@ -85,6 +87,7 @@ function EditarPlan() {
         respuestaAsignaturas,
         respuestaRangos,
         respuestaSedes,
+        respuestaModalidades,
       ] = await Promise.all([
         planService.obtenerPorId(id),
         tipoPlanesService.obtenerTodos(),
@@ -93,6 +96,7 @@ function EditarPlan() {
         asignaturaService.obtenerTodas(),
         rangoService.obtenerTodos(),
         sedeService.obtenerTodas(),
+        modalidadService.obtenerTodas(),
       ]);
 
       const planData = respuestaPlan.data || {};
@@ -124,6 +128,7 @@ function EditarPlan() {
       setAsignaturas(respuestaAsignaturas.data || []);
       setRangos(respuestaRangos.data || []);
       setSedes(respuestaSedes.data || []);
+      setModalidades(respuestaModalidades.data || []);
     } catch (err) {
       setError(obtenerMensajeError(err));
     } finally {
@@ -386,7 +391,7 @@ function EditarPlan() {
             <button
               type="button"
               onClick={() => navigate("/planes")}
-              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"
+              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
             >
               <ArrowLeft size={20} />
               Volver
@@ -557,13 +562,14 @@ function EditarPlan() {
                       placeholder="Ej: Anual"
                       icono={<BookMarked size={20} />}
                     />
-                    <CampoTexto
+                    <CampoSelect
                       label="Modalidad"
                       name="modalidad"
                       value={nuevaAsignatura.modalidad}
                       onChange={cambiarNuevaAsignatura}
-                      placeholder="Ej: Presencial"
-                      icono={<BookOpen size={20} />}
+                      opciones={modalidades}
+                      getValue={(modalidad) => modalidad.descripcion}
+                      getLabel={(modalidad) => modalidad.descripcion}
                     />
                   </div>
 
@@ -572,7 +578,7 @@ function EditarPlan() {
                       type="button"
                       onClick={agregarAsignatura}
                       disabled={guardando}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar asignatura
@@ -623,7 +629,7 @@ function EditarPlan() {
                             type="button"
                             onClick={() => eliminarAsignatura(item.id)}
                             disabled={guardando}
-                            className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60"
+                            className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
                             Eliminar
@@ -678,7 +684,7 @@ function EditarPlan() {
                         type="button"
                         onClick={cancelarEdicionCorrelativa}
                         disabled={guardando}
-                        className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+                        className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-60 transition cursor-pointer"
                       >
                         Cancelar edicion
                       </button>
@@ -687,7 +693,7 @@ function EditarPlan() {
                       type="button"
                       onClick={guardarCorrelativa}
                       disabled={guardando}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                     >
                       {correlativaEditandoId ? <Save size={22} /> : <PlusCircle size={22} />}
                       {correlativaEditandoId ? "Guardar correlativa" : "Agregar correlativa"}
@@ -729,7 +735,7 @@ function EditarPlan() {
                                 type="button"
                                 onClick={() => editarCorrelativa(item)}
                                 disabled={guardando}
-                                className="flex items-center gap-2 text-slate-700 font-semibold hover:text-slate-900 disabled:opacity-60"
+                                className="flex items-center gap-2 text-slate-700 font-semibold hover:text-slate-900 disabled:opacity-60 transition cursor-pointer"
                               >
                                 <Pencil size={18} />
                                 Editar
@@ -738,7 +744,7 @@ function EditarPlan() {
                                 type="button"
                                 onClick={() => eliminarCorrelativa(item.id)}
                                 disabled={guardando}
-                                className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60"
+                                className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60 transition cursor-pointer"
                               >
                                 <Trash2 size={18} />
                                 Eliminar
@@ -760,7 +766,7 @@ function EditarPlan() {
                 <button
                   type="button"
                   onClick={() => navigate("/planes")}
-                  className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                  className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -768,7 +774,7 @@ function EditarPlan() {
                 <button
                   type="submit"
                   disabled={guardando}
-                  className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                  className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                 >
                   <Save size={22} />
                   {guardando ? "Guardando..." : "Guardar cambios"}
@@ -788,7 +794,7 @@ function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
       <button
         type="button"
         onClick={() => onToggle(abierta ? "" : id)}
-        className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-slate-50"
+        className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-slate-50 transition cursor-pointer"
       >
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-red-100 text-red-700 flex items-center justify-center">

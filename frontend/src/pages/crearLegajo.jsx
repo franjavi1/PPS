@@ -136,7 +136,7 @@ function NuevoLegajo() {
         <div className="mb-8">
           <button
             onClick={() => navigate("/legajos")}
-            className="flex items-center gap-2 text-slate-600 hover:text-red-700 font-semibold mb-4"
+            className="flex items-center gap-2 text-slate-600 hover:text-red-700 font-semibold mb-4 transition cursor-pointer"
           >
             <ArrowLeft size={22} />
             Volver al listado de legajos
@@ -197,7 +197,7 @@ function NuevoLegajo() {
             <button
               type="button"
               onClick={() => navigate("/legajos")}
-              className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+              className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
             >
               {esVer ? "Volver" : "Cancelar"}
             </button>
@@ -206,7 +206,7 @@ function NuevoLegajo() {
               <button
                 type="submit"
                 disabled={guardando}
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-60"
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-60 cursor-pointer"
               >
                 <Save size={22} />
                 {guardando ? "Guardando..." : "Guardar legajo"}

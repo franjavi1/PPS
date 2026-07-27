@@ -4,6 +4,7 @@ from db import ma
 
 from marshmallow import ValidationError, validates_schema, pre_load, post_dump
 from marshmallow.validate import Length, Regexp
+from sqlalchemy import func
 
 
 REGEX_SOLO_LETRAS = r"^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$"
@@ -56,8 +57,9 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
         if not descripcion:
             return
 
-        existente = TipoDocumento.query.filter_by(
-            descripcion=descripcion
+        existente = TipoDocumento.query.filter(
+            func.lower(func.trim(TipoDocumento.descripcion))
+            == descripcion.strip().lower()
         ).first()
 
         tipo_documento_id = getattr(self, "context", {}).get("tipo_documento_id")
@@ -71,7 +73,7 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
     @pre_load
     def normalizar_entrada(self, data, **kwargs):
         if "descripcion" in data and isinstance(data["descripcion"], str):
-            data["descripcion"] = data["descripcion"].strip().title()
+            data["descripcion"] = data["descripcion"].strip().upper()
 
         return data
 
@@ -79,7 +81,7 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
     @post_dump
     def capitalizar_salida(self, data, **kwargs):
         if "descripcion" in data and isinstance(data["descripcion"], str):
-            data["descripcion"] = data["descripcion"].title()
+            data["descripcion"] = data["descripcion"].strip().upper()
 
         return data
 

@@ -209,7 +209,7 @@ function AutoridadesComision() {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={cargarDatos}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
+                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
               >
                 <RefreshCcw size={22} />
                 Actualizar
@@ -217,7 +217,7 @@ function AutoridadesComision() {
 
               <button
                 onClick={abrirNuevoRegistro}
-                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition"
+                className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
                 Nueva autoridad
@@ -330,7 +330,7 @@ function AutoridadesComision() {
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-3xl relative max-h-[92vh] overflow-y-auto">
                 <button
                   onClick={cerrarModal}
-                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                   title="Cerrar modal"
                 >
                   <X size={20} />
@@ -401,7 +401,7 @@ function AutoridadesComision() {
                     <button
                       type="button"
                       onClick={cerrarModal}
-                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                      className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <X size={20} />
                       Cancelar
@@ -409,7 +409,7 @@ function AutoridadesComision() {
 
                     <button
                       type="submit"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
                     >
                       <Save size={22} />
                       Guardar
@@ -456,7 +456,7 @@ function BotonAccion({ onClick, tipo }) {
         esEditar
           ? "text-blue-600 hover:text-blue-800"
           : "text-red-600 hover:text-red-800"
-      }`}
+      } transition cursor-pointer`}
     >
       {esEditar ? <Pencil size={18} /> : <Trash2 size={18} />}
       {esEditar ? "Editar" : "Eliminar"}
