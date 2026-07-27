@@ -13,15 +13,13 @@ from schemas.comision_asignatura_schema import (
     comision_asignatura_schema
 )
 from db import db
-from sqlalchemy import func
 from utils.errores import APIError
 
 
-def obtener_modalidad(modalidad):
-    descripcion = str(modalidad or "").strip()
-
-    return Modalidades.query.filter(
-        func.lower(Modalidades.descripcion) == descripcion.lower()
+def obtener_modalidad(modalidadesid):
+    return Modalidades.query.filter_by(
+        modalidadesid=modalidadesid,
+        estado=1
     ).first()
 
 
@@ -37,12 +35,13 @@ def obtener_por_id(id_comision_asignatura):
 
 def crear(datos):
     nueva_comision_asignatura = comision_asignatura_schema.load(datos)
-    modalidad = obtener_modalidad(nueva_comision_asignatura.modalidad)
+    modalidad = obtener_modalidad(
+    nueva_comision_asignatura.modalidadesid
+)
 
     if modalidad is None:
         raise APIError("La modalidad indicada no existe", status=400)
 
-    nueva_comision_asignatura.modalidadesid = modalidad.modalidadesid
 
     db.session.add(nueva_comision_asignatura)
     db.session.commit()
@@ -58,13 +57,12 @@ def actualizar(comision_asignatura, datos):
 
     schema.load(datos, instance=comision_asignatura, partial=True)
 
-    if "modalidad" in datos:
-        modalidad = obtener_modalidad(comision_asignatura.modalidad)
+    if "modalidadesid" in datos:
+        modalidad = obtener_modalidad(comision_asignatura.modalidadesid)
 
         if modalidad is None:
             raise APIError("La modalidad indicada no existe", status=400)
 
-        comision_asignatura.modalidadesid = modalidad.modalidadesid
 
     db.session.commit()
 

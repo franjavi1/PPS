@@ -2,6 +2,7 @@ from models.aula import Aula
 from models.comision import Comision
 from models.comision_asignatura import ComisionAsignatura
 from models.plan_asignatura import PlanAsignatura
+from models.modalidades import Modalidades
 
 from db import ma
 from marshmallow import ValidationError, validates, validates_schema, pre_load, fields
@@ -36,9 +37,13 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=45, error="La modalidad debe tener entre 1 y 45 caracteres")
+            Length(min=1, max=45, error="El horario debe tener entre 1 y 45 caracteres")
         ]
     )
+    modalidadesid = ma.auto_field(
+    required=True,
+    allow_none=False
+)
 
     cupo_maximo = ma.auto_field(required=True, allow_none=False)
 
@@ -83,6 +88,20 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
     def validar_usuario_accion(self, value, **kwargs):
         if value is not None and value <= 0:
             raise ValidationError("El usuario de accion debe ser un numero entero positivo")
+        
+    @validates("modalidadesid")
+    def validar_modalidad(self, value, **kwargs):
+        if value <= 0:
+            raise ValidationError("La modalidad debe ser un numero entero positivo")
+        modalidad = Modalidades.query.filter_by(
+     modalidadesid=value,
+        estado=1
+    ).first()
+
+    if modalidad is None:
+        raise ValidationError(
+            "La modalidad indicada no existe o no esta activa"
+        )
 
     @validates_schema
     def validar_relacion_unica(self, data, **kwargs):

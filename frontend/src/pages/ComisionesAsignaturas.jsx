@@ -29,6 +29,7 @@ const formularioInicial = {
   comision_id: "",
   nombre: "",
   modalidad: "",
+  modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
 };
@@ -68,17 +69,16 @@ function ComisionesAsignaturas() {
         resComisiones,
         resSedes,
         resModalidades,
-      ] =
-        await Promise.all([
-          comisionAsignaturaService.obtenerTodos(),
-          planAsignaturaService.obtenerTodos(),
-          asignaturaService.obtenerTodas(),
-          planService.obtenerTodos(),
-          aulaService.obtenerTodas(),
-          comisionService.obtenerTodas(),
-          sedeService.obtenerTodas(),
-          modalidadService.obtenerTodas(),
-        ]);
+      ] = await Promise.all([
+        comisionAsignaturaService.obtenerTodos(),
+        planAsignaturaService.obtenerTodos(),
+        asignaturaService.obtenerTodas(),
+        planService.obtenerTodos(),
+        aulaService.obtenerTodas(),
+        comisionService.obtenerTodas(),
+        sedeService.obtenerTodas(),
+        modalidadService.obtenerTodas(),
+      ]);
 
       setRegistros(resRegistros.data || []);
       setPlanesAsignaturas(resPlanesAsignaturas.data || []);
@@ -89,7 +89,9 @@ function ComisionesAsignaturas() {
       setSedes(resSedes.data || []);
       setModalidades(resModalidades.data || []);
     } catch (err) {
-      setError(err.message || "No se pudieron obtener las comisiones asignaturas");
+      setError(
+        err.message || "No se pudieron obtener las comisiones asignaturas",
+      );
     } finally {
       setCargando(false);
     }
@@ -102,7 +104,7 @@ function ComisionesAsignaturas() {
           item,
           asignaturas,
           planes,
-          sedes
+          sedes,
         );
         return acc;
       }, {}),
@@ -114,8 +116,20 @@ function ComisionesAsignaturas() {
         acc[comision.id_comision] = comision.descripcion;
         return acc;
       }, {}),
+      modalidades: modalidades.reduce((acc, modalidad) => {
+        acc[modalidad.modalidadesid] = modalidad.descripcion;
+        return acc;
+      }, {}),
     };
-  }, [planesAsignaturas, asignaturas, planes, aulas, comisiones, sedes]);
+  }, [
+    planesAsignaturas,
+    asignaturas,
+    planes,
+    aulas,
+    comisiones,
+    sedes,
+    modalidades,
+  ]);
 
   function limpiarFormulario() {
     setFormulario(formularioInicial);
@@ -149,6 +163,7 @@ function ComisionesAsignaturas() {
       comision_id: String(registro.comision_id || ""),
       nombre: registro.nombre || "",
       modalidad: registro.modalidad || "",
+      modalidadesid: String(registro.modalidadesid || ""),
       cupo_maximo: String(registro.cupo_maximo || ""),
       estado: String(registro.estado ?? 1),
     });
@@ -166,6 +181,7 @@ function ComisionesAsignaturas() {
       comision_id: Number(formulario.comision_id),
       nombre: formulario.nombre.trim(),
       modalidad: formulario.modalidad.trim(),
+      modalidadesid: Number(formulario.modalidadesid),
       cupo_maximo: Number(formulario.cupo_maximo),
       estado: Number(formulario.estado),
       usuario_accion: 1,
@@ -195,7 +211,9 @@ function ComisionesAsignaturas() {
   }
 
   async function eliminarRegistro(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta comision asignatura?");
+    const confirmar = confirm(
+      "Seguro que queres eliminar esta comision asignatura?",
+    );
 
     if (!confirmar) {
       return;
@@ -212,13 +230,18 @@ function ComisionesAsignaturas() {
 
   const registrosFiltrados = registros.filter((registro) => {
     const textoBusqueda = busqueda.toLowerCase();
-    const planAsignatura = mapas.planesAsignaturas[registro.plan_asignaturas_id] || "";
+    const planAsignatura =
+      mapas.planesAsignaturas[registro.plan_asignaturas_id] || "";
     const aula = mapas.aulas[registro.aula_id] || "";
     const comision = mapas.comisiones[registro.comision_id] || "";
 
     return (
-      String(registro.nombre || "").toLowerCase().includes(textoBusqueda) ||
-      String(registro.modalidad || "").toLowerCase().includes(textoBusqueda) ||
+      String(registro.nombre || "")
+        .toLowerCase()
+        .includes(textoBusqueda) ||
+      String(registro.modalidad || "")
+        .toLowerCase()
+        .includes(textoBusqueda) ||
       planAsignatura.toLowerCase().includes(textoBusqueda) ||
       aula.toLowerCase().includes(textoBusqueda) ||
       comision.toLowerCase().includes(textoBusqueda)
@@ -310,15 +333,31 @@ function ComisionesAsignaturas() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <Dato label="Comision" value={mapas.comisiones[registro.comision_id]} />
+                    <Dato
+                      label="Comision"
+                      value={mapas.comisiones[registro.comision_id]}
+                    />
                     <Dato label="Aula" value={mapas.aulas[registro.aula_id]} />
-                    <Dato label="Modalidad" value={registro.modalidad} />
+                    <Dato
+                      label="Modalidad"
+                      value={mapas.modalidades[registro.modalidadesid]}
+                    />
+
+                    <Dato label="Horario" value={registro.modalidad} />
                     <Dato label="Cupo" value={registro.cupo_maximo} />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
-                    <BotonAccion onClick={() => editarRegistro(registro)} tipo="editar" />
-                    <BotonAccion onClick={() => eliminarRegistro(registro.id_comision_asignatura)} tipo="eliminar" />
+                    <BotonAccion
+                      onClick={() => editarRegistro(registro)}
+                      tipo="editar"
+                    />
+                    <BotonAccion
+                      onClick={() =>
+                        eliminarRegistro(registro.id_comision_asignatura)
+                      }
+                      tipo="eliminar"
+                    />
                   </div>
                 </article>
               ))
@@ -336,6 +375,7 @@ function ComisionesAsignaturas() {
                   <Th>Plan asignatura</Th>
                   <Th>Aula</Th>
                   <Th>Modalidad</Th>
+                  <Th>Horario</Th>
                   <Th>Cupo</Th>
                   <Th>Estado</Th>
                   <Th>Acciones</Th>
@@ -345,7 +385,10 @@ function ComisionesAsignaturas() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="8" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="9"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       Cargando comisiones asignaturas...
                     </td>
                   </tr>
@@ -357,22 +400,42 @@ function ComisionesAsignaturas() {
                     >
                       <Td destacado>{registro.nombre}</Td>
                       <Td>{mapas.comisiones[registro.comision_id] || "-"}</Td>
-                      <Td>{mapas.planesAsignaturas[registro.plan_asignaturas_id] || "-"}</Td>
+                      <Td>
+                        {mapas.planesAsignaturas[
+                          registro.plan_asignaturas_id
+                        ] || "-"}
+                      </Td>
                       <Td>{mapas.aulas[registro.aula_id] || "-"}</Td>
-                      <Td>{registro.modalidad}</Td>
+                      <Td>
+                        {mapas.modalidades[registro.modalidadesid] || "-"}
+                      </Td>
+                      <Td>{registro.modalidad || "-"}</Td>
                       <Td>{registro.cupo_maximo}</Td>
-                      <Td><EstadoBadge estado={registro.estado} /></Td>
+                      <Td>
+                        <EstadoBadge estado={registro.estado} />
+                      </Td>
                       <Td>
                         <div className="flex items-center gap-4">
-                          <BotonAccion onClick={() => editarRegistro(registro)} tipo="editar" />
-                          <BotonAccion onClick={() => eliminarRegistro(registro.id_comision_asignatura)} tipo="eliminar" />
+                          <BotonAccion
+                            onClick={() => editarRegistro(registro)}
+                            tipo="editar"
+                          />
+                          <BotonAccion
+                            onClick={() =>
+                              eliminarRegistro(registro.id_comision_asignatura)
+                            }
+                            tipo="eliminar"
+                          />
                         </div>
                       </Td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="8" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="9"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       No se encontraron comisiones asignaturas.
                     </td>
                   </tr>
@@ -393,7 +456,9 @@ function ComisionesAsignaturas() {
                 </button>
 
                 <h2 className="text-2xl font-extrabold text-slate-800 mb-5">
-                  {editandoId ? "Editar comision asignatura" : "Nueva comision asignatura"}
+                  {editandoId
+                    ? "Editar comision asignatura"
+                    : "Nueva comision asignatura"}
                 </h2>
 
                 <form onSubmit={guardarRegistro} className="space-y-5">
@@ -407,7 +472,10 @@ function ComisionesAsignaturas() {
                     >
                       <option value="">Seleccione</option>
                       {planesAsignaturas.map((planAsignatura) => (
-                        <option key={planAsignatura.id} value={planAsignatura.id}>
+                        <option
+                          key={planAsignatura.id}
+                          value={planAsignatura.id}
+                        >
                           {mapas.planesAsignaturas[planAsignatura.id]}
                         </option>
                       ))}
@@ -437,7 +505,10 @@ function ComisionesAsignaturas() {
                     >
                       <option value="">Seleccione</option>
                       {comisiones.map((comision) => (
-                        <option key={comision.id_comision} value={comision.id_comision}>
+                        <option
+                          key={comision.id_comision}
+                          value={comision.id_comision}
+                        >
                           {comision.descripcion}
                         </option>
                       ))}
@@ -457,21 +528,32 @@ function ComisionesAsignaturas() {
 
                     <CampoSelect
                       label="Modalidad"
-                      name="modalidad"
-                      value={formulario.modalidad}
+                      name="modalidadesid"
+                      value={formulario.modalidadesid}
                       onChange={manejarCambio}
                       icon={<BookOpenCheck size={20} />}
                     >
                       <option value="">Seleccione</option>
+
                       {modalidades.map((modalidad) => (
                         <option
                           key={modalidad.modalidadesid}
-                          value={modalidad.descripcion}
+                          value={modalidad.modalidadesid}
                         >
                           {modalidad.descripcion}
                         </option>
                       ))}
                     </CampoSelect>
+
+                    <CampoInput
+                      label="Horario"
+                      name="modalidad"
+                      value={formulario.modalidad}
+                      onChange={manejarCambio}
+                      placeholder="Ej: 18:00 a 20:00"
+                      maxLength={45}
+                      icon={<BookOpenCheck size={20} />}
+                    />
 
                     <CampoInput
                       label="Cupo maximo"
@@ -626,24 +708,29 @@ function Th({ children }) {
 
 function Td({ children, destacado }) {
   return (
-    <td className={`px-5 py-5 text-slate-700 ${destacado ? "font-semibold" : ""}`}>
+    <td
+      className={`px-5 py-5 text-slate-700 ${destacado ? "font-semibold" : ""}`}
+    >
       {children}
     </td>
   );
 }
 
-function obtenerEtiquetaPlanAsignatura(planAsignatura, asignaturas, planes, sedes) {
+function obtenerEtiquetaPlanAsignatura(
+  planAsignatura,
+  asignaturas,
+  planes,
+  sedes,
+) {
   const asignatura = asignaturas.find(
-    (item) => item.id === planAsignatura.asignatura_id
+    (item) => item.id === planAsignatura.asignatura_id,
   );
   const plan = planes.find((item) => item.id === planAsignatura.plan_id);
   const sede = sedes.find((item) => item.id === planAsignatura.sedes_id);
 
-  const partes = [
-    asignatura?.nombre,
-    plan?.nombre,
-    sede?.nombre,
-  ].filter(Boolean);
+  const partes = [asignatura?.nombre, plan?.nombre, sede?.nombre].filter(
+    Boolean,
+  );
 
   if (partes.length === 0) {
     return `Plan asignatura #${planAsignatura.id}`;
@@ -669,8 +756,12 @@ function validarPayload(payload) {
     return "El nombre es obligatorio";
   }
 
-  if (!payload.modalidad) {
+  if (!payload.modalidadesid) {
     return "La modalidad es obligatoria";
+  }
+
+  if (!payload.modalidad) {
+    return "El horario es obligatorio";
   }
 
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {

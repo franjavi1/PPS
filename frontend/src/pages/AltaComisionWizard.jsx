@@ -38,6 +38,7 @@ const comisionAsignaturaInicial = {
   aula_id: "",
   nombre: "",
   modalidad: "",
+  modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
 };
@@ -177,6 +178,7 @@ function AltaComisionWizard() {
       modalidad: comisionAsignatura.modalidad.trim(),
       cupo_maximo: Number(comisionAsignatura.cupo_maximo),
       estado: Number(comisionAsignatura.estado),
+      modalidadesid: Number(comisionAsignatura.modalidadesid),
     };
     const mensaje = validarComisionAsignatura(payload);
 
@@ -256,6 +258,7 @@ function AltaComisionWizard() {
           comision_id: nuevaComisionId,
           nombre: item.nombre,
           modalidad: item.modalidad,
+          modalidadesid: item.modalidadesid,
           cupo_maximo: item.cupo_maximo,
           estado: item.estado,
           usuario_accion: 1,
@@ -400,12 +403,20 @@ function AltaComisionWizard() {
                     />
                     <CampoSelect
                       label="Modalidad"
+                      name="modalidadesid"
+                      value={comisionAsignatura.modalidadesid}
+                      onChange={cambiarComisionAsignatura}
+                      opciones={modalidades}
+                      getValue={(item) => item.modalidadesid}
+                      getLabel={(item) => item.descripcion}
+                    />
+                    <CampoTexto
+                      label="Horario"
                       name="modalidad"
                       value={comisionAsignatura.modalidad}
                       onChange={cambiarComisionAsignatura}
-                      opciones={modalidades}
-                      getValue={(item) => item.descripcion}
-                      getLabel={(item) => item.descripcion}
+                      placeholder="Ej: 18:00 a 20:00"
+                      maxLength={45}
                     />
                     <CampoTexto
                       label="Cupo maximo"
@@ -799,7 +810,8 @@ function validarComisionAsignatura(payload) {
     return "Debe seleccionar un plan asignatura";
   if (!payload.aula_id) return "Debe seleccionar un aula";
   if (!payload.nombre) return "El nombre es obligatorio";
-  if (!payload.modalidad) return "La modalidad es obligatoria";
+  if (!payload.modalidadesid) return "La modalidad es obligatoria";
+  if (!payload.modalidad) return "El horario es obligatorio";
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
     return "El cupo maximo debe ser mayor a cero";
   return "";
