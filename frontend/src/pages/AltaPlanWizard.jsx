@@ -16,6 +16,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import { asignaturaService } from "../services/asignaturaService";
 import { modalidadService } from "../services/modalidadService";
 import { paCorrelativaService } from "../services/paCorrelativaService";
@@ -24,6 +25,7 @@ import { planService } from "../services/planesService";
 import { rangoService } from "../services/rangoService";
 import { sedeService } from "../services/sedeService";
 import { tipoPlanesService } from "../services/tipoPlanesService";
+
 
 const pasos = [
   { id: 1, titulo: "Plan", icono: BookOpen },
@@ -384,6 +386,7 @@ function AltaPlanWizard() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
+          <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
             <div className="flex items-start gap-4">
@@ -408,10 +411,10 @@ function AltaPlanWizard() {
               <button
                 type="button"
                 onClick={() => navigate("/planes")}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"
+                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
               >
-                <ArrowLeft size={20} />
-                Volver
+                <BookOpen size={20} />
+                Planes
               </button>
 
               <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 min-w-64">
@@ -582,7 +585,7 @@ function AltaPlanWizard() {
                         <button
                           type="submit"
                           disabled={guardando}
-                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                         >
                           <PlusCircle size={22} />
                           {guardando ? "Guardando..." : "Agregar correlativa"}
@@ -619,7 +622,7 @@ function AltaPlanWizard() {
                               type="button"
                               onClick={() => eliminarCorrelativa(item.id)}
                               disabled={guardando}
-                              className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60"
+                              className="flex items-center gap-2 text-red-600 font-semibold hover:text-red-800 disabled:opacity-60 transition cursor-pointer"
                             >
                               <Trash2 size={18} />
                               Eliminar
@@ -665,7 +668,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={agregarOtraAsignatura}
-                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50"
+                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar otra asignatura
@@ -674,7 +677,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={() => setPasoActual(5)}
-                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800"
+                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
                     >
                       <CheckCircle2 size={22} />
                       Ir al resumen
@@ -745,7 +748,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={() => navigate("/planes")}
-                      className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                      className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       Volver a planes
                     </button>
@@ -753,7 +756,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={agregarOtraAsignatura}
-                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50"
+                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar otra asignatura
@@ -763,7 +766,7 @@ function AltaPlanWizard() {
                       type="button"
                       onClick={confirmarPlan}
                       disabled={guardando || Boolean(planId)}
-                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                     >
                       <Save size={22} />
                       {guardando
@@ -920,7 +923,7 @@ function Acciones({ guardando, texto, onBack, onCancel }) {
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+          className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
         >
           Cancelar
         </button>
@@ -930,7 +933,7 @@ function Acciones({ guardando, texto, onBack, onCancel }) {
         <button
           type="button"
           onClick={onBack}
-          className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+          className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
         >
           Volver
         </button>
@@ -939,7 +942,7 @@ function Acciones({ guardando, texto, onBack, onCancel }) {
       <button
         type="submit"
         disabled={guardando}
-        className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-60"
+         className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition-colors duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
       >
         <Save size={22} />
         {guardando ? "Guardando..." : texto}

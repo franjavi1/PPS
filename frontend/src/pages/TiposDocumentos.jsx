@@ -135,7 +135,7 @@ function TiposDocumentos() {
                 <button
                   type="button"
                   onClick={limpiarFormulario}
-                  className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+                  className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                 >
                   <X size={20} />
                   Cancelar
@@ -144,7 +144,7 @@ function TiposDocumentos() {
 
               <button
                 type="submit"
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 {editandoId ? <Save size={22} /> : <PlusCircle size={22} />}
                 {editandoId ? "Guardar" : "Agregar"}
@@ -184,7 +184,7 @@ function TiposDocumentos() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarTipo(tipo)}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800"
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 transition cursor-pointer"
                           >
                             <Pencil size={18} />
                             Editar
@@ -192,7 +192,7 @@ function TiposDocumentos() {
 
                           <button
                             onClick={() => eliminarTipo(tipo.id)}
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800"
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
                             Eliminar

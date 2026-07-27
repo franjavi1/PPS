@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  BookOpen,
   CheckCircle2,
   ClipboardPlus,
   FileText,
@@ -12,7 +13,9 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
+import { useNavigate } from "react-router";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import { apiRequest } from "../api";
 import { contactosService } from "../services/contactosService";
 import { personasService } from "../services/personasService";
@@ -82,6 +85,7 @@ function AltaPersonaWizard() {
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
   const [resultadoUsuario, setResultadoUsuario] = useState(null);
+    const navigate = useNavigate();
 
   useEffect(() => {
     cargarCombos();
@@ -347,33 +351,51 @@ function AltaPersonaWizard() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
+          <BotonVolver />
+          
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
-            <div>
-              <p className="text-sm font-bold text-red-700 uppercase">
-                Alta guiada
-              </p>
-              <h1 className="text-4xl font-extrabold text-slate-800 mt-2">
-                Persona, legajo y usuario
-              </h1>
-              <p className="text-slate-500 mt-2">
-                Completa todos los pasos. Los datos se guardan al confirmar el
-                resumen.
-              </p>
-            </div>
+  <div>
+    <p className="text-sm font-bold text-red-700 uppercase">
+      Alta guiada
+    </p>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 min-w-64">
-              <p className="text-xs font-bold text-slate-400 uppercase">
-                Progreso
-              </p>
-              <p className="text-slate-800 font-bold mt-1">
-                Persona ID: {personaId || "pendiente"}
-              </p>
-              <p className="text-slate-800 font-bold mt-1">
-                Legajo ID: {legajoId || "pendiente"}
-              </p>
-            </div>
-          </div>
+    <h1 className="text-4xl font-extrabold text-slate-800 mt-2">
+      Persona, legajo y usuario
+    </h1>
+
+    <p className="text-slate-500 mt-2">
+      Completa todos los pasos. Los datos se guardan al confirmar el
+      resumen.
+    </p>
+  </div>
+
+  <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
+    <button
+      type="button"
+      onClick={() => navigate("/personas")}
+      className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
+    >
+      <User size={20} />
+      Personas
+    </button>
+
+    <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 min-w-64">
+      <p className="text-xs font-bold text-slate-400 uppercase">
+        Progreso
+      </p>
+
+      <p className="text-slate-800 font-bold mt-1">
+        Persona ID: {personaId || "pendiente"}
+      </p>
+
+      <p className="text-slate-800 font-bold mt-1">
+        Legajo ID: {legajoId || "pendiente"}
+      </p>
+    </div>
+  </div>
+</div>
+           
 
           <div className="mb-8">
             <div className="flex items-start">
@@ -673,7 +695,7 @@ function AltaPersonaWizard() {
                   type="button"
                   onClick={confirmarAltaPersona}
                   disabled={guardando || Boolean(personaId)}
-                  className="px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"
+                  className="px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
                 >
                   {guardando
                     ? "Guardando..."
@@ -852,7 +874,7 @@ function Acciones({ guardando, texto, onBack }) {
         <button
           type="button"
           onClick={onBack}
-          className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100"
+          className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
         >
           Volver
         </button>
@@ -860,7 +882,7 @@ function Acciones({ guardando, texto, onBack }) {
       <button
         type="submit"
         disabled={guardando}
-        className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition disabled:opacity-60"
+        className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition-colors duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed" 
       >
         <Save size={22} />
         {guardando ? "Guardando..." : texto}

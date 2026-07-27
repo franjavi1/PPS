@@ -12,6 +12,7 @@ import {
   Tag,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import { apiRequest } from "../api";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
@@ -51,9 +52,12 @@ function AltaComisionWizard() {
   const [pasoActual, setPasoActual] = useState(1);
   const [comisionId, setComisionId] = useState(null);
   const [comision, setComision] = useState(comisionInicial);
-  const [comisionAsignatura, setComisionAsignatura] = useState(comisionAsignaturaInicial);
+  const [comisionAsignatura, setComisionAsignatura] = useState(
+    comisionAsignaturaInicial,
+  );
   const [autoridad, setAutoridad] = useState(autoridadInicial);
-  const [comisionesAsignaturasCargadas, setComisionesAsignaturasCargadas] = useState([]);
+  const [comisionesAsignaturasCargadas, setComisionesAsignaturasCargadas] =
+    useState([]);
   const [autoridadesCargadas, setAutoridadesCargadas] = useState([]);
   const [planesAsignaturas, setPlanesAsignaturas] = useState([]);
   const [asignaturas, setAsignaturas] = useState([]);
@@ -112,7 +116,12 @@ function AltaComisionWizard() {
   const mapas = useMemo(() => {
     return {
       planesAsignaturas: planesAsignaturas.reduce((acc, item) => {
-        acc[item.id] = obtenerEtiquetaPlanAsignatura(item, asignaturas, planes, sedes);
+        acc[item.id] = obtenerEtiquetaPlanAsignatura(
+          item,
+          asignaturas,
+          planes,
+          sedes,
+        );
         return acc;
       }, {}),
       aulas: crearMapa(aulas, "id_aula", "aula"),
@@ -122,14 +131,25 @@ function AltaComisionWizard() {
         return acc;
       }, {}),
     };
-  }, [planesAsignaturas, asignaturas, planes, sedes, aulas, tiposAutoridad, legajos]);
+  }, [
+    planesAsignaturas,
+    asignaturas,
+    planes,
+    sedes,
+    aulas,
+    tiposAutoridad,
+    legajos,
+  ]);
 
   function cambiarComision(e) {
     setComision({ ...comision, [e.target.name]: e.target.value });
   }
 
   function cambiarComisionAsignatura(e) {
-    setComisionAsignatura({ ...comisionAsignatura, [e.target.name]: e.target.value });
+    setComisionAsignatura({
+      ...comisionAsignatura,
+      [e.target.name]: e.target.value,
+    });
   }
 
   function cambiarAutoridad(e) {
@@ -244,7 +264,9 @@ function AltaComisionWizard() {
         const idReal = obtenerIdRespuesta(respuesta);
 
         if (!idReal) {
-          throw new Error("No se recibio el ID de una asignatura de la comision.");
+          throw new Error(
+            "No se recibio el ID de una asignatura de la comision.",
+          );
         }
 
         idsReales[item.id_comision_asignatura] = idReal;
@@ -273,6 +295,7 @@ function AltaComisionWizard() {
     <div className="min-h-screen bg-slate-100">
       <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
             <div className="flex items-start gap-4">
@@ -280,7 +303,9 @@ function AltaComisionWizard() {
                 <GraduationCap size={28} />
               </div>
               <div>
-                <p className="text-sm font-bold text-red-700 uppercase">Alta guiada</p>
+                <p className="text-sm font-bold text-red-700 uppercase">
+                  Alta guiada
+                </p>
                 <h1 className="text-4xl font-extrabold text-slate-800 mt-1">
                   Comision
                 </h1>
@@ -293,10 +318,10 @@ function AltaComisionWizard() {
             <button
               type="button"
               onClick={() => navigate("/comisiones")}
-              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100"
+              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
             >
-              <ArrowLeft size={20} />
-              Volver
+              <GraduationCap size={20} />
+              Comisiones
             </button>
           </div>
 
@@ -324,7 +349,10 @@ function AltaComisionWizard() {
             <>
               {pasoActual === 1 && (
                 <form onSubmit={guardarComision} className="space-y-6">
-                  <TituloPaso icono={<GraduationCap size={26} />} titulo="Datos de la comision" />
+                  <TituloPaso
+                    icono={<GraduationCap size={26} />}
+                    titulo="Datos de la comision"
+                  />
                   <CampoTexto
                     label="Descripcion"
                     name="descripcion"
@@ -339,64 +367,194 @@ function AltaComisionWizard() {
 
               {pasoActual === 2 && (
                 <section className="space-y-6">
-                  <TituloPaso icono={<BookOpenCheck size={26} />} titulo="Asignaturas de la comision" />
+                  <TituloPaso
+                    icono={<BookOpenCheck size={26} />}
+                    titulo="Asignaturas de la comision"
+                  />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <CampoSelect label="Plan asignatura" name="plan_asignaturas_id" value={comisionAsignatura.plan_asignaturas_id} onChange={cambiarComisionAsignatura} opciones={planesAsignaturas} getValue={(item) => item.id} getLabel={(item) => mapas.planesAsignaturas[item.id]} />
-                    <CampoSelect label="Aula" name="aula_id" value={comisionAsignatura.aula_id} onChange={cambiarComisionAsignatura} opciones={aulas} getValue={(item) => item.id_aula} getLabel={(item) => item.aula} />
-                    <CampoTexto label="Nombre" name="nombre" value={comisionAsignatura.nombre} onChange={cambiarComisionAsignatura} placeholder="Ej: Comision A - Incendios" icono={<Tag size={20} />} />
-                    <CampoSelect label="Modalidad" name="modalidad" value={comisionAsignatura.modalidad} onChange={cambiarComisionAsignatura} opciones={modalidades} getValue={(item) => item.descripcion} getLabel={(item) => item.descripcion} />
-                    <CampoTexto label="Cupo maximo" name="cupo_maximo" type="number" value={comisionAsignatura.cupo_maximo} onChange={cambiarComisionAsignatura} placeholder="Ej: 30" icono={<Hash size={20} />} />
+                    <CampoSelect
+                      label="Plan asignatura"
+                      name="plan_asignaturas_id"
+                      value={comisionAsignatura.plan_asignaturas_id}
+                      onChange={cambiarComisionAsignatura}
+                      opciones={planesAsignaturas}
+                      getValue={(item) => item.id}
+                      getLabel={(item) => mapas.planesAsignaturas[item.id]}
+                    />
+                    <CampoSelect
+                      label="Aula"
+                      name="aula_id"
+                      value={comisionAsignatura.aula_id}
+                      onChange={cambiarComisionAsignatura}
+                      opciones={aulas}
+                      getValue={(item) => item.id_aula}
+                      getLabel={(item) => item.aula}
+                    />
+                    <CampoTexto
+                      label="Nombre"
+                      name="nombre"
+                      value={comisionAsignatura.nombre}
+                      onChange={cambiarComisionAsignatura}
+                      placeholder="Ej: Comision A - Incendios"
+                      icono={<Tag size={20} />}
+                    />
+                    <CampoSelect
+                      label="Modalidad"
+                      name="modalidad"
+                      value={comisionAsignatura.modalidad}
+                      onChange={cambiarComisionAsignatura}
+                      opciones={modalidades}
+                      getValue={(item) => item.descripcion}
+                      getLabel={(item) => item.descripcion}
+                    />
+                    <CampoTexto
+                      label="Cupo maximo"
+                      name="cupo_maximo"
+                      type="number"
+                      value={comisionAsignatura.cupo_maximo}
+                      onChange={cambiarComisionAsignatura}
+                      placeholder="Ej: 30"
+                      icono={<Hash size={20} />}
+                    />
                     <CampoSelect
                       label="Estado"
                       name="estado"
                       value={comisionAsignatura.estado}
                       onChange={cambiarComisionAsignatura}
-                      opciones={[{ id: 1, label: "Activo" }, { id: 0, label: "Inactivo" }]}
+                      opciones={[
+                        { id: 1, label: "Activo" },
+                        { id: 0, label: "Inactivo" },
+                      ]}
                       getValue={(item) => item.id}
                       getLabel={(item) => item.label}
                     />
                   </div>
                   <div className="flex justify-end">
-                    <button type="button" onClick={agregarComisionAsignatura} disabled={guardando} className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60">
+                    <button
+                      type="button"
+                      onClick={agregarComisionAsignatura}
+                      disabled={guardando}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
+                    >
                       <PlusCircle size={22} />
                       Agregar asignatura
                     </button>
                   </div>
-                  <ListaItems items={comisionesAsignaturasCargadas} getTitulo={(item) => item.nombre} getDetalle={(item) => `${item.planAsignatura || "-"} - Aula ${item.aula || "-"}`} vacio="Todavia no agregaste asignaturas." />
-                  <Acciones guardando={false} texto="Continuar" onBack={() => setPasoActual(1)} onSubmit={() => setPasoActual(3)} deshabilitado={comisionesAsignaturasCargadas.length === 0} />
+                  <ListaItems
+                    items={comisionesAsignaturasCargadas}
+                    getTitulo={(item) => item.nombre}
+                    getDetalle={(item) =>
+                      `${item.planAsignatura || "-"} - Aula ${item.aula || "-"}`
+                    }
+                    vacio="Todavia no agregaste asignaturas."
+                  />
+                  <Acciones
+                    guardando={false}
+                    texto="Continuar"
+                    onBack={() => setPasoActual(1)}
+                    onSubmit={() => setPasoActual(3)}
+                    deshabilitado={comisionesAsignaturasCargadas.length === 0}
+                  />
                 </section>
               )}
 
               {pasoActual === 3 && (
                 <section className="space-y-6">
-                  <TituloPaso icono={<ShieldUser size={26} />} titulo="Autoridades" />
+                  <TituloPaso
+                    icono={<ShieldUser size={26} />}
+                    titulo="Autoridades"
+                  />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <CampoSelect label="Tipo autoridad" name="tipo_autoridad_id" value={autoridad.tipo_autoridad_id} onChange={cambiarAutoridad} opciones={tiposAutoridad} getValue={(item) => item.id} getLabel={(item) => item.descripcion} />
-                    <CampoSelect label="Legajo" name="legajo_id" value={autoridad.legajo_id} onChange={cambiarAutoridad} opciones={legajos} getValue={(item) => item.id} getLabel={obtenerEtiquetaLegajo} />
-                    <CampoSelect label="Comision asignatura" name="comision_id" value={autoridad.comision_id} onChange={cambiarAutoridad} opciones={comisionesAsignaturasCargadas} getValue={(item) => item.id_comision_asignatura} getLabel={(item) => item.nombre} />
+                    <CampoSelect
+                      label="Tipo autoridad"
+                      name="tipo_autoridad_id"
+                      value={autoridad.tipo_autoridad_id}
+                      onChange={cambiarAutoridad}
+                      opciones={tiposAutoridad}
+                      getValue={(item) => item.id}
+                      getLabel={(item) => item.descripcion}
+                    />
+                    <CampoSelect
+                      label="Legajo"
+                      name="legajo_id"
+                      value={autoridad.legajo_id}
+                      onChange={cambiarAutoridad}
+                      opciones={legajos}
+                      getValue={(item) => item.id}
+                      getLabel={obtenerEtiquetaLegajo}
+                    />
+                    <CampoSelect
+                      label="Comision asignatura"
+                      name="comision_id"
+                      value={autoridad.comision_id}
+                      onChange={cambiarAutoridad}
+                      opciones={comisionesAsignaturasCargadas}
+                      getValue={(item) => item.id_comision_asignatura}
+                      getLabel={(item) => item.nombre}
+                    />
                   </div>
                   <div className="flex justify-end">
-                    <button type="button" onClick={agregarAutoridad} disabled={guardando} className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60">
+                    <button
+                      type="button"
+                      onClick={agregarAutoridad}
+                      disabled={guardando}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
+                    >
                       <PlusCircle size={22} />
                       Agregar autoridad
                     </button>
                   </div>
-                  <ListaItems items={autoridadesCargadas} getTitulo={(item) => item.tipoAutoridad} getDetalle={(item) => `${item.legajo || "-"} - ${item.comisionAsignatura || "-"}`} vacio="Podés finalizar sin autoridades cargadas." />
-                  <Acciones guardando={false} texto="Finalizar" onBack={() => setPasoActual(2)} onSubmit={() => setPasoActual(4)} />
+                  <ListaItems
+                    items={autoridadesCargadas}
+                    getTitulo={(item) => item.tipoAutoridad}
+                    getDetalle={(item) =>
+                      `${item.legajo || "-"} - ${item.comisionAsignatura || "-"}`
+                    }
+                    vacio="Podés finalizar sin autoridades cargadas."
+                  />
+                  <Acciones
+                    guardando={false}
+                    texto="Finalizar"
+                    onBack={() => setPasoActual(2)}
+                    onSubmit={() => setPasoActual(4)}
+                  />
                 </section>
               )}
 
               {pasoActual === 4 && (
                 <section className="space-y-6">
-                  <TituloPaso icono={<CheckCircle2 size={26} />} titulo="Resumen" />
+                  <TituloPaso
+                    icono={<CheckCircle2 size={26} />}
+                    titulo="Resumen"
+                  />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <ResumenItem titulo="Comision" texto={`${comision.descripcion || "-"} - ID ${comisionId || "pendiente de guardar"}`} />
-                    <ResumenItem titulo="Asignaturas" texto={comisionesAsignaturasCargadas.length} />
-                    <ResumenItem titulo="Autoridades" texto={autoridadesCargadas.length} />
+                    <ResumenItem
+                      titulo="Comision"
+                      texto={`${comision.descripcion || "-"} - ID ${comisionId || "pendiente de guardar"}`}
+                    />
+                    <ResumenItem
+                      titulo="Asignaturas"
+                      texto={comisionesAsignaturasCargadas.length}
+                    />
+                    <ResumenItem
+                      titulo="Autoridades"
+                      texto={autoridadesCargadas.length}
+                    />
                   </div>
                   <div className="flex flex-col sm:flex-row justify-end gap-3">
-                    <button type="button" onClick={() => navigate("/comisiones")} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">Volver a comisiones</button>
-                    <button type="button" onClick={confirmarComision} disabled={guardando || Boolean(comisionId)} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60">
+                    <button
+                      type="button"
+                      onClick={() => navigate("/comisiones")}
+                      className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                    >
+                      Volver a comisiones
+                    </button>
+                    <button
+                      type="button"
+                      onClick={confirmarComision}
+                      disabled={guardando || Boolean(comisionId)}
+                      className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
+                    >
                       <Save size={22} />
                       {guardando
                         ? "Guardando..."
@@ -421,12 +579,22 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
   return (
     <div className="flex flex-1 items-start">
       <div className="flex flex-col items-center min-w-12">
-        <div className={`w-11 h-11 rounded-full flex items-center justify-center border-2 ${resaltado ? "bg-red-700 border-red-700 text-white" : "bg-slate-100 border-slate-300 text-slate-400"}`}>
+        <div
+          className={`w-11 h-11 rounded-full flex items-center justify-center border-2 ${resaltado ? "bg-red-700 border-red-700 text-white" : "bg-slate-100 border-slate-300 text-slate-400"}`}
+        >
           <Icono size={20} />
         </div>
-        <p className={`hidden md:block mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"}`}>{paso.titulo}</p>
+        <p
+          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"}`}
+        >
+          {paso.titulo}
+        </p>
       </div>
-      {!ultimo && <div className={`h-1 flex-1 rounded-full mt-5 ${completo ? "bg-red-700" : "bg-slate-200"}`} />}
+      {!ultimo && (
+        <div
+          className={`h-1 flex-1 rounded-full mt-5 ${completo ? "bg-red-700" : "bg-slate-200"}`}
+        />
+      )}
     </div>
   );
 }
@@ -434,47 +602,115 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
 function TituloPaso({ icono, titulo }) {
   return (
     <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-      <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center">{icono}</div>
+      <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
+        {icono}
+      </div>
       <h2 className="text-2xl font-extrabold text-slate-800">{titulo}</h2>
     </div>
   );
 }
 
-function CampoTexto({ label, name, value, onChange, placeholder, icono, type = "text" }) {
+function CampoTexto({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  icono,
+  type = "text",
+}) {
   return (
     <div>
-      <label className="block text-sm font-bold text-slate-700 mb-2">{label}</label>
+      <label className="block text-sm font-bold text-slate-700 mb-2">
+        {label}
+      </label>
       <div className="relative">
-        {icono && <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">{icono}</span>}
-        <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"}`} />
+        {icono && (
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+            {icono}
+          </span>
+        )}
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"}`}
+        />
       </div>
     </div>
   );
 }
 
-function CampoSelect({ label, name, value, onChange, opciones, getValue, getLabel }) {
+function CampoSelect({
+  label,
+  name,
+  value,
+  onChange,
+  opciones,
+  getValue,
+  getLabel,
+}) {
   const opcionesSeguras = Array.isArray(opciones) ? opciones : [];
 
   return (
     <div>
-      <label className="block text-sm font-bold text-slate-700 mb-2">{label}</label>
-      <select name={name} value={value} onChange={onChange} className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500">
+      <label className="block text-sm font-bold text-slate-700 mb-2">
+        {label}
+      </label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+      >
         <option value="">Seleccione una opcion</option>
-        {opcionesSeguras.map((opcion) => <option key={getValue(opcion)} value={getValue(opcion)}>{getLabel(opcion)}</option>)}
+        {opcionesSeguras.map((opcion) => (
+          <option key={getValue(opcion)} value={getValue(opcion)}>
+            {getLabel(opcion)}
+          </option>
+        ))}
       </select>
     </div>
   );
 }
 
 function CampoSelectSimple({ label, name, value, onChange, opciones }) {
-  return <CampoSelect label={label} name={name} value={value} onChange={onChange} opciones={opciones.map((item) => ({ id: item, label: item }))} getValue={(item) => item.id} getLabel={(item) => item.label} />;
+  return (
+    <CampoSelect
+      label={label}
+      name={name}
+      value={value}
+      onChange={onChange}
+      opciones={opciones.map((item) => ({ id: item, label: item }))}
+      getValue={(item) => item.id}
+      getLabel={(item) => item.label}
+    />
+  );
 }
 
 function Acciones({ guardando, texto, onBack, onSubmit, deshabilitado }) {
   return (
     <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-      {onBack && <button type="button" onClick={onBack} className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100">Volver</button>}
-      <button type={onSubmit ? "button" : "submit"} onClick={onSubmit} disabled={guardando || deshabilitado} className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60"><Save size={22} />{guardando ? "Guardando..." : texto}</button>
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+        >
+          Volver
+        </button>
+      )}
+      <button
+        type={onSubmit ? "button" : "submit"}
+        onClick={onSubmit}
+        disabled={guardando || deshabilitado}
+        className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition-colors duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        <Save size={22} />
+        {guardando ? "Guardando..." : texto}
+      </button>
     </div>
   );
 }
@@ -484,9 +720,14 @@ function ListaItems({ items, getTitulo, getDetalle, vacio }) {
   return (
     <div className="space-y-3">
       {items.map((item, index) => (
-        <div key={item.id_comision_asignatura || index} className="border border-slate-200 rounded-xl bg-slate-50 p-4">
+        <div
+          key={item.id_comision_asignatura || index}
+          className="border border-slate-200 rounded-xl bg-slate-50 p-4"
+        >
           <p className="text-slate-800 font-extrabold">{getTitulo(item)}</p>
-          <p className="text-slate-500 font-semibold mt-1">{getDetalle(item)}</p>
+          <p className="text-slate-500 font-semibold mt-1">
+            {getDetalle(item)}
+          </p>
         </div>
       ))}
     </div>
@@ -503,15 +744,30 @@ function ResumenItem({ titulo, texto }) {
 }
 
 function EstadoVacio({ texto }) {
-  return <div className="border border-slate-200 rounded-xl bg-slate-50 p-5 text-center text-slate-500 font-semibold">{texto}</div>;
+  return (
+    <div className="border border-slate-200 rounded-xl bg-slate-50 p-5 text-center text-slate-500 font-semibold">
+      {texto}
+    </div>
+  );
 }
 
-function obtenerEtiquetaPlanAsignatura(planAsignatura, asignaturas, planes, sedes) {
-  const asignatura = asignaturas.find((item) => item.id === planAsignatura.asignatura_id);
+function obtenerEtiquetaPlanAsignatura(
+  planAsignatura,
+  asignaturas,
+  planes,
+  sedes,
+) {
+  const asignatura = asignaturas.find(
+    (item) => item.id === planAsignatura.asignatura_id,
+  );
   const plan = planes.find((item) => item.id === planAsignatura.plan_id);
   const sede = sedes.find((item) => item.id === planAsignatura.sedes_id);
-  const partes = [asignatura?.nombre, plan?.nombre, sede?.nombre].filter(Boolean);
-  return partes.length ? partes.join(" - ") : `Plan asignatura #${planAsignatura.id}`;
+  const partes = [asignatura?.nombre, plan?.nombre, sede?.nombre].filter(
+    Boolean,
+  );
+  return partes.length
+    ? partes.join(" - ")
+    : `Plan asignatura #${planAsignatura.id}`;
 }
 
 function obtenerEtiquetaLegajo(legajo) {
@@ -519,7 +775,9 @@ function obtenerEtiquetaLegajo(legajo) {
 }
 
 function obtenerEtiquetaComisionAsignaturaCargada(id, items) {
-  const item = items.find((registro) => Number(registro.id_comision_asignatura) === Number(id));
+  const item = items.find(
+    (registro) => Number(registro.id_comision_asignatura) === Number(id),
+  );
   return item?.nombre || `Comision asignatura #${id}`;
 }
 
@@ -537,29 +795,37 @@ function obtenerLista(respuesta) {
 }
 
 function validarComisionAsignatura(payload) {
-  if (!payload.plan_asignaturas_id) return "Debe seleccionar un plan asignatura";
+  if (!payload.plan_asignaturas_id)
+    return "Debe seleccionar un plan asignatura";
   if (!payload.aula_id) return "Debe seleccionar un aula";
   if (!payload.nombre) return "El nombre es obligatorio";
   if (!payload.modalidad) return "La modalidad es obligatoria";
-  if (!payload.cupo_maximo || payload.cupo_maximo <= 0) return "El cupo maximo debe ser mayor a cero";
+  if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
+    return "El cupo maximo debe ser mayor a cero";
   return "";
 }
 
 function validarAutoridad(payload) {
-  if (!payload.tipo_autoridad_id) return "Debe seleccionar un tipo de autoridad";
+  if (!payload.tipo_autoridad_id)
+    return "Debe seleccionar un tipo de autoridad";
   if (!payload.legajo_id) return "Debe seleccionar un legajo";
   if (!payload.comision_id) return "Debe seleccionar una comision asignatura";
   return "";
 }
 
 function obtenerIdRespuesta(respuesta) {
-  return respuesta?.data?.id || respuesta?.data?.id_comision || respuesta?.data?.id_comision_asignatura;
+  return (
+    respuesta?.data?.id ||
+    respuesta?.data?.id_comision ||
+    respuesta?.data?.id_comision_asignatura
+  );
 }
 
 function obtenerMensajeError(err) {
   const errores = err.errors || {};
   const primerCampo = Object.keys(errores)[0];
-  if (primerCampo && Array.isArray(errores[primerCampo])) return errores[primerCampo][0];
+  if (primerCampo && Array.isArray(errores[primerCampo]))
+    return errores[primerCampo][0];
   return err.message || "No se pudo completar la operacion";
 }
 
