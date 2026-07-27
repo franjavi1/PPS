@@ -3,6 +3,7 @@ from utils.utilidades import respuesta_api
 from utils.errores import APIError
 from auth_common.decorador import requires_permission
 from schemas.contactos_schema import contacto_schema, contactos_schema
+from flask import request, g
 
 from services.contactos_service import (
     obtener_todos,
@@ -30,12 +31,18 @@ def get_contactos():
 
 
 @contactos_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("planes.contactos.ver")
+@requires_permission("planes.contactos.ver", "planes.contactos.ver_propio", policy="ANY")
 def get_contacto(id):
     contacto = obtener_por_id(id)
 
     if not contacto:
         raise APIError("Contacto no encontrado.", status=404)
+
+    tiene_acceso_total = "planes.contactos.ver" in g.acciones
+    es_propio = contacto.persona_id == g.id_persona
+
+    if not tiene_acceso_total and not es_propio:
+        raise APIError("No tenes permiso para ver este contacto", status=403)
 
     data = contacto_schema.dump(contacto)
 
@@ -54,12 +61,18 @@ def crear_contacto():
 
 
 @contactos_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("planes.contactos.editar")
+@requires_permission("planes.contactos.editar", "planes.contactos.editar_propio", policy="ANY")
 def editar_contacto(id):
     contacto = obtener_por_id(id)
 
     if not contacto:
         raise APIError("Contacto no encontrado.", status=404)
+
+    tiene_acceso_total = "planes.contactos.editar" in g.acciones
+    es_propio = contacto.persona_id == g.id_persona
+
+    if not tiene_acceso_total and not es_propio:
+        raise APIError("No tenes permiso para ver este contacto", status=403)
 
     req = request.get_json(silent=True) or {}
     contacto_actualizado = actualizar(contacto, req)

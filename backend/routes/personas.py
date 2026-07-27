@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-
+from flask import request, g
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
 from schemas.persona_schema import persona_schema, personas_schema
@@ -35,17 +35,22 @@ def get_personas():
 
 
 @personas_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("planes.personas.ver")
+@requires_permission("planes.personas.ver", "planes.personas.ver_propio", policy="ANY")
 def get_persona(id):
+    tiene_acceso_total = "planes.personas.ver" in g.acciones
+    es_su_propia_persona = id == g.id_persona
+
+    if not tiene_acceso_total and not es_su_propia_persona:
+        raise APIError("No tenes permiso para ver esta persona", status=403)
+
     persona = obtener_por_id(id)
 
     if not persona:
         raise APIError("Persona no encontrada", status=404)
 
     data = persona_schema.dump(persona)
-    
-    return respuesta_api(True, data, "Persona obtenida correctamente")
 
+    return respuesta_api(True, data, "Persona obtenida correctamente")
 
 @personas_bp.route("", methods=["POST"])
 @requires_permission("planes.personas.crear")
@@ -57,8 +62,13 @@ def crear_persona():
 
 
 @personas_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("planes.personas.editar")
+@requires_permission("planes.personas.editar", "planes.personas.editar_propio", policy="ANY")
 def editar_persona(id):
+    tiene_acceso_total = "planes.personas.editar" in g.acciones
+    es_su_propia_persona = id == g.id_persona
+
+    if not tiene_acceso_total and not es_su_propia_persona:
+        raise APIError("No tenes permiso para editar esta persona", status=403)
     persona = obtener_por_id(id)
     
     if not persona:
