@@ -36,6 +36,7 @@ const nuevaComisionAsignaturaInicial = {
   aula_id: "",
   nombre: "",
   modalidad: "",
+  modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
 };
@@ -148,13 +149,23 @@ function EditarComision() {
         return acc;
       }, {}),
       aulas: crearMapa(aulas, "id_aula", "aula"),
+      modalidades: crearMapa(modalidades, "modalidadesid", "descripcion"),
       tiposAutoridad: crearMapa(tiposAutoridad, "id", "descripcion"),
       legajos: legajos.reduce((acc, item) => {
         acc[item.id] = obtenerEtiquetaLegajo(item);
         return acc;
       }, {}),
     };
-  }, [planesAsignaturas, asignaturas, planes, sedes, aulas, tiposAutoridad, legajos]);
+  }, [
+    planesAsignaturas,
+    asignaturas,
+    planes,
+    sedes,
+    aulas,
+    modalidades,
+    tiposAutoridad,
+    legajos,
+  ]);
 
   function cambiarComision(e) {
     const { name, value } = e.target;
@@ -210,6 +221,7 @@ function EditarComision() {
       comision_id: Number(id),
       nombre: nuevaComisionAsignatura.nombre.trim(),
       modalidad: nuevaComisionAsignatura.modalidad.trim(),
+      modalidadesid: Number(nuevaComisionAsignatura.modalidadesid),
       cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo),
       estado: Number(nuevaComisionAsignatura.estado),
       usuario_accion: 1,
@@ -240,7 +252,9 @@ function EditarComision() {
   }
 
   async function eliminarComisionAsignatura(comisionAsignaturaId) {
-    const confirmar = confirm("Seguro que queres eliminar esta asignatura de la comision?");
+    const confirmar = confirm(
+      "Seguro que queres eliminar esta asignatura de la comision?",
+    );
 
     if (!confirmar) {
       return;
@@ -447,12 +461,20 @@ function EditarComision() {
                     />
                     <CampoSelect
                       label="Modalidad"
+                      name="modalidadesid"
+                      value={nuevaComisionAsignatura.modalidadesid}
+                      onChange={cambiarNuevaComisionAsignatura}
+                      opciones={modalidades}
+                      getValue={(item) => item.modalidadesid}
+                      getLabel={(item) => item.descripcion}
+                    />
+                    <CampoTexto
+                      label="Horario"
                       name="modalidad"
                       value={nuevaComisionAsignatura.modalidad}
                       onChange={cambiarNuevaComisionAsignatura}
-                      opciones={modalidades}
-                      getValue={(item) => item.descripcion}
-                      getLabel={(item) => item.descripcion}
+                      placeholder="Ej: 18:00 a 20:00"
+                      maxLength={45}
                     />
                     <CampoTexto
                       label="Cupo maximo"
@@ -498,7 +520,9 @@ function EditarComision() {
                               {item.nombre}
                             </h3>
                             <p className="text-slate-600 font-semibold mt-1">
-                              {mapas.planesAsignaturas[item.plan_asignaturas_id] || "-"}
+                              {mapas.planesAsignaturas[
+                                item.plan_asignaturas_id
+                              ] || "-"}
                             </p>
                             <p className="flex items-center gap-2 text-slate-600 font-semibold mt-1">
                               <DoorOpen size={18} />
@@ -507,7 +531,12 @@ function EditarComision() {
                           </div>
 
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-2 text-sm">
-                            <Dato label="Modalidad" value={item.modalidad} />
+                            <Dato
+                              label="Modalidad"
+                              value={mapas.modalidades[item.modalidadesid]}
+                            />
+
+                            <Dato label="Horario" value={item.modalidad} />
                             <Dato label="Cupo" value={item.cupo_maximo} />
                             <Dato label="Estado" value={item.estado} />
                           </div>
@@ -606,7 +635,8 @@ function EditarComision() {
                           <div>
                             <p className="flex items-center gap-2 text-lg font-extrabold text-slate-800">
                               <ShieldUser size={22} />
-                              {mapas.tiposAutoridad[item.tipo_autoridad_id] || "-"}
+                              {mapas.tiposAutoridad[item.tipo_autoridad_id] ||
+                                "-"}
                             </p>
                             <p className="flex items-center gap-2 text-slate-600 font-semibold mt-1">
                               <UserRound size={18} />
@@ -807,15 +837,24 @@ function obtenerLista(respuesta) {
   return Array.isArray(respuesta?.data) ? respuesta.data : [];
 }
 
-function obtenerEtiquetaPlanAsignatura(planAsignatura, asignaturas, planes, sedes) {
+function obtenerEtiquetaPlanAsignatura(
+  planAsignatura,
+  asignaturas,
+  planes,
+  sedes,
+) {
   const asignatura = asignaturas.find(
     (item) => item.id === planAsignatura.asignatura_id,
   );
   const plan = planes.find((item) => item.id === planAsignatura.plan_id);
   const sede = sedes.find((item) => item.id === planAsignatura.sedes_id);
-  const partes = [asignatura?.nombre, plan?.nombre, sede?.nombre].filter(Boolean);
+  const partes = [asignatura?.nombre, plan?.nombre, sede?.nombre].filter(
+    Boolean,
+  );
 
-  return partes.length ? partes.join(" - ") : `Plan asignatura #${planAsignatura.id}`;
+  return partes.length
+    ? partes.join(" - ")
+    : `Plan asignatura #${planAsignatura.id}`;
 }
 
 function obtenerEtiquetaLegajo(legajo) {
@@ -843,8 +882,12 @@ function validarComisionAsignatura(payload) {
     return "El nombre es obligatorio";
   }
 
-  if (!payload.modalidad) {
+  if (!payload.modalidadesid) {
     return "La modalidad es obligatoria";
+  }
+
+  if (!payload.modalidad) {
+    return "El horario es obligatorio";
   }
 
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {
