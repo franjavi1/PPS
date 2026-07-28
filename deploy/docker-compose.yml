@@ -13,8 +13,10 @@ services:
     restart: always
     command: sh -c "pip install -e /auth-common --quiet && python app.py"
     volumes:
-      - ./planes/backend:/app
-      - ./planes/auth-common:/auth-common
+      - ../backend:/app
+      - ../auth-common:/auth-common
+    ports:
+      - "5000:5000"
     env_file:
       - ../backend/.env
     environment:
@@ -25,6 +27,9 @@ services:
     depends_on:
       - postgres-planes
       - redis
+    networks:
+      red_bomberos_estatica:
+        ipv4_address: 172.10.10.20
 
   frontend:
     build:
@@ -38,8 +43,11 @@ services:
     volumes:
       - ../frontend:/app
       - /app/node_modules
+    networks:
+      red_bomberos_estatica:
+        ipv4_address: 172.10.10.30
 
-  postgres:
+  postgres-planes:
     image: postgres:17
     container_name: bomberos_postgres
     restart: always
@@ -54,6 +62,9 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432" 
+    networks:
+      red_bomberos_estatica:
+        ipv4_address: 172.10.10.40
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
