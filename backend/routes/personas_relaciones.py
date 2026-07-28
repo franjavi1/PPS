@@ -17,7 +17,7 @@ from services.legajo_service import crear as crear_legajo
 from services.datos_medicos_service import crear as crear_datos_medicos
 from services.legajo_rangos_service import crear as crear_legajo_rango
 from services.legajo_sedes_service import crear as crear_legajo_sede
-
+from auth_common.decorador import requires_permission
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
 
@@ -26,6 +26,7 @@ personas_relaciones_bp = Blueprint("personas_relaciones_bp", __name__)
 
 
 @personas_relaciones_bp.route("/personas/<int:persona_id>/legajo", methods=["POST"])
+@requires_permission("legajos.crear")
 def crear_legajo_de_persona(persona_id):
     req = request.get_json(silent=True) or {}
     req["persona_id"] = persona_id
@@ -53,6 +54,7 @@ def crear_legajo_de_persona(persona_id):
 
 
 @personas_relaciones_bp.route("/personas/<int:persona_id>/datos-medicos", methods=["POST"])
+@requires_permission("planes.datos_medicos.crear")
 def crear_datos_medicos_de_persona(persona_id):
     req = request.get_json(silent=True) or {}
     req["persona_id"] = persona_id
@@ -79,6 +81,7 @@ def crear_datos_medicos_de_persona(persona_id):
 
 
 @personas_relaciones_bp.route("/legajos/<int:legajo_id>/rangos", methods=["POST"])
+@requires_permission("planes.legajo_rangos.crear")
 def crear_rango_de_legajo(legajo_id):
     req = request.get_json(silent=True) or {}
     req["legajo_id"] = legajo_id
@@ -105,6 +108,7 @@ def crear_rango_de_legajo(legajo_id):
 
 
 @personas_relaciones_bp.route("/legajos/<int:legajo_id>/sedes", methods=["POST"])
+@requires_permission("planes.legajo_sedes.crear")
 def crear_sede_de_legajo(legajo_id):
     req = request.get_json(silent=True) or {}
     req["legajo_id"] = legajo_id
@@ -121,6 +125,7 @@ def crear_sede_de_legajo(legajo_id):
 
 
 @personas_relaciones_bp.route("/personas/<int:persona_id>/usuario", methods=["POST"])
+@requires_permission("planes.personas.solicitar_usuario")
 def solicitar_usuario_de_persona(persona_id):
     req = request.get_json(silent=True) or {}
     usuarios_service_url = os.getenv("USUARIOS_SERVICE_URL")

@@ -5,7 +5,7 @@ from models.aula import Aula
 from models.legajo_sedes import LegajoSedes
 from models.plan_asignatura import PlanAsignatura
 from schemas.sedes_schema import sede_schema, sedes_schema
-
+from auth_common.decorador import requires_permission
 from services.sedes_service import (
     obtener_todos,
     obtener_por_id,
@@ -24,6 +24,7 @@ sedes_bp = Blueprint("sedes_bp", __name__, url_prefix="/sedes")
 
 
 @sedes_bp.route("", methods=["GET"])
+@requires_permission("planes.sedes.ver")
 def get_sedes():
     sedes = obtener_todos()
     data = sedes_schema.dump(sedes)
@@ -35,6 +36,7 @@ def get_sedes():
 
 
 @sedes_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.sedes.ver")
 def get_sede(id):
     sede = obtener_por_id(id)
 
@@ -47,6 +49,7 @@ def get_sede(id):
 
 
 @sedes_bp.route("", methods=["POST"])
+@requires_permission("planes.sedes.crear")
 def crear_sede():
     req = request.get_json(silent=True) or {}
 
@@ -57,6 +60,7 @@ def crear_sede():
 
 
 @sedes_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.sedes.editar")
 def editar_sede(id):
     sede = obtener_por_id(id)
 
@@ -71,6 +75,7 @@ def editar_sede(id):
 
 
 @sedes_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.sedes.eliminar")
 def eliminar_sede(id):
     sede = obtener_por_id(id)
 

@@ -3,7 +3,7 @@ from models.persona import Persona
 from schemas.tipo_documento_schema import tipo_documento_schema, tipos_documento_schema
 from utils.errores import APIError
 from utils.utilidades import respuesta_api
-
+from auth_common.decorador import requires_permission
 from services.tipo_documento_service import (
     obtener_todos,
     obtener_por_id,
@@ -16,6 +16,7 @@ tipos_documentos_bp = Blueprint("tipos_documentos_bp", __name__, url_prefix="/ti
 
 
 @tipos_documentos_bp.route("", methods=["GET"])
+@requires_permission("planes.tipos_documentos.ver")
 def get_tipos_documentos():
     tipos_documentos = obtener_todos()
     data = tipos_documento_schema.dump(tipos_documentos)
@@ -27,6 +28,7 @@ def get_tipos_documentos():
 
 
 @tipos_documentos_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.tipos_documentos.ver")
 def get_tipo_documento(id):
     tipo_documento = obtener_por_id(id)
 
@@ -39,6 +41,7 @@ def get_tipo_documento(id):
 
 
 @tipos_documentos_bp.route("", methods=["POST"])
+@requires_permission("planes.tipos_documentos.crear")
 def crear_tipo_documento():
     req = request.get_json(silent=True) or {}
     nuevo_tipo_documento = crear(req)
@@ -48,6 +51,7 @@ def crear_tipo_documento():
 
 
 @tipos_documentos_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.tipos_documentos.editar")
 def editar_tipo_documento(id):
     tipo_documento = obtener_por_id(id)
 
@@ -62,6 +66,7 @@ def editar_tipo_documento(id):
 
 
 @tipos_documentos_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.tipos_documentos.eliminar")
 def eliminar_tipo_documento(id):
     tipo_documento = obtener_por_id(id)
 

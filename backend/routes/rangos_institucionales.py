@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
-
+from auth_common.decorador import requires_permission
 from models.legajo_rangos import LegajoRangos
 from models.plan_asignatura import PlanAsignatura
 from schemas.rangos_institucionales_schema import (
@@ -23,6 +23,7 @@ rangos_institucionales_bp = Blueprint(
 
 
 @rangos_institucionales_bp.route("", methods=["GET"])
+@requires_permission("planes.rangos_institucionales.ver")
 def get_rangos_institucionales():
     rangos = obtener_todos()
     data = rangos_institucionales_schema.dump(rangos)
@@ -34,6 +35,7 @@ def get_rangos_institucionales():
 
 
 @rangos_institucionales_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.rangos_institucionales.ver")
 def get_rango_institucional(id):
     rango = obtener_por_id(id)
 
@@ -46,6 +48,7 @@ def get_rango_institucional(id):
 
 
 @rangos_institucionales_bp.route("", methods=["POST"])
+@requires_permission("planes.rangos_institucionales.crear")
 def crear_rango_institucional():
     req = request.get_json(silent=True) or {}
 
@@ -56,6 +59,7 @@ def crear_rango_institucional():
 
 
 @rangos_institucionales_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.rangos_institucionales.editar")
 def editar_rango_institucional(id):
     rango = obtener_por_id(id)
 
@@ -70,6 +74,7 @@ def editar_rango_institucional(id):
 
 
 @rangos_institucionales_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.rangos_institucionales.eliminar")
 def eliminar_rango_institucional(id):
     rango = obtener_por_id(id)
 

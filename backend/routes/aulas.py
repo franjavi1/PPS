@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from db import db
 from models.comision_asignatura import ComisionAsignatura
-
+from auth_common.decorador import requires_permission
 from schemas.aula_schema import aula_schema, aulas_schema
 from services.aula_service import (
     obtener_todos,
@@ -16,6 +16,7 @@ from utils.errores import APIError
 aulas_bp = Blueprint("aulas_bp", __name__, url_prefix="/aulas")
 
 @aulas_bp.route("", methods=["GET"])
+@requires_permission("planes.aulas.ver")
 def get_aulas():
     aulas = obtener_todos()
     data = aulas_schema.dump(aulas)
@@ -26,6 +27,7 @@ def get_aulas():
     return respuesta_api(True, data, "Lista de aulas obtenida")
 
 @aulas_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.aulas.ver")
 def get_aula(id):
     aula = obtener_por_id(id)
 
@@ -36,6 +38,7 @@ def get_aula(id):
     return respuesta_api(True, data, "Aula obtenida correctamente")
 
 @aulas_bp.route("", methods=["POST"])
+@requires_permission("planes.aulas.crear")
 def crear_aula():
     req = request.get_json(silent=True) or {}
     nueva_aula = crear(req)
@@ -43,6 +46,7 @@ def crear_aula():
     return respuesta_api(True, {"id_aula": data["id_aula"]}, "Aula creada correctamente", 201)
 
 @aulas_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.aulas.editar")
 def editar_aula(id):
     aula = obtener_por_id(id)
     
@@ -56,6 +60,7 @@ def editar_aula(id):
     return respuesta_api(True, {"id_aula": data["id_aula"]}, "Aula actualizada correctamente")
 
 @aulas_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.aulas.eliminar")
 def eliminar_aula(id):
     aula = obtener_por_id(id)
     

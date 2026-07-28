@@ -1,0 +1,1 @@
+from auth_common.extension import AuthCommon
