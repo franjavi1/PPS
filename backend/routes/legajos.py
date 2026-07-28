@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, g
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
@@ -24,6 +24,7 @@ from services.legajo_service import (
 legajos_bp = Blueprint("legajos_bp", __name__, url_prefix="/legajos")
 
 @legajos_bp.route("/GetPersonaFromPersonaId", methods=["GET"])
+@requires_permission("planes.legajos.ver", "planes.legajos.ver_propio", policy="ANY")
 def get_detalle_legajo_por_persona_id():
     persona_id_raw = request.args.get("persona_id") or request.args.get("id")
 
@@ -35,12 +36,23 @@ def get_detalle_legajo_por_persona_id():
     except ValueError:
         raise APIError("El ID de la persona debe ser un numero entero valido", status=400)
 
+    tiene_acceso_total = "planes.legajos.ver" in g.acciones
+    es_propio = persona_id == g.id_persona
+
+    if not tiene_acceso_total and not es_propio:
+        raise APIError("No tenes permiso para ver este legajo", status=403)
+
     legajo = obtener_legajo_completo_por_persona_id(persona_id)
+
+    if not legajo:
+        raise APIError("Legajo no encontrado", status=404)
+
     data = legajo_schema.dump(legajo)
 
     return respuesta_api(True, data, "Legajo, persona y contactos obtenidos correctamente")
 
 @legajos_bp.route("/GetPersonaFromLegajoId", methods=["GET"])
+@requires_permission("planes.legajos.ver", "planes.legajos.ver_propio", policy="ANY")
 def get_detalle_legajo_persona():
     legajo_id_raw = request.args.get("id") or request.args.get("legajo_id")
 
@@ -53,12 +65,23 @@ def get_detalle_legajo_persona():
         raise APIError("El ID del legajo debe ser un numero entero valido", status=400)
 
     legajo = obtener_legajo_completo_por_id(legajo_id)
+
+    if not legajo:
+        raise APIError("Legajo no encontrado", status=404)
+
+    tiene_acceso_total = "planes.legajos.ver" in g.acciones
+    es_propio = legajo.persona_id == g.id_persona
+
+    if not tiene_acceso_total and not es_propio:
+        raise APIError("No tenes permiso para ver este legajo", status=403)
+
     data = legajo_schema.dump(legajo)
 
     return respuesta_api(True, data, "Legajo, persona y contactos obtenidos correctamente")
 
 #Se obtiene la Persona a partir del numero de legajo
 @legajos_bp.route("/GetPersonaFromLegajoNum", methods=["GET"])
+@requires_permission("planes.legajos.ver", "planes.legajos.ver_propio", policy="ANY")
 def get_legajo_por_numero():
     numero = request.args.get("numero") or request.args.get("legajo")
 
@@ -69,6 +92,12 @@ def get_legajo_por_numero():
 
     if not legajo:
         raise APIError(f"No se encontró un legajo activo con el numero '{numero}'", status=404)
+
+    tiene_acceso_total = "planes.legajos.ver" in g.acciones
+    es_propio = legajo.persona_id == g.id_persona
+
+    if not tiene_acceso_total and not es_propio:
+        raise APIError("No tenes permiso para ver este legajo", status=403)
 
     data = legajo_schema.dump(legajo)
 
