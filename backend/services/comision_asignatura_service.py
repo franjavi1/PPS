@@ -1,3 +1,4 @@
+from sqlalchemy.orm import joinedload, selectinload
 from models.comision_asignatura import ComisionAsignatura
 from models.modalidades import Modalidades
 from models.legajo import Legajo
@@ -6,6 +7,7 @@ from models.rangos_institucionales import RangosInstitucionales
 from models.plan_asignatura import PlanAsignatura
 from models.planes import Planes
 from models.comision import Comision
+from models.autoridad_comision import AutoridadComision
 from utils.errores import APIError
 
 from schemas.comision_asignatura_schema import (
@@ -13,15 +15,13 @@ from schemas.comision_asignatura_schema import (
     comision_asignatura_schema
 )
 from db import db
-from sqlalchemy import func
 from utils.errores import APIError
 
 
-def obtener_modalidad(modalidad):
-    descripcion = str(modalidad or "").strip()
-
-    return Modalidades.query.filter(
-        func.lower(Modalidades.descripcion) == descripcion.lower()
+def obtener_modalidad(modalidadesid):
+    return Modalidades.query.filter_by(
+        modalidadesid=modalidadesid,
+        estado=1
     ).first()
 
 
@@ -37,12 +37,13 @@ def obtener_por_id(id_comision_asignatura):
 
 def crear(datos):
     nueva_comision_asignatura = comision_asignatura_schema.load(datos)
-    modalidad = obtener_modalidad(nueva_comision_asignatura.modalidad)
+    modalidad = obtener_modalidad(
+    nueva_comision_asignatura.modalidadesid
+)
 
     if modalidad is None:
         raise APIError("La modalidad indicada no existe", status=400)
 
-    nueva_comision_asignatura.modalidadesid = modalidad.modalidadesid
 
     db.session.add(nueva_comision_asignatura)
     db.session.commit()
@@ -58,13 +59,12 @@ def actualizar(comision_asignatura, datos):
 
     schema.load(datos, instance=comision_asignatura, partial=True)
 
-    if "modalidad" in datos:
-        modalidad = obtener_modalidad(comision_asignatura.modalidad)
+    if "modalidadesid" in datos:
+        modalidad = obtener_modalidad(comision_asignatura.modalidadesid)
 
         if modalidad is None:
             raise APIError("La modalidad indicada no existe", status=400)
 
-        comision_asignatura.modalidadesid = modalidad.modalidadesid
 
     db.session.commit()
 
@@ -80,7 +80,6 @@ def eliminar(comision_asignatura):
 def obtener_comisiones_por_legajo(legajo_id: int | None = None):
     nivel_jerarquia_legajo = None
 
-    # Si tenemos el ID del legajo, obtenemos su nivel de jerarquía actual
     if legajo_id is not None:
         legajo = Legajo.query.filter_by(id=legajo_id, estado=1).first()
         if not legajo:
@@ -98,13 +97,19 @@ def obtener_comisiones_por_legajo(legajo_id: int | None = None):
 
         nivel_jerarquia_legajo = ultimo_legajo_rango.rangos_institucionales.nivel_jerarquia
 
-    # Busco la ComisionAsignatura uniendo Comision, PlanAsignatura, Planes y RangosInstitucionales
     query = (
         ComisionAsignatura.query
         .join(Comision, ComisionAsignatura.comision_id == Comision.id_comision)
         .join(PlanAsignatura, ComisionAsignatura.plan_asignaturas_id == PlanAsignatura.id)
         .join(Planes, PlanAsignatura.plan_id == Planes.id)
         .join(RangosInstitucionales, PlanAsignatura.rango_minimo_id == RangosInstitucionales.id)
+        .options(
+            # Cargamos las autoridades de la comisión asignatura y sus correspondientes tipo y legajo
+            selectinload(ComisionAsignatura.autoridad_comision_items)
+            .joinedload(AutoridadComision.tipo_autoridad),
+            selectinload(ComisionAsignatura.autoridad_comision_items)
+            .joinedload(AutoridadComision.legajo)
+        )
         .filter(
             ComisionAsignatura.estado == 1,
             Comision.estado == 1,
@@ -114,7 +119,6 @@ def obtener_comisiones_por_legajo(legajo_id: int | None = None):
         )
     )
 
-    # Filtro de jerarquía únicamente si se envió un legajo
     if nivel_jerarquia_legajo is not None:
         query = query.filter(RangosInstitucionales.nivel_jerarquia <= nivel_jerarquia_legajo)
 

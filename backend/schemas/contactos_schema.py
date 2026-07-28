@@ -2,9 +2,11 @@ from models.contactos import Contactos
 from models.persona import Persona
 from models.tipo_contacto import TipoContacto
 
+from schemas.tipo_contacto_schema import TipoContactoSchema
+
 from db import ma
 
-from marshmallow import ValidationError, validates, validates_schema, pre_load, post_dump
+from marshmallow import ValidationError, validates, validates_schema, pre_load, post_dump, fields
 from marshmallow.validate import Length
 
 
@@ -63,6 +65,9 @@ class ContactosSchema(ma.SQLAlchemySchema):
             "invalid": "El contacto debe ser un texto valido"
         }
     )
+    
+    tipo_contacto = fields.Nested(TipoContactoSchema, dump_only=True)
+    
     estado = ma.auto_field(dump_only=True)
     # Usuario que realiza la accion sobre el registro.
     usuario_accion = ma.auto_field(
@@ -137,7 +142,6 @@ class ContactosSchema(ma.SQLAlchemySchema):
             data["contacto"] = data["contacto"].strip()
 
         return data
-
 
 # Instancias usadas por las rutas y servicios.
 contacto_schema = ContactosSchema()

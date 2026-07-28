@@ -1,9 +1,11 @@
 from models.persona import Persona
 from models.tipo_documento import TipoDocumento
 
+from schemas.contactos_schema import ContactosSchema
+
 from db import ma
 
-from marshmallow import ValidationError, validates, pre_load, post_dump, validates_schema
+from marshmallow import ValidationError, validates, pre_load, post_dump, validates_schema, fields
 from marshmallow.validate import Regexp, Length
 
 REGEX_SOLO_LETRAS = r"^[A-Za-zÁÉÍÓÚáéíóúñÑ\s'-]+$"
@@ -88,6 +90,8 @@ class PersonaSchema(ma.SQLAlchemySchema):
         }
     )
 
+    contactos_items = fields.Nested(ContactosSchema, many=True, dump_only=True)
+    
     # Fechas administradas por la base de datos.
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
@@ -152,7 +156,6 @@ class PersonaSchema(ma.SQLAlchemySchema):
             if campo in data and isinstance(data[campo], str):
                 data[campo] = data[campo].title()
         return data
-
 
 # Instancias usadas por las rutas y servicios.
 persona_schema = PersonaSchema()
