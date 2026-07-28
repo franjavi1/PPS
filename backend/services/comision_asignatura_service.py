@@ -1,3 +1,4 @@
+from sqlalchemy.orm import joinedload, selectinload
 from models.comision_asignatura import ComisionAsignatura
 from models.modalidades import Modalidades
 from models.legajo import Legajo
@@ -6,6 +7,7 @@ from models.rangos_institucionales import RangosInstitucionales
 from models.plan_asignatura import PlanAsignatura
 from models.planes import Planes
 from models.comision import Comision
+from models.autoridad_comision import AutoridadComision
 from utils.errores import APIError
 
 from schemas.comision_asignatura_schema import (
@@ -78,7 +80,6 @@ def eliminar(comision_asignatura):
 def obtener_comisiones_por_legajo(legajo_id: int | None = None):
     nivel_jerarquia_legajo = None
 
-    # Si tenemos el ID del legajo, obtenemos su nivel de jerarquía actual
     if legajo_id is not None:
         legajo = Legajo.query.filter_by(id=legajo_id, estado=1).first()
         if not legajo:
@@ -96,13 +97,19 @@ def obtener_comisiones_por_legajo(legajo_id: int | None = None):
 
         nivel_jerarquia_legajo = ultimo_legajo_rango.rangos_institucionales.nivel_jerarquia
 
-    # Busco la ComisionAsignatura uniendo Comision, PlanAsignatura, Planes y RangosInstitucionales
     query = (
         ComisionAsignatura.query
         .join(Comision, ComisionAsignatura.comision_id == Comision.id_comision)
         .join(PlanAsignatura, ComisionAsignatura.plan_asignaturas_id == PlanAsignatura.id)
         .join(Planes, PlanAsignatura.plan_id == Planes.id)
         .join(RangosInstitucionales, PlanAsignatura.rango_minimo_id == RangosInstitucionales.id)
+        .options(
+            # Cargamos las autoridades de la comisión asignatura y sus correspondientes tipo y legajo
+            selectinload(ComisionAsignatura.autoridad_comision_items)
+            .joinedload(AutoridadComision.tipo_autoridad),
+            selectinload(ComisionAsignatura.autoridad_comision_items)
+            .joinedload(AutoridadComision.legajo)
+        )
         .filter(
             ComisionAsignatura.estado == 1,
             Comision.estado == 1,
@@ -112,7 +119,6 @@ def obtener_comisiones_por_legajo(legajo_id: int | None = None):
         )
     )
 
-    # Filtro de jerarquía únicamente si se envió un legajo
     if nivel_jerarquia_legajo is not None:
         query = query.filter(RangosInstitucionales.nivel_jerarquia <= nivel_jerarquia_legajo)
 
