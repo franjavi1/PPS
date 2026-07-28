@@ -60,18 +60,12 @@ def crear_datos_medicos():
 
 
 @datos_medicos_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("planes.datos_medicos.editar", "planes.datos_medicos.editar_propio", policy="ANY")
+@requires_permission("planes.datos_medicos.editar")
 def editar_datos_medicos(id):
     datos_medicos = obtener_por_id(id)
 
     if not datos_medicos:
         raise APIError("Datos medicos no encontrados", status=404)
-
-    tiene_acceso_total = "planes.datos_medicos.editar" in g.acciones
-    es_su_propia_persona = id == g.id_persona
-
-    if not tiene_acceso_total and not es_su_propia_persona:
-        raise APIError("No tenes permiso para editar esta persona", status=403)
 
     req = request.get_json(silent=True) or {}
     datos_medicos_actualizados = actualizar(datos_medicos, req)

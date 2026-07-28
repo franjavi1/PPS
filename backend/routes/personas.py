@@ -62,13 +62,9 @@ def crear_persona():
 
 
 @personas_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("planes.personas.editar", "planes.personas.editar_propio", policy="ANY")
+@requires_permission("planes.personas.editar")
 def editar_persona(id):
-    tiene_acceso_total = "planes.personas.editar" in g.acciones
-    es_su_propia_persona = id == g.id_persona
 
-    if not tiene_acceso_total and not es_su_propia_persona:
-        raise APIError("No tenes permiso para editar esta persona", status=403)
     persona = obtener_por_id(id)
     
     if not persona:

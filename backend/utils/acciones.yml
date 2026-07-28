@@ -16,9 +16,6 @@ acciones:
   - nombre: personas.editar
     descripcion: Editar personas existentes
     activo: true
-  - nombre: personas.editar_propio
-    descripcion: Editar sólo persona propia
-    activo: true
   - nombre: personas.eliminar
     descripcion: Eliminar personas
     activo: true
@@ -38,9 +35,6 @@ acciones:
   - nombre: datos_medicos.editar
     descripcion: Editar datos médicos existentes
     activo: true
-  - nombre: datos_medicos.editar_propio
-    descripcion: Editar datos médicos propios
-    activo: true
   - nombre: datos_medicos.eliminar
     descripcion: Eliminar datos médicos
     activo: true
@@ -56,9 +50,6 @@ acciones:
     activo: true
   - nombre: contactos.editar
     descripcion: Editar contactos existentes
-    activo: true
-  - nombre: contactos.editar_propio
-    descripcion: Editar contactos propios
     activo: true
   - nombre: contactos.eliminar
     descripcion: Eliminar contactos
@@ -104,25 +95,6 @@ acciones:
     activo: true
   - nombre: legajo_rangos.eliminar
     descripcion: Quitar un rango asignado a un legajo
-    activo: true
-
-  - nombre: legajos.ver
-    descripcion: Ver listado y detalle de legajos
-    activo: true
-  - nombre: legajos.ver_propio
-    descripcion: Ver el propio legajo
-    activo: true
-  - nombre: legajos.crear
-    descripcion: Crear legajos nuevos
-    activo: true
-  - nombre: legajos.editar
-    descripcion: Editar legajos existentes
-    activo: true
-  - nombre: legajos.editar_propio
-    descripcion: Editar sólo legajo propio
-    activo: true
-  - nombre: legajos.eliminar
-    descripcion: Eliminar legajos
     activo: true
 
   # -------------------------
@@ -355,7 +327,7 @@ roles:
   - nombre: GESTION_CONFIGURACION
     descripcion: Gestion de parámetros y entidades de configuracion
   - nombre: ALUMNO
-    descripcion: Puede ver contenido académico y ver/editar sus propios datos personales, médicos y de contacto
+    descripcion: Puede ver contenido académico y sus propios datos personales, médicos y de contacto
 
 rol_accion:
   - rol: ADMINISTRADOR
@@ -543,10 +515,6 @@ rol_accion:
       - planes.ver
       - comisiones.ver
       - personas.ver_propio
-      - personas.editar_propio
       - legajos.ver_propio
-      - legajos.editar_propio
       - datos_medicos.ver_propio
-      - datos_medicos.editar_propio
       - contactos.ver_propio
-      - contactos.editar_propio
