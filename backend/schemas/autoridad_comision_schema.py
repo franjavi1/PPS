@@ -2,9 +2,11 @@ from models.autoridad_comision import AutoridadComision
 from models.comision_asignatura import ComisionAsignatura
 from models.legajo import Legajo
 from models.tipos_autoridad import TipoAutoridad
+from schemas.tipo_autoridad_schema import TipoAutoridadSchema
+from schemas.legajo_schema import LegajoSchema
 
 from db import ma
-from marshmallow import ValidationError, validates, validates_schema
+from marshmallow import ValidationError, validates, validates_schema, fields
 
 
 class AutoridadComisionSchema(ma.SQLAlchemySchema):
@@ -21,6 +23,9 @@ class AutoridadComisionSchema(ma.SQLAlchemySchema):
     estado = ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    
+    tipo_autoridad = fields.Nested(TipoAutoridadSchema, dump_only=True)
+    legajo = fields.Nested(LegajoSchema, dump_only=True)
 
     @validates("tipo_autoridad_id")
     def validar_tipo_autoridad(self, value, **kwargs):
