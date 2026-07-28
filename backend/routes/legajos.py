@@ -15,11 +15,47 @@ from services.legajo_service import (
     crear,
     actualizar,
     eliminar,
-    obtener_por_numero
+    obtener_por_numero,
+    obtener_legajo_completo_por_id,
+    obtener_legajo_completo_por_persona_id
 )
 
 
 legajos_bp = Blueprint("legajos_bp", __name__, url_prefix="/legajos")
+
+@legajos_bp.route("/GetPersonaFromPersonaId", methods=["GET"])
+def get_detalle_legajo_por_persona_id():
+    persona_id_raw = request.args.get("persona_id") or request.args.get("id")
+
+    if not persona_id_raw:
+        raise APIError("Debe incluir el ID de la persona en el parametro 'id'", status=400)
+
+    try:
+        persona_id = int(persona_id_raw)
+    except ValueError:
+        raise APIError("El ID de la persona debe ser un numero entero valido", status=400)
+
+    legajo = obtener_legajo_completo_por_persona_id(persona_id)
+    data = legajo_schema.dump(legajo)
+
+    return respuesta_api(True, data, "Legajo, persona y contactos obtenidos correctamente")
+
+@legajos_bp.route("/GetPersonaFromLegajoId", methods=["GET"])
+def get_detalle_legajo_persona():
+    legajo_id_raw = request.args.get("id") or request.args.get("legajo_id")
+
+    if not legajo_id_raw:
+        raise APIError("Debe incluir el ID del legajo en el parametro 'id'", status=400)
+
+    try:
+        legajo_id = int(legajo_id_raw)
+    except ValueError:
+        raise APIError("El ID del legajo debe ser un numero entero valido", status=400)
+
+    legajo = obtener_legajo_completo_por_id(legajo_id)
+    data = legajo_schema.dump(legajo)
+
+    return respuesta_api(True, data, "Legajo, persona y contactos obtenidos correctamente")
 
 #Se obtiene la Persona a partir del numero de legajo
 @legajos_bp.route("/GetPersonaFromLegajoNum", methods=["GET"])
