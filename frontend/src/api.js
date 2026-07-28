@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+export const API_URL = import.meta.env.VITE_API_URL || "http://186.19.137.9:8480/api/inscripciones";
 
 
 export async function apiRequest(path, options = {}) {
