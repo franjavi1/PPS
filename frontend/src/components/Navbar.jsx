@@ -22,6 +22,7 @@ import {
   Home,
   IdCard,
   LogOut,
+  SendToBack,
   MapPinned,
   Menu,
   Phone,
@@ -51,11 +52,16 @@ function Navbar() {
     setMobileOpen(false);
   };
   const handleLogout = () => {
-    //logout();
+    logout();
+    window.location.replace(LOGIN_ROUTE);
     //closeMenus();
-    window.location.href = MENU_ROUTE;
+    
     //navigate(LOGIN_ROUTE);
   };
+
+  const handleVolver = () => {
+    window.location.href = MENU_ROUTE;
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -318,11 +324,20 @@ function Navbar() {
           )}
           <button
             type="button"
+            onClick={handleVolver}
+            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
+          >
+            <SendToBack size={17} />
+            Volver
+          </button>
+
+          <button
+            type="button"
             onClick={handleLogout}
             className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
           >
             <LogOut size={17} />
-            Volver
+            Cerrar Sesion
           </button>
         </nav>
       </div>
