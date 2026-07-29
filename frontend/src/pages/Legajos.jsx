@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Eye,
@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import { obtenerMensajeError } from "../utils/notificaciones";
 
 function Legajos() {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ function Legajos() {
       setLegajos(respuestaLegajos.data || []);
       setPersonas(respuestaPersonas.data || []);
     } catch (err) {
-      setError(err.message || "No se pudieron obtener los legajos");
+      setError(obtenerMensajeError(error));
     } finally {
       setCargando(false);
     }

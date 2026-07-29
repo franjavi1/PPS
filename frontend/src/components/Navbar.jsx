@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router-dom";
 import useAuth from "../auth/hooks/useAuth";
 //import { hasPermission } from "../auth/utils/permissions";
 import { MENU_ROUTE } from "../api";
@@ -42,7 +42,7 @@ function Navbar() {
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
   const { hasPermission, hasRole } = useAuth();
-
+  useEffect(()=>{console.log(currentUserRole)},[currentUserRole])
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
@@ -433,7 +433,7 @@ function Navbar() {
             >
               Comisiones
             </MobileLink>
-            {currentUserRole === "ROLE_ADMIN" && (
+            {hasPermission("planes.config.ver") (
               <>
                 <MobileLink
                   to="/sedes"
