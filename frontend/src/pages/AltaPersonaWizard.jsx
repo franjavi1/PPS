@@ -14,7 +14,7 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
 import { apiRequest } from "../api";
