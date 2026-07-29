@@ -31,7 +31,7 @@ const formularioInicial = {
 
 function Planes() {
   const navigate = useNavigate();
-  const { currentUserRole } = useAuth();
+  const { currentUserRole, hasPermission } = useAuth();
   const esAdministrador = currentUserRole === "ROLE_ADMIN";
   const [planes, setPlanes] = useState([]);
   const [tiposPlanes, setTiposPlanes] = useState([]);
@@ -218,6 +218,12 @@ function Planes() {
 
               <button
                 onClick={() => navigate("/planes/alta")}
+                disabled={!hasPermission("planes.planes.crear")}
+                title={
+                  hasPermission("planes.planes.crear", "crear")
+                    ? "Registrar una persona"
+                    : "No tenés permiso para crear personas"
+                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
@@ -286,6 +292,12 @@ function Planes() {
                   <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => navigate(`/planes/${plan.id}`)}
+                      disabled={!hasPermission("planes.planes.ver")}
+                      title={
+                        hasPermission("planes.planes.ver")
+                          ? "Ver plan"
+                          : "No tenés permiso para ver planes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer"
                     >
                       <Eye size={16} />
@@ -294,8 +306,12 @@ function Planes() {
 
                     <button
                       onClick={() => editarPlan(plan)}
-                      disabled={!esAdministrador}
-                      title={esAdministrador ? "Editar plan" : "Solo los administradores pueden editar"}
+                      disabled={!hasPermission("planes.planes.editar")}
+                      title={
+                        hasPermission("planes.planes.editar")
+                          ? "Editar plan"
+                          : "No tenés permiso para editar planes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Pencil size={16} />
@@ -304,8 +320,12 @@ function Planes() {
 
                     <button
                       onClick={() => eliminarPlan(plan.id)}
-                      disabled={!esAdministrador}
-                      title={esAdministrador ? "Dar de baja el plan" : "Solo los administradores pueden dar de baja"}
+                      disabled={!hasPermission("planes.planes.eliminar")}
+                      title={
+                        hasPermission("planes.planes.eliminar")
+                          ? "Eliminar plan"
+                          : "No tenés permiso para eliminar planes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Trash2 size={16} />
@@ -371,8 +391,12 @@ function Planes() {
 
                           <button
                             onClick={() => editarPlan(plan)}
-                            disabled={!esAdministrador}
-                            title={esAdministrador ? "Editar plan" : "Solo los administradores pueden editar"}
+                            disabled={!hasPermission("planes.planes.editar")}
+                            title={
+                              hasPermission("planes.planes.editar")
+                                ? "Editar plan"
+                                : "No tenés permiso para editar planes"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -381,8 +405,12 @@ function Planes() {
 
                           <button
                             onClick={() => eliminarPlan(plan.id)}
-                            disabled={!esAdministrador}
-                            title={esAdministrador ? "Dar de baja el plan" : "Solo los administradores pueden dar de baja"}
+                            disabled={!hasPermission("planes.planes.eliminar")}
+                            title={
+                              hasPermission("planes.planes.eliminar")
+                                ? "Eliminar plan"
+                                : "No tenés permiso para eliminar planes"
+                            }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Trash2 size={18} />

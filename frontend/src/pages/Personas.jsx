@@ -16,7 +16,7 @@ import BotonVolver from "../components/BotonVolver";
 import { apiRequest } from "../api";
 import { personasService } from "../services/personasService";
 import useAuth from "../auth/hooks/useAuth";  
-import { hasPermission } from "../auth/utils/permissions"; 
+//import { hasPermission } from "../auth/utils/permissions"; 
 import { LOGIN_ROUTE } from "../auth/config";
 
 const formularioInicial = {
@@ -38,7 +38,7 @@ function Personas() {
   const [cargando, setCargando] = useState(true);
   const [estadoListado, setEstadoListado] = useState(1);
   const navigate = useNavigate();
-  const { currentUserRole } = useAuth();
+  const { currentUserRole, hasPermission } = useAuth();
 
   useEffect(() => {
     cargarDatos();
@@ -245,9 +245,9 @@ function Personas() {
               <button
                 type="button"
                 onClick={() => navigate("/alta-persona")}
-                disabled={!hasPermission(currentUserRole, "crear")}
+                disabled={!hasPermission("planes.personas.crear")}
                 title={
-                  hasPermission(currentUserRole, "crear")
+                  hasPermission("planes.personas.crear", "crear")
                     ? "Registrar una persona"
                     : "No tenés permiso para crear personas"
                 }
@@ -363,7 +363,7 @@ function Personas() {
                       <button
                         type="button"
                         onClick={() => navigate(`/personas/${persona.id}/editar`)}
-                        disabled={!hasPermission(currentUserRole, "editar")}
+                        disabled={!hasPermission("planes.personas.editar")}
                         className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                       >
                         <Pencil size={16} />
@@ -373,7 +373,7 @@ function Personas() {
                       <button
                         type="button"
                         onClick={() => eliminarPersona(persona.id)}
-                        disabled={!hasPermission(currentUserRole, "eliminar")}
+                        disabled={!hasPermission("planes.personas.eliminar")}
                         className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                       >
                         <Trash2 size={16} />
@@ -470,7 +470,7 @@ function Personas() {
                             onClick={() =>
                               navigate(`/personas/${persona.id}/editar`)
                             }
-                            disabled={!hasPermission(currentUserRole, "editar")}
+                            disabled={!hasPermission("planes.personas.editar")}
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -482,7 +482,7 @@ function Personas() {
                             type="button"
                             onClick={() => eliminarPersona(persona.id)}
                             disabled={
-                              !hasPermission(currentUserRole, "eliminar")
+                              !hasPermission("planes.personas.eliminar")
                             }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >

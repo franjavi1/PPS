@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import useAuth from "../auth/hooks/useAuth";
-import { hasPermission } from "../auth/utils/permissions";
+//import { hasPermission } from "../auth/utils/permissions";
 import { LOGIN_ROUTE } from "../auth/config";
 import {
   BookOpen,
@@ -39,6 +39,7 @@ function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
+  const { hasPermission, hasRole } = useAuth();
 
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
@@ -118,7 +119,7 @@ function Navbar() {
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.personas.crear") && (
               <NavLink
                 to="/alta-persona"
                 className={linkClass}
@@ -135,7 +136,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.personas.editar") && (
               <NavLink
                 to="/personas"
                 className={linkClass}
@@ -150,7 +151,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.legajos.editar") && (
               <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
                 <ClipboardList size={18} />
                 <span>
@@ -170,7 +171,7 @@ function Navbar() {
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.planes.crear") && (
               <NavLink
                 to="/planes/alta"
                 className={linkClass}
@@ -185,7 +186,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.planes.ver") && (
               <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
                 <BookOpen size={18} />
                 <span>
@@ -194,7 +195,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.asignaturas.ver") && (
               <NavLink
                 to="/asignaturas"
                 className={linkClass}
@@ -209,7 +210,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.comisiones.crear") && (
               <NavLink
                 to="/comisiones/alta"
                 className={linkClass}
@@ -224,7 +225,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.comisiones.ver") && (
               <NavLink
                 to="/comisiones"
                 className={linkClass}
@@ -346,7 +347,7 @@ function Navbar() {
             >
               Inicio
             </MobileLink>
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.personas.crear") && (
               <MobileLink
                 to="/alta-persona"
                 icon={<Plus size={20} />}
@@ -372,7 +373,7 @@ function Navbar() {
               Legajos
             </MobileLink>
 
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.planes.crear") && (
               <MobileLink
                 to="/planes/alta"
                 icon={<Plus size={20} />}
@@ -397,7 +398,7 @@ function Navbar() {
             >
               Asignaturas
             </MobileLink>
-            {hasPermission(currentUserRole) && (
+            {hasPermission("planes.comisiones.crear") && (
               <MobileLink
                 to="/comisiones/alta"
                 icon={<Plus size={20} />}
