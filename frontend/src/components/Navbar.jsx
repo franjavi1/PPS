@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
-import { hasPermission } from "../utils/authHelper";
+import useAuth from "../auth/hooks/useAuth";
+import { hasPermission } from "../auth/utils/permissions";
+import { LOGIN_ROUTE } from "../auth/config";
 import {
   BookOpen,
   BookMarked,
@@ -50,7 +51,7 @@ function Navbar() {
   const handleLogout = () => {
     logout();
     closeMenus();
-    navigate("/login");
+    navigate(LOGIN_ROUTE);
   };
 
   useEffect(() => {

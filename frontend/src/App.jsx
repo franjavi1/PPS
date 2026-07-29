@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router";
 import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import InicioSesion from "./pages/Login";
 import Inicio from "./pages/Inicio";
 import Legajos from "./pages/Legajos";
 import ConfigDocumentos from "./pages/ConfigDocumentos";
@@ -30,7 +29,6 @@ import Sedes from "./pages/Sedes";
 import TiposSedes from "./pages/TiposSedes";
 import TipoRangos from "./pages/TipoRangos";
 import TiposDocumentos from "./pages/TiposDocumentos";
-import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   useEffect(() => {
@@ -46,7 +44,6 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
       <div className="relative min-h-screen">
         {/* Contenedor flexible para centrar la marca de agua de forma 100% responsiva */}
         <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center p-4">
@@ -81,8 +78,7 @@ function App() {
             }}
           />
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<InicioSesion />} />
+            <Route path="/" element={<Navigate to="/inicio" replace />} />
             <Route path="/inicio" element={<Inicio />} />
             <Route path="/legajos" element={<Legajos />} />
             <Route path="/config-documentos" element={<ConfigDocumentos />} />
@@ -122,7 +118,6 @@ function App() {
           </Routes>
         </div>
       </div>
-    </AuthProvider>
   );
 }
 

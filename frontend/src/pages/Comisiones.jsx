@@ -14,7 +14,7 @@ import {
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
 import { comisionService } from "../services/comisionService";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   descripcion: "",

@@ -21,7 +21,7 @@ import { planService } from "../services/planesService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { rangoService } from "../services/rangoService";
 import { sedeService } from "../services/sedeService";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   asignatura_id: "",
