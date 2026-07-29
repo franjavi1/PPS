@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import App from "./App.jsx";
 import "./index.css";
+import { AuthProvider } from "./auth/context/AuthContext.jsx";
 
 const temaGuardado = localStorage.getItem("tema");
 
@@ -13,7 +14,9 @@ if (temaGuardado === "oscuro") {
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter basename="/planes">
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

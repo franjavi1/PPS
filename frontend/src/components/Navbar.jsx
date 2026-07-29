@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
-import { hasPermission } from "../utils/authHelper";
+import useAuth from "../auth/hooks/useAuth";
+import { hasPermission } from "../auth/utils/permissions";
+import { LOGIN_ROUTE } from "../auth/config";
 import {
   BookOpen,
   BookMarked,
@@ -50,7 +51,7 @@ function Navbar() {
   const handleLogout = () => {
     logout();
     closeMenus();
-    navigate("/login");
+    navigate(LOGIN_ROUTE);
   };
 
   useEffect(() => {
@@ -117,7 +118,7 @@ function Navbar() {
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
-            {hasPermission(currentUserRole, "crear") && (
+            {hasPermission(currentUserRole) && (
               <NavLink
                 to="/alta-persona"
                 className={linkClass}
@@ -134,7 +135,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole, "leer") && (
+            {hasPermission(currentUserRole) && (
               <NavLink
                 to="/personas"
                 className={linkClass}
@@ -149,7 +150,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole, "leer") && (
+            {hasPermission(currentUserRole) && (
               <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
                 <ClipboardList size={18} />
                 <span>
@@ -169,7 +170,7 @@ function Navbar() {
             openMenu={openMenu}
             toggleMenu={toggleMenu}
           >
-            {hasPermission(currentUserRole, "crear") && (
+            {hasPermission(currentUserRole) && (
               <NavLink
                 to="/planes/alta"
                 className={linkClass}
@@ -184,7 +185,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole, "leer") && (
+            {hasPermission(currentUserRole) && (
               <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
                 <BookOpen size={18} />
                 <span>
@@ -193,7 +194,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole, "leer") && (
+            {hasPermission(currentUserRole) && (
               <NavLink
                 to="/asignaturas"
                 className={linkClass}
@@ -208,7 +209,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole, "crear") && (
+            {hasPermission(currentUserRole) && (
               <NavLink
                 to="/comisiones/alta"
                 className={linkClass}
@@ -223,7 +224,7 @@ function Navbar() {
                 </span>
               </NavLink>
             )}
-            {hasPermission(currentUserRole, "leer") && (
+            {hasPermission(currentUserRole) && (
               <NavLink
                 to="/comisiones"
                 className={linkClass}
@@ -345,7 +346,7 @@ function Navbar() {
             >
               Inicio
             </MobileLink>
-            {hasPermission(currentUserRole, "crear") && (
+            {hasPermission(currentUserRole) && (
               <MobileLink
                 to="/alta-persona"
                 icon={<Plus size={20} />}
@@ -371,7 +372,7 @@ function Navbar() {
               Legajos
             </MobileLink>
 
-            {hasPermission(currentUserRole, "crear") && (
+            {hasPermission(currentUserRole) && (
               <MobileLink
                 to="/planes/alta"
                 icon={<Plus size={20} />}
@@ -396,7 +397,7 @@ function Navbar() {
             >
               Asignaturas
             </MobileLink>
-            {hasPermission(currentUserRole, "crear") && (
+            {hasPermission(currentUserRole) && (
               <MobileLink
                 to="/comisiones/alta"
                 icon={<Plus size={20} />}

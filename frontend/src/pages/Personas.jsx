@@ -15,8 +15,8 @@ import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
 import { apiRequest } from "../api";
 import { personasService } from "../services/personasService";
-import { useAuth } from "../context/AuthContext";
-import { hasPermission } from "../utils/authHelper";
+import useAuth from "../auth/hooks/useAuth";  
+import { hasPermission } from "../auth/utils/permissions";
 
 const formularioInicial = {
   td_id: "",

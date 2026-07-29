@@ -12,7 +12,7 @@ import {
 import Navbar from "../components/Navbar";
 import { asignaturaService } from "../services/asignaturaService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   nombre: "",

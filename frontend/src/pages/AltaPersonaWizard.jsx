@@ -85,7 +85,7 @@ function AltaPersonaWizard() {
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
   const [resultadoUsuario, setResultadoUsuario] = useState(null);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     cargarCombos();
@@ -248,16 +248,14 @@ function AltaPersonaWizard() {
         throw new Error("No se recibio el ID de la persona creada.");
       }
 
-      const respuestaLegajo = await apiRequest(
-        `/personas/${nuevaPersonaId}/legajo`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            numero: legajo.numero.trim(),
-            usuario_accion: 1,
-          }),
-        },
-      );
+      const respuestaLegajo = await apiRequest(`/legajos`, { 
+        method: "POST",
+        body: JSON.stringify({
+          numero: legajo.numero.trim(),
+          persona_id: nuevaPersonaId,
+          usuario_accion: 1,
+        }),
+      });
 
       const nuevoLegajoId = obtenerIdRespuesta(respuestaLegajo);
 
@@ -351,51 +349,51 @@ function AltaPersonaWizard() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
-          <BotonVolver />
-          
+        <BotonVolver />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
-  <div>
-    <p className="text-sm font-bold text-red-700 uppercase">
-      Alta guiada
-    </p>
+            <div>
+              <p className="text-sm font-bold text-red-700 uppercase">
+                Alta guiada
+              </p>
 
-    <h1 className="text-4xl font-extrabold text-slate-800 mt-2">
-      Persona, legajo y usuario
-    </h1>
+              <h1 className="text-4xl font-extrabold text-slate-800 mt-2">
+                Persona, legajo y usuario
+              </h1>
 
-    <p className="text-slate-500 mt-2">
-      Completa todos los pasos. Los datos se guardan al confirmar el
-      resumen.
-    </p>
-  </div>
+              <p className="text-slate-500 mt-2">
+                Completa todos los pasos. Los datos se guardan al confirmar el
+                resumen.
+              </p>
+            </div>
 
-  <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
-    <button
-      type="button"
-      onClick={() => navigate("/personas")}
-      className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
-    >
-      <User size={20} />
-      Personas
-    </button>
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => navigate("/personas")}
+                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
+              >
+                <User size={20} />
+                Personas
+              </button>
 
-    <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 min-w-64">
-      <p className="text-xs font-bold text-slate-400 uppercase">
-        Progreso
-      </p>
+              <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 min-w-64">
+                <p className="text-xs font-bold text-slate-400 uppercase">
+                  Progreso
+                </p>
 
-      <p className="text-slate-800 font-bold mt-1">
-        Persona ID: {personaId || "pendiente"}
-      </p>
+                <p className="text-slate-800 font-bold mt-1">
+                  Persona ID: {personaId || "pendiente"}
+                </p>
 
-      <p className="text-slate-800 font-bold mt-1">
-        Legajo ID: {legajoId || "pendiente"}
-      </p>
-    </div>
-  </div>
-</div>
-           
+                <p className="text-slate-800 font-bold mt-1">
+                  Legajo ID: {legajoId || "pendiente"}
+                </p>
+              </div>
+            </div>
+          </div>
+
 
           <div className="mb-8">
             <div className="flex items-start">
@@ -719,18 +717,16 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
     <div className="flex flex-1 items-start">
       <div className="flex flex-col items-center min-w-12">
         <div
-          className={`w-11 h-11 rounded-full flex items-center justify-center text-base font-extrabold border-2 transition ${
-            resaltado
+          className={`w-11 h-11 rounded-full flex items-center justify-center text-base font-extrabold border-2 transition ${resaltado
               ? "bg-red-700 border-red-700 text-white shadow-sm"
               : "bg-slate-100 border-slate-300 text-slate-400"
-          }`}
+            }`}
         >
           {paso.id}
         </div>
         <p
-          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${
-            resaltado ? "text-red-700" : "text-slate-400"
-          }`}
+          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"
+            }`}
         >
           {paso.titulo}
         </p>
@@ -738,9 +734,8 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
 
       {!ultimo && (
         <div
-          className={`h-1 flex-1 rounded-full mt-5 transition ${
-            completo ? "bg-red-700" : "bg-slate-200"
-          }`}
+          className={`h-1 flex-1 rounded-full mt-5 transition ${completo ? "bg-red-700" : "bg-slate-200"
+            }`}
         />
       )}
     </div>
@@ -784,9 +779,8 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
-            icono ? "pl-12" : "px-4"
-          }`}
+          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "px-4"
+            }`}
         />
       </div>
     </div>
@@ -882,7 +876,7 @@ function Acciones({ guardando, texto, onBack }) {
       <button
         type="submit"
         disabled={guardando}
-        className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition-colors duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed" 
+        className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition-colors duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
       >
         <Save size={22} />
         {guardando ? "Guardando..." : texto}

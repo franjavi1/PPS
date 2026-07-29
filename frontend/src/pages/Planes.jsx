@@ -18,7 +18,7 @@ import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
 import { planService } from "../services/planesService";
 import { tipoPlanesService } from "../services/tipoPlanesService";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   tipo_planes_id_tipo_planes: "",
