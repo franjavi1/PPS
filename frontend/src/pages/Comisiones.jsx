@@ -22,7 +22,7 @@ const formularioInicial = {
 
 function Comisiones() {
   const navigate = useNavigate();
-  const { currentUserRole } = useAuth();
+  const { currentUserRole, hasPermission } = useAuth();
   const esAdministrador = currentUserRole === "ROLE_ADMIN";
   const [comisiones, setComisiones] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -180,11 +180,11 @@ function Comisiones() {
 
               <button
                 onClick={() => navigate("/comisiones/alta")}
-                disabled={!esAdministrador}
+                disabled={!hasPermission("planes.comisiones.crear")}
                 title={
-                  esAdministrador
-                    ? "Crear comisión"
-                    : "Solo los administradores pueden crear comisiones"
+                  hasPermission("planes.comisiones.crear")
+                    ? "Crear comision"
+                    : "No tenés permiso para crear comisiones"
                 }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-700"
               >
@@ -237,6 +237,12 @@ function Comisiones() {
 
                   <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
+                      disabled={!hasPermission("planes.comisiones.ver")}
+                      title={
+                        hasPermission("planes.comisiones.ver")
+                          ? "Ver comision"
+                          : "No tenés permiso para ver comisiones"
+                      }
                       onClick={() =>
                         navigate(`/comisiones/${comision.id_comision}`)
                       }
@@ -250,11 +256,11 @@ function Comisiones() {
                       onClick={() =>
                         navigate(`/comisiones/${comision.id_comision}/editar`)
                       }
-                      disabled={!esAdministrador}
+                      disabled={!hasPermission("planes.comisiones.editar")}
                       title={
-                        esAdministrador
-                          ? "Editar comisión"
-                          : "Solo los administradores pueden editar"
+                        hasPermission("planes.comisiones.editar")
+                          ? "Editar comision"
+                          : "No tenés permiso para editar comisiones"
                       }
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
@@ -264,11 +270,11 @@ function Comisiones() {
 
                     <button
                       onClick={() => eliminarComision(comision.id_comision)}
-                      disabled={!esAdministrador}
+                      disabled={!hasPermission("planes.comisiones.eliminar")}
                       title={
-                        esAdministrador
-                          ? "Eliminar comisión"
-                          : "Solo los administradores pueden eliminar"
+                        hasPermission("planes.comisiones.eliminar")
+                          ? "Eliminar comision"
+                          : "No tenés permiso para eliminar comisiones"
                       }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
@@ -320,6 +326,12 @@ function Comisiones() {
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
                           <button
+                            disabled={!hasPermission("planes.comisiones.ver")}
+                            title={
+                              hasPermission("planes.comisiones.ver")
+                                ? "Ver comision"
+                                : "No tenés permiso para ver comisiones"
+                            }
                             onClick={() =>
                               navigate(`/comisiones/${comision.id_comision}`)
                             }
@@ -335,11 +347,11 @@ function Comisiones() {
                                 `/comisiones/${comision.id_comision}/editar`,
                               )
                             }
-                            disabled={!esAdministrador}
+                            disabled={!hasPermission("planes.comisiones.editar")}
                             title={
-                              esAdministrador
-                                ? "Editar comisión"
-                                : "Solo los administradores pueden editar"
+                              hasPermission("planes.comisiones.editar")
+                                ? "Editar comision"
+                                : "No tenés permiso para editar comisiones"
                             }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
@@ -351,11 +363,11 @@ function Comisiones() {
                             onClick={() =>
                               eliminarComision(comision.id_comision)
                             }
-                            disabled={!esAdministrador}
+                            disabled={!hasPermission("planes.comisiones.eliminar")}
                             title={
-                              esAdministrador
-                                ? "Eliminar comisión"
-                                : "Solo los administradores pueden eliminar"
+                              hasPermission("planes.comisiones.eliminar")
+                                ? "Eliminar comision"
+                                : "No tenés permiso para edliminar comisiones"
                             }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
