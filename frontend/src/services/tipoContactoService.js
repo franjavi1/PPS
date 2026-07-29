@@ -1,13 +1,13 @@
 /**
- * Servicio para la gestion de Tipos de Documento.
- * Se conecta con el endpoint de Flask: /tipos-documentos
+ * Servicio para la gestion de Tipos de Contacto.
+ * Se conecta con el endpoint de Flask: /tipos-contacto
  */
 
 import { apiRequest } from "../api";
 
-const BASE_URL = "/tipos-documentos";
+const BASE_URL = "/tipos-contacto";
 
-export const tipoDocumentoService = {
+export const tipoContactoService = {
  
   obtenerTodos() {
     return apiRequest(BASE_URL);
@@ -19,19 +19,19 @@ export const tipoDocumentoService = {
   },
 
   
-  crear(tipoDocumento) {
+  crear(tipoContacto) {
     return apiRequest(BASE_URL, {
       method: "POST",
-      body: JSON.stringify(tipoDocumento),
+      body: JSON.stringify(tipoContacto),
     });
   },
 
 
   
-  actualizar(id, tipoDocumento) {
+  actualizar(id, tipoContacto) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "PUT",
-      body: JSON.stringify(tipoDocumento),
+      body: JSON.stringify(tipoContacto),
     });
   },
 

@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
-import { apiRequest } from "../api";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
@@ -24,6 +23,7 @@ import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
 import { modalidadService } from "../services/modalidadService";
+import { legajoService } from "../services/legajoService";
 
 const pasos = [
   { id: 1, titulo: "Comision", icono: GraduationCap },
@@ -95,7 +95,7 @@ function AltaComisionWizard() {
         sedeService.obtenerTodas(),
         aulaService.obtenerTodas(),
         tipoAutoridadService.obtenerTodos(),
-        apiRequest("/legajos"),
+        legajoService.obtenerTodos,
         modalidadService.obtenerTodas(),
       ]);
 

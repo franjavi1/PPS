@@ -24,6 +24,9 @@ import { legajoRangosService } from "../services/legajoRangosService";
 import { legajoSedesService } from "../services/legajoSedesService";
 import { rangoService } from "../services/rangoService";
 import { sedeService } from "../services/sedeService";
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
+import { tipoContactoService } from "../services/tipoContactoService";
+import { legajoService } from "../services/legajoService";
 
 const pasos = [
   { id: 1, titulo: "Persona", icono: User },
@@ -95,10 +98,10 @@ function AltaPersonaWizard() {
     try {
       const [respuestaTipos, respuestaRangos, respuestaSedes, respuestaTiposContacto] =
         await Promise.all([
-          apiRequest("/tipos-documentos"),
+          tipoDocumentoService.obtenerTodos(),
           rangoService.obtenerTodos(),
           sedeService.obtenerTodas(),
-          apiRequest("/tipos-contacto"),
+          tipoContactoService.obtenerTodos(),
         ]);
 
       setTiposDocumento(respuestaTipos.data || []);
@@ -234,13 +237,16 @@ function AltaPersonaWizard() {
       setGuardando(true);
       setError("");
 
-      const respuestaPersona = await personasService.crear({
+      // 1. Datos de persona listos desde el hook/estado con sus conversiones necesarias
+      const datosPersona = {
         td_id: Number(persona.td_id),
         numero_doc: Number(persona.numero_doc),
         nombre: persona.nombre.trim(),
         apellido: persona.apellido.trim(),
         usuario_accion: 1,
-      });
+      };
+
+      const respuestaPersona = await personasService.crear(datosPersona);
 
       const nuevaPersonaId = obtenerIdRespuesta(respuestaPersona);
 
@@ -248,14 +254,14 @@ function AltaPersonaWizard() {
         throw new Error("No se recibio el ID de la persona creada.");
       }
 
-      const respuestaLegajo = await apiRequest(`/legajos`, { 
-        method: "POST",
-        body: JSON.stringify({
-          numero: legajo.numero.trim(),
-          persona_id: nuevaPersonaId,
-          usuario_accion: 1,
-        }),
-      });
+      // 2. Datos de legajo listos desde el hook/estado
+      const datosLegajoPayload = {
+        numero: legajo.numero.trim(),
+        persona_id: nuevaPersonaId,
+        usuario_accion: 1,
+      };
+
+      const respuestaLegajo = await legajoService.crear(datosLegajoPayload);
 
       const nuevoLegajoId = obtenerIdRespuesta(respuestaLegajo);
 
@@ -264,39 +270,45 @@ function AltaPersonaWizard() {
       }
 
       if (datosMedicos.grupo_sanguineo && datosMedicos.seguro.trim()) {
+        const datosMedicosPayload = {
+          grupo_sanguineo: datosMedicos.grupo_sanguineo,
+          alergias: datosMedicos.alergias.trim() || null,
+          aptitud_fisica: Boolean(datosMedicos.aptitud_fisica),
+          seguro: datosMedicos.seguro.trim(),
+          usuario_accion: 1,
+        };
+
         await apiRequest(`/personas/${nuevaPersonaId}/datos-medicos`, {
           method: "POST",
-          body: JSON.stringify({
-            grupo_sanguineo: datosMedicos.grupo_sanguineo,
-            alergias: datosMedicos.alergias.trim() || null,
-            aptitud_fisica: Boolean(datosMedicos.aptitud_fisica),
-            seguro: datosMedicos.seguro.trim(),
-            usuario_accion: 1,
-          }),
+          body: JSON.stringify(datosMedicosPayload),
         });
       }
 
       if (datosLegajo.rangos_institucionales_id) {
+        // 4. Datos de rangos listos desde el hook/estado
+        const datosRangosPayload = {
+          rangos_institucionales_id: Number(datosLegajo.rangos_institucionales_id),
+          usuario_accion: 1,
+        };
+
         await apiRequest(`/legajos/${nuevoLegajoId}/rangos`, {
           method: "POST",
-          body: JSON.stringify({
-            rangos_institucionales_id: Number(
-              datosLegajo.rangos_institucionales_id,
-            ),
-            usuario_accion: 1,
-          }),
+          body: JSON.stringify(datosRangosPayload),
         });
       }
 
       if (datosLegajo.sede_id) {
+        // 5. Datos de sedes listos desde el hook/estado
+        const datosSedesPayload = {
+          sede_id: Number(datosLegajo.sede_id),
+          es_autoridad: Boolean(datosLegajo.es_autoridad),
+          es_sede_base: Boolean(datosLegajo.es_sede_base),
+          usuario_accion: 1,
+        };
+
         await apiRequest(`/legajos/${nuevoLegajoId}/sedes`, {
           method: "POST",
-          body: JSON.stringify({
-            sede_id: Number(datosLegajo.sede_id),
-            es_autoridad: Boolean(datosLegajo.es_autoridad),
-            es_sede_base: Boolean(datosLegajo.es_sede_base),
-            usuario_accion: 1,
-          }),
+          body: JSON.stringify(datosSedesPayload),
         });
       }
 
@@ -717,16 +729,18 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
     <div className="flex flex-1 items-start">
       <div className="flex flex-col items-center min-w-12">
         <div
-          className={`w-11 h-11 rounded-full flex items-center justify-center text-base font-extrabold border-2 transition ${resaltado
+          className={`w-11 h-11 rounded-full flex items-center justify-center text-base font-extrabold border-2 transition ${
+            resaltado
               ? "bg-red-700 border-red-700 text-white shadow-sm"
               : "bg-slate-100 border-slate-300 text-slate-400"
-            }`}
+          }`}
         >
           {paso.id}
         </div>
         <p
-          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"
-            }`}
+          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${
+            resaltado ? "text-red-700" : "text-slate-400"
+          }`}
         >
           {paso.titulo}
         </p>
@@ -734,8 +748,9 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
 
       {!ultimo && (
         <div
-          className={`h-1 flex-1 rounded-full mt-5 transition ${completo ? "bg-red-700" : "bg-slate-200"
-            }`}
+          className={`h-1 flex-1 rounded-full mt-5 transition ${
+            completo ? "bg-red-700" : "bg-slate-200"
+          }`}
         />
       )}
     </div>
@@ -779,8 +794,9 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "px-4"
-            }`}
+          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+            icono ? "pl-12" : "px-4"
+          }`}
         />
       </div>
     </div>
