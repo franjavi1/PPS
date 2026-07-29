@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { STORAGE_KEY } from "./auth/config";
+import { AUTH_API, STORAGE_KEY, LOGIN_ROUTE } from "./auth/config";
 
 const isLocal =
   window.location.hostname === "localhost" ||
@@ -76,15 +76,35 @@ async function ejecutarRequest(url, options = {}) {
   const data = await response.json();
   console.log(response);
 
-  if (!response.ok || data?.ok === false) {
-    const mensaje = obtenerMensajeApi(data);
-    const errorNormalizado =
-      data && typeof data === "object"
-        ? { ...data, message: mensaje }
-        : { message: mensaje };
+  if (!response.ok) {
+    const errores = data.errors || {};
+    const primerCampo = Object.keys(errores)[0];
+    const primerError = primerCampo && Array.isArray(errores[primerCampo])
+      ? errores[primerCampo][0]
+      : errores[primerCampo];
+    
+    if (res.status === 401 && sesion?.refresh_token) {
+      try {
+        const nuevoToken = await refrescarToken();
 
-    toast.error(mensaje);
-    throw errorNormalizado;
+        res = await fetch(`${API_URL}/${path}`, {
+          ...options,
+          headers: construirHeaders(options, nuevoToken),
+        });
+      } catch (error) {
+        // Si no fue posible renovar la sesión, elimina la información local y redirige al login
+        authService.clearSession();
+        window.location.assign(LOGIN_ROUTE);
+
+        throw error;
+      }
+    }
+    /*if(response.status==401){
+      window.location.assign("/auth/login")
+    }*/
+    data.message = primerError || data.message || "No se pudo completar la operacion";
+    toast.error(data.message);
+    throw data;
   }
 
   return data;
