@@ -23,3 +23,11 @@ class Config:
         for ip in os.environ.get("AUTH_COMMON_SERVICIOS_PERMITIDOS", "").split(",")
         if ip.strip()
         ]
+
+# JWT_SECRET_KEY se lee de entorno. Si no está seteado, falla.
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+    if not JWT_SECRET_KEY:
+        raise RuntimeError(
+            "JWT_SECRET_KEY no está definida. Seteala como variable de entorno "
+            "(ver .env.dev) antes de levantar la app."
+        )

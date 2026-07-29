@@ -96,6 +96,23 @@ acciones:
   - nombre: legajo_rangos.eliminar
     descripcion: Quitar un rango asignado a un legajo
     activo: true
+    
+  - nombre: legajo_sedes.ver
+    descripcion: Quitar un rango asignado a un legajo
+    activo: true
+    
+  - nombre: legajo_sedes.crear
+    descripcion: Quitar un rango asignado a un legajo
+    activo: true
+    
+  - nombre: legajo_sedes.editar
+    descripcion: Quitar un rango asignado a un legajo
+    activo: true
+    
+  - nombre: legajo_sedes.eliminar
+    descripcion: Quitar un rango asignado a un legajo
+    activo: true
+    
 
   # -------------------------
   # PLANES
