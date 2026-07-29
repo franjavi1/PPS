@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import useAuth from "../auth/hooks/useAuth";
 //import { hasPermission } from "../auth/utils/permissions";
+import { MENU_ROUTE } from "../api";
 import { LOGIN_ROUTE } from "../auth/config";
 import {
   BookOpen,
@@ -50,9 +51,10 @@ function Navbar() {
     setMobileOpen(false);
   };
   const handleLogout = () => {
-    logout();
-    closeMenus();
-    navigate(LOGIN_ROUTE);
+    //logout();
+    //closeMenus();
+    window.location.href = MENU_ROUTE;
+    //navigate(LOGIN_ROUTE);
   };
 
   useEffect(() => {
@@ -320,7 +322,7 @@ function Navbar() {
             className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
           >
             <LogOut size={17} />
-            Cerrar sesión
+            Volver
           </button>
         </nav>
       </div>

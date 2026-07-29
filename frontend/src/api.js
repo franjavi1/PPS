@@ -7,6 +7,11 @@ export const API_URL = isLocal
   ? "http://localhost:8480/api/planes"
   : "http://186.19.137.9:8480/api/planes";
 
+
+export const MENU_ROUTE = isLocal
+  ? "http://localhost:8480"
+  : "http://186.19.137.9:8480";
+
 //export const API_URL = "http://186.19.137.9:8480/api/planes";
 
 function obtenerSesion() {
