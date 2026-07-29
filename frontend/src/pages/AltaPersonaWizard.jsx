@@ -263,6 +263,21 @@ function AltaPersonaWizard() {
       return;
     }
 
+    if (cargandoRoles) {
+      setError("Espera a que termine la carga de roles.");
+      return;
+    }
+
+    if (errorRoles) {
+      setError("No se pudieron cargar los roles. Reintenta antes de continuar.");
+      return;
+    }
+
+    if (datosPersonaAuth.id_roles.length === 0) {
+      setError("Selecciona al menos un rol para crear el usuario.");
+      return;
+    }
+
     setError("");
     setPasoActual(5);
   }
@@ -705,22 +720,25 @@ function AltaPersonaWizard() {
             <form onSubmit={guardarUsuario} className="space-y-6">
               <TituloPaso
                 icono={<ShieldCheck size={26} />}
-                titulo="Usuario de acceso"
+                titulo="Usuario y roles de acceso"
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5">
                 <CampoSoloLectura
                   label="Email del usuario"
                   value={contactos.email || "Falta cargar el email"}
                 />
-                <CampoSoloLectura
-                  label="Asignación de roles"
-                  value="Los roles se seleccionan en el resumen final"
-                />
               </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 text-blue-800 font-semibold">
-                Al confirmar el alta se creará la persona, el legajo y el
-                usuario de Auth con los roles seleccionados.
-              </div>
+
+              <ListaRoles
+                roles={roles}
+                idRolesSeleccionados={datosPersonaAuth.id_roles}
+                cargando={cargandoRoles}
+                error={errorRoles}
+                onAlternarRol={alternarRol}
+                onReintentar={cargarRolesAuth}
+                deshabilitado={false}
+              />
+
               <Acciones
                 guardando={false}
                 texto="Ir al resumen"
@@ -774,22 +792,23 @@ function AltaPersonaWizard() {
                   titulo="Usuario"
                   texto={
                     resultadoUsuario?.mensaje ||
-                    `${contactos.email} - pendiente de guardar`
+                    `${contactos.email} - ${obtenerNombresRolesSeleccionados(
+                      roles,
+                      datosPersonaAuth.id_roles,
+                    )} - pendiente de guardar`
                   }
                 />
               </div>
 
-              <ListaRoles
-                roles={roles}
-                idRolesSeleccionados={datosPersonaAuth.id_roles}
-                cargando={cargandoRoles}
-                error={errorRoles}
-                onAlternarRol={alternarRol}
-                onReintentar={cargarRolesAuth}
-                deshabilitado={guardando || Boolean(personaId)}
-              />
-
-              <div className="flex justify-end">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPasoActual(4)}
+                  disabled={guardando}
+                  className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg font-bold hover:bg-slate-300 disabled:opacity-60 transition cursor-pointer"
+                >
+                  Volver
+                </button>
                 <button
                   type="button"
                   onClick={confirmarAltaPersona}
@@ -1160,6 +1179,14 @@ function obtenerTipoContacto(tiposContacto, nombre) {
     );
     return tipoNormalizado === nombreNormalizado;
   });
+}
+
+function obtenerNombresRolesSeleccionados(roles, idRolesSeleccionados) {
+  const nombres = roles
+    .filter((rol) => idRolesSeleccionados.includes(Number(rol.id_rol)))
+    .map((rol) => rol.nombre);
+
+  return nombres.length > 0 ? `Roles: ${nombres.join(", ")}` : "Sin roles";
 }
 
 function normalizarTexto(texto) {
