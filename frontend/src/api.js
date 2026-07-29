@@ -7,6 +7,9 @@ export const API_URL = isLocal
   ? "http://localhost:8480/api/planes"
   : "http://186.19.137.9:8480/api/planes";
 
+export const API_URL_AUTH = isLocal
+  ? "http://localhost:8480/api/auth"
+  : "http://186.19.137.9:8480/api/auth";
 
 export const MENU_ROUTE = isLocal
   ? "http://localhost:8480"
@@ -32,6 +35,8 @@ export async function apiRequest(path, options = {}) {
     ...options,
   });
 
+
+
   const data = await response.json();
   console.log(response);
 
@@ -50,4 +55,35 @@ export async function apiRequest(path, options = {}) {
   return data;
 }
 
+export async function apiRequestAuth(path, options = {}) {
+  debugger;
+  const sesion = obtenerSesion();
+  const response = await fetch(`${API_URL_AUTH}${path}`, {
+  headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+      Authorization: `Bearer ${sesion.access_token}`
+    },
+    ...options,
+  });
+
+
+
+  const data = await response.json();
+  console.log(response);
+
+  if (!response.ok) {
+    const errores = data.errors || {};
+    const primerCampo = Object.keys(errores)[0];
+    const primerError = primerCampo && Array.isArray(errores[primerCampo])
+      ? errores[primerCampo][0]
+      : errores[primerCampo];
+
+    data.message = primerError || data.message || "No se pudo completar la operacion";
+    toast.error(data.message);
+    throw data;
+  }
+
+  return data;
+}
 
