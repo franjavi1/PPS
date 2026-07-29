@@ -241,7 +241,7 @@ function Navbar() {
               </NavLink>
             )}
           </Dropdown>
-          {currentUserRole === "ROLE_ADMIN" && (
+          {hasPermission("planes.config.ver") && (
             <Dropdown
               id="config"
               title="Configuración"

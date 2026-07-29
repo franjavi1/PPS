@@ -256,6 +256,10 @@ acciones:
   # -------------------------
   # CONFIG
   # -------------------------
+  - nombre: config.ver
+    descripcion: Permite ver las opciones de configuracion
+    activo: true
+
   - nombre: sedes.ver
     descripcion: Ver listado y detalle de sedes
     activo: true
@@ -413,6 +417,7 @@ rol_accion:
       - autoridades_comision.crear
       - autoridades_comision.editar
       - autoridades_comision.eliminar
+      - config.ver
       - tipos_autoridad.ver
       - tipos_autoridad.crear
       - tipos_autoridad.editar
