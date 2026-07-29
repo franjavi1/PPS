@@ -1,42 +1,35 @@
-/**
- * Servicio para la gestion de Tipos de Documento.
- * Se conecta con el endpoint de Flask: /tipos-documentos
- */
-
 import { apiRequest } from "../api";
 
-const BASE_URL = "/tipos-documentos";
+/**
+ * Servicio para la gestion de Legajos.
+ * Se conecta con el endpoint de Flask: /legajo
+ */
 
-export const tipoDocumentoService = {
- 
+const BASE_URL = "/legajos";
+
+export const legajoService = {
   obtenerTodos() {
     return apiRequest(BASE_URL);
   },
 
-  
   obtenerPorId(id) {
     return apiRequest(`${BASE_URL}/${id}`);
   },
 
-  
-  crear(tipoDocumento) {
+  crear(legajo) {
     return apiRequest(BASE_URL, {
       method: "POST",
-      body: JSON.stringify(tipoDocumento),
+      body: JSON.stringify(legajo),
     });
   },
 
-
-  
-  actualizar(id, tipoDocumento) {
+  actualizar(id, legajo) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "PUT",
-      body: JSON.stringify(tipoDocumento),
+      body: JSON.stringify(legajo),
     });
   },
 
-
-  
   eliminar(id) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "DELETE",
