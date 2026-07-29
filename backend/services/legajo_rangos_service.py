@@ -1,6 +1,7 @@
 from models.legajo_rangos import LegajoRangos
 from schemas.legajo_rangos_schema import LegajoRangosSchema, legajo_rangos_schema
 from db import db
+from utils.auditoria import Auditoria
 
 
 """
@@ -18,7 +19,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_legajo_rangos = legajo_rangos_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_legajo_rangos)
     db.session.add(nuevo_legajo_rangos)
     db.session.commit()
 
@@ -26,6 +27,7 @@ def crear(datos):
 
 
 def actualizar(legajo_rangos, datos):
+    Auditoria.preparar_modificacion(legajo_rangos)
     schema = LegajoRangosSchema(partial=True)
 
     # Evita que la validacion de relacion unica tome como duplicado
@@ -40,6 +42,7 @@ def actualizar(legajo_rangos, datos):
 
 
 def eliminar(legajo_rangos):
+    Auditoria.preparar_baja(legajo_rangos)
     legajo_rangos.estado = 0
     db.session.commit()
 

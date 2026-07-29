@@ -1,6 +1,7 @@
 from models.plan_asignatura import PlanAsignatura
 from schemas.plan_asignatura_schema import PlanAsignaturaSchema, plan_asignatura_schema
 from db import db
+from utils.auditoria import Auditoria
 from utils.errores import APIError
 
 def obtener_todos():

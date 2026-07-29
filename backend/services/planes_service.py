@@ -2,6 +2,7 @@ from models.planes import Planes
 from models.plan_asignatura import PlanAsignatura
 from schemas.planes_schema import PlanesSchema, plan_schema
 from db import db
+from utils.auditoria import Auditoria
 
 """
 Este archivo contiene la logica de negocio del CRUD de Planes

@@ -1,6 +1,7 @@
 from models.legajo_sedes import LegajoSedes
 from schemas.legajo_sedes_schema import LegajoSedesSchema, legajo_sedes_schema
 from db import db
+from utils.auditoria import Auditoria
 
 
 """

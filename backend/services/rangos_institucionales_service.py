@@ -4,6 +4,7 @@ from schemas.rangos_institucionales_schema import (
     rango_institucional_schema
 )
 from db import db
+from utils.auditoria import Auditoria
 
 
 """

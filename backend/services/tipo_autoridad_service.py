@@ -1,6 +1,7 @@
 from models.tipos_autoridad import TipoAutoridad
 from schemas.tipo_autoridad_schema import TipoAutoridadSchema, tipo_autoridad_schema
 from db import db
+from utils.auditoria import Auditoria
 
 """
 Este archivo contiene la lógica de negocio del CRUD de TipoAutoridad

@@ -4,6 +4,7 @@ from schemas.autoridad_comision_schema import (
     autoridad_comision_schema
 )
 from db import db
+from utils.auditoria import Auditoria
 
 
 def obtener_todos():
@@ -16,7 +17,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nueva_autoridad_comision = autoridad_comision_schema.load(datos)
-
+    Auditoria.preparar_alta(nueva_autoridad_comision)
     db.session.add(nueva_autoridad_comision)
     db.session.commit()
 
@@ -24,6 +25,7 @@ def crear(datos):
 
 
 def actualizar(autoridad_comision, datos):
+    Auditoria.preparar_modificacion(autoridad_comision)
     schema = AutoridadComisionSchema(partial=True)
     schema.context = {"autoridad_comision_id": autoridad_comision.id}
 
@@ -35,6 +37,7 @@ def actualizar(autoridad_comision, datos):
 
 
 def eliminar(autoridad_comision):
+    Auditoria.preparar_baja(autoridad_comision)
     autoridad_comision.estado = 0
     db.session.commit()
 

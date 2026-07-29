@@ -2,6 +2,7 @@ from models.persona import Persona
 from models.legajo import Legajo
 from schemas.persona_schema import PersonaSchema, persona_schema
 from db import db
+from utils.auditoria import Auditoria
 
 
 """

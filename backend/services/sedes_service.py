@@ -1,6 +1,7 @@
 from models.sedes import Sedes
 from schemas.sedes_schema import sede_schema
 from db import db
+from utils.auditoria import Auditoria
 
 
 """

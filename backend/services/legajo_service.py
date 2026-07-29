@@ -5,6 +5,7 @@ from models.persona import Persona
 from schemas.legajo_schema import LegajoSchema, legajo_schema
 from schemas.persona_schema import PersonaSchema
 from db import db
+from utils.auditoria import Auditoria
 from utils.errores import APIError
 
 """
