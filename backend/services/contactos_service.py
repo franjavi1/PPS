@@ -1,4 +1,5 @@
 from models.contactos import Contactos
+from models.legajo import Legajo
 from schemas.contactos_schema import ContactosSchema, contacto_schema
 from db import db
 
@@ -49,6 +50,11 @@ def eliminar(contacto):
 def obtener_personaid_por_email(email: str):
     contacto = Contactos.query.filter_by(contacto=email).first()
 
-    if contacto:
-        return contacto.persona_id
-    return None
+    if not contacto:
+        return None, None
+    
+    persona_id = contacto.persona_id
+    legajo = Legajo.query.filter_by(persona_id=persona_id, estado=1).first()
+    legajo_id = legajo.id if legajo else None
+    
+    return persona_id, legajo_id

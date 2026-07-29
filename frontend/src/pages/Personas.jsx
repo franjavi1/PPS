@@ -16,7 +16,8 @@ import BotonVolver from "../components/BotonVolver";
 import { apiRequest } from "../api";
 import { personasService } from "../services/personasService";
 import useAuth from "../auth/hooks/useAuth";  
-import { hasPermission } from "../auth/utils/permissions";
+import { hasPermission } from "../auth/utils/permissions"; 
+import { LOGIN_ROUTE } from "../auth/config";
 
 const formularioInicial = {
   td_id: "",

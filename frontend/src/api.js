@@ -1,7 +1,13 @@
 import toast from "react-hot-toast";
 import { STORAGE_KEY } from "./auth/config";
 
-export const API_URL = "http://localhost:8480/api/planes";
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+export const API_URL = isLocal
+  ? "http://localhost:8480/api/planes"
+  : "http://186.19.137.9:8480/api/planes";
+
+//export const API_URL = "http://186.19.137.9:8480/api/planes";
 
 function obtenerSesion() {
   const data = sessionStorage.getItem(STORAGE_KEY);

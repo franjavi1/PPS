@@ -95,9 +95,9 @@ def get_persona_id_from_mail():
     if not email:
         raise APIError("El parametro 'email' es requerido.", status=400)
 
-    personaid = obtener_personaid_por_email(email)
+    personaid, legajoid = obtener_personaid_por_email(email)
 
     if not personaid:
         raise APIError("No se encontro ningun contacto con ese email.", status=404)
 
-    return respuesta_api(True, {"personaid": personaid}, "Persona ID encontrada")
+    return respuesta_api(True, {"personaid": personaid, "legajoid": legajoid}, "Persona ID encontrada")
