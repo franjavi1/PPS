@@ -51,29 +51,7 @@ class Contactos(db.Model):
     )
 
 
-    # Usuario que realizo la ultima accion sobre el registro
-    usuario_accion: Mapped[int] = mapped_column(
-        "usuarioAccion",
-        Integer,
-        nullable=True
-    )
 
-    # Fecha y hora de creacion del registro
-    ts_creacion: Mapped[datetime] = mapped_column(
-        "tsCreacion",
-        DateTime,
-        server_default=func.now(),
-        nullable=True
-    )
-
-    # Fecha y hora de la ultima modificacion del registro
-    ts_modificacion: Mapped[datetime] = mapped_column(
-        "tsModificacion",
-        DateTime,
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=True
-    )
 
     # Relacion con el modelo de persona.
     persona = relationship("Persona", backref="contactos_items")
@@ -83,3 +61,11 @@ class Contactos(db.Model):
 
     def __repr__(self):
         return f"<Contactos {self.id}>"
+
+    # --- AUDITORIA ---
+    id_persona_creacion: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
+    id_persona_modificacion: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
+    id_persona_baja: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
+    ts_creacion: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(), nullable=True)
+    ts_modificacion: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    ts_baja: Mapped[datetime] = mapped_column(DateTime, nullable=True)

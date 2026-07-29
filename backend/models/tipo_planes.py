@@ -28,26 +28,13 @@ class TipoPlanes(db.Model):
         default=1
     )
 
-    # Usuario que realizo la ultima accion sobre el registro
-    usuario_accion: Mapped[int] = mapped_column(
-        "usuarioAccion",
-        Integer,
-        nullable=False
-    )
 
-    # Fecha y hora de creacion del registro
-    ts_creacion: Mapped[datetime] = mapped_column(
-        "tsCreacion",
-        DateTime,
-        server_default=func.now(),
-        nullable=False
-    )
 
-    # Fecha y hora de la ultima modificacion del registro
-    ts_modificacion: Mapped[datetime] = mapped_column(
-        "tsModificacion",
-        DateTime,
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False
-    )
+
+    # --- AUDITORIA ---
+    id_persona_creacion: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
+    id_persona_modificacion: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
+    id_persona_baja: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
+    ts_creacion: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(), nullable=True)
+    ts_modificacion: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    ts_baja: Mapped[datetime] = mapped_column(DateTime, nullable=True)
