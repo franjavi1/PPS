@@ -59,10 +59,27 @@ function obtenerMensajeApi(data) {
     "No se pudo completar la operacion"
   );
 }
+function construirHeaders(options, token) {
+  const esFormData = options.body instanceof FormData;
+
+  return {
+    // No forzar JSON si el body es FormData: el navegador necesita fijar
+    // su propio Content-Type con el boundary del multipart.
+    ...(options.body && !esFormData
+      ? { "Content-Type": "application/json" }
+      : {}),
+    ...options.headers,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+function eliminarSesion() {
+  sessionStorage.removeItem(STORAGE_KEY);
+}
 
 async function ejecutarRequest(url, options = {}) {
   const sesion = obtenerSesion();
-  const response = await fetch(url, {
+  let response = await fetch(url, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -73,27 +90,36 @@ async function ejecutarRequest(url, options = {}) {
     },
   });
 
-  const data = await response.json();
+
+  let data = await response.json();
   console.log(response);
 
-  if (!response.ok) {
-    const errores = data.errors || {};
-    const primerCampo = Object.keys(errores)[0];
-    const primerError = primerCampo && Array.isArray(errores[primerCampo])
-      ? errores[primerCampo][0]
-      : errores[primerCampo];
+  if (!response.ok) {    
+    const mensajeErrorApi = obtenerMensajeApi(data);
     
-    if (res.status === 401 && sesion?.refresh_token) {
+    if (response.status === 403 || mensajeErrorApi === "No tenes permiso para realizar esta accion") {
+      toast.error("No tenés permisos para realizar esta acción");
+      window.location.replace("/inicio");
+      throw new Error("Redirigiendo por falta de permisos...");
+    }
+
+    if (response.status === 401 && sesion?.refresh_token) {
       try {
         const nuevoToken = await refrescarToken();
 
-        res = await fetch(`${API_URL}/${path}`, {
+        response = await fetch(`${API_URL}/${path}`, {
           ...options,
           headers: construirHeaders(options, nuevoToken),
         });
+
+        data = await response.json();
+
+        if (response.ok) {
+          return data;
+        }
       } catch (error) {
         // Si no fue posible renovar la sesión, elimina la información local y redirige al login
-        authService.clearSession();
+        eliminarSesion();
         window.location.assign(LOGIN_ROUTE);
 
         throw error;
@@ -102,7 +128,16 @@ async function ejecutarRequest(url, options = {}) {
     /*if(response.status==401){
       window.location.assign("/auth/login")
     }*/
+
+    const errores = data.errors || {};
+    const primerCampo = Object.keys(errores)[0];
+    const primerError = primerCampo && Array.isArray(errores[primerCampo])
+      ? errores[primerCampo][0]
+      : errores[primerCampo];
+    
     data.message = primerError || data.message || "No se pudo completar la operacion";
+    
+    // Si no fue error 403 ni 401 (o falló el reintento), mostramos el toast por defecto
     toast.error(data.message);
     throw data;
   }
