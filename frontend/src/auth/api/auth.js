@@ -24,8 +24,9 @@ export async function login({ email, password }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-
+    debugger;
     console.debug("[authApi.login] Status:", response.status);
+    console.debug("[authApi.login] Headers:", response.headers);
     console.debug("[authApi.login] OK:", response.ok);
 
     const body = await response.json();
