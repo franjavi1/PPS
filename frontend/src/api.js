@@ -90,7 +90,6 @@ async function ejecutarRequest(url, options = {}) {
     },
   });
 
-
   let data = await response.json();
   console.log(response);
 
@@ -99,7 +98,11 @@ async function ejecutarRequest(url, options = {}) {
     
     if (response.status === 403 || mensajeErrorApi === "No tenes permiso para realizar esta accion") {
       toast.error("No tenés permisos para realizar esta acción");
-      window.location.replace("/inicio");
+      
+      if (!window.location.pathname.includes("/inicio")) {
+        window.location.replace("/planes/inicio");
+      }
+
       throw new Error("Redirigiendo por falta de permisos...");
     }
 
@@ -107,7 +110,7 @@ async function ejecutarRequest(url, options = {}) {
       try {
         const nuevoToken = await refrescarToken();
 
-        response = await fetch(`${API_URL}/${path}`, {
+        response = await fetch(url, {
           ...options,
           headers: construirHeaders(options, nuevoToken),
         });
