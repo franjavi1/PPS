@@ -81,7 +81,7 @@ function App() {
           />
           <Routes>
             <Route path="/" element={<Navigate to="/inicio" replace />} />
-            <Route path="/inicio" element={<PublicRoute><Inicio /></PublicRoute>} />
+            <Route path="/inicio" element={<ProtectedRoute><Inicio /></ProtectedRoute>} />
             <Route path="/legajos" element={<ProtectedRoute permissions={["planes.legajos.ver"]}><Legajos /></ProtectedRoute>} />
             <Route path="/sedes" element={<ProtectedRoute permissions={["planes.sedes.ver"]}><Sedes /></ProtectedRoute>} />
             <Route path="/tipos-sedes" element={<ProtectedRoute permissions={["planes.tipos_sedes.ver"]}><TiposSedes /></ProtectedRoute>} />
