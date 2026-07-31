@@ -26,6 +26,11 @@ class ComisionSchema(ma.SQLAlchemySchema):
         }
     )
     estado = ma.auto_field(dump_only=True)
+
+    # Nuevos campos de vigencia para la comision.
+    vigencia_dde = ma.auto_field(allow_none=True)
+    vigencia_hta = ma.auto_field(allow_none=True)
+
     # Usuario que realiza la accion sobre el registro.
     usuario_accion = ma.auto_field(
         required=True,

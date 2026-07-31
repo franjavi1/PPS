@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column
@@ -18,7 +19,7 @@ class Comision(db.Model):
     )
 
     # Descripcion de la comision.
-    descripcion: Mapped[str] = mapped_column(
+    descripcion: Mapped[Optional[str]] = mapped_column(
         "Descripcion",
         String(45),
         nullable=False
@@ -28,6 +29,20 @@ class Comision(db.Model):
         Integer,
         nullable=False,
         default=1
+    )
+
+    # Fecha desde la cual rige la comision 
+    vigencia_dde: Mapped[datetime] = mapped_column(
+        "vigenciaDde",
+        DateTime,
+        nullable=True
+    )
+
+    # Fecha hasta la cual rige la comision
+    vigencia_hasta: Mapped[datetime] = mapped_column(
+        "vigenciaHasta",
+        DateTime,
+        nullable=True
     )
 
 
