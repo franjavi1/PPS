@@ -12,7 +12,7 @@ Este archivo contiene la logica de negocio del CRUD de RangosInstitucionales
 
 
 def obtener_todos():
-    return RangosInstitucionales.query.all()
+    return RangosInstitucionales.query.filter_by(estado=1).all()
 
 
 def obtener_por_id(id):

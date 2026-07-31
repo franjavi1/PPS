@@ -59,7 +59,8 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
 
         existente = TipoDocumento.query.filter(
             func.lower(func.trim(TipoDocumento.descripcion))
-            == descripcion.strip().lower()
+            == descripcion.strip().lower(),
+            estado=1
         ).first()
 
         tipo_documento_id = getattr(self, "context", {}).get("tipo_documento_id")

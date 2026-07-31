@@ -7,7 +7,7 @@ Este archivo contiene la lógica de negocio del CRUD de PACorrelativas
 """
 
 def obtener_todos():
-    return PACorrelativa.query.all()
+    return PACorrelativa.query.filter_by(estado=1).all()
 
 def obtener_por_id(id_pa_correlativa):
     return PACorrelativa.query.filter_by(id=id_pa_correlativa).first()

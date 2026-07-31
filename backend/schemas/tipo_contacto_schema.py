@@ -57,7 +57,8 @@ class TipoContactoSchema(ma.SQLAlchemySchema):
             return
 
         existente = TipoContacto.query.filter_by(
-            tipo=tipo
+            tipo=tipo,
+            estado=1
         ).first()
 
         tipo_contacto_id = getattr(self, "context", {}).get("tipo_contacto_id")

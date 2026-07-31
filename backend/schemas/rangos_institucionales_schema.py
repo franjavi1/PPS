@@ -76,7 +76,8 @@ class RangosInstitucionalesSchema(ma.SQLAlchemySchema):
             return
 
         existente = RangosInstitucionales.query.filter_by(
-            descripcion=descripcion
+            descripcion=descripcion,
+            estado=1
         ).first()
 
         rango_id = getattr(self, "context", {}).get("rango_id")

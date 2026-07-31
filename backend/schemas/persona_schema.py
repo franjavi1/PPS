@@ -130,7 +130,8 @@ class PersonaSchema(ma.SQLAlchemySchema):
 
         existente = Persona.query.filter_by(
             td_id=td_id,
-            numero_doc=numero_doc
+            numero_doc=numero_doc,
+            estado=1
 
         ).first()
 

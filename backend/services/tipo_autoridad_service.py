@@ -7,7 +7,7 @@ Este archivo contiene la lógica de negocio del CRUD de TipoAutoridad
 """
 
 def obtener_todos():
-    return TipoAutoridad.query.all()
+    return TipoAutoridad.query.filter_by(estado=1).all()
 
 def obtener_por_id(id_tipo_autoridad):
     return TipoAutoridad.query.filter_by(id=id_tipo_autoridad).first()
