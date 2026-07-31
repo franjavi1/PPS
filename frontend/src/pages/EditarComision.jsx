@@ -597,13 +597,15 @@ function EditarComision() {
                       getLabel={obtenerEtiquetaLegajo}
                     />
                     <CampoSelect
-                      label="Comision asignatura"
+                      label="Asignatura de la comisión"
                       name="comision_id"
                       value={nuevaAutoridad.comision_id}
                       onChange={cambiarNuevaAutoridad}
                       opciones={comisionesAsignaturas}
                       getValue={(item) => item.id_comision_asignatura}
-                      getLabel={(item) => item.nombre}
+                      getLabel={(item) =>
+                        mapas.planesAsignaturas[item.plan_asignaturas_id] || `Comisión #${item.id_comision_asignatura}`
+                      }
                     />
                   </div>
 
@@ -646,6 +648,7 @@ function EditarComision() {
                               {obtenerNombreComisionAsignatura(
                                 item.comision_id,
                                 comisionesAsignaturas,
+                                mapas.planesAsignaturas
                               )}
                             </p>
                           </div>
@@ -751,9 +754,8 @@ function CampoTexto({
           onChange={onChange}
           placeholder={placeholder}
           maxLength={maxLength}
-          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
-            icono ? "pl-12" : "pl-4"
-          }`}
+          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"
+            }`}
         />
       </div>
     </div>
@@ -861,12 +863,14 @@ function obtenerEtiquetaLegajo(legajo) {
   return legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
 }
 
-function obtenerNombreComisionAsignatura(id, items) {
+function obtenerNombreComisionAsignatura(id, items, mapaPlanes) {
   const item = items.find(
     (registro) => Number(registro.id_comision_asignatura) === Number(id),
   );
 
-  return item?.nombre || `Comision asignatura #${id}`;
+  if (!item) return `Comision asignatura #${id}`;
+
+  return mapaPlanes[item.plan_asignaturas_id] || item.nombre;
 }
 
 function validarComisionAsignatura(payload) {

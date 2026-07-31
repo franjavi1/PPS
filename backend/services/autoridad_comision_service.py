@@ -7,11 +7,11 @@ from db import db
 
 
 def obtener_todos():
-    return AutoridadComision.query.all()
+    return AutoridadComision.query.filter_by(estado=1).all()
 
 
 def obtener_por_id(id):
-    return AutoridadComision.query.get(id)
+    return AutoridadComision.query.filter_by(id=id, estado=1).first()
 
 
 def crear(datos):
