@@ -179,8 +179,14 @@ function TiposSedes() {
 
               <button
                 onClick={abrirNuevoTipoSede}
+                disabled={!hasPermission("planes.tipos_sedes.crear")}
+                title={
+                  hasPermission("planes.tipos_sedes.crear")
+                    ? "Editar tipo de sede"
+                    : "No tenés permiso para editar tipos de sedes"
+                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
-              >
+                >
                 <PlusCircle size={22} />
                 Nuevo tipo
               </button>

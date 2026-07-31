@@ -203,6 +203,13 @@ function Sedes() {
 
               <button
                 onClick={abrirNuevaSede}
+                disabled={!hasPermission("planes.sedes.crear")}
+                title={
+                  hasPermission("planes.sedes.crear")
+                    ? "Crear sede"
+                    : "No tenés permiso para crear sedes"
+                }
+
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />

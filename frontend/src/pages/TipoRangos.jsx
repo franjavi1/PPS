@@ -181,6 +181,12 @@ function TipoRangos() {
               <button
                 type="button"
                 onClick={abrirNuevoRango}
+                disabled={!hasPermission("planes.rangos_institucionales.crear")}
+                title={
+                  hasPermission("planes.rangos_institucionales.crear")
+                    ? "Crear rango"
+                    : "No tenés permiso para crear rangos"
+                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />

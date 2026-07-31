@@ -14,6 +14,7 @@ import {
 import Navbar from "../components/Navbar";
 import { aulaService } from "../services/aulaService";
 import { sedeService } from "../services/sedeService";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   sedes_id: "",
@@ -22,6 +23,7 @@ const formularioInicial = {
 };
 
 function Aulas() {
+  const { currentUserRole, hasPermission } = useAuth();
   const [aulas, setAulas] = useState([]);
   const [sedes, setSedes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -203,6 +205,12 @@ function Aulas() {
 
               <button
                 onClick={abrirNuevaAula}
+                disabled={!hasPermission("planes.aulas.crear")}
+                title={
+                  hasPermission("planes.aulas.crear")
+                    ? "Crear aula"
+                    : "No tenés permiso para crear aulas"
+                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
@@ -257,8 +265,18 @@ function Aulas() {
                   <Dato label="Sede" value={sedesPorId[aula.sedes_id]} />
 
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
-                    <BotonAccion onClick={() => editarAula(aula)} tipo="editar" />
-                    <BotonAccion onClick={() => eliminarAula(aula.id_aula)} tipo="eliminar" />
+                    <BotonAccion
+                      onClick={() => editarAula(aula)}
+                      tipo="editar"
+                      disabled={!hasPermission("planes.aulas.editar")}
+                      mensajeSinPermiso="No tenés permiso para editar aulas"
+                    />
+                    <BotonAccion
+                      onClick={() => eliminarAula(aula.id_aula)}
+                      tipo="eliminar"
+                      disabled={!hasPermission("planes.aulas.eliminar")}
+                      mensajeSinPermiso="No tenés permiso para eliminar aulas"
+                    />
                   </div>
                 </article>
               ))
@@ -295,8 +313,18 @@ function Aulas() {
                       <Td><EstadoBadge estado={aula.estado} /></Td>
                       <Td>
                         <div className="flex items-center gap-4">
-                          <BotonAccion onClick={() => editarAula(aula)} tipo="editar" />
-                          <BotonAccion onClick={() => eliminarAula(aula.id_aula)} tipo="eliminar" />
+                          <BotonAccion
+                            onClick={() => editarAula(aula)}
+                            tipo="editar"
+                            disabled={!hasPermission("planes.aulas.editar")}
+                            mensajeSinPermiso="No tenés permiso para editar aulas"
+                          />
+                          <BotonAccion
+                            onClick={() => eliminarAula(aula.id_aula)}
+                            tipo="eliminar"
+                            disabled={!hasPermission("planes.aulas.eliminar")}
+                            mensajeSinPermiso="No tenés permiso para eliminar aulas"
+                          />
                         </div>
                       </Td>
                     </tr>
@@ -438,19 +466,33 @@ function CampoSelect({ label, icon, children, ...props }) {
   );
 }
 
-function BotonAccion({ onClick, tipo }) {
+function BotonAccion({ 
+  onClick, 
+  tipo, 
+  disabled = false, 
+  title, 
+  mensajeSinPermiso 
+}) {
   const esEditar = tipo === "editar";
+
+  const tituloFinal = title || (
+    disabled 
+      ? (mensajeSinPermiso || `No tenés permiso para ${esEditar ? "editar" : "eliminar"}`) 
+      : (esEditar ? "Editar" : "Eliminar")
+  );
 
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1 font-semibold ${
+      disabled={disabled}
+      title={tituloFinal}
+      className={`h-10 flex items-center justify-center gap-1 font-semibold border rounded-lg transition ${
         esEditar
-          ? "text-blue-600 hover:text-blue-800"
-          : "text-red-600 hover:text-red-800"
-      } transition cursor-pointer`}
+          ? "text-blue-600 border-blue-100 hover:bg-blue-50"
+          : "text-red-600 border-red-100 hover:bg-red-50"
+      } disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white cursor-pointer`}
     >
-      {esEditar ? <Pencil size={18} /> : <Trash2 size={18} />}
+      {esEditar ? <Pencil size={16} /> : <Trash2 size={16} />}
       {esEditar ? "Editar" : "Eliminar"}
     </button>
   );
