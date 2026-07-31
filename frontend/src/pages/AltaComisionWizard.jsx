@@ -95,7 +95,7 @@ function AltaComisionWizard() {
         sedeService.obtenerTodas(),
         aulaService.obtenerTodas(),
         tipoAutoridadService.obtenerTodos(),
-        legajoService.obtenerTodos,
+        legajoService.obtenerTodos(),
         modalidadService.obtenerTodas(),
       ]);
 
