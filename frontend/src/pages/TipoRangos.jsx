@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { rangoService } from "../services/rangoService";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   descripcion: "",
@@ -18,6 +19,7 @@ const formularioInicial = {
 };
 
 function TipoRangos() {
+  const { currentUserRole, hasPermission } = useAuth();
   const [rangos, setRangos] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -255,6 +257,12 @@ function TipoRangos() {
                           <button
                             type="button"
                             onClick={() => editarRango(rango)}
+                            disabled={!hasPermission("planes.rangos_institucionales.editar")}
+                            title={
+                              hasPermission("planes.rangos_institucionales.editar")
+                                ? "Editar rango"
+                                : "No tenés permiso para editar rangos"
+                            }
                             className="h-10 px-3 flex items-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
                           >
                             <Pencil size={16} />
@@ -264,6 +272,12 @@ function TipoRangos() {
                           <button
                             type="button"
                             onClick={() => eliminarRango(rango.id)}
+                            disabled={!hasPermission("planes.rangos_institucionales.eliminar")}
+                            title={
+                              hasPermission("planes.rangos_institucionales.eliminar")
+                                ? "Eliminar rango"
+                                : "No tenés permiso para eliminar rangos"
+                            }
                             className="h-10 px-3 flex items-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
                           >
                             <Trash2 size={16} />
@@ -352,6 +366,7 @@ function TipoRangos() {
 }
 
 function TarjetaRango({ rango, onEdit, onDelete }) {
+  const { currentUserRole, hasPermission } = useAuth();
   return (
     <article className="border border-slate-200 rounded-xl bg-white p-5 shadow-sm">
       <p className="text-xs font-bold text-slate-400 uppercase">Tipo de rango</p>
@@ -366,6 +381,12 @@ function TarjetaRango({ rango, onEdit, onDelete }) {
         <button
           type="button"
           onClick={() => onEdit(rango)}
+          disabled={!hasPermission("planes.rangos_institucionales.editar")}
+          title={
+            hasPermission("planes.rangos_institucionales.editar")
+              ? "Editar rango"
+              : "No tenés permiso para editar rangos"
+          }
           className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
         >
           <Pencil size={16} />
@@ -375,6 +396,12 @@ function TarjetaRango({ rango, onEdit, onDelete }) {
         <button
           type="button"
           onClick={() => onDelete(rango.id)}
+          disabled={!hasPermission("planes.rangos_institucionales.eliminar")}
+          title={
+            hasPermission("planes.rangos_institucionales.eliminar")
+              ? "Eliminar rango"
+              : "No tenés permiso para eliminar rangos"
+          }
           className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
         >
           <Trash2 size={16} />

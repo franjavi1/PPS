@@ -11,12 +11,14 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { tipoSedeService } from "../services/tipoSedeService";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   descripcion: "",
 };
 
 function TiposSedes() {
+  const { currentUserRole, hasPermission } = useAuth();
   const [tiposSedes, setTiposSedes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -229,6 +231,12 @@ function TiposSedes() {
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => editarTipoSede(tipoSede)}
+                      disabled={!hasPermission("planes.tipos_sedes.editar")}
+                      title={
+                        hasPermission("planes.tipos_sedes.editar")
+                          ? "Editar tipo de sede"
+                          : "No tenés permiso para editar tipos de sedes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
                     >
                       <Pencil size={16} />
@@ -237,6 +245,12 @@ function TiposSedes() {
 
                     <button
                       onClick={() => eliminarTipoSede(tipoSede.id)}
+                      disabled={!hasPermission("planes.tipos_sedes.eliminar")}
+                      title={
+                        hasPermission("planes.tipos_sedes.eliminar")
+                          ? "Eliminar tipo de sede"
+                          : "No tenés permiso para eliminar tipos de sedes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
                     >
                       <Trash2 size={16} />
@@ -278,6 +292,12 @@ function TiposSedes() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarTipoSede(tipoSede)}
+                            disabled={!hasPermission("planes.tipos_sedes.editar")}
+                            title={
+                              hasPermission("planes.tipos_sedes.editar")
+                                ? "Editar tipo de sede"
+                                : "No tenés permiso para editar tipos de sedes"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -286,6 +306,12 @@ function TiposSedes() {
 
                           <button
                             onClick={() => eliminarTipoSede(tipoSede.id)}
+                            disabled={!hasPermission("planes.tipos_sedes.eliminar")}
+                            title={
+                              hasPermission("planes.tipos_sedes.eliminar")
+                                ? "Eliminar tipo de sede"
+                                : "No tenés permiso para eliminar tipos de sedes"
+                            }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 transition cursor-pointer"
                           >
                             <Trash2 size={18} />

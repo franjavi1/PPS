@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { FileText, Pencil, PlusCircle, Save, Trash2, X } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import useAuth from "../auth/hooks/useAuth";
 
 function TiposDocumentos() {
+  const { currentUserRole, hasPermission } = useAuth();
   const [tipos, setTipos] = useState([]);
   const [descripcion, setDescripcion] = useState("");
   const [editandoId, setEditandoId] = useState(null);
@@ -184,6 +186,13 @@ function TiposDocumentos() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarTipo(tipo)}
+                            onClick={() => editarAsignatura(asignatura)}
+                            disabled={!hasPermission("planes.tipos_documentos.editar")}
+                            title={
+                              hasPermission("planes.tipos_documentos.editar")
+                                ? "Editar tipo de documento"
+                                : "No tenés permiso para editar tipos de documentos"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -192,6 +201,12 @@ function TiposDocumentos() {
 
                           <button
                             onClick={() => eliminarTipo(tipo.id)}
+                            disabled={!hasPermission("planes.tipos_documentos.eliminar")}
+                            title={
+                              hasPermission("planes.tipos_documentos.eliminar")
+                                ? "Eliminar tipo de documento"
+                                : "No tenés permiso para eliminar tipos de documentos"
+                            }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
