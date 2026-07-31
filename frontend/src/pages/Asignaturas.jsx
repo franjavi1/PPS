@@ -20,8 +20,7 @@ const formularioInicial = {
 };
 
 function Asignaturas() {
-  const { currentUserRole } = useAuth();
-  const esAdministrador = currentUserRole === "ROLE_ADMIN";
+  const { currentUserRole, hasPermission } = useAuth();
   const [asignaturas, setAsignaturas] = useState([]);
   const [planAsignaturas, setPlanAsignaturas] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -274,8 +273,12 @@ function Asignaturas() {
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => editarAsignatura(asignatura)}
-                      disabled={!esAdministrador}
-                      title={esAdministrador ? "Editar asignatura" : "Solo los administradores pueden editar"}
+                      disabled={!hasPermission("planes.asignaturas.editar")}
+                      title={
+                        hasPermission("planes.asignaturas.editar")
+                          ? "Editar asignatura"
+                          : "No tenés permiso para editar asignaturas"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Pencil size={16} />
@@ -284,13 +287,11 @@ function Asignaturas() {
 
                     <button
                       onClick={() => eliminarAsignatura(asignatura.id)}
-                      disabled={!esAdministrador || asignaturaEstaEnPlan(asignatura.id)}
+                      disabled={!hasPermission("planes.asignaturas.eliminar")}
                       title={
-                        !esAdministrador
-                          ? "Solo los administradores pueden dar de baja"
-                          : asignaturaEstaEnPlan(asignatura.id)
-                          ? "No se puede dar de baja una asignatura asociada a un plan"
-                          : "Dar de baja asignatura"
+                        hasPermission("planes.asignaturas.eliminar")
+                          ? "Eliminar asignatura"
+                          : "No tenés permiso para eliminar asignaturas"
                       }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
@@ -341,8 +342,12 @@ function Asignaturas() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarAsignatura(asignatura)}
-                            disabled={!esAdministrador}
-                            title={esAdministrador ? "Editar asignatura" : "Solo los administradores pueden editar"}
+                            disabled={!hasPermission("planes.asignaturas.editar")}
+                            title={
+                              hasPermission("planes.asignaturas.editar")
+                                ? "Editar asignatura"
+                                : "No tenés permiso para editar asignaturas"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -351,13 +356,11 @@ function Asignaturas() {
 
                           <button
                             onClick={() => eliminarAsignatura(asignatura.id)}
-                            disabled={!esAdministrador || asignaturaEstaEnPlan(asignatura.id)}
+                            disabled={!hasPermission("planes.asignaturas.eliminar")}
                             title={
-                              !esAdministrador
-                                ? "Solo los administradores pueden dar de baja"
-                                : asignaturaEstaEnPlan(asignatura.id)
-                                ? "No se puede dar de baja una asignatura asociada a un plan"
-                                : "Dar de baja asignatura"
+                              hasPermission("planes.asignaturas.eliminar")
+                                ? "Eliminar asignatura"
+                                : "No tenés permiso para eliminar asignaturas"
                             }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
