@@ -197,7 +197,13 @@ INSERT INTO public."tipoContacto" ("idtipoContacto", tipo, estado, "usuarioAccio
 INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (2, 1, 1, true, '1122334455', 1, 1, '2026-07-05 23:16:42.028058', '2026-07-05 23:16:42.028058');
 INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (3, 2, 1, true, '1122334455', 1, 1, '2026-07-05 23:17:03.023635', '2026-07-05 23:17:03.023635');
 INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (4, 3, 1, true, '1122334455', 1, 1, '2026-07-05 23:17:09.237241', '2026-07-05 23:17:09.237241');
-INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 1, 2, true, 'Juan@gmail.com', 1, 1, '2026-07-05 23:17:34.166658', '2026-07-05 23:17:34.166658');
+
+--   personaId=1 (Juan Perez)      -> admin@test.com    (admin/superadmin)
+--   personaId=2 (Jose Rodriguez)  -> docente@test.com  (PENDIENTE, activación)
+--   personaId=3 (Martina Gonzalez)-> alumno@test.com   (ACTIVO, recuperación/credenciales)
+INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (5, 1, 2, true, 'admin@test.com', 1, 1, '2026-07-05 23:17:34.166658', '2026-07-05 23:17:34.166658');
+INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (6, 2, 2, true, 'docente@test.com', 1, 1, '2026-07-07 00:00:00.000000', '2026-07-07 00:00:00.000000');
+INSERT INTO public."Contactos" (id, "personaId", "tipoContactoId", principal, contacto, estado, "usuarioAccion", "tsCreacion", "tsModificacion") VALUES (7, 3, 2, true, 'alumno@test.com', 1, 1, '2026-07-07 00:00:00.000000', '2026-07-07 00:00:00.000000');
 
 
 --
@@ -290,7 +296,7 @@ SELECT pg_catalog.setval('public."Aulas_id_aula_seq"', 3, true);
 -- Name: Contactos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."Contactos_id_seq"', 5, true);
+SELECT pg_catalog.setval('public."Contactos_id_seq"', 7, true);
 
 
 --

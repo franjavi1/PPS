@@ -1,0 +1,94 @@
+
+<AccionBtn
+  texto="Nuevo Usuario"
+  variant="primary"
+  permission="usuarios.crear" 
+  onClick={() => abrirModal()}
+/>
+
+
+<Routes>
+  {/* Ruta Pública (ej. Login) */}
+  <Route 
+    path="/login" 
+    element={
+      <PublicRoute>
+        <LoginPage />
+      </PublicRoute>
+    } 
+  />
+
+  {/* Ruta Protegida por Permiso o Rol */}
+  <Route 
+    path="/dashboard/usuarios" 
+    element={
+      <ProtectedRoute permissions={["usuarios.ver"]}>
+        <UsuariosPage />
+      </ProtectedRoute>
+    } 
+  />
+</Routes>
+
+
+// frontend/src/hooks/useAutoridadComision.jsx
+import { useState, useCallback } from "react";
+import autoridadComisionService from "../services/autoridadComisionService";
+import { usePermissionCheck } from "../utils/permissionHelper";
+
+export default function useAutoridadComision() {
+    const [autoridadesComision, setAutoridadesComision] = useState([]);
+    const [cargando, setCargando] = useState(false);
+    const { verificarPermiso } = usePermissionCheck();
+
+    const listarAutoridadesPorComision = useCallback(async (idComision, permission = "VER_AUTORIDADES_COMISION") => {
+        if (!verificarPermiso(permission)) {
+            console.warn("Acceso denegado: No tienes permisos para listar autoridades.");
+            return { ok: false, message: "No autorizado" };
+        }
+
+        setCargando(true);
+        try {
+            const res = await autoridadComisionService.listarPorComision(idComision);
+            if (res.ok) {
+                setAutoridadesComision(res.data);
+            } else {
+                console.error(res.message || "Error al listar las autoridades");
+            }
+            return res;
+        } catch (error) {
+            console.error("Error en la peticion", error);
+        } finally {
+            setCargando(false);
+        }
+    }, []);
+
+    const obtenerAutoridadComision = async (id, permission = "VER_AUTORIDADES_COMISION") => {
+        if (!verificarPermiso(permission)) return { ok: false, message: "No autorizado" };
+        return await autoridadComisionService.obtenerPorId(id);
+    };
+
+    const crearAutoridadComision = async (data, permission = "CREAR_AUTORIDAD_COMISION") => {
+        if (!verificarPermiso(permission)) return { ok: false, message: "No autorizado" };
+        return await autoridadComisionService.crear(data);
+    };
+
+    const editarAutoridadComision = async (id, data, permission = "EDITAR_AUTORIDAD_COMISION") => {
+        if (!verificarPermiso(permission)) return { ok: false, message: "No autorizado" };
+        return await autoridadComisionService.actualizar(id, data);
+    };
+
+    const eliminarAutoridadComision = async (id, permission = "ELIMINAR_AUTORIDAD_COMISION") => {
+        if (!verificarPermiso(permission)) return { ok: false, message: "No autorizado" };
+        return await autoridadComisionService.eliminar(id);
+    };
+
+    return { 
+        autoridadesComision,
+        cargando,
+        listarAutoridadesPorComision, 
+        obtenerAutoridadComision, 
+        crearAutoridadComision, 
+        editarAutoridadComision, 
+        eliminarAutoridadComision 
+    };
+}
