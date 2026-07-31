@@ -33,7 +33,11 @@ export async function apiRequest(path, options = {}) {
   });
 
   const data = await response.json();
-  console.log(response);
+  console.log(response.error);
+
+  if(response.status==401){
+      window.location.assign("/auth/login")
+    }
 
   if (!response.ok) {
     const errores = data.errors || {};
@@ -42,7 +46,7 @@ export async function apiRequest(path, options = {}) {
       ? errores[primerCampo][0]
       : errores[primerCampo];
     
-    if (res.status === 401 && sesion?.refresh_token) {
+    if (response.status == 401 && sesion?.refresh_token) {
       try {
         const nuevoToken = await refrescarToken();
 
@@ -58,9 +62,7 @@ export async function apiRequest(path, options = {}) {
         throw error;
       }
     }
-    /*if(response.status==401){
-      window.location.assign("/auth/login")
-    }*/
+    
     data.message = primerError || data.message || "No se pudo completar la operacion";
     toast.error(data.message);
     throw data;
