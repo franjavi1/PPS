@@ -208,6 +208,12 @@ function Asignaturas() {
 
               <button
                 onClick={abrirNuevaAsignatura}
+                disabled={!hasPermission("planes.asignaturas.crear")}
+                title={
+                  hasPermission("planes.asignaturas.crear")
+                    ? "Crear asignatura"
+                    : "No tenés permiso para crear asignaturas"
+                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />

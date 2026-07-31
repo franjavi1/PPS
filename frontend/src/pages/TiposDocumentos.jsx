@@ -145,6 +145,12 @@ function TiposDocumentos() {
               )}
 
               <button
+                disabled={!hasPermission("planes.tipos_documentos.crear")}
+                title={
+                  hasPermission("planes.tipos_documentos.crear")
+                    ? "Crear tipo de documento"
+                    : "No tenés permiso para crear tipos de documentos"
+                }
                 type="submit"
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
@@ -186,7 +192,6 @@ function TiposDocumentos() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarTipo(tipo)}
-                            onClick={() => editarAsignatura(asignatura)}
                             disabled={!hasPermission("planes.tipos_documentos.editar")}
                             title={
                               hasPermission("planes.tipos_documentos.editar")

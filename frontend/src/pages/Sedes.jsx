@@ -13,6 +13,7 @@ import {
 import Navbar from "../components/Navbar";
 import { sedeService } from "../services/sedeService";
 import { tipoSedeService } from "../services/tipoSedeService";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   tipo_sede_id: "",
@@ -21,6 +22,7 @@ const formularioInicial = {
 };
 
 function Sedes() {
+  const { currentUserRole, hasPermission } = useAuth();
   const [sedes, setSedes] = useState([]);
   const [tiposSedes, setTiposSedes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -201,6 +203,13 @@ function Sedes() {
 
               <button
                 onClick={abrirNuevaSede}
+                disabled={!hasPermission("planes.sedes.crear")}
+                title={
+                  hasPermission("planes.sedes.crear")
+                    ? "Crear sede"
+                    : "No tenés permiso para crear sedes"
+                }
+
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
@@ -273,6 +282,12 @@ function Sedes() {
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => editarSede(sede)}
+                      disabled={!hasPermission("planes.sedes.editar")}
+                      title={
+                        hasPermission("planes.sedes.editar")
+                          ? "Editar sede"
+                          : "No tenés permiso para editar sedes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
                     >
                       <Pencil size={16} />
@@ -281,6 +296,12 @@ function Sedes() {
 
                     <button
                       onClick={() => eliminarSede(sede.id)}
+                      disabled={!hasPermission("planes.sedes.eliminar")}
+                      title={
+                        hasPermission("planes.sedes.eliminar")
+                          ? "Eliminar sede"
+                          : "No tenés permiso para eliminar sedes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
                     >
                       <Trash2 size={16} />
@@ -334,6 +355,12 @@ function Sedes() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarSede(sede)}
+                            disabled={!hasPermission("planes.sedes.editar")}
+                            title={
+                              hasPermission("planes.sedes.editar")
+                                ? "Editar sede"
+                                : "No tenés permiso para editar sedes"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -342,6 +369,12 @@ function Sedes() {
 
                           <button
                             onClick={() => eliminarSede(sede.id)}
+                            disabled={!hasPermission("planes.sedes.eliminar")}
+                            title={
+                              hasPermission("planes.sedes.eliminar")
+                                ? "Eliminar sede"
+                                : "No tenés permiso para eliminar sedes"
+                            }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
