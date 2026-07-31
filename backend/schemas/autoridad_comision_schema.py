@@ -65,7 +65,8 @@ class AutoridadComisionSchema(ma.SQLAlchemySchema):
         existente = AutoridadComision.query.filter_by(
             tipo_autoridad_id=tipo_autoridad_id,
             legajo_id=legajo_id,
-            comision_id=comision_id
+            comision_id=comision_id,
+            estado=1
         ).first()
 
         autoridad_comision_id = getattr(self, "context", {}).get(

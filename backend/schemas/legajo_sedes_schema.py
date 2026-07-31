@@ -114,7 +114,8 @@ class LegajoSedesSchema(ma.SQLAlchemySchema):
         if legajo_id and sede_id:
             existente = LegajoSedes.query.filter_by(
                 legajo_id=legajo_id,
-                sede_id=sede_id
+                sede_id=sede_id,
+                estado=1
             ).first()
 
             if existente and existente.id != legajo_sedes_id:
@@ -127,7 +128,8 @@ class LegajoSedesSchema(ma.SQLAlchemySchema):
         if legajo_id and es_sede_base is True:
             sede_base = LegajoSedes.query.filter_by(
                 legajo_id=legajo_id,
-                es_sede_base=True
+                es_sede_base=True,
+                estado=1
             ).first()
 
             if sede_base and sede_base.id != legajo_sedes_id:

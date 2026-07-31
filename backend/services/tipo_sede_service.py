@@ -9,7 +9,7 @@ Este archivo contiene la logica de negocio del CRUD de TipoSede
 
 
 def obtener_todos():
-    return TipoSede.query.all()
+    return TipoSede.query.filter_by(estado=1).all()
 
 
 def obtener_por_id(id):

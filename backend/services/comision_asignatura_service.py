@@ -26,7 +26,7 @@ def obtener_modalidad(modalidadesid):
 
 
 def obtener_todos():
-    return ComisionAsignatura.query.all()
+    return ComisionAsignatura.query.filter_by(estado=1).all()
 
 
 def obtener_por_id(id_comision_asignatura):
@@ -122,4 +122,4 @@ def obtener_comisiones_por_legajo(legajo_id: int | None = None):
     if nivel_jerarquia_legajo is not None:
         query = query.filter(RangosInstitucionales.nivel_jerarquia <= nivel_jerarquia_legajo)
 
-    return query.all()
+    return query.filter_by(estado=1).all()

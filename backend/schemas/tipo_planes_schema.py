@@ -57,7 +57,8 @@ class TipoPlanesSchema(ma.SQLAlchemySchema):
             return
 
         existente = TipoPlanes.query.filter_by(
-            descripcion=descripcion
+            descripcion=descripcion,
+            estado=1
         ).first()
 
         tipo_planes_id = getattr(self, "context", {}).get("tipo_planes_id")
