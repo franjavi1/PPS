@@ -50,7 +50,7 @@ def crear_aula():
 def editar_aula(id):
     aula = obtener_por_id(id)
     
-    if not aula or aula.tsBaja is not None:
+    if not aula:
         raise APIError("Aula no encontrada.", status=404)
     
     req = request.get_json(silent=True) or {}
