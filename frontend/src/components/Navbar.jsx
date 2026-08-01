@@ -433,7 +433,7 @@ function Navbar() {
             >
               Comisiones
             </MobileLink>
-            {hasPermission("planes.config.ver") (
+            
               <>
                 <MobileLink
                   to="/sedes"
@@ -467,7 +467,7 @@ function Navbar() {
                   Tipo de rangos
                 </MobileLink>
               </>
-            )}
+            
           </div>
         </div>
       )}
