@@ -433,7 +433,7 @@ function Navbar() {
             >
               Comisiones
             </MobileLink>
-            {hasPermission("planes.config.ver") (
+            {hasPermission("planes.config.ver") && (
               <>
                 <MobileLink
                   to="/sedes"
