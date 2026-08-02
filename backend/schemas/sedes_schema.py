@@ -4,7 +4,7 @@ from models.tipo_sede import TipoSede
 from db import ma
 
 from marshmallow import ValidationError, validates, pre_load, post_dump
-from marshmallow.validate import Length
+from marshmallow.validate import Length, Regexp
 
 
 class SedesSchema(ma.SQLAlchemySchema):
@@ -32,7 +32,8 @@ class SedesSchema(ma.SQLAlchemySchema):
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=100, error="El nombre debe tener entre 1 y 100 caracteres")
+            Length(min=1, max=100, error="El nombre debe tener entre 1 y 100 caracteres"),
+            Regexp(r".*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*", error="El nombre debe contener al menos una letra") 
         ],
         error_messages={
             "required": "El nombre es obligatorio",
