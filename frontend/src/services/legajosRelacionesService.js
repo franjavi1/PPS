@@ -4,7 +4,7 @@ import { apiRequest } from "../api";
  * Servicio para la gestión de relaciones y operaciones agrupadas 
  * del alta guiada de personas, legajos, datos médicos, rangos, sedes y usuarios.
  */
-export const personasRelacionesService = {
+export const legajosRelacionesService = {
   crearLegajoDePersona(personaId, datosLegajo) {
     return apiRequest(`/personas/${personaId}/legajo`, {
       method: "POST",

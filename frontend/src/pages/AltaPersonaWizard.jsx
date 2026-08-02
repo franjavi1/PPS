@@ -26,7 +26,7 @@ import { tipoDocumentoService } from "../services/tipoDocumentoService";
 import { tipoContactoService } from "../services/tipoContactoService";
 import { legajoService } from "../services/legajoService";
 import { datosAuthService } from "../services/datosAuthService";
-import { personasRelacionesService } from "../services/personasRelacionesService";
+import { legajosRelacionesService } from "../services/legajosRelacionesService";
 
 const pasos = [
   { id: 1, titulo: "Persona", icono: User },
@@ -389,7 +389,7 @@ function AltaPersonaWizard() {
           usuario_accion: 1,
         };
 
-        await personasRelacionesService.crearDatosMedicos(nuevaPersonaId, datosMedicosPayload);
+        await legajosRelacionesService.crearDatosMedicos(nuevaPersonaId, datosMedicosPayload);
       }
 
       if (datosLegajo.rangos_institucionales_id) {
@@ -400,7 +400,7 @@ function AltaPersonaWizard() {
           usuario_accion: 1,
         };
 
-        await personasRelacionesService.crearRangoLegajo(nuevoLegajoId, datosRangosPayload);
+        await legajosRelacionesService.crearRangoLegajo(nuevoLegajoId, datosRangosPayload);
       }
 
       if (datosLegajo.sede_id) {
@@ -411,7 +411,7 @@ function AltaPersonaWizard() {
           usuario_accion: 1,
         };
 
-        await personasRelacionesService.crearSedeLegajo(nuevoLegajoId, datosSedesPayload);
+        await legajosRelacionesService.crearSedeLegajo(nuevoLegajoId, datosSedesPayload);
       }
 
       if (contactos.email.trim()) {
@@ -457,7 +457,7 @@ function AltaPersonaWizard() {
         throw new Error("Auth no devolvió el ID del usuario creado.");
       }
 
-      await personasRelacionesService.actualizarPersona(nuevaPersonaId, {
+      await legajosRelacionesService.actualizarPersona(nuevaPersonaId, {
         ...datosPersona,
         usuario_id: Number(nuevoUsuarioId),
       });
