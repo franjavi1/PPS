@@ -122,6 +122,12 @@ function Aulas() {
       return;
     }
 
+    const tieneLetras = /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(nombreAula);
+    if (!tieneLetras) {
+      setErrorFormulario("El nombre debe contener al menos una letra valida.");
+      return;
+    }
+
     const payload = {
       sedes_id: sedesId,
       aula: nombreAula,
@@ -254,7 +260,7 @@ function Aulas() {
                       <p className="text-xs font-bold text-slate-400 uppercase">
                         Aula
                       </p>
-                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1 break-all">
                         {aula.aula}
                       </h2>
                     </div>
@@ -307,7 +313,7 @@ function Aulas() {
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
                     <tr key={aula.id_aula}>
-                      <Td destacado className="border-b border-slate-200 hover:bg-slate-50">{aula.aula}</Td>
+                      <Td destacado className="border-b border-slate-200 hover:bg-slate-50 break-all">{aula.aula}</Td>
                       <Td className="truncate max-w-full block">{sedesPorId[aula.sedes_id] || "-"}</Td>
                       <Td><TipoBadge esVirtual={aula.es_virtual} /></Td>
                       <Td><EstadoBadge estado={aula.estado} /></Td>
@@ -375,7 +381,6 @@ function Aulas() {
                     label="Nombre del aula"
                     name="aula"
                     value={formulario.aula}
-                    pattern=".*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*"
                     onChange={manejarCambio}
                     placeholder="Ej: Aula 1"
                     maxLength={45}

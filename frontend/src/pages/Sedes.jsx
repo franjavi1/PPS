@@ -110,6 +110,12 @@ function Sedes() {
       return;
     }
 
+    const tieneLetras = /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(formulario.nombre.trim());
+    if (!tieneLetras) {
+      setErrorFormulario("El nombre debe contener al menos una letra valida.");
+      return;
+    }
+
     const payload = {
       tipo_sede_id: Number(formulario.tipo_sede_id),
       nombre: formulario.nombre.trim(),
@@ -255,7 +261,7 @@ function Sedes() {
                       <p className="text-xs font-bold text-slate-400 uppercase">
                         Sede
                       </p>
-                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1 break-all">
                         {sede.nombre}
                       </h2>
                     </div>
@@ -339,7 +345,7 @@ function Sedes() {
                 ) : sedesFiltradas.length > 0 ? (
                   sedesFiltradas.map((sede) => (
                     <tr key={sede.id} className="border-b border-slate-200 hover:bg-slate-50">
-                      <td className="px-5 py-5 text-slate-700 font-semibold">
+                      <td className="px-5 py-5 text-slate-700 font-semibold break-all">
                         {sede.nombre}
                       </td>
                       <td className="px-5 py-5 text-slate-700">
@@ -444,7 +450,6 @@ function Sedes() {
                         name="nombre"
                         value={formulario.nombre}
                         onChange={manejarCambio}
-                        pattern=".*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*"
                         placeholder="Ej: Sede Central"
                         className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                       />
