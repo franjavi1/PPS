@@ -456,6 +456,7 @@ function Sedes() {
                         name="nombre"
                         value={formulario.nombre}
                         onChange={manejarCambio}
+                        pattern=".*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*"
                         placeholder="Ej: Sede Central"
                         className="w-full h-14 pl-12 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                       />

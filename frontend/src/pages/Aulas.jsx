@@ -319,9 +319,9 @@ function Aulas() {
                   </tr>
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
-                    <tr key={aula.id_aula} className="border-b border-slate-200 hover:bg-slate-50">
-                      <Td destacado>{aula.aula}</Td>
-                      <Td>{sedesPorId[aula.sedes_id] || "-"}</Td>
+                    <tr key={aula.id_aula}>
+                      <Td destacado className="border-b border-slate-200 hover:bg-slate-50">{aula.aula}</Td>
+                      <Td className="truncate max-w-full block">{sedesPorId[aula.sedes_id] || "-"}</Td>
                       <Td><TipoBadge esVirtual={aula.es_virtual} /></Td>
                       <Td><EstadoBadge estado={aula.estado} /></Td>
                       <Td>
@@ -388,6 +388,7 @@ function Aulas() {
                     label="Nombre del aula"
                     name="aula"
                     value={formulario.aula}
+                    pattern=".*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*"
                     onChange={manejarCambio}
                     placeholder="Ej: Aula 1"
                     maxLength={45}
