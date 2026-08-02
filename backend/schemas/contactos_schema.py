@@ -117,7 +117,8 @@ class ContactosSchema(ma.SQLAlchemySchema):
         existente = Contactos.query.filter_by(
             persona_id=persona_id,
             tipo_contacto_id=tipo_contacto_id,
-            contacto=contacto
+            contacto=contacto,
+            estado=1
         ).first()
 
         contacto_id = getattr(self, "context", {}).get("contacto_id")

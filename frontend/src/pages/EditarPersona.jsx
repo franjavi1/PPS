@@ -110,6 +110,8 @@ function EditarPersona({ soloLectura = false }) {
         apiRequest("/sedes"),
       ]);
 
+      console.log("Sedes del backend:", respuestaSedesAsignadas.data);
+
       const personaData = respuestaPersona.data || {};
       const legajoData = (respuestaLegajos.data || []).find(
         (item) => Number(item.persona_id) === Number(id),

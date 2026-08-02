@@ -118,7 +118,8 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         existente = ComisionAsignatura.query.filter_by(
             plan_asignaturas_id=plan_asignaturas_id,
             aula_id=aula_id,
-            comision_id=comision_id
+            comision_id=comision_id,
+            estado=1
         ).first()
 
         comision_asignatura_id = getattr(self, "context", {}).get(
