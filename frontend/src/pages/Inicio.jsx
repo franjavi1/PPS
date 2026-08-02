@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
   BookOpen,
@@ -16,6 +17,7 @@ import { apiRequest } from "../api";
 
 function Inicio() {
   const navigate = useNavigate();
+  const { user, hasPermission } = useContext(AuthContext);
   const [resumen, setResumen] = useState({
     legajos: 0,
     planes: 0,
@@ -29,15 +31,15 @@ function Inicio() {
   async function cargarResumen() {
     try {
       const [legajos, planes, comisiones] = await Promise.all([
-        apiRequest("/legajos"),
-        apiRequest("/planes"),
-        apiRequest("/comisiones"),
+        hasPermission("planes.legajos.ver") ? apiRequest("/legajos") : Promise.resolve(null),
+        hasPermission("planes.planes.ver") ? apiRequest("/planes") : Promise.resolve(null),
+        hasPermission("planes.comisiones.ver") ? apiRequest("/comisiones") : Promise.resolve(null),
       ]);
 
       setResumen({
-        legajos: obtenerLista(legajos).length,
-        planes: obtenerLista(planes).length,
-        comisiones: obtenerLista(comisiones).length,
+        legajos: legajos ? obtenerLista(legajos).length : 0,
+        planes: planes ? obtenerLista(planes).length : 0,
+        comisiones: comisiones ? obtenerLista(comisiones).length : 0,
       });
     } catch {
       setResumen({
@@ -71,78 +73,100 @@ function Inicio() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mt-7">
-              <button
-                type="button"
-                onClick={() => navigate("/alta-persona")}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
-              >
-                <PlusCircle size={22} />
-                Nueva persona
-              </button>
+              {hasPermission("planes.personas.crear") && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/alta-persona")}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
+                >
+                  <PlusCircle size={22} />
+                  Nueva persona
+                </button>
+              )}
 
-              <button
-                type="button"
-                onClick={() => navigate("/planes/alta")}
-                className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
-              >
-                <BookOpen size={22} />
-                Nuevo plan
-              </button>
+              {hasPermission("planes.planes.crear") && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/planes/alta")}
+                  className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
+                >
+                  <BookOpen size={22} />
+                  Nuevo plan
+                </button>
+              )}
 
-              <button
-                type="button"
-                onClick={() => navigate("/comisiones/alta")}
-                className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
-              >
-                <CalendarCheck size={22} />
-                Nueva comisión
-              </button>
+              {hasPermission("planes.comisiones.crear") && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/comisiones/alta")}
+                  className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-50 transition cursor-pointer"
+                >
+                  <CalendarCheck size={22} />
+                  Nueva comisión
+                </button>
+              )}
             </div>
           </div>
         </section>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
-          <TarjetaResumen icono={<FileText size={30} />} titulo="Legajos" valor={resumen.legajos} tono="blue" />
-          <TarjetaResumen icono={<BookOpen size={30} />} titulo="Planes" valor={resumen.planes} tono="green" />
-          <TarjetaResumen icono={<GraduationCap size={30} />} titulo="Comisiones" valor={resumen.comisiones} tono="amber" />
+          {hasPermission("planes.legajos.ver") && (
+            <TarjetaResumen icono={<FileText size={30} />} titulo="Legajos" valor={resumen.legajos} tono="blue" />
+          )}
+          {hasPermission("planes.planes.ver") && (
+            <TarjetaResumen icono={<BookOpen size={30} />} titulo="Planes" valor={resumen.planes} tono="green" />
+          )}
+          {hasPermission("planes.comisiones.ver") && (
+            <TarjetaResumen icono={<GraduationCap size={30} />} titulo="Comisiones" valor={resumen.comisiones} tono="amber" />
+          )}
         </section>
 
-        <section>
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
-            <div className="flex items-center justify-between gap-4 mb-5">
-              <div>
-                <p className="text-sm font-bold text-red-700 uppercase">
-                  Accesos principales
-                </p>
-                <h2 className="text-2xl font-extrabold text-slate-800 mt-1">
-                  Gestión diaria
-                </h2>
+        {(hasPermission("planes.personas.ver") ||
+          hasPermission("planes.planes.ver") ||
+          hasPermission("planes.comisiones.ver")) && (
+          <section>
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-md p-6">
+              <div className="flex items-center justify-between gap-4 mb-5">
+                <div>
+                  <p className="text-sm font-bold text-red-700 uppercase">
+                    Accesos principales
+                  </p>
+                  <h2 className="text-2xl font-extrabold text-slate-800 mt-1">
+                    Gestión diaria
+                  </h2>
+                </div>
+                <Layers3 className="text-red-700" size={34} />
               </div>
-              <Layers3 className="text-red-700" size={34} />
-            </div>
 
-            <div className="space-y-3">
-              <AccesoRapido
-                icono={<Users size={28} />}
-                titulo="Personas"
-                descripcion="Alta guiada, listado y edición de personas."
-                onClick={() => navigate("/personas")}
-              />
-              <AccesoRapido
-                icono={<BookOpen size={28} />}
-                titulo="Planes"
-                descripcion="Planes, asignaturas y correlativas."
-                onClick={() => navigate("/planes")}
-              />
-              <AccesoRapido
-                icono={<GraduationCap size={28} />}
-                titulo="Comisiones"
-                descripcion="Alta guiada, consulta y edición de comisiones."
-                onClick={() => navigate("/comisiones")}
-              />
+              <div className="space-y-3">
+                {hasPermission("planes.personas.ver") && (
+                  <AccesoRapido
+                    icono={<Users size={28} />}
+                    titulo="Personas"
+                    descripcion="Alta guiada, listado y edición de personas."
+                    onClick={() => navigate("/personas")}
+                  />
+                )}
+                {hasPermission("planes.planes.ver") && (
+                  <AccesoRapido
+                    icono={<BookOpen size={28} />}
+                    titulo="Planes"
+                    descripcion="Planes, asignaturas y correlativas."
+                    onClick={() => navigate("/planes")}
+                  />
+                )}
+                {hasPermission("planes.comisiones.ver") && (
+                  <AccesoRapido
+                    icono={<GraduationCap size={28} />}
+                    titulo="Comisiones"
+                    descripcion="Alta guiada, consulta y edición de comisiones."
+                    onClick={() => navigate("/comisiones")}
+                  />
+                )}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         <footer className="flex items-center justify-center gap-2 text-slate-500 mt-10">
           <ShieldCheck size={22} />

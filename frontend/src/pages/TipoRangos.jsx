@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar";
 import {
   ChevronsUp,
   Pencil,
@@ -28,6 +30,10 @@ function TipoRangos() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
+
+  // Estado para el modal de borrado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarRangos();
@@ -120,20 +126,23 @@ function TipoRangos() {
     }
   }
 
-  async function eliminarRango(id) {
-    const confirmar = confirm("Seguro que queres eliminar este tipo de rango?");
+  function solicitarEliminacion(id) {
+    setIdAEliminar(id);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
+      setEliminando(true);
       setError("");
-      const respuesta = await rangoService.eliminar(id);
-      alert(respuesta.message || "Tipo de rango eliminado correctamente");
+      await rangoService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarRangos();
     } catch (err) {
       setError(obtenerMensajeError(err));
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -151,6 +160,9 @@ function TipoRangos() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -224,7 +236,7 @@ function TipoRangos() {
                   key={rango.id}
                   rango={rango}
                   onEdit={editarRango}
-                  onDelete={eliminarRango}
+                  onDelete={solicitarEliminacion}
                 />
               ))
             ) : (
@@ -277,7 +289,7 @@ function TipoRangos() {
 
                           <button
                             type="button"
-                            onClick={() => eliminarRango(rango.id)}
+                            onClick={() => solicitarEliminacion(rango.id)}
                             disabled={!hasPermission("planes.rangos_institucionales.eliminar")}
                             title={
                               hasPermission("planes.rangos_institucionales.eliminar")
@@ -367,6 +379,16 @@ function TipoRangos() {
           </div>
         </div>
       )}
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Eliminar tipo de rango"
+        mensaje="¿Estás seguro de que querés eliminar este tipo de rango? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }
