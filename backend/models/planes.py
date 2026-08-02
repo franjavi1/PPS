@@ -23,9 +23,9 @@ class Planes(db.Model):
     )
 
     # Numero de resolucion ministerial del plan
-    resolucion_ministerial: Mapped[int] = mapped_column(
+    resolucion_ministerial: Mapped[str] = mapped_column(
         "ResolucionMinisterial",
-        Integer,
+        String(14),
         nullable=False
 
     )

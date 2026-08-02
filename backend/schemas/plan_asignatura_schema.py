@@ -21,8 +21,8 @@ class PlanAsignaturaSchema(ma.SQLAlchemySchema):
     sedes_id = ma.auto_field(required=True)
     
     presentismo_porc = ma.auto_field(required=True)
-    regularizacion_prom = ma.auto_field(required=True)
-    final_aprobacion = ma.auto_field(required=True)
+    regularizacion_prom = ma.auto_field(required=False)
+    final_aprobacion = ma.auto_field(required=False)
     duracion = ma.auto_field(required=True)
 
     regimen = ma.auto_field(
