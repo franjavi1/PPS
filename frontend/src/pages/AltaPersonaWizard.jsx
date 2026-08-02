@@ -142,11 +142,29 @@ function AltaPersonaWizard() {
 
   function cambiarPersona(e) {
     const { name, value } = e.target;
+    // Validación en tiempo real para evitar números o caracteres especiales en Nombre y Apellido
+    if (name === "nombre" || name === "apellido") {
+      const soloLetras = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+      setPersona({ ...persona, [name]: soloLetras });
+      return;
+    }
+    // Validación para documento (solo números y hasta 8 dígitos)
+    if (name === "numero_doc") {
+      const soloNum = value.replace(/\D/g, "").slice(0, 8);
+      setPersona({ ...persona, [name]: soloNum });
+      return;
+    }
     setPersona({ ...persona, [name]: value });
   }
 
   function cambiarLegajo(e) {
     const { name, value } = e.target;
+    if (name === "numero") {
+      // Limitar legajo a un máximo razonable de caracteres para evitar roturas visuales
+      const valorLimpio = value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20);
+      setLegajo({ ...legajo, [name]: valorLimpio });
+      return;
+    }
     setLegajo({ ...legajo, [name]: value });
   }
 
@@ -168,6 +186,11 @@ function AltaPersonaWizard() {
 
   function cambiarContactos(e) {
     const { name, value } = e.target;
+    if (name === "celular") {
+      const soloNum = value.replace(/\D/g, "").slice(0, 15);
+      setContactos({ ...contactos, [name]: soloNum });
+      return;
+    }
     setContactos({ ...contactos, [name]: value });
   }
 
@@ -189,13 +212,20 @@ function AltaPersonaWizard() {
   function guardarPersona(e) {
     e.preventDefault();
 
-    if (
-      !persona.td_id ||
-      !persona.numero_doc ||
-      !persona.nombre.trim() ||
-      !persona.apellido.trim()
-    ) {
-      setError("Completa tipo de documento, numero, nombre y apellido.");
+    if (!persona.td_id) {
+      setError("Selecciona un tipo de documento válido.");
+      return;
+    }
+    if (!persona.numero_doc || persona.numero_doc.length < 7) {
+      setError("El número de documento debe tener al menos 7 dígitos.");
+      return;
+    }
+    if (!persona.nombre.trim() || persona.nombre.trim().length < 2) {
+      setError("El nombre ingresado no es válido.");
+      return;
+    }
+    if (!persona.apellido.trim() || persona.apellido.trim().length < 2) {
+      setError("El apellido ingresado no es válido.");
       return;
     }
 
@@ -207,7 +237,7 @@ function AltaPersonaWizard() {
     e.preventDefault();
 
     if (!legajo.numero.trim()) {
-      setError("El numero de legajo es obligatorio.");
+      setError("El número de legajo es obligatorio.");
       return;
     }
 
@@ -229,7 +259,7 @@ function AltaPersonaWizard() {
       (datosMedicos.grupo_sanguineo && !datosMedicos.seguro.trim()) ||
       (!datosMedicos.grupo_sanguineo && datosMedicos.seguro.trim())
     ) {
-      setError("Para guardar datos medicos completa grupo sanguineo y seguro.");
+      setError("Para guardar datos médicos complete grupo sanguíneo y seguro.");
       return;
     }
 
@@ -258,7 +288,7 @@ function AltaPersonaWizard() {
 
     if (!contactos.email.trim()) {
       setError(
-        "El email es obligatorio porque se utilizara para crear el usuario en Auth.",
+        "El email es obligatorio porque se utilizará para crear el usuario en Auth.",
       );
       return;
     }
@@ -283,6 +313,7 @@ function AltaPersonaWizard() {
   }
 
   async function confirmarAltaPersona() {
+    // Prevención estricta contra múltiples clics / doble submit que generan registros duplicados
     if (guardando || personaId) {
       return;
     }
@@ -301,7 +332,6 @@ function AltaPersonaWizard() {
       setGuardando(true);
       setError("");
 
-      // 1. Datos de persona listos desde el hook/estado con sus conversiones necesarias
       const datosPersona = {
         td_id: Number(persona.td_id),
         numero_doc: Number(persona.numero_doc),
@@ -311,14 +341,12 @@ function AltaPersonaWizard() {
       };
 
       const respuestaPersona = await personasService.crear(datosPersona);
-
       const nuevaPersonaId = obtenerIdRespuesta(respuestaPersona);
 
       if (!nuevaPersonaId) {
-        throw new Error("No se recibio el ID de la persona creada.");
+        throw new Error("No se recibió el ID de la persona creada.");
       }
 
-      // 2. Datos de legajo listos desde el hook/estado
       const datosLegajoPayload = {
         numero: legajo.numero.trim(),
         persona_id: nuevaPersonaId,
@@ -326,11 +354,10 @@ function AltaPersonaWizard() {
       };
 
       const respuestaLegajo = await legajoService.crear(datosLegajoPayload);
-
       const nuevoLegajoId = obtenerIdRespuesta(respuestaLegajo);
 
       if (!nuevoLegajoId) {
-        throw new Error("No se recibio el ID del legajo creado.");
+        throw new Error("No se recibió el ID del legajo creado.");
       }
 
       if (datosMedicos.grupo_sanguineo && datosMedicos.seguro.trim()) {
@@ -349,7 +376,6 @@ function AltaPersonaWizard() {
       }
 
       if (datosLegajo.rangos_institucionales_id) {
-        // 4. Datos de rangos listos desde el hook/estado
         const datosRangosPayload = {
           rangos_institucionales_id: Number(
             datosLegajo.rangos_institucionales_id,
@@ -364,7 +390,6 @@ function AltaPersonaWizard() {
       }
 
       if (datosLegajo.sede_id) {
-        // 5. Datos de sedes listos desde el hook/estado
         const datosSedesPayload = {
           sede_id: Number(datosLegajo.sede_id),
           es_autoridad: Boolean(datosLegajo.es_autoridad),
@@ -380,29 +405,30 @@ function AltaPersonaWizard() {
 
       if (contactos.email.trim()) {
         const tipoEmail = obtenerTipoContacto(tiposContacto, "email");
-
-        await contactosService.crear({
-          persona_id: Number(nuevaPersonaId),
-          tipo_contacto_id: Number(tipoEmail.id),
-          principal: true,
-          contacto: contactos.email.trim(),
-          usuario_accion: 1,
-        });
+        if (tipoEmail) {
+          await contactosService.crear({
+            persona_id: Number(nuevaPersonaId),
+            tipo_contacto_id: Number(tipoEmail.id),
+            principal: true,
+            contacto: contactos.email.trim(),
+            usuario_accion: 1,
+          });
+        }
       }
 
       if (contactos.celular.trim()) {
         const tipoCelular = obtenerTipoContacto(tiposContacto, "celular");
-
-        await contactosService.crear({
-          persona_id: Number(nuevaPersonaId),
-          tipo_contacto_id: Number(tipoCelular.id),
-          principal: false,
-          contacto: contactos.celular.trim(),
-          usuario_accion: 1,
-        });
+        if (tipoCelular) {
+          await contactosService.crear({
+            persona_id: Number(nuevaPersonaId),
+            tipo_contacto_id: Number(tipoCelular.id),
+            principal: false,
+            contacto: contactos.celular.trim(),
+            usuario_accion: 1,
+          });
+        }
       }
 
-      // 6. Armar los datos de Auth con los IDs reales recién creados.
       const datosAuth = {
         id_persona: Number(nuevaPersonaId),
         id_legajo: Number(nuevoLegajoId),
@@ -412,18 +438,14 @@ function AltaPersonaWizard() {
 
       setDatosPersonaAuth(datosAuth);
 
-      // 7. Crear el usuario y asignarle los roles seleccionados en Auth.
       const respuestaUsuario =
         await datosAuthService.exportarDatosPersona(datosAuth);
       const nuevoUsuarioId = obtenerUsuarioIdRespuesta(respuestaUsuario);
 
       if (!nuevoUsuarioId) {
-        throw new Error("Auth no devolvio el ID del usuario creado.");
+        throw new Error("Auth no devolvió el ID del usuario creado.");
       }
 
-      // 8. Guardar en Personas la relación con el usuario creado en Auth.
-      // Se envían también los datos existentes por si el PUT no admite
-      // actualizaciones parciales.
       await apiRequest(`/personas/${nuevaPersonaId}`, {
         method: "PUT",
         body: JSON.stringify({
@@ -541,9 +563,9 @@ function AltaPersonaWizard() {
                   getLabel={(tipo) => tipo.descripcion}
                 />
                 <CampoTexto
-                  label="Numero de documento"
+                  label="Número de documento"
                   name="numero_doc"
-                  type="number"
+                  type="text"
                   value={persona.numero_doc}
                   onChange={cambiarPersona}
                   placeholder="Ej: 30123456"
@@ -579,7 +601,7 @@ function AltaPersonaWizard() {
                   value={personaResumen}
                 />
                 <CampoTexto
-                  label="Numero de legajo"
+                  label="Número de legajo"
                   name="numero"
                   value={legajo.numero}
                   onChange={cambiarLegajo}
@@ -603,11 +625,11 @@ function AltaPersonaWizard() {
 
               <div>
                 <h2 className="text-xl font-extrabold text-slate-800 mb-4">
-                  Datos medicos
+                  Datos médicos
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <CampoSelectSimple
-                    label="Grupo sanguineo"
+                    label="Grupo sanguíneo"
                     name="grupo_sanguineo"
                     value={datosMedicos.grupo_sanguineo}
                     onChange={cambiarDatosMedicos}
@@ -637,7 +659,7 @@ function AltaPersonaWizard() {
                     placeholder="Ej: Penicilina"
                   />
                   <CampoCheckbox
-                    label="Aptitud fisica"
+                    label="Aptitud física"
                     name="aptitud_fisica"
                     checked={datosMedicos.aptitud_fisica}
                     onChange={cambiarDatosMedicos}
@@ -762,11 +784,11 @@ function AltaPersonaWizard() {
                 <ResumenItem
                   icono={<IdCard size={24} />}
                   titulo="Legajo"
-                  texto={`Numero ${legajo.numero} - ID ${legajoId || "pendiente de guardar"}`}
+                  texto={`Número ${legajo.numero} - ID ${legajoId || "pendiente de guardar"}`}
                 />
                 <ResumenItem
                   icono={<HeartPulse size={24} />}
-                  titulo="Datos medicos"
+                  titulo="Datos médicos"
                   texto={
                     datosMedicos.grupo_sanguineo
                       ? "Cargados o solicitados"
@@ -776,7 +798,7 @@ function AltaPersonaWizard() {
                 <ResumenItem
                   icono={<MapPinned size={24} />}
                   titulo="Rango y sede"
-                  texto="Se guardaran si fueron seleccionados"
+                  texto="Se guardarán si fueron seleccionados"
                 />
                 <ResumenItem
                   icono={<Phone size={24} />}
@@ -923,7 +945,7 @@ function CampoSelect({ label, name, value, onChange, opciones, getLabel }) {
         onChange={onChange}
         className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
       >
-        <option value="">Seleccione una opcion</option>
+        <option value="">Seleccione una opción</option>
         {opciones.map((opcion) => (
           <option key={opcion.id} value={opcion.id}>
             {getLabel(opcion)}
@@ -946,7 +968,7 @@ function CampoSelectSimple({ label, name, value, onChange, opciones }) {
         onChange={onChange}
         className="w-full h-14 border border-slate-300 rounded-xl px-4 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
       >
-        <option value="">Seleccione una opcion</option>
+        <option value="">Seleccione una opción</option>
         {opciones.map((opcion) => (
           <option key={opcion} value={opcion}>
             {opcion}
@@ -959,7 +981,7 @@ function CampoSelectSimple({ label, name, value, onChange, opciones }) {
 
 function CampoCheckbox({ label, name, checked, onChange }) {
   return (
-    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold">
+    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold cursor-pointer">
       <input
         type="checkbox"
         name={name}
@@ -1160,11 +1182,11 @@ function validarContactos(contactos) {
   const regexCelular = /^[0-9+\-\s()]{6,20}$/;
 
   if (email && !regexEmail.test(email)) {
-    return "Ingresa un email valido";
+    return "Ingresa un email válido.";
   }
 
   if (celular && !regexCelular.test(celular)) {
-    return "Ingresa un celular valido";
+    return "Ingresa un celular válido (mínimo 6 dígitos numéricos).";
   }
 
   return "";
@@ -1205,7 +1227,7 @@ function obtenerMensajeError(err) {
     return errores[primerCampo][0];
   }
 
-  return err.message || "No se pudo completar la operacion";
+  return err.message || "No se pudo completar la operación.";
 }
 
 export default AltaPersonaWizard;
