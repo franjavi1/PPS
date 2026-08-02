@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar"; // IMPORTE DE MODAL
 import {
   FileText,
   Pencil,
@@ -30,6 +32,10 @@ function Asignaturas() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Estado para el modal de eliminación estilizado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarAsignaturas();
@@ -136,24 +142,28 @@ function Asignaturas() {
     }
   }
 
-  async function eliminarAsignatura(id) {
+  // Prepara el ID a eliminar y abre el modal si cumple condiciones
+  function solicitarEliminacion(id) {
     if (asignaturaEstaEnPlan(id)) {
       setError("No se puede dar de baja una asignatura asociada a un plan");
       return;
     }
+    setIdAEliminar(id);
+  }
 
-    const confirmar = confirm("Seguro que queres dar de baja esta asignatura?");
-
-    if (!confirmar) {
-      return;
-    }
+  // Ejecuta la baja cuando el usuario confirma en el modal
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await asignaturaService.eliminar(id);
-      alert(respuesta.message || "Asignatura dada de baja correctamente");
+      setEliminando(true);
+      await asignaturaService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarAsignaturas();
     } catch (err) {
       setError(err.message || "No se pudo dar de baja la asignatura");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -179,6 +189,9 @@ function Asignaturas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -292,7 +305,7 @@ function Asignaturas() {
                     </button>
 
                     <button
-                      onClick={() => eliminarAsignatura(asignatura.id)}
+                      onClick={() => solicitarEliminacion(asignatura.id)}
                       disabled={!hasPermission("planes.asignaturas.eliminar")}
                       title={
                         hasPermission("planes.asignaturas.eliminar")
@@ -361,7 +374,7 @@ function Asignaturas() {
                           </button>
 
                           <button
-                            onClick={() => eliminarAsignatura(asignatura.id)}
+                            onClick={() => solicitarEliminacion(asignatura.id)}
                             disabled={!hasPermission("planes.asignaturas.eliminar")}
                             title={
                               hasPermission("planes.asignaturas.eliminar")
@@ -464,6 +477,16 @@ function Asignaturas() {
           )}
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Dar de baja asignatura"
+        mensaje="¿Estás seguro de que querés dar de baja esta asignatura? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }
