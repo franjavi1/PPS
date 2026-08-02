@@ -106,12 +106,6 @@ class PlanesSchema(ma.SQLAlchemySchema):
         if TipoPlanes.query.get(value) is None:
             raise ValidationError("El tipo de plan indicado no existe.")
 
-    # Verifica que la resolucion ministerial sea valida.
-    @validates("resolucion_ministerial")
-    def validar_resolucion_ministerial(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError("La resolucion ministerial debe ser un numero entero positivo")
-
     # Verifica que el usuario informado sea valido.
     @validates("usuario_accion")
     def validar_usuario_accion(self, value, **kwargs):
