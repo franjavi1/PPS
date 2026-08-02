@@ -298,7 +298,7 @@ function AltaComisionWizard() {
     <div className="min-h-screen bg-slate-100">
       <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-10">
-        <BotonVolver />
+        <BotonVolver ruta="/comisiones" />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
             <div className="flex items-start gap-4">
