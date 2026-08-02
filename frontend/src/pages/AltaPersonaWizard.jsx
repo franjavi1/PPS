@@ -1,5 +1,4 @@
 // frontend\src\pages\AltaPersonaWizard.jsx
-
 import { useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
@@ -9,6 +8,7 @@ import {
   IdCard,
   Mail,
   MapPinned,
+  Pencil,
   Phone,
   Save,
   ShieldCheck,
@@ -26,6 +26,7 @@ import { tipoDocumentoService } from "../services/tipoDocumentoService";
 import { tipoContactoService } from "../services/tipoContactoService";
 import { legajoService } from "../services/legajoService";
 import { datosAuthService } from "../services/datosAuthService";
+import { personasRelacionesService } from "../services/personasRelacionesService";
 
 const pasos = [
   { id: 1, titulo: "Persona", icono: User },
@@ -142,16 +143,15 @@ function AltaPersonaWizard() {
 
   function cambiarPersona(e) {
     const { name, value } = e.target;
-    // Validación en tiempo real para evitar números o caracteres especiales en Nombre y Apellido
     if (name === "nombre" || name === "apellido") {
       const soloLetras = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
       setPersona({ ...persona, [name]: soloLetras });
       return;
     }
-    // Validación para documento (solo números y hasta 8 dígitos)
+    // Expansión para soportar DNI, CUIT (con guiones) o Pasaporte (letras y números), hasta 15 caracteres
     if (name === "numero_doc") {
-      const soloNum = value.replace(/\D/g, "").slice(0, 8);
-      setPersona({ ...persona, [name]: soloNum });
+      const valorLimpio = value.replace(/[^a-zA-Z0-9-]/g, "").slice(0, 15);
+      setPersona({ ...persona, [name]: valorLimpio });
       return;
     }
     setPersona({ ...persona, [name]: value });
@@ -160,8 +160,7 @@ function AltaPersonaWizard() {
   function cambiarLegajo(e) {
     const { name, value } = e.target;
     if (name === "numero") {
-      // Limitar legajo a un máximo razonable de caracteres para evitar roturas visuales
-      const valorLimpio = value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20);
+      const valorLimpio = value.replace(/[^a-zA-Z0-9/\-|]/g, "").slice(0, 20);
       setLegajo({ ...legajo, [name]: valorLimpio });
       return;
     }
@@ -216,8 +215,8 @@ function AltaPersonaWizard() {
       setError("Selecciona un tipo de documento válido.");
       return;
     }
-    if (!persona.numero_doc || persona.numero_doc.length < 7) {
-      setError("El número de documento debe tener al menos 7 dígitos.");
+    if (!persona.numero_doc || persona.numero_doc.length < 6) {
+      setError("El número de documento/cuit/pasaporte debe tener al menos 6 caracteres.");
       return;
     }
     if (!persona.nombre.trim() || persona.nombre.trim().length < 2) {
@@ -236,8 +235,8 @@ function AltaPersonaWizard() {
   function guardarLegajo(e) {
     e.preventDefault();
 
-    if (!legajo.numero.trim()) {
-      setError("El número de legajo es obligatorio.");
+    if (!legajo.numero.trim() || legajo.numero.trim().length < 8) {
+      setError("El número de legajo debe tener un mínimo de 8 dígitos/caracteres.");
       return;
     }
 
@@ -245,7 +244,7 @@ function AltaPersonaWizard() {
     setPasoActual(3);
   }
 
-  function guardarDatosDelLegajo(e) {
+  async function guardarDatosDelLegajo(e) {
     e.preventDefault();
 
     const mensajeContactos = validarContactos(contactos);
@@ -277,6 +276,28 @@ function AltaPersonaWizard() {
     ) {
       setError("No existe el tipo de contacto Celular en la base.");
       return;
+    }
+
+    if (contactos.email.trim()) {
+      try {
+        setGuardando(true);
+        const respuestaContactos = await contactosService.obtenerTodos?.() || await apiRequest("/contactos");
+        const listaContactos = respuestaContactos.data || respuestaContactos || [];
+        
+        const emailExistente = listaContactos.some(
+          (c) => normalizarTexto(c.contacto || c.email) === normalizarTexto(contactos.email)
+        );
+
+        if (emailExistente) {
+          setError("El correo electrónico ya se encuentra registrado en el sistema.");
+          setGuardando(false);
+          return;
+        }
+      } catch (err) {
+        // Ignorar si falla la comprobación remota por disponibilidad
+      } finally {
+        setGuardando(false);
+      }
     }
 
     setError("");
@@ -313,7 +334,6 @@ function AltaPersonaWizard() {
   }
 
   async function confirmarAltaPersona() {
-    // Prevención estricta contra múltiples clics / doble submit que generan registros duplicados
     if (guardando || personaId) {
       return;
     }
@@ -334,7 +354,7 @@ function AltaPersonaWizard() {
 
       const datosPersona = {
         td_id: Number(persona.td_id),
-        numero_doc: Number(persona.numero_doc),
+        numero_doc: persona.numero_doc.trim(), // Soporta string para CUIT/Pasaporte
         nombre: persona.nombre.trim(),
         apellido: persona.apellido.trim(),
         usuario_accion: 1,
@@ -369,10 +389,7 @@ function AltaPersonaWizard() {
           usuario_accion: 1,
         };
 
-        await apiRequest(`/personas/${nuevaPersonaId}/datos-medicos`, {
-          method: "POST",
-          body: JSON.stringify(datosMedicosPayload),
-        });
+        await personasRelacionesService.crearDatosMedicos(nuevaPersonaId, datosMedicosPayload);
       }
 
       if (datosLegajo.rangos_institucionales_id) {
@@ -383,10 +400,7 @@ function AltaPersonaWizard() {
           usuario_accion: 1,
         };
 
-        await apiRequest(`/legajos/${nuevoLegajoId}/rangos`, {
-          method: "POST",
-          body: JSON.stringify(datosRangosPayload),
-        });
+        await personasRelacionesService.crearRangoLegajo(nuevoLegajoId, datosRangosPayload);
       }
 
       if (datosLegajo.sede_id) {
@@ -397,10 +411,7 @@ function AltaPersonaWizard() {
           usuario_accion: 1,
         };
 
-        await apiRequest(`/legajos/${nuevoLegajoId}/sedes`, {
-          method: "POST",
-          body: JSON.stringify(datosSedesPayload),
-        });
+        await personasRelacionesService.crearSedeLegajo(nuevoLegajoId, datosSedesPayload);
       }
 
       if (contactos.email.trim()) {
@@ -446,12 +457,9 @@ function AltaPersonaWizard() {
         throw new Error("Auth no devolvió el ID del usuario creado.");
       }
 
-      await apiRequest(`/personas/${nuevaPersonaId}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          ...datosPersona,
-          usuario_id: Number(nuevoUsuarioId),
-        }),
+      await personasRelacionesService.actualizarPersona(nuevaPersonaId, {
+        ...datosPersona,
+        usuario_id: Number(nuevoUsuarioId),
       });
 
       setPersonaId(nuevaPersonaId);
@@ -462,6 +470,7 @@ function AltaPersonaWizard() {
       });
 
       alert("Persona guardada correctamente.");
+      navigate("/personas");
     } catch (err) {
       setError(obtenerMensajeError(err));
     } finally {
@@ -568,7 +577,7 @@ function AltaPersonaWizard() {
                   type="text"
                   value={persona.numero_doc}
                   onChange={cambiarPersona}
-                  placeholder="Ej: 30123456"
+                  placeholder="Ej: 20-441114411-1"
                 />
                 <CampoTexto
                   label="Nombre"
@@ -605,7 +614,7 @@ function AltaPersonaWizard() {
                   name="numero"
                   value={legajo.numero}
                   onChange={cambiarLegajo}
-                  placeholder="Ej: 1001"
+                  placeholder="Ej: 1001-A / 2026"
                 />
               </div>
               <Acciones
@@ -780,11 +789,13 @@ function AltaPersonaWizard() {
                   icono={<User size={24} />}
                   titulo="Persona"
                   texto={`${personaResumen} - ID ${personaId || "pendiente de guardar"}`}
+                  onEditar={() => setPasoActual(1)}
                 />
                 <ResumenItem
                   icono={<IdCard size={24} />}
                   titulo="Legajo"
                   texto={`Número ${legajo.numero} - ID ${legajoId || "pendiente de guardar"}`}
+                  onEditar={() => setPasoActual(2)}
                 />
                 <ResumenItem
                   icono={<HeartPulse size={24} />}
@@ -794,11 +805,13 @@ function AltaPersonaWizard() {
                       ? "Cargados o solicitados"
                       : "Omitidos"
                   }
+                  onEditar={() => setPasoActual(3)}
                 />
                 <ResumenItem
                   icono={<MapPinned size={24} />}
                   titulo="Rango y sede"
                   texto="Se guardarán si fueron seleccionados"
+                  onEditar={() => setPasoActual(3)}
                 />
                 <ResumenItem
                   icono={<Phone size={24} />}
@@ -808,6 +821,7 @@ function AltaPersonaWizard() {
                       ? `${contactos.email || "Sin email"} - ${contactos.celular || "Sin celular"}`
                       : "Omitidos"
                   }
+                  onEditar={() => setPasoActual(3)}
                 />
                 <ResumenItem
                   icono={<ShieldCheck size={24} />}
@@ -819,6 +833,7 @@ function AltaPersonaWizard() {
                       datosPersonaAuth.id_roles,
                     )} - pendiente de guardar`
                   }
+                  onEditar={() => setPasoActual(4)}
                 />
               </div>
 
@@ -1031,12 +1046,26 @@ function Acciones({ guardando, texto, onBack }) {
   );
 }
 
-function ResumenItem({ icono, titulo, texto }) {
+function ResumenItem({ icono, titulo, texto, onEditar }) {
   return (
-    <div className="border border-slate-200 rounded-xl p-5 bg-slate-50">
-      <div className="text-red-700 mb-3">{icono}</div>
-      <p className="text-sm font-bold text-slate-400 uppercase">{titulo}</p>
-      <p className="text-slate-800 font-extrabold mt-1">{texto}</p>
+    <div className="border border-slate-200 rounded-xl p-5 bg-slate-50 flex flex-col justify-between">
+      <div>
+        <div className="flex items-center justify-between">
+          <div className="text-red-700 mb-3">{icono}</div>
+          {onEditar && (
+            <button
+              type="button"
+              onClick={onEditar}
+              className="flex items-center gap-1.5 text-xs font-extrabold text-red-700 bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded-lg transition cursor-pointer"
+            >
+              <Pencil size={14} />
+              Editar
+            </button>
+          )}
+        </div>
+        <p className="text-sm font-bold text-slate-400 uppercase">{titulo}</p>
+        <p className="text-slate-800 font-extrabold mt-1">{texto}</p>
+      </div>
     </div>
   );
 }
