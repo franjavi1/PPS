@@ -87,34 +87,8 @@ function getSession() {
 
 // Verifica si el usuario esta autenticado.
 // Devuelve true si existe un access_token almacenado, de lo contrario, devuelve false
-function tokenEstaVigente(token) {
-  if (!token) {
-    return false;
-  }
-
-  try {
-    const parteCentral = token.split(".")[1];
-
-    const textoDecodificado = window.atob(
-      parteCentral
-        .replace(/-/g, "+")
-        .replace(/_/g, "/")
-    );
-
-    const datosToken = JSON.parse(textoDecodificado);
-    const fechaActual = Date.now() / 1000;
-
-    return datosToken.exp > fechaActual;
-  } catch {
-    return false;
-  }
-}
-
 function isAuthenticated() {
-  const sesion = obtenerSesion();
-  const token = sesion?.access_token;
-
-  return tokenEstaVigente(token);
+  return !!obtenerSesion()?.access_token;
 }
 
 // Exporta el servicio de autenticacion para ser utilizado en cualquier parte de la aplicacion
