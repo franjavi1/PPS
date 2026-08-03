@@ -58,9 +58,8 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
             return
 
         existente = TipoDocumento.query.filter(
-            func.lower(func.trim(TipoDocumento.descripcion))
-            == descripcion.strip().lower(),
-            estado=1
+            func.lower(func.trim(TipoDocumento.descripcion)) == descripcion.strip().lower(),
+            TipoDocumento.estado == 1 
         ).first()
 
         tipo_documento_id = getattr(self, "context", {}).get("tipo_documento_id")
@@ -89,4 +88,4 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
 
 # Instancias usadas por las rutas y servicios.
 tipo_documento_schema = TipoDocumentoSchema()
-tipos_documento_schema = TipoDocumentoSchema(many=True)
+tipos_documento_schema = TipoDocumentoSchema(many=True) 

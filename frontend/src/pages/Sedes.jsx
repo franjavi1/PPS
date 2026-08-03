@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar";
 import {
   Building2,
   MapPin,
@@ -32,6 +34,10 @@ function Sedes() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Estado para el modal de borrado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -110,6 +116,12 @@ function Sedes() {
       return;
     }
 
+    const tieneLetras = /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(formulario.nombre.trim());
+    if (!tieneLetras) {
+      setErrorFormulario("El nombre debe contener al menos una letra valida.");
+      return;
+    }
+
     const payload = {
       tipo_sede_id: Number(formulario.tipo_sede_id),
       nombre: formulario.nombre.trim(),
@@ -133,19 +145,22 @@ function Sedes() {
     }
   }
 
-  async function eliminarSede(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta sede?");
+  function solicitarEliminacion(id) {
+    setIdAEliminar(id);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await sedeService.eliminar(id);
-      alert(respuesta.message || "Sede eliminada correctamente");
+      setEliminando(true);
+      await sedeService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la sede");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -174,6 +189,9 @@ function Sedes() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver ruta="/planes" />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -255,7 +273,7 @@ function Sedes() {
                       <p className="text-xs font-bold text-slate-400 uppercase">
                         Sede
                       </p>
-                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1 break-all">
                         {sede.nombre}
                       </h2>
                     </div>
@@ -295,7 +313,7 @@ function Sedes() {
                     </button>
 
                     <button
-                      onClick={() => eliminarSede(sede.id)}
+                      onClick={() => solicitarEliminacion(sede.id)}
                       disabled={!hasPermission("planes.sedes.eliminar")}
                       title={
                         hasPermission("planes.sedes.eliminar")
@@ -339,7 +357,7 @@ function Sedes() {
                 ) : sedesFiltradas.length > 0 ? (
                   sedesFiltradas.map((sede) => (
                     <tr key={sede.id} className="border-b border-slate-200 hover:bg-slate-50">
-                      <td className="px-5 py-5 text-slate-700 font-semibold">
+                      <td className="px-5 py-5 text-slate-700 font-semibold break-all">
                         {sede.nombre}
                       </td>
                       <td className="px-5 py-5 text-slate-700">
@@ -368,7 +386,7 @@ function Sedes() {
                           </button>
 
                           <button
-                            onClick={() => eliminarSede(sede.id)}
+                            onClick={() => solicitarEliminacion(sede.id)}
                             disabled={!hasPermission("planes.sedes.eliminar")}
                             title={
                               hasPermission("planes.sedes.eliminar")
@@ -500,6 +518,16 @@ function Sedes() {
           )}
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Eliminar sede"
+        mensaje="¿Estás seguro de que querés eliminar esta sede? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }

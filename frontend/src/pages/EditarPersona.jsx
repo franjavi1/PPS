@@ -122,11 +122,14 @@ function EditarPersona({ soloLectura = false }) {
             (item) => Number(item.legajo_id) === Number(legajoData.id),
           )
         : null;
+      
+      const listaSedesAsignadas = respuestaSedesAsignadas.data || [];
       const sedeData = legajoData
-        ? (respuestaSedesAsignadas.data || []).find(
-            (item) => Number(item.legajo_id) === Number(legajoData.id),
+        ? listaSedesAsignadas.find(
+            (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
           )
         : null;
+
       const tiposContactoData = respuestaTiposContacto.data || [];
       const tipoEmail = obtenerTipoContacto(tiposContactoData, "email");
       const tipoCelular = obtenerTipoContacto(tiposContactoData, "celular");
@@ -159,11 +162,13 @@ function EditarPersona({ soloLectura = false }) {
       setRango({
         rangos_institucionales_id: rangoData?.rangos_institucionales_id || "",
       });
+      
       setSede({
-        sede_id: sedeData?.sede_id || "",
-        es_autoridad: Boolean(sedeData?.es_autoridad),
-        es_sede_base: sedeData?.es_sede_base ?? true,
+        sede_id: sedeData?.sede_id || sedeData?.sedesId || "",
+        es_autoridad: sedeData ? Boolean(sedeData.es_autoridad) : false,
+        es_sede_base: sedeData ? Boolean(sedeData.es_sede_base) : true,
       });
+
       setContactos({
         email: contactoEmailData?.contacto || "",
         celular: contactoCelularData?.contacto || "",
@@ -741,7 +746,7 @@ function CampoSelectSimple({ label, name, value, onChange, opciones }) {
 
 function CampoCheckbox({ label, name, checked, onChange }) {
   return (
-    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold">
+    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold cursor-pointer">
       <input
         type="checkbox"
         name={name}

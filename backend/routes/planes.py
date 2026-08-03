@@ -1,4 +1,6 @@
 from flask import Blueprint, request
+from models.plan_asignatura import PlanAsignatura
+from models.comision_asignatura import ComisionAsignatura
 from schemas.planes_schema import plan_schema, planes_schema
 from utils.utilidades import respuesta_api
 from auth_common.decorador import requires_permission
@@ -72,6 +74,29 @@ def eliminar_plan(id):
     if not plan:
         raise APIError("Plan no encontrado.", status=404)
 
+    esta_en_comision = (
+        ComisionAsignatura.query
+        .join(
+            PlanAsignatura,
+            ComisionAsignatura.plan_asignaturas_id == PlanAsignatura.id,
+        )
+        .filter(
+            PlanAsignatura.plan_id == id,
+            ComisionAsignatura.estado == 1,
+        )
+        .first()
+    )
+
+    if esta_en_comision:
+        raise APIError(
+            "No se puede dar de baja un plan con asignaturas asociadas a comisiones",
+            status=409,
+        )
+
     eliminar(plan)
 
-    return respuesta_api(True, {"id": id}, "Plan dado de baja correctamente")
+    return respuesta_api(
+        True,
+        {"id": id},
+        "Plan dado de baja correctamente",
+    )

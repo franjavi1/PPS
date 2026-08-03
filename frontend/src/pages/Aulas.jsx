@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar";
 import {
   Building2,
   DoorOpen,
@@ -33,6 +35,10 @@ function Aulas() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Estado para el modal de borrado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -122,6 +128,12 @@ function Aulas() {
       return;
     }
 
+    const tieneLetras = /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(nombreAula);
+    if (!tieneLetras) {
+      setErrorFormulario("El nombre debe contener al menos una letra valida.");
+      return;
+    }
+
     const payload = {
       sedes_id: sedesId,
       aula: nombreAula,
@@ -145,19 +157,23 @@ function Aulas() {
     }
   }
 
-  async function eliminarAula(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta aula?");
+  function solicitarEliminacion(id) {
+    setIdAEliminar(id);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await aulaService.eliminar(id);
-      alert(respuesta.message || "Aula eliminada correctamente");
+      setEliminando(true);
+      setError("");
+      await aulaService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el aula");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -176,6 +192,9 @@ function Aulas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver ruta="/planes" />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -254,7 +273,7 @@ function Aulas() {
                       <p className="text-xs font-bold text-slate-400 uppercase">
                         Aula
                       </p>
-                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1 break-all">
                         {aula.aula}
                       </h2>
                     </div>
@@ -272,7 +291,7 @@ function Aulas() {
                       mensajeSinPermiso="No tenés permiso para editar aulas"
                     />
                     <BotonAccion
-                      onClick={() => eliminarAula(aula.id_aula)}
+                      onClick={() => solicitarEliminacion(aula.id_aula)}
                       tipo="eliminar"
                       disabled={!hasPermission("planes.aulas.eliminar")}
                       mensajeSinPermiso="No tenés permiso para eliminar aulas"
@@ -306,9 +325,9 @@ function Aulas() {
                   </tr>
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
-                    <tr key={aula.id_aula} className="border-b border-slate-200 hover:bg-slate-50">
-                      <Td destacado>{aula.aula}</Td>
-                      <Td>{sedesPorId[aula.sedes_id] || "-"}</Td>
+                    <tr key={aula.id_aula}>
+                      <Td destacado className="border-b border-slate-200 hover:bg-slate-50 break-all">{aula.aula}</Td>
+                      <Td className="truncate max-w-full block">{sedesPorId[aula.sedes_id] || "-"}</Td>
                       <Td><TipoBadge esVirtual={aula.es_virtual} /></Td>
                       <Td><EstadoBadge estado={aula.estado} /></Td>
                       <Td>
@@ -320,7 +339,7 @@ function Aulas() {
                             mensajeSinPermiso="No tenés permiso para editar aulas"
                           />
                           <BotonAccion
-                            onClick={() => eliminarAula(aula.id_aula)}
+                            onClick={() => solicitarEliminacion(aula.id_aula)}
                             tipo="eliminar"
                             disabled={!hasPermission("planes.aulas.eliminar")}
                             mensajeSinPermiso="No tenés permiso para eliminar aulas"
@@ -422,6 +441,16 @@ function Aulas() {
           )}
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Eliminar aula"
+        mensaje="¿Estás seguro de que querés eliminar esta aula? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }
