@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import useAuth from "../../auth/hooks/useAuth"; 
 import { HOME_ROUTE } from "../../auth/config"; 
 import { LOGIN_ROUTE } from "../../auth/config"; 
+import authService from "../../auth/services/authService";
 
 export default function ProtectedRoute({
   children,
@@ -24,10 +25,11 @@ export default function ProtectedRoute({
     );
   }
 
-  if (!isAuthenticated) {
-    window.location.replace(LOGIN_ROUTE)
-    return null;
-  }
+ if (!isAuthenticated || !authService.isAuthenticated()) {
+  authService.clearSession();
+  window.location.replace(LOGIN_ROUTE);
+  return null;
+}
 
   // Validacion de permisos
   if (permissions.length > 0 && !permissions.some((permiso) => hasPermission(permiso))) {

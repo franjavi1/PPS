@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { AUTH_API, STORAGE_KEY, LOGIN_ROUTE } from "./auth/config";
+import { STORAGE_KEY, LOGIN_ROUTE } from "./auth/config";
 
 const isLocal =
   window.location.hostname === "localhost" ||
@@ -59,26 +59,24 @@ function obtenerMensajeApi(data) {
     "No se pudo completar la operacion"
   );
 }
-function construirHeaders(options, token) {
-  const esFormData = options.body instanceof FormData;
 
-  return {
-    // No forzar JSON si el body es FormData: el navegador necesita fijar
-    // su propio Content-Type con el boundary del multipart.
-    ...(options.body && !esFormData
-      ? { "Content-Type": "application/json" }
-      : {}),
-    ...options.headers,
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
+let redirigiendoAlLogin = false;
 
-function eliminarSesion() {
+function cerrarSesionYRedirigir() {
   sessionStorage.removeItem(STORAGE_KEY);
+
+  if (!redirigiendoAlLogin) {
+    redirigiendoAlLogin = true;
+    window.location.replace(LOGIN_ROUTE);
+  }
 }
 
 async function ejecutarRequest(url, options = {}) {
   const sesion = obtenerSesion();
+  if (!sesion?.access_token) {
+  cerrarSesionYRedirigir();
+  throw new Error("La sesión no existe.");
+}
   let response = await fetch(url, {
     ...options,
     headers: {
@@ -91,6 +89,10 @@ async function ejecutarRequest(url, options = {}) {
   });
 
   let data = await response.json();
+  if (response.status === 401) {
+  cerrarSesionYRedirigir();
+  throw new Error("La sesión venció. Debe iniciar sesión nuevamente.");
+}
   console.log(response);
 
   if (!response.ok) {    
@@ -106,28 +108,6 @@ async function ejecutarRequest(url, options = {}) {
       throw new Error("Redirigiendo por falta de permisos...");
     }
 
-    if (response.status === 401 && sesion?.refresh_token) {
-      try {
-        const nuevoToken = await refrescarToken();
-
-        response = await fetch(url, {
-          ...options,
-          headers: construirHeaders(options, nuevoToken),
-        });
-
-        data = await response.json();
-
-        if (response.ok) {
-          return data;
-        }
-      } catch (error) {
-        // Si no fue posible renovar la sesión, elimina la información local y redirige al login
-        eliminarSesion();
-        window.location.assign(LOGIN_ROUTE);
-
-        throw error;
-      }
-    }
     /*if(response.status==401){
       window.location.assign("/auth/login")
     }*/
