@@ -75,3 +75,22 @@ def reactivar(persona):
     db.session.commit()
 
     return persona
+
+def es_legajo_de_persona(legajo_id, persona_id):
+    
+    ## Verifica si un legajo activo pertenece a una persona activa específica
+    
+    if not legajo_id or not persona_id:
+        return False
+        
+    legajo = Legajo.query.filter_by(id=legajo_id, estado=1).first()
+    
+    if legajo and legajo.persona_id == persona_id:
+        return True
+        
+    return False
+
+def obtener_persona_activa(persona_id):
+    
+    ## Obtiene una persona por su ID siempre que su estado sea 1
+    return Persona.query.filter_by(id=persona_id, estado=1).first()

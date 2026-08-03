@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from schemas.legajo_sedes_schema import legajo_sedes_schema
+from schemas.legajo_sedes_schema import legajo_sedes_schema, legajos_sedes_schema
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
 from auth_common.decorador import requires_permission
@@ -16,10 +16,10 @@ legajo_sedes_bp = Blueprint("legajo_sedes_bp", __name__, url_prefix="/legajo-sed
 
 
 @legajo_sedes_bp.route("", methods=["GET"])
-@requires_permission("planes.legajo_sedes.ver")
+@requires_permission("planes.legajo_sedes.ver", "planes.personas.ver_propio", policy="ANY")
 def get_legajos_sedes():
     legajos_sedes = obtener_todos()
-    data = legajo_sedes_schema.dump(legajos_sedes)
+    data = legajos_sedes_schema.dump(legajos_sedes)
 
     if len(data) == 0:
         return respuesta_api(True, [], "No se encontraron resultados")

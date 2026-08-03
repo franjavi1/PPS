@@ -50,7 +50,7 @@ def crear_aula():
 def editar_aula(id):
     aula = obtener_por_id(id)
     
-    if not aula or aula.tsBaja is not None:
+    if not aula:
         raise APIError("Aula no encontrada.", status=404)
     
     req = request.get_json(silent=True) or {}
@@ -64,7 +64,7 @@ def editar_aula(id):
 def eliminar_aula(id):
     aula = obtener_por_id(id)
     
-    if not aula or aula.tsBaja is not None:
+    if not aula:
         raise APIError("Aula no encontrada.", status=404)
 
     esta_en_uso = ComisionAsignatura.query.filter_by(aula_id=id).first()

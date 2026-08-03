@@ -57,7 +57,8 @@ class TipoSedeSchema(ma.SQLAlchemySchema):
             return
 
         existente = TipoSede.query.filter_by(
-            descripcion=descripcion
+            descripcion=descripcion,
+            estado=1
         ).first()
 
         tipo_sede_id = getattr(self, "context", {}).get("tipo_sede_id")

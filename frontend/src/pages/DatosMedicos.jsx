@@ -118,7 +118,6 @@ function DatosMedicos() {
       alergias: formulario.alergias.trim() || null,
       aptitud_fisica: formulario.aptitud_fisica,
       seguro: formulario.seguro,
-      usuario_accion: 1,
     };
 
     try {

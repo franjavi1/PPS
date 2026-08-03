@@ -17,7 +17,7 @@ legajo_rangos_bp = Blueprint("legajo_rangos_bp", __name__, url_prefix="/legajo-r
 
 
 @legajo_rangos_bp.route("", methods=["GET"])
-@requires_permission("planes.legajo_rangos.ver")
+@requires_permission("planes.legajo_rangos.ver", "planes.personas.ver_propio", policy="ANY")
 def get_legajos_rangos():
     legajos_rangos = obtener_todos()
     data = legajos_rangos_schema.dump(legajos_rangos)

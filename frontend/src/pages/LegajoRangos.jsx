@@ -107,7 +107,6 @@ function LegajoRangos() {
     const payload = {
       legajo_id: Number(formulario.legajo_id),
       rangos_institucionales_id: Number(formulario.rangos_institucionales_id),
-      usuario_accion: 1,
     };
 
     try {

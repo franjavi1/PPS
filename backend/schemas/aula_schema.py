@@ -1,7 +1,7 @@
 from models.aula import Aula
 from db import ma
 from marshmallow import ValidationError, validates, pre_load
-from marshmallow.validate import Length, OneOf
+from marshmallow.validate import Length, OneOf, Regexp
 
 class AulaSchema(ma.SQLAlchemySchema):
     class Meta:
@@ -28,7 +28,8 @@ class AulaSchema(ma.SQLAlchemySchema):
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=45, error="El nombre del aula debe tener entre 1 y 45 caracteres")
+            Length(min=1, max=45, error="El nombre del aula debe tener entre 1 y 45 caracteres"),
+            Regexp(r".*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*", error="El nombre debe contener al menos una letra") 
         ],
         error_messages={
             "required": "El nombre del aula es obligatorio",
@@ -52,10 +53,10 @@ class AulaSchema(ma.SQLAlchemySchema):
 
     # Usuario que realiza la acción sobre el registro.
     usuario_accion = ma.auto_field(
-        required=True,
+        required=False,
         allow_none=False,
         error_messages={
-            "required": "El usuario de acción es obligatorio",
+            
             "null": "El usuario de acción no puede ser null",
             "invalid": "El usuario de acción debe ser un número entero"
         }

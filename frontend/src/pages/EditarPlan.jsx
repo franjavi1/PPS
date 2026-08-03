@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   BookMarked,
@@ -145,12 +145,29 @@ function EditarPlan() {
   }, [asignaturas, rangos, sedes]);
 
   function cambiarPlan(e) {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    if (name === "resolucion_ministerial") {
+      value = value.replace(/[^0-9/-]/g, "").slice(0, 14);
+    }
+
     setPlan({ ...plan, [name]: value });
   }
 
   function cambiarNuevaAsignatura(e) {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    if (["presentismo_porc", "regularizacion_prom", "final_aprobacion"].includes(name)) {
+      value = value.replace(/[^0-9]/g, "");
+      if (value !== "" && parseInt(value, 10) > 100) {
+        value = "100";
+      }
+    } else if (name === "duracion") {
+      value = value.replace(/[^0-9]/g, "").slice(0, 4);
+    } else if (name === "regimen") {
+      value = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "").slice(0, 20);
+    }
+
     setNuevaAsignatura({ ...nuevaAsignatura, [name]: value });
   }
 
@@ -165,13 +182,12 @@ function EditarPlan() {
       plan_id: Number(id),
       rango_minimo_id: Number(nuevaAsignatura.rango_minimo_id),
       sedes_id: Number(nuevaAsignatura.sedes_id),
-      presentismo_porc: Number(nuevaAsignatura.presentismo_porc),
-      regularizacion_prom: Number(nuevaAsignatura.regularizacion_prom),
-      final_aprobacion: Number(nuevaAsignatura.final_aprobacion),
-      duracion: Number(nuevaAsignatura.duracion),
+      presentismo_porc: nuevaAsignatura.presentismo_porc !== "" ? Number(nuevaAsignatura.presentismo_porc) : null,
+      regularizacion_prom: nuevaAsignatura.regularizacion_prom !== "" ? Number(nuevaAsignatura.regularizacion_prom) : null,
+      final_aprobacion: nuevaAsignatura.final_aprobacion !== "" ? Number(nuevaAsignatura.final_aprobacion) : null,
+      duracion: nuevaAsignatura.duracion !== "" ? Number(nuevaAsignatura.duracion) : null,
       regimen: nuevaAsignatura.regimen.trim(),
       modalidad: nuevaAsignatura.modalidad.trim(),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarAsignatura(payload);
@@ -225,7 +241,6 @@ function EditarPlan() {
     const payload = {
       pa_id: Number(nuevaCorrelativa.pa_id),
       asignatura_id: Number(nuevaCorrelativa.asignatura_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarCorrelativa(
@@ -311,7 +326,7 @@ function EditarPlan() {
     e.preventDefault();
 
     const tipoPlanId = Number(plan.tipo_planes_id_tipo_planes);
-    const resolucionMinisterial = Number(plan.resolucion_ministerial);
+    const resolucionMinisterial = plan.resolucion_ministerial.trim();
     const nombre = plan.nombre.trim();
     const descrip = plan.descrip.trim();
 
@@ -320,8 +335,8 @@ function EditarPlan() {
       return;
     }
 
-    if (!resolucionMinisterial || resolucionMinisterial <= 0) {
-      setError("La resolucion ministerial debe ser un numero positivo");
+    if (!resolucionMinisterial) {
+      setError("La resolucion ministerial no puede estar vacía");
       return;
     }
 
@@ -355,8 +370,7 @@ function EditarPlan() {
         usuario_accion: 1,
       });
 
-      setMensaje("Plan actualizado correctamente");
-      await cargarDatos();
+      navigate("/planes");
     } catch (err) {
       setError(obtenerMensajeError(err));
     } finally {
@@ -435,11 +449,11 @@ function EditarPlan() {
                 <CampoTexto
                   label="Resolucion ministerial"
                   name="resolucion_ministerial"
-                  type="number"
                   value={plan.resolucion_ministerial}
                   onChange={cambiarPlan}
-                  placeholder="Ej: 2026001"
+                  placeholder="Ej: 12314/-2022"
                   icono={<Hash size={20} />}
+                  maxLength={14}
                 />
                 <CampoTexto
                   label="Nombre"
@@ -519,40 +533,41 @@ function EditarPlan() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                     <CampoTexto
-                      label="Presentismo %"
+                      label="Presentismo requerido"
                       name="presentismo_porc"
-                      type="number"
                       value={nuevaAsignatura.presentismo_porc}
                       onChange={cambiarNuevaAsignatura}
                       placeholder="Ej: 75"
                       icono={<Hash size={20} />}
+                      inputMode="numeric"
                     />
                     <CampoTexto
-                      label="Regularizacion prom."
+                      label="Promedio para regularizar"
                       name="regularizacion_prom"
-                      type="number"
                       value={nuevaAsignatura.regularizacion_prom}
                       onChange={cambiarNuevaAsignatura}
                       placeholder="Ej: 6"
                       icono={<Hash size={20} />}
+                      inputMode="numeric"
                     />
                     <CampoTexto
-                      label="Final aprobacion"
+                      label="Nota mínima de aprobación de final"
                       name="final_aprobacion"
-                      type="number"
                       value={nuevaAsignatura.final_aprobacion}
                       onChange={cambiarNuevaAsignatura}
                       placeholder="Ej: 7"
                       icono={<Hash size={20} />}
+                      inputMode="numeric"
                     />
                     <CampoTexto
-                      label="Duracion"
+                      label="Horas cátedra"
                       name="duracion"
-                      type="number"
                       value={nuevaAsignatura.duracion}
                       onChange={cambiarNuevaAsignatura}
                       placeholder="Ej: 120"
                       icono={<Hash size={20} />}
+                      maxLength={4}
+                      inputMode="numeric"
                     />
                     <CampoTexto
                       label="Regimen"
@@ -561,6 +576,7 @@ function EditarPlan() {
                       onChange={cambiarNuevaAsignatura}
                       placeholder="Ej: Anual"
                       icono={<BookMarked size={20} />}
+                      maxLength={20}
                     />
                     <CampoSelect
                       label="Modalidad"
@@ -825,6 +841,8 @@ function CampoTexto({
   placeholder,
   icono,
   type = "text",
+  maxLength,
+  inputMode,
 }) {
   return (
     <div>
@@ -843,6 +861,8 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          maxLength={maxLength}
+          inputMode={inputMode}
           className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
             icono ? "pl-12" : "pl-4"
           }`}
@@ -920,21 +940,24 @@ function validarAsignatura(payload) {
     }
   }
 
-  const camposNumericos = [
-    ["presentismo_porc", "El presentismo debe ser un numero"],
-    ["regularizacion_prom", "La regularizacion debe ser un numero"],
-    ["final_aprobacion", "La nota final debe ser un numero"],
-    ["duracion", "La duracion debe ser un numero"],
-  ];
+  if (payload.presentismo_porc === null || payload.presentismo_porc < 1 || payload.presentismo_porc > 100) {
+    return "El presentismo debe ser un número entre 1 y 100";
+  }
 
-  for (const [campo, mensaje] of camposNumericos) {
-    if (Number.isNaN(payload[campo])) {
-      return mensaje;
-    }
+  if (payload.regularizacion_prom !== null && (payload.regularizacion_prom < 1 || payload.regularizacion_prom > 100)) {
+    return "La regularización debe ser un número entre 1 y 100, o estar vacía";
+  }
+
+  if (payload.final_aprobacion !== null && (payload.final_aprobacion < 1 || payload.final_aprobacion > 100)) {
+    return "La nota final debe ser un número entre 1 y 100, o estar vacía";
+  }
+
+  if (payload.duracion === null || payload.duracion < 1) {
+    return "La duración debe ser de al menos 1 y no puede estar vacía";
   }
 
   if (!payload.regimen) {
-    return "El regimen es obligatorio";
+    return "El regimen es obligatorio y sólo debe contener letras";
   }
 
   if (!payload.modalidad) {

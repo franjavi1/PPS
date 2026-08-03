@@ -37,7 +37,6 @@ class Aula(db.Model):
     )
 
 
-
     # Estado del registro dentro del sistema.
     estado: Mapped[int] = mapped_column(
         Integer,

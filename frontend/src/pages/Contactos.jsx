@@ -117,7 +117,6 @@ function Contactos() {
       tipo_contacto_id: Number(formulario.tipo_contacto_id),
       principal: formulario.principal,
       contacto: formulario.contacto,
-      usuario_accion: 1,
     };
 
     try {

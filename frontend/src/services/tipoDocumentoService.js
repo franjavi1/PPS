@@ -8,23 +8,17 @@ import { apiRequest } from "../api";
 const BASE_URL = "/tipos-documentos";
 
 export const tipoDocumentoService = {
-  /**
-   * Obtiene todos los registros de Tipos de Documento desde la base de datos.
-   */
+ 
   obtenerTodos() {
     return apiRequest(BASE_URL);
   },
 
-  /**
-   * Obtiene un Tipo de Documento por su ID.
-   */
+  
   obtenerPorId(id) {
     return apiRequest(`${BASE_URL}/${id}`);
   },
 
-  /**
-   * Crea un nuevo Tipo de Documento.
-   */
+  
   crear(tipoDocumento) {
     return apiRequest(BASE_URL, {
       method: "POST",
@@ -32,9 +26,8 @@ export const tipoDocumentoService = {
     });
   },
 
-  /**
-   * Actualiza un Tipo de Documento existente.
-   */
+
+  
   actualizar(id, tipoDocumento) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "PUT",
@@ -42,9 +35,8 @@ export const tipoDocumentoService = {
     });
   },
 
-  /**
-   * Elimina un Tipo de Documento por su ID.
-   */
+
+  
   eliminar(id) {
     return apiRequest(`${BASE_URL}/${id}`, {
       method: "DELETE",

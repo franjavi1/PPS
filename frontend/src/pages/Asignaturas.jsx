@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar"; // IMPORTE DE MODAL
 import {
   FileText,
   Pencil,
@@ -20,8 +22,7 @@ const formularioInicial = {
 };
 
 function Asignaturas() {
-  const { currentUserRole } = useAuth();
-  const esAdministrador = currentUserRole === "ROLE_ADMIN";
+  const { currentUserRole, hasPermission } = useAuth();
   const [asignaturas, setAsignaturas] = useState([]);
   const [planAsignaturas, setPlanAsignaturas] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -31,6 +32,10 @@ function Asignaturas() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Estado para el modal de eliminación estilizado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarAsignaturas();
@@ -118,7 +123,6 @@ function Asignaturas() {
     const payload = {
       nombre,
       formato,
-      usuario_accion: 1,
     };
 
     try {
@@ -137,24 +141,28 @@ function Asignaturas() {
     }
   }
 
-  async function eliminarAsignatura(id) {
+  // Prepara el ID a eliminar y abre el modal si cumple condiciones
+  function solicitarEliminacion(id) {
     if (asignaturaEstaEnPlan(id)) {
       setError("No se puede dar de baja una asignatura asociada a un plan");
       return;
     }
+    setIdAEliminar(id);
+  }
 
-    const confirmar = confirm("Seguro que queres dar de baja esta asignatura?");
-
-    if (!confirmar) {
-      return;
-    }
+  // Ejecuta la baja cuando el usuario confirma en el modal
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await asignaturaService.eliminar(id);
-      alert(respuesta.message || "Asignatura dada de baja correctamente");
+      setEliminando(true);
+      await asignaturaService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarAsignaturas();
     } catch (err) {
       setError(err.message || "No se pudo dar de baja la asignatura");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -180,6 +188,9 @@ function Asignaturas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver ruta="/planes" />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -209,6 +220,12 @@ function Asignaturas() {
 
               <button
                 onClick={abrirNuevaAsignatura}
+                disabled={!hasPermission("planes.asignaturas.crear")}
+                title={
+                  hasPermission("planes.asignaturas.crear")
+                    ? "Crear asignatura"
+                    : "No tenés permiso para crear asignaturas"
+                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
@@ -274,8 +291,12 @@ function Asignaturas() {
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => editarAsignatura(asignatura)}
-                      disabled={!esAdministrador}
-                      title={esAdministrador ? "Editar asignatura" : "Solo los administradores pueden editar"}
+                      disabled={!hasPermission("planes.asignaturas.editar")}
+                      title={
+                        hasPermission("planes.asignaturas.editar")
+                          ? "Editar asignatura"
+                          : "No tenés permiso para editar asignaturas"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Pencil size={16} />
@@ -283,14 +304,12 @@ function Asignaturas() {
                     </button>
 
                     <button
-                      onClick={() => eliminarAsignatura(asignatura.id)}
-                      disabled={!esAdministrador || asignaturaEstaEnPlan(asignatura.id)}
+                      onClick={() => solicitarEliminacion(asignatura.id)}
+                      disabled={!hasPermission("planes.asignaturas.eliminar")}
                       title={
-                        !esAdministrador
-                          ? "Solo los administradores pueden dar de baja"
-                          : asignaturaEstaEnPlan(asignatura.id)
-                          ? "No se puede dar de baja una asignatura asociada a un plan"
-                          : "Dar de baja asignatura"
+                        hasPermission("planes.asignaturas.eliminar")
+                          ? "Eliminar asignatura"
+                          : "No tenés permiso para eliminar asignaturas"
                       }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
@@ -341,8 +360,12 @@ function Asignaturas() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarAsignatura(asignatura)}
-                            disabled={!esAdministrador}
-                            title={esAdministrador ? "Editar asignatura" : "Solo los administradores pueden editar"}
+                            disabled={!hasPermission("planes.asignaturas.editar")}
+                            title={
+                              hasPermission("planes.asignaturas.editar")
+                                ? "Editar asignatura"
+                                : "No tenés permiso para editar asignaturas"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -350,14 +373,12 @@ function Asignaturas() {
                           </button>
 
                           <button
-                            onClick={() => eliminarAsignatura(asignatura.id)}
-                            disabled={!esAdministrador || asignaturaEstaEnPlan(asignatura.id)}
+                            onClick={() => solicitarEliminacion(asignatura.id)}
+                            disabled={!hasPermission("planes.asignaturas.eliminar")}
                             title={
-                              !esAdministrador
-                                ? "Solo los administradores pueden dar de baja"
-                                : asignaturaEstaEnPlan(asignatura.id)
-                                ? "No se puede dar de baja una asignatura asociada a un plan"
-                                : "Dar de baja asignatura"
+                              hasPermission("planes.asignaturas.eliminar")
+                                ? "Eliminar asignatura"
+                                : "No tenés permiso para eliminar asignaturas"
                             }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
@@ -455,6 +476,16 @@ function Asignaturas() {
           )}
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Dar de baja asignatura"
+        mensaje="¿Estás seguro de que querés dar de baja esta asignatura? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }

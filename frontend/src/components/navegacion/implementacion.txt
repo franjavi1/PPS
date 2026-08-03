@@ -1,0 +1,37 @@
+<ItemMenuDesplegable 
+    variant="menu" 
+    icon={Users} 
+    label="Cuerpo Docente" 
+    subtitle="Gestionar profesores y cargos" 
+    onClick={() => navigate("/autoridad-comision")} 
+    permission="planes.autoridad_comision.leer"
+/>
+</MenuDesplegable>
+
+{/* Gestion educativa */}
+<MenuDesplegable 
+label="Gestion educativa" 
+icon={GraduationCap} 
+width="w-64"
+permission={["planes.planes.leer", "planes.asignaturas.leer", "planes.comisiones.leer", "planes.tipos_plan.leer", "planes.comisiones_asignatura.leer", "planes.planes_asignatura.leer"]}
+>
+
+
+
+
+<ItemMenuDesplegable 
+    variant="menu" 
+    icon={Plus} 
+    label="Nueva persona" 
+    subtitle="Alta guiada de persona" 
+    onClick={() => navigate("/persona/alta-guiada")} 
+    permission={["planes.personas.crear", "planes.legajos.crear"]}
+/>
+<ItemMenuDesplegable 
+    variant="menu" 
+    icon={User} 
+    label="Personas y Legajos" 
+    subtitle="Buscar y editar personas" 
+    onClick={() => navigate("/personas")} 
+    permission="planes.personas.leer"
+/>

@@ -128,7 +128,6 @@ function AutoridadesComision() {
       tipo_autoridad_id: Number(formulario.tipo_autoridad_id),
       legajo_id: Number(formulario.legajo_id),
       comision_id: Number(formulario.comision_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarPayload(payload);

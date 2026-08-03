@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router-dom";
 import useAuth from "../auth/hooks/useAuth";
 //import { hasPermission } from "../auth/utils/permissions";
+import { MENU_ROUTE } from "../api";
 import { LOGIN_ROUTE } from "../auth/config";
 import {
   BookOpen,
@@ -21,6 +22,7 @@ import {
   Home,
   IdCard,
   LogOut,
+  SendToBack,
   MapPinned,
   Menu,
   Phone,
@@ -40,7 +42,7 @@ function Navbar() {
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
   const { hasPermission, hasRole } = useAuth();
-
+  useEffect(()=>{console.log(currentUserRole)},[currentUserRole])
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
@@ -51,9 +53,15 @@ function Navbar() {
   };
   const handleLogout = () => {
     logout();
-    closeMenus();
-    navigate(LOGIN_ROUTE);
+    window.location.replace(LOGIN_ROUTE);
+    //closeMenus();
+    
+    //navigate(LOGIN_ROUTE);
   };
+
+  const handleVolver = () => {
+    window.location.href = MENU_ROUTE;
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -239,7 +247,7 @@ function Navbar() {
               </NavLink>
             )}
           </Dropdown>
-          {currentUserRole === "ROLE_ADMIN" && (
+          {hasPermission("planes.config.ver") && (
             <Dropdown
               id="config"
               title="Configuración"
@@ -316,11 +324,20 @@ function Navbar() {
           )}
           <button
             type="button"
+            onClick={handleVolver}
+            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
+          >
+            <SendToBack size={17} />
+            Volver
+          </button>
+
+          <button
+            type="button"
             onClick={handleLogout}
             className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
           >
             <LogOut size={17} />
-            Cerrar sesión
+            Cerrar Sesion
           </button>
         </nav>
       </div>
@@ -416,7 +433,7 @@ function Navbar() {
             >
               Comisiones
             </MobileLink>
-            {currentUserRole === "ROLE_ADMIN" && (
+            {hasPermission("planes.config.ver") && (
               <>
                 <MobileLink
                   to="/sedes"

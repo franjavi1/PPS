@@ -184,7 +184,6 @@ function ComisionesAsignaturas() {
       modalidadesid: Number(formulario.modalidadesid),
       cupo_maximo: Number(formulario.cupo_maximo),
       estado: Number(formulario.estado),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarPayload(payload);
@@ -776,14 +775,35 @@ function validarPayload(payload) {
 }
 
 function obtenerMensajeError(err) {
-  const errores = err.errors || {};
-  const primerCampo = Object.keys(errores)[0];
-
-  if (primerCampo && Array.isArray(errores[primerCampo])) {
-    return errores[primerCampo][0];
+  if (typeof err?.message === "string" && err.message.trim()) {
+    return err.message;
   }
 
-  return err.message || "No se pudo guardar la comision asignatura";
+  const errores = err?.errors;
+
+  if (typeof errores === "string" && errores.trim()) {
+    return errores;
+  }
+
+  if (errores && typeof errores === "object") {
+    const primerError = Object.values(errores)[0];
+
+    if (Array.isArray(primerError)) {
+      const mensaje = primerError.find(
+        (item) => typeof item === "string" && item.trim(),
+      );
+
+      if (mensaje) {
+        return mensaje;
+      }
+    }
+
+    if (typeof primerError === "string" && primerError.trim()) {
+      return primerError;
+    }
+  }
+
+  return "No se pudo completar la operación";
 }
 
 export default ComisionesAsignaturas;

@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar";
 import { FileText, Pencil, PlusCircle, Save, Trash2, X } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { apiRequest } from "../api";
+import useAuth from "../auth/hooks/useAuth";
 
 function TiposDocumentos() {
+  const { currentUserRole, hasPermission } = useAuth();
   const [tipos, setTipos] = useState([]);
   const [descripcion, setDescripcion] = useState("");
   const [editandoId, setEditandoId] = useState(null);
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Estado para el modal de borrado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarTipos();
@@ -48,7 +56,6 @@ function TiposDocumentos() {
 
     const payload = {
       descripcion: descripcion.trim().toUpperCase(),
-      usuario_accion: 1,
     };
 
     try {
@@ -74,21 +81,25 @@ function TiposDocumentos() {
     }
   }
 
-  async function eliminarTipo(id) {
-    const confirmar = confirm("Seguro que queres eliminar este tipo de documento?");
+  function solicitarEliminacion(id) {
+    setIdAEliminar(id);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await apiRequest(`/tipos-documentos/${id}`, {
+      setEliminando(true);
+      setError("");
+      await apiRequest(`/tipos-documentos/${idAEliminar}`, {
         method: "DELETE",
       });
-      alert(respuesta.message || "Tipo de documento eliminado correctamente");
+      setIdAEliminar(null);
       await cargarTipos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el tipo de documento");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -97,6 +108,9 @@ function TiposDocumentos() {
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver ruta="/planes" />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex items-start gap-5 mb-8">
             <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
@@ -143,6 +157,12 @@ function TiposDocumentos() {
               )}
 
               <button
+                disabled={!hasPermission("planes.tipos_documentos.crear")}
+                title={
+                  hasPermission("planes.tipos_documentos.crear")
+                    ? "Crear tipo de documento"
+                    : "No tenés permiso para crear tipos de documentos"
+                }
                 type="submit"
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
@@ -184,6 +204,12 @@ function TiposDocumentos() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarTipo(tipo)}
+                            disabled={!hasPermission("planes.tipos_documentos.editar")}
+                            title={
+                              hasPermission("planes.tipos_documentos.editar")
+                                ? "Editar tipo de documento"
+                                : "No tenés permiso para editar tipos de documentos"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -191,7 +217,13 @@ function TiposDocumentos() {
                           </button>
 
                           <button
-                            onClick={() => eliminarTipo(tipo.id)}
+                            onClick={() => solicitarEliminacion(tipo.id)}
+                            disabled={!hasPermission("planes.tipos_documentos.eliminar")}
+                            title={
+                              hasPermission("planes.tipos_documentos.eliminar")
+                                ? "Eliminar tipo de documento"
+                                : "No tenés permiso para eliminar tipos de documentos"
+                            }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
@@ -203,7 +235,7 @@ function TiposDocumentos() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="2" className="text-center px-5 py-10 text-slate-500">
                       No hay tipos de documento cargados.
                     </td>
                   </tr>
@@ -213,6 +245,16 @@ function TiposDocumentos() {
           </div>
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Eliminar tipo de documento"
+        mensaje="¿Estás seguro de que querés eliminar este tipo de documento? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }

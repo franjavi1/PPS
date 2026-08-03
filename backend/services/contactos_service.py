@@ -11,7 +11,7 @@ Este archivo contiene la logica de negocio del CRUD de Contactos
 
 
 def obtener_todos():
-    return Contactos.query.all()
+    return Contactos.query.filter_by(estado=1).all()
 
 
 def obtener_por_id(id):

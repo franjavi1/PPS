@@ -10,7 +10,7 @@ Este archivo contiene la logica de negocio del CRUD de LegajoSedes
 
 
 def obtener_todos():
-    return LegajoSedes.query.all()
+    return LegajoSedes.query.filter_by(estado=1).all()
 
 
 def obtener_por_id(id):

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import {
   Eye,
   GraduationCap,
@@ -27,6 +27,8 @@ function Comisiones() {
   const [comisiones, setComisiones] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModalConfirmacion, setMostrarModalConfirmacion] = useState(false);
+  const [comisionAEliminar, setComisionAEliminar] = useState(null);
   const [editandoId, setEditandoId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
@@ -102,7 +104,6 @@ function Comisiones() {
 
     const payload = {
       descripcion,
-      usuario_accion: 1,
     };
 
     try {
@@ -121,19 +122,24 @@ function Comisiones() {
     }
   }
 
-  async function eliminarComision(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta comision?");
+  function solicitarEliminacionComision(comision) {
+    setComisionAEliminar(comision);
+    setMostrarModalConfirmacion(true);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacionComision() {
+    if (!comisionAEliminar) return;
 
     try {
-      const respuesta = await comisionService.eliminar(id);
-      alert(respuesta.message || "Comision eliminada correctamente");
+      const respuesta = await comisionService.eliminar(comisionAEliminar.id_comision);
+      setMostrarModalConfirmacion(false);
+      setComisionAEliminar(null);
+      window.alert?.(respuesta.message || "Comision eliminada correctamente");
       await cargarComisiones();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la comision");
+      setMostrarModalConfirmacion(false);
+      setComisionAEliminar(null);
     }
   }
 
@@ -150,7 +156,7 @@ function Comisiones() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
-        <BotonVolver />
+        <BotonVolver ruta="/planes" />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -269,7 +275,7 @@ function Comisiones() {
                     </button>
 
                     <button
-                      onClick={() => eliminarComision(comision.id_comision)}
+                      onClick={() => solicitarEliminacionComision(comision)}
                       disabled={!hasPermission("planes.comisiones.eliminar")}
                       title={
                         hasPermission("planes.comisiones.eliminar")
@@ -361,7 +367,7 @@ function Comisiones() {
 
                           <button
                             onClick={() =>
-                              eliminarComision(comision.id_comision)
+                              solicitarEliminacionComision(comision)
                             }
                             disabled={!hasPermission("planes.comisiones.eliminar")}
                             title={
@@ -391,6 +397,53 @@ function Comisiones() {
               </tbody>
             </table>
           </div>
+
+          {mostrarModalConfirmacion && (
+            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative">
+                <button
+                  onClick={() => {
+                    setMostrarModalConfirmacion(false);
+                    setComisionAEliminar(null);
+                  }}
+                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                  title="Cerrar modal"
+                >
+                  <X size={20} />
+                </button>
+
+                <h2 className="text-xl font-extrabold text-slate-800 mb-3">
+                  Eliminar comision
+                </h2>
+                <p className="text-slate-600 mb-6">
+                  ¿Seguro que querés eliminar esta comision?
+                </p>
+
+                <div className="flex flex-col sm:flex-row justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMostrarModalConfirmacion(false);
+                      setComisionAEliminar(null);
+                    }}
+                    className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                  >
+                    <X size={20} />
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={confirmarEliminacionComision}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
+                  >
+                    <Trash2 size={20} />
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {mostrarModal && (
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

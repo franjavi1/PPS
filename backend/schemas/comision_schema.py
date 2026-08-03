@@ -53,7 +53,7 @@ class ComisionSchema(ma.SQLAlchemySchema):
         if not descripcion:
             return
 
-        existente = Comision.query.filter_by(descripcion=descripcion).first()
+        existente = Comision.query.filter_by(descripcion=descripcion, estado=1).first()
         comision_id = getattr(self, "context", {}).get("comision_id")
 
         if existente and existente.id_comision != comision_id:

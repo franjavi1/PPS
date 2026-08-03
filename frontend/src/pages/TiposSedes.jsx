@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar";
 import {
   Building,
   Pencil,
@@ -11,12 +13,14 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { tipoSedeService } from "../services/tipoSedeService";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   descripcion: "",
 };
 
 function TiposSedes() {
+  const { currentUserRole, hasPermission } = useAuth();
   const [tiposSedes, setTiposSedes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -25,6 +29,10 @@ function TiposSedes() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Estado para el modal de borrado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarTiposSedes();
@@ -100,7 +108,6 @@ function TiposSedes() {
 
     const payload = {
       descripcion,
-      usuario_accion: 1,
     };
 
     try {
@@ -119,19 +126,22 @@ function TiposSedes() {
     }
   }
 
-  async function eliminarTipoSede(id) {
-    const confirmar = confirm("Seguro que queres eliminar este tipo de sede?");
+  function solicitarEliminacion(id) {
+    setIdAEliminar(id);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await tipoSedeService.eliminar(id);
-      alert(respuesta.message || "Tipo de sede eliminado correctamente");
+      setEliminando(true);
+      await tipoSedeService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarTiposSedes();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el tipo de sede");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -148,6 +158,9 @@ function TiposSedes() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver ruta="/planes" />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -177,6 +190,12 @@ function TiposSedes() {
 
               <button
                 onClick={abrirNuevoTipoSede}
+                disabled={!hasPermission("planes.tipos_sedes.crear")}
+                title={
+                  hasPermission("planes.tipos_sedes.crear")
+                    ? "Crear tipo de sede"
+                    : "No tenés permiso para crear tipos de sedes"
+                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
@@ -229,6 +248,12 @@ function TiposSedes() {
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => editarTipoSede(tipoSede)}
+                      disabled={!hasPermission("planes.tipos_sedes.editar")}
+                      title={
+                        hasPermission("planes.tipos_sedes.editar")
+                          ? "Editar tipo de sede"
+                          : "No tenés permiso para editar tipos de sedes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
                     >
                       <Pencil size={16} />
@@ -236,7 +261,13 @@ function TiposSedes() {
                     </button>
 
                     <button
-                      onClick={() => eliminarTipoSede(tipoSede.id)}
+                      onClick={() => solicitarEliminacion(tipoSede.id)}
+                      disabled={!hasPermission("planes.tipos_sedes.eliminar")}
+                      title={
+                        hasPermission("planes.tipos_sedes.eliminar")
+                          ? "Eliminar tipo de sede"
+                          : "No tenés permiso para eliminar tipos de sedes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
                     >
                       <Trash2 size={16} />
@@ -278,6 +309,12 @@ function TiposSedes() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarTipoSede(tipoSede)}
+                            disabled={!hasPermission("planes.tipos_sedes.editar")}
+                            title={
+                              hasPermission("planes.tipos_sedes.editar")
+                                ? "Editar tipo de sede"
+                                : "No tenés permiso para editar tipos de sedes"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -285,7 +322,13 @@ function TiposSedes() {
                           </button>
 
                           <button
-                            onClick={() => eliminarTipoSede(tipoSede.id)}
+                            onClick={() => solicitarEliminacion(tipoSede.id)}
+                            disabled={!hasPermission("planes.tipos_sedes.eliminar")}
+                            title={
+                              hasPermission("planes.tipos_sedes.eliminar")
+                                ? "Eliminar tipo de sede"
+                                : "No tenés permiso para eliminar tipos de sedes"
+                            }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
@@ -373,6 +416,16 @@ function TiposSedes() {
           )}
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Eliminar tipo de sede"
+        mensaje="¿Estás seguro de que querés eliminar este tipo de sede? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }

@@ -21,8 +21,8 @@ class PlanAsignaturaSchema(ma.SQLAlchemySchema):
     sedes_id = ma.auto_field(required=True)
     
     presentismo_porc = ma.auto_field(required=True)
-    regularizacion_prom = ma.auto_field(required=True)
-    final_aprobacion = ma.auto_field(required=True)
+    regularizacion_prom = ma.auto_field(required=False)
+    final_aprobacion = ma.auto_field(required=False)
     duracion = ma.auto_field(required=True)
 
     regimen = ma.auto_field(
@@ -38,7 +38,7 @@ class PlanAsignaturaSchema(ma.SQLAlchemySchema):
     estado = ma.auto_field(dump_only=True)
 
     usuario_accion = ma.auto_field(
-        required=True,
+        required=False,
         error_messages={"required": "El usuario de acción es obligatorio"}
     )
 

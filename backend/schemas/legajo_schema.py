@@ -85,6 +85,7 @@ class LegajoSchema(ma.SQLAlchemySchema):
 
         existente = Legajo.query.filter_by(
             numero=numero,
+            estado=1
         ).first()
 
         legajo_id = getattr(self, "context", {}).get("legajo_id")

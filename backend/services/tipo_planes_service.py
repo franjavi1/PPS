@@ -9,7 +9,7 @@ Este archivo contiene la logica de negocio del CRUD de TipoPlanes
 
 
 def obtener_todos():
-    return TipoPlanes.query.all()
+    return TipoPlanes.query.filter_by(estado=1).all()
 
 
 def obtener_por_id(id):

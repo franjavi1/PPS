@@ -51,14 +51,14 @@ class PlanAsignatura(db.Model):
     regularizacion_prom: Mapped[float] = mapped_column(
         "regularizacionProm",
         Float,
-        nullable=False,
+        nullable=True,
         default=0.0
     )
 
     final_aprobacion: Mapped[int] = mapped_column(
         "finalAprobacion",
         Integer,
-        nullable=False,
+        nullable=True,
         default=0
     )
 

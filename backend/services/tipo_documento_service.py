@@ -10,7 +10,7 @@ Este archivo contiene la logica de negocio del CRUD de TipoDocumento
 
 
 def obtener_todos():
-    return TipoDocumento.query.all()
+    return TipoDocumento.query.filter_by(estado=1).all()
 
 
 def obtener_por_id(id):

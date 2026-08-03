@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ChevronDown,
@@ -122,11 +122,14 @@ function EditarPersona({ soloLectura = false }) {
             (item) => Number(item.legajo_id) === Number(legajoData.id),
           )
         : null;
+      
+      const listaSedesAsignadas = respuestaSedesAsignadas.data || [];
       const sedeData = legajoData
-        ? (respuestaSedesAsignadas.data || []).find(
-            (item) => Number(item.legajo_id) === Number(legajoData.id),
+        ? listaSedesAsignadas.find(
+            (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
           )
         : null;
+
       const tiposContactoData = respuestaTiposContacto.data || [];
       const tipoEmail = obtenerTipoContacto(tiposContactoData, "email");
       const tipoCelular = obtenerTipoContacto(tiposContactoData, "celular");
@@ -159,11 +162,13 @@ function EditarPersona({ soloLectura = false }) {
       setRango({
         rangos_institucionales_id: rangoData?.rangos_institucionales_id || "",
       });
+      
       setSede({
-        sede_id: sedeData?.sede_id || "",
-        es_autoridad: Boolean(sedeData?.es_autoridad),
-        es_sede_base: sedeData?.es_sede_base ?? true,
+        sede_id: sedeData?.sede_id || sedeData?.sedesId || "",
+        es_autoridad: sedeData ? Boolean(sedeData.es_autoridad) : false,
+        es_sede_base: sedeData ? Boolean(sedeData.es_sede_base) : true,
       });
+
       setContactos({
         email: contactoEmailData?.contacto || "",
         celular: contactoCelularData?.contacto || "",
@@ -259,7 +264,7 @@ function EditarPersona({ soloLectura = false }) {
 
       await personasService.actualizar(id, {
         td_id: Number(persona.td_id),
-        numero_doc: Number(persona.numero_doc),
+        numero_doc: persona.numero_doc.trim(),
         nombre: persona.nombre.trim(),
         apellido: persona.apellido.trim(),
         usuario_accion: 1,
@@ -448,7 +453,6 @@ function EditarPersona({ soloLectura = false }) {
                 <CampoTexto
                   label="Numero de documento"
                   name="numero_doc"
-                  type="number"
                   value={persona.numero_doc}
                   onChange={cambiarPersona}
                   placeholder="Ej: 30123456"
@@ -741,7 +745,7 @@ function CampoSelectSimple({ label, name, value, onChange, opciones }) {
 
 function CampoCheckbox({ label, name, checked, onChange }) {
   return (
-    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold">
+    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold cursor-pointer">
       <input
         type="checkbox"
         name={name}

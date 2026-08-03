@@ -39,9 +39,9 @@ class Persona(db.Model):
     )
 
     # Numero de documento registrado
-    numero_doc: Mapped[int] = mapped_column(
+    numero_doc: Mapped[str] = mapped_column(
         "numeroDoc",
-        Integer,
+        String(15),
         nullable=False
     )
 

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar";
 import {
   Building2,
   MapPin,
@@ -13,6 +15,7 @@ import {
 import Navbar from "../components/Navbar";
 import { sedeService } from "../services/sedeService";
 import { tipoSedeService } from "../services/tipoSedeService";
+import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   tipo_sede_id: "",
@@ -21,6 +24,7 @@ const formularioInicial = {
 };
 
 function Sedes() {
+  const { currentUserRole, hasPermission } = useAuth();
   const [sedes, setSedes] = useState([]);
   const [tiposSedes, setTiposSedes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -30,6 +34,10 @@ function Sedes() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Estado para el modal de borrado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -108,11 +116,16 @@ function Sedes() {
       return;
     }
 
+    const tieneLetras = /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(formulario.nombre.trim());
+    if (!tieneLetras) {
+      setErrorFormulario("El nombre debe contener al menos una letra valida.");
+      return;
+    }
+
     const payload = {
       tipo_sede_id: Number(formulario.tipo_sede_id),
       nombre: formulario.nombre.trim(),
       direccion: formulario.direccion.trim(),
-      usuario_accion: 1,
     };
 
     try {
@@ -131,19 +144,22 @@ function Sedes() {
     }
   }
 
-  async function eliminarSede(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta sede?");
+  function solicitarEliminacion(id) {
+    setIdAEliminar(id);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await sedeService.eliminar(id);
-      alert(respuesta.message || "Sede eliminada correctamente");
+      setEliminando(true);
+      await sedeService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la sede");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -172,6 +188,9 @@ function Sedes() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver ruta="/planes" />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -201,6 +220,13 @@ function Sedes() {
 
               <button
                 onClick={abrirNuevaSede}
+                disabled={!hasPermission("planes.sedes.crear")}
+                title={
+                  hasPermission("planes.sedes.crear")
+                    ? "Crear sede"
+                    : "No tenés permiso para crear sedes"
+                }
+
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
@@ -246,7 +272,7 @@ function Sedes() {
                       <p className="text-xs font-bold text-slate-400 uppercase">
                         Sede
                       </p>
-                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1 break-all">
                         {sede.nombre}
                       </h2>
                     </div>
@@ -273,6 +299,12 @@ function Sedes() {
                   <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => editarSede(sede)}
+                      disabled={!hasPermission("planes.sedes.editar")}
+                      title={
+                        hasPermission("planes.sedes.editar")
+                          ? "Editar sede"
+                          : "No tenés permiso para editar sedes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
                     >
                       <Pencil size={16} />
@@ -280,7 +312,13 @@ function Sedes() {
                     </button>
 
                     <button
-                      onClick={() => eliminarSede(sede.id)}
+                      onClick={() => solicitarEliminacion(sede.id)}
+                      disabled={!hasPermission("planes.sedes.eliminar")}
+                      title={
+                        hasPermission("planes.sedes.eliminar")
+                          ? "Eliminar sede"
+                          : "No tenés permiso para eliminar sedes"
+                      }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
                     >
                       <Trash2 size={16} />
@@ -318,7 +356,7 @@ function Sedes() {
                 ) : sedesFiltradas.length > 0 ? (
                   sedesFiltradas.map((sede) => (
                     <tr key={sede.id} className="border-b border-slate-200 hover:bg-slate-50">
-                      <td className="px-5 py-5 text-slate-700 font-semibold">
+                      <td className="px-5 py-5 text-slate-700 font-semibold break-all">
                         {sede.nombre}
                       </td>
                       <td className="px-5 py-5 text-slate-700">
@@ -334,6 +372,12 @@ function Sedes() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => editarSede(sede)}
+                            disabled={!hasPermission("planes.sedes.editar")}
+                            title={
+                              hasPermission("planes.sedes.editar")
+                                ? "Editar sede"
+                                : "No tenés permiso para editar sedes"
+                            }
                             className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 transition cursor-pointer"
                           >
                             <Pencil size={18} />
@@ -341,7 +385,13 @@ function Sedes() {
                           </button>
 
                           <button
-                            onClick={() => eliminarSede(sede.id)}
+                            onClick={() => solicitarEliminacion(sede.id)}
+                            disabled={!hasPermission("planes.sedes.eliminar")}
+                            title={
+                              hasPermission("planes.sedes.eliminar")
+                                ? "Eliminar sede"
+                                : "No tenés permiso para eliminar sedes"
+                            }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 transition cursor-pointer"
                           >
                             <Trash2 size={18} />
@@ -467,6 +517,16 @@ function Sedes() {
           )}
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Eliminar sede"
+        mensaje="¿Estás seguro de que querés eliminar esta sede? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }

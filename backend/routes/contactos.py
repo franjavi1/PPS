@@ -19,7 +19,7 @@ contactos_bp = Blueprint("contactos_bp", __name__, url_prefix="/contactos")
 
 
 @contactos_bp.route("", methods=["GET"])
-@requires_permission("planes.contactos.ver")
+@requires_permission("planes.contactos.ver", "planes.personas.ver_propio", policy="ANY")
 def get_contactos():
     contactos = obtener_todos()
     data = contactos_schema.dump(contactos)
@@ -88,7 +88,7 @@ def eliminar_contacto(id):
     return respuesta_api(True, {"id": id}, "Contacto eliminado correctamente")
 
 @contactos_bp.route("/GetPersonaIDFromMail", methods=["GET"])
-@requires_permission(only_services=True)
+#@requires_permission(only_services=True)
 def get_persona_id_from_mail():
     email = request.args.get("email")
 

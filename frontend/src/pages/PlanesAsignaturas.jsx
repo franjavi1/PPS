@@ -157,7 +157,6 @@ function PlanesAsignaturas() {
       duracion: Number(formulario.duracion),
       regimen: formulario.regimen.trim(),
       modalidad: formulario.modalidad.trim(),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarPayload(payload);

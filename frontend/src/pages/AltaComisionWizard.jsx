@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
-import { apiRequest } from "../api";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
@@ -24,6 +23,7 @@ import { planService } from "../services/planesService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
 import { modalidadService } from "../services/modalidadService";
+import { legajoService } from "../services/legajoService";
 
 const pasos = [
   { id: 1, titulo: "Comision", icono: GraduationCap },
@@ -95,7 +95,7 @@ function AltaComisionWizard() {
         sedeService.obtenerTodas(),
         aulaService.obtenerTodas(),
         tipoAutoridadService.obtenerTodos(),
-        apiRequest("/legajos"),
+        legajoService.obtenerTodos(),
         modalidadService.obtenerTodas(),
       ]);
 
@@ -298,7 +298,7 @@ function AltaComisionWizard() {
     <div className="min-h-screen bg-slate-100">
       <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-10">
-        <BotonVolver />
+        <BotonVolver ruta="/comisiones" />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
             <div className="flex items-start gap-4">
@@ -422,6 +422,8 @@ function AltaComisionWizard() {
                       label="Cupo maximo"
                       name="cupo_maximo"
                       type="number"
+                      min="1"
+                      max="500"
                       value={comisionAsignatura.cupo_maximo}
                       onChange={cambiarComisionAsignatura}
                       placeholder="Ej: 30"
@@ -814,6 +816,8 @@ function validarComisionAsignatura(payload) {
   if (!payload.modalidad) return "El horario es obligatorio";
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
     return "El cupo maximo debe ser mayor a cero";
+  if (payload.cupo_maximo > 500)
+  return "El cupo maximo no puede ser mayor a 500";
   return "";
 }
 
@@ -834,11 +838,34 @@ function obtenerIdRespuesta(respuesta) {
 }
 
 function obtenerMensajeError(err) {
-  const errores = err.errors || {};
-  const primerCampo = Object.keys(errores)[0];
-  if (primerCampo && Array.isArray(errores[primerCampo]))
-    return errores[primerCampo][0];
-  return err.message || "No se pudo completar la operacion";
-}
+  if (typeof err?.message === "string" && err.message.trim()) {
+    return err.message;
+  }
 
+  const errores = err?.errors;
+
+  if (typeof errores === "string" && errores.trim()) {
+    return errores;
+  }
+
+  if (errores && typeof errores === "object") {
+    const primerError = Object.values(errores)[0];
+
+    if (Array.isArray(primerError)) {
+      const mensaje = primerError.find(
+        (item) => typeof item === "string" && item.trim(),
+      );
+
+      if (mensaje) {
+        return mensaje;
+      }
+    }
+
+    if (typeof primerError === "string" && primerError.trim()) {
+      return primerError;
+    }
+  }
+
+  return "No se pudo completar la operación";
+}
 export default AltaComisionWizard;

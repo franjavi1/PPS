@@ -72,7 +72,7 @@ class PersonaSchema(ma.SQLAlchemySchema):
         error_messages={
             "required": "El número de documento es obligatorio",
             "null": "El número de documento no puede ser null",
-            "invalid": "El número de documento debe ser un número entero"
+            "invalid": "El número de documento debe ser un texto válido"
         }
     )
 
@@ -81,10 +81,10 @@ class PersonaSchema(ma.SQLAlchemySchema):
 
     # Usuario que realiza la accion sobre el registro.
     usuario_accion = ma.auto_field(
-        required=True,
+        required=False,
         allow_none=False,
         error_messages={
-            "required": "El usuario de acción es obligatorio",
+            
             "null": "El usuario de acción no puede ser null",
             "invalid": "El usuario de acción debe ser un número entero"
         }
@@ -108,9 +108,9 @@ class PersonaSchema(ma.SQLAlchemySchema):
     # Verifica que el numero de documento sea valido.
     @validates("numero_doc")
     def validar_numero_doc(self, value, **kwargs):
-        if value <= 0:
+        if not value or len(value) < 7:
             raise ValidationError(
-                "El número de documento debe ser un número entero positivo")
+                "El número de documento debe tener al menos 7 caracteres")
 
     # Verifica que el usuario informado sea valido.
     @validates("usuario_accion")
@@ -130,7 +130,8 @@ class PersonaSchema(ma.SQLAlchemySchema):
 
         existente = Persona.query.filter_by(
             td_id=td_id,
-            numero_doc=numero_doc
+            numero_doc=numero_doc,
+            estado=1
 
         ).first()
 

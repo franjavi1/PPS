@@ -84,7 +84,8 @@ class LegajoRangosSchema(ma.SQLAlchemySchema):
 
         existente = LegajoRangos.query.filter_by(
             legajo_id=legajo_id,
-            rangos_institucionales_id=rangos_institucionales_id
+            rangos_institucionales_id=rangos_institucionales_id,
+            estado=1
         ).first()
 
         legajo_rangos_id = getattr(self, "context", {}).get("legajo_rangos_id")

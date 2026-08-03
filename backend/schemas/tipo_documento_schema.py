@@ -36,10 +36,10 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
 
     # Usuario que realiza la accion sobre el registro.
     usuario_accion = ma.auto_field(
-        required=True,
+        required=False,
         allow_none=False,
         error_messages={
-            "required": "El usuario de acción es obligatorio",
+            
             "null": "El usuario de acción no puede ser null",
             "invalid": "El usuario de acción debe ser un número entero"
         }
@@ -58,8 +58,8 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
             return
 
         existente = TipoDocumento.query.filter(
-            func.lower(func.trim(TipoDocumento.descripcion))
-            == descripcion.strip().lower()
+            func.lower(func.trim(TipoDocumento.descripcion)) == descripcion.strip().lower(),
+            TipoDocumento.estado == 1 
         ).first()
 
         tipo_documento_id = getattr(self, "context", {}).get("tipo_documento_id")
@@ -88,4 +88,4 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
 
 # Instancias usadas por las rutas y servicios.
 tipo_documento_schema = TipoDocumentoSchema()
-tipos_documento_schema = TipoDocumentoSchema(many=True)
+tipos_documento_schema = TipoDocumentoSchema(many=True) 

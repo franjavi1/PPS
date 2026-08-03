@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -224,7 +224,6 @@ function EditarComision() {
       modalidadesid: Number(nuevaComisionAsignatura.modalidadesid),
       cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo),
       estado: Number(nuevaComisionAsignatura.estado),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarComisionAsignatura(payload);
@@ -281,7 +280,6 @@ function EditarComision() {
       tipo_autoridad_id: Number(nuevaAutoridad.tipo_autoridad_id),
       legajo_id: Number(nuevaAutoridad.legajo_id),
       comision_id: Number(nuevaAutoridad.comision_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarAutoridad(payload);
@@ -480,6 +478,8 @@ function EditarComision() {
                       label="Cupo maximo"
                       name="cupo_maximo"
                       type="number"
+                      min="1"
+                      max="500"
                       value={nuevaComisionAsignatura.cupo_maximo}
                       onChange={cambiarNuevaComisionAsignatura}
                       placeholder="Ej: 30"
@@ -597,13 +597,16 @@ function EditarComision() {
                       getLabel={obtenerEtiquetaLegajo}
                     />
                     <CampoSelect
-                      label="Comision asignatura"
+                      label="Asignatura de la comisión"
                       name="comision_id"
                       value={nuevaAutoridad.comision_id}
                       onChange={cambiarNuevaAutoridad}
                       opciones={comisionesAsignaturas}
                       getValue={(item) => item.id_comision_asignatura}
-                      getLabel={(item) => item.nombre}
+                      getLabel={(item) =>
+                        mapas.planesAsignaturas[item.plan_asignaturas_id] ||
+                        `Comisión #${item.id_comision_asignatura}`
+                      }
                     />
                   </div>
 
@@ -646,6 +649,7 @@ function EditarComision() {
                               {obtenerNombreComisionAsignatura(
                                 item.comision_id,
                                 comisionesAsignaturas,
+                                mapas.planesAsignaturas,
                               )}
                             </p>
                           </div>
@@ -732,6 +736,8 @@ function CampoTexto({
   icono,
   type = "text",
   maxLength,
+  min,
+  max,
 }) {
   return (
     <div>
@@ -751,6 +757,8 @@ function CampoTexto({
           onChange={onChange}
           placeholder={placeholder}
           maxLength={maxLength}
+          min={min}
+          max={max}
           className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
             icono ? "pl-12" : "pl-4"
           }`}
@@ -861,12 +869,14 @@ function obtenerEtiquetaLegajo(legajo) {
   return legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
 }
 
-function obtenerNombreComisionAsignatura(id, items) {
+function obtenerNombreComisionAsignatura(id, items, mapaPlanes) {
   const item = items.find(
     (registro) => Number(registro.id_comision_asignatura) === Number(id),
   );
 
-  return item?.nombre || `Comision asignatura #${id}`;
+  if (!item) return `Comision asignatura #${id}`;
+
+  return mapaPlanes[item.plan_asignaturas_id] || item.nombre;
 }
 
 function validarComisionAsignatura(payload) {
@@ -893,7 +903,9 @@ function validarComisionAsignatura(payload) {
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {
     return "El cupo maximo debe ser mayor a cero";
   }
-
+  if (payload.cupo_maximo > 500) {
+    return "El cupo maximo no puede ser mayor a 500";
+  }
   if (!payload.estado) {
     return "El estado es obligatorio";
   }
@@ -918,14 +930,35 @@ function validarAutoridad(payload) {
 }
 
 function obtenerMensajeError(err) {
-  const errores = err.errors || {};
-  const primerCampo = Object.keys(errores)[0];
-
-  if (primerCampo && Array.isArray(errores[primerCampo])) {
-    return errores[primerCampo][0];
+  if (typeof err?.message === "string" && err.message.trim()) {
+    return err.message;
   }
 
-  return err.message || "No se pudo completar la operacion";
+  const errores = err?.errors;
+
+  if (typeof errores === "string" && errores.trim()) {
+    return errores;
+  }
+
+  if (errores && typeof errores === "object") {
+    const primerError = Object.values(errores)[0];
+
+    if (Array.isArray(primerError)) {
+      const mensaje = primerError.find(
+        (item) => typeof item === "string" && item.trim(),
+      );
+
+      if (mensaje) {
+        return mensaje;
+      }
+    }
+
+    if (typeof primerError === "string" && primerError.trim()) {
+      return primerError;
+    }
+  }
+
+  return "No se pudo completar la operación";
 }
 
 export default EditarComision;

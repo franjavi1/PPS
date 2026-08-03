@@ -1,9 +1,8 @@
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Inicio from "./pages/Inicio";
 import Legajos from "./pages/Legajos";
-import ConfigDocumentos from "./pages/ConfigDocumentos";
 import Asignaturas from "./pages/Asignaturas";
 import Comisiones from "./pages/Comisiones";
 import AltaComisionWizard from "./pages/AltaComisionWizard";
@@ -29,6 +28,9 @@ import Sedes from "./pages/Sedes";
 import TiposSedes from "./pages/TiposSedes";
 import TipoRangos from "./pages/TipoRangos";
 import TiposDocumentos from "./pages/TiposDocumentos";
+import ProtectedRoute from "./components/permisos/ProtectedRoute"
+import PublicRoute from "./components/permisos/PublicRoute"
+
 
 function App() {
   useEffect(() => {
@@ -79,41 +81,34 @@ function App() {
           />
           <Routes>
             <Route path="/" element={<Navigate to="/inicio" replace />} />
-            <Route path="/inicio" element={<Inicio />} />
-            <Route path="/legajos" element={<Legajos />} />
-            <Route path="/config-documentos" element={<ConfigDocumentos />} />
-            <Route path="/sedes" element={<Sedes />} />
-            <Route path="/tipos-sedes" element={<TiposSedes />} />
-            <Route path="/tipo-rangos" element={<TipoRangos />} />
-            <Route path="/tipos-documentos" element={<TiposDocumentos />} />
-            <Route path="/asignaturas" element={<Asignaturas />} />
-            <Route path="/comisiones" element={<Comisiones />} />
-            <Route path="/comisiones/alta" element={<AltaComisionWizard />} />
-            <Route path="/comisiones/:id" element={<VerComision />} />
-            <Route path="/comisiones/:id/editar" element={<EditarComision />} />
-            <Route path="/planes" element={<Planes />} />
-            <Route path="/planes-asignaturas" element={<PlanesAsignaturas />} />
-            <Route path="/aulas" element={<Aulas />} />
-            <Route
-              path="/comisiones-asignaturas"
-              element={<ComisionesAsignaturas />}
-            />
-            <Route
-              path="/autoridades-comision"
-              element={<AutoridadesComision />}
-            />
-            <Route path="/pa-correlativas" element={<PACorrelativas />} />
-            <Route path="/datos-medicos" element={<DatosMedicos />} />
-            <Route path="/legajo-rangos" element={<LegajoRangos />} />
-            <Route path="/legajo-sedes" element={<LegajoSedes />} />
-            <Route path="/contactos" element={<Contactos />} />
-            <Route path="/personas" element={<Personas />} />
-            <Route path="/alta-persona" element={<AltaPersonaWizard />} />
-            <Route path="/personas/:id"element={<EditarPersona soloLectura />}/>
-            <Route path="/personas/:id/editar" element={<EditarPersona />} />
-            <Route path="/planes/alta" element={<AltaPlanWizard />} />
-            <Route path="/planes/:id" element={<VerPlan />} />
-            <Route path="/planes/:id/editar" element={<EditarPlan />} />
+            <Route path="/inicio" element={<ProtectedRoute><Inicio /></ProtectedRoute>} />
+            <Route path="/legajos" element={<ProtectedRoute permissions={["planes.legajos.ver"]}><Legajos /></ProtectedRoute>} />
+            <Route path="/sedes" element={<ProtectedRoute permissions={["planes.sedes.ver"]}><Sedes /></ProtectedRoute>} />
+            <Route path="/tipos-sedes" element={<ProtectedRoute permissions={["planes.tipos_sedes.ver"]}><TiposSedes /></ProtectedRoute>} />
+            <Route path="/tipo-rangos" element={<ProtectedRoute permissions={["planes.rangos_institucionales.ver"]}><TipoRangos /></ProtectedRoute>} />
+            <Route path="/tipos-documentos" element={<ProtectedRoute permissions={["planes.tipos_documentos.ver"]}><TiposDocumentos /></ProtectedRoute>} />
+            <Route path="/asignaturas" element={<ProtectedRoute permissions={["planes.asignaturas.ver"]}><Asignaturas /></ProtectedRoute>} />
+            <Route path="/comisiones" element={<ProtectedRoute permissions={["planes.comisiones.ver"]}><Comisiones /></ProtectedRoute>} />
+            <Route path="/comisiones/alta" element={<ProtectedRoute permissions={["planes.comisiones.crear"]}><AltaComisionWizard /></ProtectedRoute>} />
+            <Route path="/comisiones/:id" element={<ProtectedRoute permissions={["planes.comisiones.ver"]}><VerComision /></ProtectedRoute>} />
+            <Route path="/comisiones/:id/editar" element={<ProtectedRoute permissions={["planes.comisiones.editar"]}><EditarComision /></ProtectedRoute>} />
+            <Route path="/planes" element={<ProtectedRoute permissions={["planes.planes.ver"]}><Planes /></ProtectedRoute>} />
+            <Route path="/planes-asignaturas" element={<ProtectedRoute permissions={["planes.planes_asignaturas.ver"]}><PlanesAsignaturas /></ProtectedRoute>} />
+            <Route path="/aulas" element={<ProtectedRoute permissions={["planes.aulas.ver"]}><Aulas /></ProtectedRoute>} />
+            <Route path="/comisiones-asignaturas" element={<ProtectedRoute permissions={["planes.comisiones_asignaturas.ver"]}><ComisionesAsignaturas /></ProtectedRoute>}/>
+            <Route path="/autoridades-comision" element={<ProtectedRoute permissions={["planes.autoridades_comision.ver"]}><AutoridadesComision /></ProtectedRoute>}/>
+            <Route path="/pa-correlativas" element={<ProtectedRoute permissions={["planes.pa_correlativas.ver"]}><PACorrelativas /></ProtectedRoute>} />
+            <Route path="/datos-medicos" element={<ProtectedRoute permissions={["planes.datos_medicos.ver"]}><DatosMedicos /></ProtectedRoute>} />
+            <Route path="/legajo-rangos" element={<ProtectedRoute permissions={["planes.legajo_rangos.ver"]}><LegajoRangos /></ProtectedRoute>} />
+            <Route path="/legajo-sedes" element={<ProtectedRoute permissions={["planes.legajo_sedes.ver"]}><LegajoSedes /></ProtectedRoute>} />
+            <Route path="/contactos" element={<ProtectedRoute permissions={["planes.contactos.ver"]}><Contactos /></ProtectedRoute>} />
+            <Route path="/personas" element={<ProtectedRoute permissions={["planes.personas.ver"]}><Personas /></ProtectedRoute>} />
+            <Route path="/alta-persona" element={<ProtectedRoute permissions={["planes.personas.crear"]}><AltaPersonaWizard /></ProtectedRoute>} />
+            <Route path="/personas/:id"element={<ProtectedRoute permissions={["planes.personas.editar", "planes.personas.ver_propio"]}><EditarPersona soloLectura /></ProtectedRoute>}/>
+            <Route path="/personas/:id/editar" element={<ProtectedRoute permissions={["planes.personas.editar"]}><EditarPersona /></ProtectedRoute>} />
+            <Route path="/planes/alta" element={<ProtectedRoute permissions={["planes.planes.crear"]}><AltaPlanWizard /></ProtectedRoute>} />
+            <Route path="/planes/:id" element={<ProtectedRoute permissions={["planes.planes.ver"]}><VerPlan /></ProtectedRoute>} />
+            <Route path="/planes/:id/editar" element={<ProtectedRoute permissions={["planes.planes.editar"]}><EditarPlan /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </div>
