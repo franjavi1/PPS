@@ -104,7 +104,7 @@ function App() {
             <Route path="/contactos" element={<ProtectedRoute permissions={["planes.contactos.ver"]}><Contactos /></ProtectedRoute>} />
             <Route path="/personas" element={<ProtectedRoute permissions={["planes.personas.ver"]}><Personas /></ProtectedRoute>} />
             <Route path="/alta-persona" element={<ProtectedRoute permissions={["planes.personas.crear"]}><AltaPersonaWizard /></ProtectedRoute>} />
-            <Route path="/personas/:id"element={<ProtectedRoute permissions={["planes.personas.editar"]}><EditarPersona soloLectura /></ProtectedRoute>}/>
+            <Route path="/personas/:id"element={<ProtectedRoute permissions={["planes.personas.editar", "planes.personas.ver_propio"]}><EditarPersona soloLectura /></ProtectedRoute>}/>
             <Route path="/personas/:id/editar" element={<ProtectedRoute permissions={["planes.personas.editar"]}><EditarPersona /></ProtectedRoute>} />
             <Route path="/planes/alta" element={<ProtectedRoute permissions={["planes.planes.crear"]}><AltaPlanWizard /></ProtectedRoute>} />
             <Route path="/planes/:id" element={<ProtectedRoute permissions={["planes.planes.ver"]}><VerPlan /></ProtectedRoute>} />

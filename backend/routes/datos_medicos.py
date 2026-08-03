@@ -18,7 +18,7 @@ datos_medicos_bp = Blueprint("datos_medicos_bp", __name__, url_prefix="/datos-me
 
 
 @datos_medicos_bp.route("", methods=["GET"])
-@requires_permission("planes.datos_medicos.ver")
+@requires_permission("planes.datos_medicos.ver", "planes.personas.ver_propio", policy="ANY")
 def get_datos_medicos():
     datos_medicos = obtener_todos()
     data = datos_medicos_lista_schema.dump(datos_medicos)

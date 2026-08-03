@@ -21,7 +21,7 @@ tipos_contacto_bp = Blueprint(
 
 
 @tipos_contacto_bp.route("", methods=["GET"])
-@requires_permission("planes.tipos_contacto.ver")
+@requires_permission("planes.tipos_contacto.ver", "planes.personas.ver_propio", policy="ANY")
 def get_tipos_contacto():
     tipos_contacto = obtener_todos()
     data = tipos_contacto_schema.dump(tipos_contacto)
