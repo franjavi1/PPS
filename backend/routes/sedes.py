@@ -24,7 +24,7 @@ sedes_bp = Blueprint("sedes_bp", __name__, url_prefix="/sedes")
 
 
 @sedes_bp.route("", methods=["GET"])
-@requires_permission("planes.sedes.ver")
+@requires_permission("planes.sedes.ver", "planes.personas.ver_propio", policy="ANY")
 def get_sedes():
     sedes = obtener_todos()
     data = sedes_schema.dump(sedes)

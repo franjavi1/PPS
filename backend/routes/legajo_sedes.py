@@ -16,7 +16,7 @@ legajo_sedes_bp = Blueprint("legajo_sedes_bp", __name__, url_prefix="/legajo-sed
 
 
 @legajo_sedes_bp.route("", methods=["GET"])
-@requires_permission("planes.legajo_sedes.ver")
+@requires_permission("planes.legajo_sedes.ver", "planes.personas.ver_propio", policy="ANY")
 def get_legajos_sedes():
     legajos_sedes = obtener_todos()
     data = legajo_sedes_schema.dump(legajos_sedes)

@@ -16,7 +16,7 @@ tipos_documentos_bp = Blueprint("tipos_documentos_bp", __name__, url_prefix="/ti
 
 
 @tipos_documentos_bp.route("", methods=["GET"])
-@requires_permission("planes.tipos_documentos.ver")
+@requires_permission("planes.tipos_documentos.ver", "planes.personas.ver_propio", policy="ANY")
 def get_tipos_documentos():
     tipos_documentos = obtener_todos()
     data = tipos_documento_schema.dump(tipos_documentos)

@@ -15,7 +15,7 @@ planes_bp = Blueprint("planes_bp", __name__, url_prefix="/planes")
 
 
 @planes_bp.route("", methods=["GET"])
-@requires_permission("planes.planes.ver")
+@requires_permission("planes.planes.ver", "planes.personas.ver_propio", policy="ANY")
 def get_planes():
     planes = obtener_todos()
     data = planes_schema.dump(planes)
