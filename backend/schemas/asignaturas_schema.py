@@ -15,7 +15,7 @@ class AsignaturasSchema(ma.SQLAlchemySchema):
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=20,
+            Length(min=1, max=45,
                    error="El nombre debe tener entre 1 y 20 caracteres")
         ],
         error_messages={
@@ -41,18 +41,12 @@ class AsignaturasSchema(ma.SQLAlchemySchema):
         }
     )
 
-    usuario_accion = ma.auto_field(
-        required=True,
-        allow_none=False,
-        error_messages={
-            "required": "El usuario de accion es obligatorio",
-            "null": "El usuario de accion no puede ser null",
-            "invalid": "El usuario de accion debe ser un numero entero"
-        }
-    )
-
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     @validates("nombre")
     def validar_nombre_unico(self, value, **kwargs):
@@ -64,11 +58,6 @@ class AsignaturasSchema(ma.SQLAlchemySchema):
         if query.first():
             raise ValidationError("Ya existe una asignatura con ese nombre")
 
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError(
-                "El usuario de accion debe ser un numero entero positivo")
 
     @pre_load
     def normalizar_entrada(self, data, **kwargs):

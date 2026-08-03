@@ -19,7 +19,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_tipo_documento = tipo_documento_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_tipo_documento)
     db.session.add(nuevo_tipo_documento)
     db.session.commit()
 
@@ -27,6 +27,7 @@ def crear(datos):
 
 
 def actualizar(tipo_documento, datos):
+    Auditoria.preparar_modificacion(tipo_documento)
     schema = TipoDocumentoSchema(partial=True)
 
     # Evita que la validacion de descripcion unica tome como duplicado
@@ -41,6 +42,7 @@ def actualizar(tipo_documento, datos):
 
 
 def eliminar(tipo_documento):
+    Auditoria.preparar_baja(tipo_documento)
     tipo_documento.estado = 0
     db.session.commit()
 

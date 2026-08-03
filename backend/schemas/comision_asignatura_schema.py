@@ -56,10 +56,15 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         validate=[OneOf([0, 1], error="El estado debe ser 0 o 1")]
     )
 
-    usuario_accion = ma.auto_field(required=False, allow_none=True)
 
+
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     @validates("plan_asignaturas_id")
     def validar_plan_asignaturas(self, value, **kwargs):
@@ -89,10 +94,7 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         if value > 500:
             raise ValidationError("El cupo máximo no puede ser mayor a 500")
         
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value is not None and value <= 0:
-            raise ValidationError("El usuario de accion debe ser un numero entero positivo")
+
         
     @validates("modalidadesid")
     def validar_modalidad(self, value, **kwargs):

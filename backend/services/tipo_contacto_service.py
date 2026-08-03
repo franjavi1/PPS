@@ -19,7 +19,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_tipo_contacto = tipo_contacto_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_tipo_contacto)
     db.session.add(nuevo_tipo_contacto)
     db.session.commit()
 
@@ -27,6 +27,7 @@ def crear(datos):
 
 
 def actualizar(tipo_contacto, datos):
+    Auditoria.preparar_modificacion(tipo_contacto)
     schema = TipoContactoSchema(partial=True)
 
     # Evita que la validacion de tipo unico tome como duplicado
@@ -41,6 +42,7 @@ def actualizar(tipo_contacto, datos):
 
 
 def eliminar(tipo_contacto):
+    Auditoria.preparar_baja(tipo_contacto)
     tipo_contacto.estado = 0
     db.session.commit()
 

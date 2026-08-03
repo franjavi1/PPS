@@ -24,7 +24,7 @@ function NuevoLegajo() {
   const [formulario, setFormulario] = useState({
     persona_id: "",
     numero: "",
-    usuario_accion: 1,
+    
   });
 
   useEffect(() => {
@@ -43,7 +43,6 @@ function NuevoLegajo() {
         setFormulario({
           persona_id: legajo.data.persona_id || "",
           numero: legajo.data.numero || "",
-          usuario_accion: legajo.data.usuario_accion || 1,
         });
       }
     } catch (err) {
@@ -96,7 +95,6 @@ function NuevoLegajo() {
     const payload = {
       persona_id: Number(formulario.persona_id),
       numero: String(formulario.numero).trim(),
-      usuario_accion: Number(formulario.usuario_accion) || 1,
     };
 
     try {

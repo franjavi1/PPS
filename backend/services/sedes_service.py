@@ -19,7 +19,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nueva_sede = sede_schema.load(datos)
-
+    Auditoria.preparar_alta(nueva_sede)
     db.session.add(nueva_sede)
     db.session.commit()
 
@@ -27,6 +27,7 @@ def crear(datos):
 
 
 def actualizar(sede, datos):
+    Auditoria.preparar_modificacion(sede)
     sede_schema.load(datos, instance=sede, partial=True)
 
     db.session.commit()
@@ -35,6 +36,7 @@ def actualizar(sede, datos):
 
 
 def eliminar(sede):
+    Auditoria.preparar_baja(sede)
     sede.estado = 0
     db.session.commit()
 

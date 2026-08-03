@@ -18,7 +18,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_tipo_plan = tipo_planes_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_tipo_plan)
     db.session.add(nuevo_tipo_plan)
     db.session.commit()
 
@@ -26,7 +26,7 @@ def crear(datos):
 
 
 def actualizar(tipo_plan, datos):
-
+    Auditoria.preparar_modificacion(tipo_plan)
     schema = TipoPlanesSchema(partial=True)
 
     # Evita que la validacion de descripcion unica tome como duplicado
@@ -41,6 +41,7 @@ def actualizar(tipo_plan, datos):
 
 
 def eliminar(tipo_plan):
+    Auditoria.preparar_baja(tipo_plan)
     tipo_plan.estado = 0
     db.session.commit()
 

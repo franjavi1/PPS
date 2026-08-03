@@ -24,7 +24,7 @@ def obtener_por_id_sin_filtrar_estado(id):
 
 def crear(datos):
     nueva_persona = persona_schema.load(datos)
-
+    Auditoria.preparar_alta(nueva_persona)
     db.session.add(nueva_persona)
     db.session.commit()
 
@@ -32,6 +32,7 @@ def crear(datos):
 
 
 def actualizar(persona, datos):
+    Auditoria.preparar_modificacion(persona)
     schema = PersonaSchema(partial=True)
 
     # Esto sirve para que la validación de documento único
@@ -48,11 +49,11 @@ def actualizar(persona, datos):
 def eliminar(persona):
     # La baja de la persona también deja inactivos sus legajos.
     # Los contactos y datos médicos se conservan como historial.
+    Auditoria.preparar_baja(persona)
     legajos_activos = Legajo.query.filter_by(
         persona_id=persona.id,
         estado=1
     ).all()
-
     for legajo in legajos_activos:
         legajo.estado = 0
 
@@ -75,22 +76,3 @@ def reactivar(persona):
     db.session.commit()
 
     return persona
-
-def es_legajo_de_persona(legajo_id, persona_id):
-    
-    ## Verifica si un legajo activo pertenece a una persona activa específica
-    
-    if not legajo_id or not persona_id:
-        return False
-        
-    legajo = Legajo.query.filter_by(id=legajo_id, estado=1).first()
-    
-    if legajo and legajo.persona_id == persona_id:
-        return True
-        
-    return False
-
-def obtener_persona_activa(persona_id):
-    
-    ## Obtiene una persona por su ID siempre que su estado sea 1
-    return Persona.query.filter_by(id=persona_id, estado=1).first()

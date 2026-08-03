@@ -367,7 +367,7 @@ function EditarPlan() {
         descrip: descrip || null,
         vigencia_dde: `${plan.vigencia_dde}T00:00:00`,
         vigencia_hta: `${plan.vigencia_hta}T00:00:00`,
-        usuario_accion: 1,
+        
       });
 
       navigate("/planes");

@@ -37,17 +37,16 @@ class LegajoRangosSchema(ma.SQLAlchemySchema):
     )
     estado = ma.auto_field(dump_only=True)
     # Usuario que realiza la accion sobre el registro.
-    usuario_accion = ma.auto_field(
-        required=False,
-        allow_none=True,
-        error_messages={
-            "invalid": "El usuario de accion debe ser un numero entero"
-        }
-    )
+
 
     # Fechas administradas por la base de datos.
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     # Verifica que el legajo exista y este activo.
     @validates("legajo_id")
@@ -68,10 +67,7 @@ class LegajoRangosSchema(ma.SQLAlchemySchema):
             raise ValidationError("El rango institucional indicado no existe")
 
     # Verifica que el usuario informado sea valido.
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value is not None and value <= 0:
-            raise ValidationError("El usuario de accion debe ser un numero entero positivo")
+
 
     # Evita repetir el mismo rango para el mismo legajo.
     @validates_schema

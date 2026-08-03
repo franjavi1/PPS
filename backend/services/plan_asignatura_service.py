@@ -15,11 +15,13 @@ def obtener_por_id(id_plan_asignatura):
 
 def crear(datos):
     nuevo_plan = plan_asignatura_schema.load(datos)
+    Auditoria.preparar_alta(nuevo_plan)
     db.session.add(nuevo_plan)
     db.session.commit()
     return nuevo_plan
 
 def actualizar(plan, datos):
+    Auditoria.preparar_modificacion(plan)
     schema = PlanAsignaturaSchema(partial=True)
     schema.context = {"plan_id": plan.id}
     schema.load(datos, instance=plan, partial=True)
@@ -27,6 +29,7 @@ def actualizar(plan, datos):
     return plan
 
 def eliminar(plan):
+    Auditoria.preparar_baja(plan)
     plan.estado = 0
     db.session.commit()
     return plan

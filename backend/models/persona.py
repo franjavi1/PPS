@@ -61,9 +61,9 @@ class Persona(db.Model):
 
 
     # --- AUDITORIA ---
-    id_persona_creacion: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
-    id_persona_modificacion: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
-    id_persona_baja: Mapped[int] = mapped_column(Integer, ondelete='RESTRICT', nullable=True)
+    id_persona_alta: Mapped[int] = mapped_column(Integer, nullable=True)
+    id_persona_modificacion: Mapped[int] = mapped_column(Integer, nullable=True)
+    id_persona_baja: Mapped[int] = mapped_column(Integer, nullable=True)
     ts_creacion: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(), nullable=True)
     ts_modificacion: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     ts_baja: Mapped[datetime] = mapped_column(DateTime, nullable=True)

@@ -22,7 +22,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_rango = rango_institucional_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_rango)
     db.session.add(nuevo_rango)
     db.session.commit()
 
@@ -30,6 +30,7 @@ def crear(datos):
 
 
 def actualizar(rango, datos):
+    Auditoria.preparar_modificacion(rango)
     schema = RangosInstitucionalesSchema(partial=True)
 
     # Evita que la validacion de descripcion unica tome como duplicado
@@ -44,6 +45,7 @@ def actualizar(rango, datos):
 
 
 def eliminar(rango):
+    Auditoria.preparar_baja(rango)
     rango.estado = 0
     db.session.commit()
 

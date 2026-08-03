@@ -19,7 +19,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_tipo_sede = tipo_sede_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_tipo_sede)
     db.session.add(nuevo_tipo_sede)
     db.session.commit()
 
@@ -27,6 +27,7 @@ def crear(datos):
 
 
 def actualizar(tipo_sede, datos):
+    Auditoria.preparar_modificacion(tipo_sede)
     schema = TipoSedeSchema(partial=True)
 
     # Evita que la validacion de descripcion unica tome como duplicado
@@ -41,6 +42,7 @@ def actualizar(tipo_sede, datos):
 
 
 def eliminar(tipo_sede):
+    Auditoria.preparar_baja(tipo_sede)
     tipo_sede.estado = 0
     db.session.commit()
 

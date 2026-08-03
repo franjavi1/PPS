@@ -267,7 +267,7 @@ function EditarPersona({ soloLectura = false }) {
         numero_doc: persona.numero_doc.trim(),
         nombre: persona.nombre.trim(),
         apellido: persona.apellido.trim(),
-        usuario_accion: 1,
+        
       });
 
       let legajoId = ids.legajoId;
@@ -275,7 +275,7 @@ function EditarPersona({ soloLectura = false }) {
       if (legajo.numero.trim()) {
         const payloadLegajo = {
           numero: legajo.numero.trim(),
-          usuario_accion: 1,
+          
         };
 
         if (legajoId) {
@@ -298,7 +298,7 @@ function EditarPersona({ soloLectura = false }) {
           alergias: datosMedicos.alergias.trim() || null,
           aptitud_fisica: Boolean(datosMedicos.aptitud_fisica),
           seguro: datosMedicos.seguro.trim(),
-          usuario_accion: 1,
+          
         };
 
         if (ids.datosMedicosId) {
@@ -317,7 +317,7 @@ function EditarPersona({ soloLectura = false }) {
       if (rango.rangos_institucionales_id && legajoId) {
         const payloadRango = {
           rangos_institucionales_id: Number(rango.rangos_institucionales_id),
-          usuario_accion: 1,
+          
         };
 
         if (ids.rangoId) {
@@ -338,7 +338,7 @@ function EditarPersona({ soloLectura = false }) {
           sede_id: Number(sede.sede_id),
           es_autoridad: Boolean(sede.es_autoridad),
           es_sede_base: Boolean(sede.es_sede_base),
-          usuario_accion: 1,
+          
         };
 
         if (ids.sedeId) {
@@ -792,7 +792,7 @@ async function guardarContactoPersona({
     tipo_contacto_id: Number(tipoContacto.id),
     principal: Boolean(tipoPrincipal),
     contacto,
-    usuario_accion: 1,
+    
   };
 
   if (contactoId) {
