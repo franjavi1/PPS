@@ -80,21 +80,18 @@ class PersonaSchema(ma.SQLAlchemySchema):
     estado = ma.auto_field(dump_only=True)
 
     # Usuario que realiza la accion sobre el registro.
-    usuario_accion = ma.auto_field(
-        required=False,
-        allow_none=False,
-        error_messages={
-            
-            "null": "El usuario de acción no puede ser null",
-            "invalid": "El usuario de acción debe ser un número entero"
-        }
-    )
+
 
     contactos_items = fields.Nested(ContactosSchema, many=True, dump_only=True)
     
     # Fechas administradas por la base de datos.
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     # Verifica que el tipo de documento exista.
     @validates("td_id")
@@ -113,11 +110,7 @@ class PersonaSchema(ma.SQLAlchemySchema):
                 "El número de documento debe tener al menos 7 caracteres")
 
     # Verifica que el usuario informado sea valido.
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError(
-                "El usuario de acción debe ser un número entero positivo")
+
 
     # Evita registrar la misma persona con igual tipo y numero de documento.
     @validates_schema

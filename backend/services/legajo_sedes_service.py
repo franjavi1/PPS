@@ -1,6 +1,7 @@
 from models.legajo_sedes import LegajoSedes
 from schemas.legajo_sedes_schema import LegajoSedesSchema, legajo_sedes_schema
 from db import db
+from utils.auditoria import Auditoria
 
 
 """
@@ -18,7 +19,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_legajo_sedes = legajo_sedes_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_legajo_sedes)
     db.session.add(nuevo_legajo_sedes)
     db.session.commit()
 
@@ -26,6 +27,7 @@ def crear(datos):
 
 
 def actualizar(legajo_sedes, datos):
+    Auditoria.preparar_modificacion(legajo_sedes)
     schema = LegajoSedesSchema(partial=True)
 
     # Evita que las validaciones de relacion unica tomen como duplicado
@@ -43,6 +45,7 @@ def actualizar(legajo_sedes, datos):
 
 
 def eliminar(legajo_sedes):
+    Auditoria.preparar_baja(legajo_sedes)
     legajo_sedes.estado = 0
     db.session.commit()
 

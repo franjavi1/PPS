@@ -202,7 +202,7 @@ function EditarComision() {
 
       await comisionService.actualizar(id, {
         descripcion,
-        usuario_accion: 1,
+        
       });
 
       setMensaje("Comision actualizada correctamente");

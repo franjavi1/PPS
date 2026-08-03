@@ -240,7 +240,7 @@ function AltaComisionWizard() {
 
       const respuestaComision = await comisionService.crear({
         descripcion: comision.descripcion.trim(),
-        usuario_accion: 1,
+        
       });
 
       const nuevaComisionId = obtenerIdRespuesta(respuestaComision);
@@ -261,7 +261,7 @@ function AltaComisionWizard() {
           modalidadesid: item.modalidadesid,
           cupo_maximo: item.cupo_maximo,
           estado: item.estado,
-          usuario_accion: 1,
+          
         });
 
         const idReal = obtenerIdRespuesta(respuesta);
@@ -280,7 +280,7 @@ function AltaComisionWizard() {
           tipo_autoridad_id: item.tipo_autoridad_id,
           legajo_id: item.legajo_id,
           comision_id: idsReales[item.comision_id],
-          usuario_accion: 1,
+          
         });
       }
 

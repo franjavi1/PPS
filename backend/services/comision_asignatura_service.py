@@ -15,6 +15,7 @@ from schemas.comision_asignatura_schema import (
     comision_asignatura_schema
 )
 from db import db
+from utils.auditoria import Auditoria
 from utils.errores import APIError
 
 
@@ -37,9 +38,8 @@ def obtener_por_id(id_comision_asignatura):
 
 def crear(datos):
     nueva_comision_asignatura = comision_asignatura_schema.load(datos)
-    modalidad = obtener_modalidad(
-    nueva_comision_asignatura.modalidadesid
-)
+    Auditoria.preparar_alta(nueva_comision_asignatura)    
+    modalidad = obtener_modalidad(nueva_comision_asignatura.modalidadesid)
 
     if modalidad is None:
         raise APIError("La modalidad indicada no existe", status=400)
@@ -52,6 +52,7 @@ def crear(datos):
 
 
 def actualizar(comision_asignatura, datos):
+    Auditoria.preparar_modificacion(comision_asignatura)
     schema = ComisionAsignaturaSchema(partial=True)
     schema.context = {
         "comision_asignatura_id": comision_asignatura.id_comision_asignatura
@@ -65,13 +66,13 @@ def actualizar(comision_asignatura, datos):
         if modalidad is None:
             raise APIError("La modalidad indicada no existe", status=400)
 
-
     db.session.commit()
 
     return comision_asignatura
 
 
 def eliminar(comision_asignatura):
+    Auditoria.preparar_baja(comision_asignatura)
     comision_asignatura.estado = 0
     db.session.commit()
 
