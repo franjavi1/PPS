@@ -30,6 +30,7 @@ import TipoRangos from "./pages/TipoRangos";
 import TiposDocumentos from "./pages/TiposDocumentos";
 import ProtectedRoute from "./components/permisos/ProtectedRoute"
 import PublicRoute from "./components/permisos/PublicRoute"
+import PaginaNoEncontrada from "./pages/PaginaNoEncontrada";
 
 
 function App() {
@@ -109,7 +110,7 @@ function App() {
             <Route path="/planes/alta" element={<ProtectedRoute permissions={["planes.planes.crear"]}><AltaPlanWizard /></ProtectedRoute>} />
             <Route path="/planes/:id" element={<ProtectedRoute permissions={["planes.planes.ver"]}><VerPlan /></ProtectedRoute>} />
             <Route path="/planes/:id/editar" element={<ProtectedRoute permissions={["planes.planes.editar"]}><EditarPlan /></ProtectedRoute>} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<ProtectedRoute><PaginaNoEncontrada/></ProtectedRoute>} />
           </Routes>
         </div>
       </div>
