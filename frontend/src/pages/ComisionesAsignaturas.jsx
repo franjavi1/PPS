@@ -184,7 +184,6 @@ function ComisionesAsignaturas() {
       modalidadesid: Number(formulario.modalidadesid),
       cupo_maximo: Number(formulario.cupo_maximo),
       estado: Number(formulario.estado),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarPayload(payload);

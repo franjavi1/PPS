@@ -56,7 +56,6 @@ function TiposDocumentos() {
 
     const payload = {
       descripcion: descripcion.trim().toUpperCase(),
-      usuario_accion: 1,
     };
 
     try {

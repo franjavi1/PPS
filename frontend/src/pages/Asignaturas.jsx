@@ -123,7 +123,6 @@ function Asignaturas() {
     const payload = {
       nombre,
       formato,
-      usuario_accion: 1,
     };
 
     try {

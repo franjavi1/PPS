@@ -25,10 +25,10 @@ class TipoAutoridadSchema(ma.SQLAlchemySchema):
 
     estado = ma.auto_field(dump_only=True)
     usuario_accion = ma.auto_field(
-        required=True,
+        required=False,
         allow_none=False,
         error_messages={
-            "required": "El usuario de acción es obligatorio",
+            
             "null": "El usuario de acción no puede ser null",
             "invalid": "El usuario de acción debe ser un número entero"
         }

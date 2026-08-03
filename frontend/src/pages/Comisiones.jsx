@@ -104,7 +104,6 @@ function Comisiones() {
 
     const payload = {
       descripcion,
-      usuario_accion: 1,
     };
 
     try {

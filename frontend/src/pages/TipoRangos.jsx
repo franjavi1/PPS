@@ -107,7 +107,6 @@ function TipoRangos() {
     const payload = {
       descripcion,
       nivel_jerarquia: nivelJerarquia,
-      usuario_accion: 1,
     };
 
     try {

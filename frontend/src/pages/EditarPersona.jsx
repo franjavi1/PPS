@@ -264,7 +264,7 @@ function EditarPersona({ soloLectura = false }) {
 
       await personasService.actualizar(id, {
         td_id: Number(persona.td_id),
-        numero_doc: Number(persona.numero_doc),
+        numero_doc: persona.numero_doc.trim(),
         nombre: persona.nombre.trim(),
         apellido: persona.apellido.trim(),
         usuario_accion: 1,
@@ -453,7 +453,6 @@ function EditarPersona({ soloLectura = false }) {
                 <CampoTexto
                   label="Numero de documento"
                   name="numero_doc"
-                  type="number"
                   value={persona.numero_doc}
                   onChange={cambiarPersona}
                   placeholder="Ej: 30123456"

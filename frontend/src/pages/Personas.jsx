@@ -132,8 +132,7 @@ function Personas() {
       td_id: Number(formulario.td_id),
       nombre: formulario.nombre,
       apellido: formulario.apellido,
-      numero_doc: Number(formulario.numero_doc),
-      usuario_accion: 1,
+      numero_doc: formulario.numero_doc
     };
 
     try {

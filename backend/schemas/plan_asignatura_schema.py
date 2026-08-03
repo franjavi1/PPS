@@ -38,7 +38,7 @@ class PlanAsignaturaSchema(ma.SQLAlchemySchema):
     estado = ma.auto_field(dump_only=True)
 
     usuario_accion = ma.auto_field(
-        required=True,
+        required=False,
         error_messages={"required": "El usuario de acción es obligatorio"}
     )
 

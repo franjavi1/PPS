@@ -357,7 +357,6 @@ function AltaPersonaWizard() {
         numero_doc: persona.numero_doc.trim(), // Soporta string para CUIT/Pasaporte
         nombre: persona.nombre.trim(),
         apellido: persona.apellido.trim(),
-        usuario_accion: 1,
       };
 
       const respuestaPersona = await personasService.crear(datosPersona);
@@ -370,7 +369,6 @@ function AltaPersonaWizard() {
       const datosLegajoPayload = {
         numero: legajo.numero.trim(),
         persona_id: nuevaPersonaId,
-        usuario_accion: 1,
       };
 
       const respuestaLegajo = await legajoService.crear(datosLegajoPayload);
@@ -386,7 +384,7 @@ function AltaPersonaWizard() {
           alergias: datosMedicos.alergias.trim() || null,
           aptitud_fisica: Boolean(datosMedicos.aptitud_fisica),
           seguro: datosMedicos.seguro.trim(),
-          usuario_accion: 1,
+
         };
 
         await legajosRelacionesService.crearDatosMedicos(nuevaPersonaId, datosMedicosPayload);
@@ -397,7 +395,7 @@ function AltaPersonaWizard() {
           rangos_institucionales_id: Number(
             datosLegajo.rangos_institucionales_id,
           ),
-          usuario_accion: 1,
+
         };
 
         await legajosRelacionesService.crearRangoLegajo(nuevoLegajoId, datosRangosPayload);
@@ -408,7 +406,7 @@ function AltaPersonaWizard() {
           sede_id: Number(datosLegajo.sede_id),
           es_autoridad: Boolean(datosLegajo.es_autoridad),
           es_sede_base: Boolean(datosLegajo.es_sede_base),
-          usuario_accion: 1,
+
         };
 
         await legajosRelacionesService.crearSedeLegajo(nuevoLegajoId, datosSedesPayload);
@@ -422,7 +420,7 @@ function AltaPersonaWizard() {
             tipo_contacto_id: Number(tipoEmail.id),
             principal: true,
             contacto: contactos.email.trim(),
-            usuario_accion: 1,
+  
           });
         }
       }
@@ -435,7 +433,7 @@ function AltaPersonaWizard() {
             tipo_contacto_id: Number(tipoCelular.id),
             principal: false,
             contacto: contactos.celular.trim(),
-            usuario_accion: 1,
+  
           });
         }
       }

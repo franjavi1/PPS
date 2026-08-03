@@ -188,7 +188,6 @@ function EditarPlan() {
       duracion: nuevaAsignatura.duracion !== "" ? Number(nuevaAsignatura.duracion) : null,
       regimen: nuevaAsignatura.regimen.trim(),
       modalidad: nuevaAsignatura.modalidad.trim(),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarAsignatura(payload);
@@ -242,7 +241,6 @@ function EditarPlan() {
     const payload = {
       pa_id: Number(nuevaCorrelativa.pa_id),
       asignatura_id: Number(nuevaCorrelativa.asignatura_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarCorrelativa(

@@ -138,7 +138,6 @@ function Aulas() {
       sedes_id: sedesId,
       aula: nombreAula,
       es_virtual: esVirtual,
-      usuario_accion: 1,
     };
 
     try {

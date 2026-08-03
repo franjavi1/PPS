@@ -1,12 +1,15 @@
 from flask import Blueprint, request, jsonify
-
-from db import db
-from models.aula import Aula
-from models.legajo_sedes import LegajoSedes
-from models.plan_asignatura import PlanAsignatura
-from schemas.sedes_schema import sede_schema, sedes_schema
+from utils.utilidades import respuesta_api
+from utils.errores import APIError
 from auth_common.decorador import requires_permission
-from services.sedes_service import (
+from models.legajo_rangos import LegajoRangos
+from models.plan_asignatura import PlanAsignatura
+from schemas.rangos_institucionales_schema import (
+    rango_institucional_schema,
+    rangos_institucionales_schema
+)
+
+from services.rangos_institucionales_service import (
     obtener_todos,
     obtener_por_id,
     crear,
@@ -14,83 +17,78 @@ from services.sedes_service import (
     eliminar
 )
 
-# Se importa la función de utilidad provista
-from utils.utilidades import respuesta_api
-# Excepción personalizada para los errores de negocio
-from utils.errores import APIError
+
+rangos_institucionales_bp = Blueprint(
+    "rangos_institucionales_bp", __name__, url_prefix="/rangos-institucionales")
 
 
-sedes_bp = Blueprint("sedes_bp", __name__, url_prefix="/sedes")
-
-
-@sedes_bp.route("", methods=["GET"])
-@requires_permission("planes.sedes.ver", "planes.personas.ver_propio", policy="ANY")
-def get_sedes():
-    sedes = obtener_todos()
-    data = sedes_schema.dump(sedes)
+@rangos_institucionales_bp.route("", methods=["GET"])
+@requires_permission("planes.rangos_institucionales.ver", "planes.personas.ver_propio", policy="ANY")
+def get_rangos_institucionales():
+    rangos = obtener_todos()
+    data = rangos_institucionales_schema.dump(rangos)
 
     if len(data) == 0:
         return respuesta_api(True, [], "No se encontraron resultados")
 
-    return respuesta_api(True, data, "Lista de sedes obtenida")
+    return respuesta_api(True, data, "Lista de rangos institucionales obtenida")
 
 
-@sedes_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("planes.sedes.ver")
-def get_sede(id):
-    sede = obtener_por_id(id)
+@rangos_institucionales_bp.route("/<int:id>", methods=["GET"])
+@requires_permission("planes.rangos_institucionales.ver")
+def get_rango_institucional(id):
+    rango = obtener_por_id(id)
 
-    if not sede:
-        raise APIError("Sede no encontrada.", status=404)
+    if not rango:
+        raise APIError("Rango institucional no encontrado.", status=404)
 
-    data = sede_schema.dump(sede)
+    data = rango_institucional_schema.dump(rango)
 
-    return respuesta_api(True, data, "Sede obtenida correctamente")
+    return respuesta_api(True, data, "Rango institucional obtenido correctamente")
 
 
-@sedes_bp.route("", methods=["POST"])
-@requires_permission("planes.sedes.crear")
-def crear_sede():
+@rangos_institucionales_bp.route("", methods=["POST"])
+@requires_permission("planes.rangos_institucionales.crear")
+def crear_rango_institucional():
     req = request.get_json(silent=True) or {}
 
-    nueva_sede = crear(req)
-    data = sede_schema.dump(nueva_sede)
+    nuevo_rango = crear(req)
+    data = rango_institucional_schema.dump(nuevo_rango)
 
-    return respuesta_api(True, {"id": data["id"]}, "Sede creada correctamente", 201)
+    return respuesta_api(True, {"id": data["id"]}, "Rango institucional creado correctamente", 201)
 
 
-@sedes_bp.route("/<int:id>", methods=["PUT"])
-@requires_permission("planes.sedes.editar")
-def editar_sede(id):
-    sede = obtener_por_id(id)
+@rangos_institucionales_bp.route("/<int:id>", methods=["PUT"])
+@requires_permission("planes.rangos_institucionales.editar")
+def editar_rango_institucional(id):
+    rango = obtener_por_id(id)
 
-    if not sede:
-        raise APIError("Sede no encontrada.", status=404)
+    if not rango:
+        raise APIError("Rango institucional no encontrado.", status=404)
 
     req = request.get_json(silent=True) or {}
-    sede_actualizada = actualizar(sede, req)
-    data = sede_schema.dump(sede_actualizada)
+    rango_actualizado = actualizar(rango, req)
+    data = rango_institucional_schema.dump(rango_actualizado)
 
-    return respuesta_api(True, {"id": data["id"]}, "Sede actualizada correctamente")
+    return respuesta_api(True, {"id": data["id"]}, "Rango institucional actualizado correctamente")
 
 
-@sedes_bp.route("/<int:id>", methods=["DELETE"])
-@requires_permission("planes.sedes.eliminar")
-def eliminar_sede(id):
-    sede = obtener_por_id(id)
+@rangos_institucionales_bp.route("/<int:id>", methods=["DELETE"])
+@requires_permission("planes.rangos_institucionales.eliminar")
+def eliminar_rango_institucional(id):
+    rango = obtener_por_id(id)
 
-    if not sede:
-        raise APIError("Sede no encontrada.", status=404)
+    if not rango:
+        raise APIError("Rango institucional no encontrado.", status=404)
 
     esta_en_uso = (
-        Aula.query.filter_by(sedes_id=id, estado=1).first()
-        or LegajoSedes.query.filter_by(sede_id=id).first()
-        or PlanAsignatura.query.filter_by(sedes_id=id, estado=1).first()
+        LegajoRangos.query.filter_by(rangos_institucionales_id=id).first()
+        or PlanAsignatura.query.filter_by(rango_minimo_id=id, estado=1).first()
     )
 
     if esta_en_uso:
-        raise APIError("No se puede eliminar una sede asociada a aulas, legajos o planes.", status=409)
+        raise APIError("No se puede eliminar un rango asociado a legajos o planes.", status=409)
 
-    eliminar(sede)
+    eliminar(rango)
 
-    return respuesta_api(True, {"id": id}, "Sede eliminada correctamente")
+    return respuesta_api(True, {"id": id}, "Rango institucional eliminado correctamente")

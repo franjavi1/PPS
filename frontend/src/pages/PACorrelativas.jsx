@@ -131,7 +131,6 @@ function PACorrelativas() {
     const payload = {
       pa_id: Number(formulario.pa_id),
       asignatura_id: Number(formulario.asignatura_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarPayload(payload, planesAsignaturas);

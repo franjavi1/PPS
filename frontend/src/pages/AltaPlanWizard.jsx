@@ -242,7 +242,7 @@ function AltaPlanWizard() {
       duracion: asignaturaPlan.duracion !== "" ? Number(asignaturaPlan.duracion) : null,
       regimen: asignaturaPlan.regimen.trim(),
       modalidad: asignaturaPlan.modalidad.trim(),
-      usuario_accion: 1,
+      
     };
 
     const mensajeValidacion = validarCondiciones(payload);
@@ -346,7 +346,7 @@ function AltaPlanWizard() {
         descrip: plan.descrip.trim() || null,
         vigencia_dde: `${plan.vigencia_dde}T00:00:00`,
         vigencia_hta: `${plan.vigencia_hta}T00:00:00`,
-        usuario_accion: 1,
+        
       });
 
       const nuevoPlanId = obtenerIdRespuesta(respuestaPlan);
@@ -369,7 +369,7 @@ function AltaPlanWizard() {
           duracion: item.duracion,
           regimen: item.regimen,
           modalidad: item.modalidad,
-          usuario_accion: 1,
+          
         });
 
         const idReal = obtenerIdRespuesta(respuesta);
@@ -385,7 +385,7 @@ function AltaPlanWizard() {
         await paCorrelativaService.crear({
           pa_id: idsReales[item.pa_id],
           asignatura_id: item.asignatura_id,
-          usuario_accion: 1,
+          
         });
       }
 

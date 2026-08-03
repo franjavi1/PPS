@@ -224,7 +224,6 @@ function EditarComision() {
       modalidadesid: Number(nuevaComisionAsignatura.modalidadesid),
       cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo),
       estado: Number(nuevaComisionAsignatura.estado),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarComisionAsignatura(payload);
@@ -281,7 +280,6 @@ function EditarComision() {
       tipo_autoridad_id: Number(nuevaAutoridad.tipo_autoridad_id),
       legajo_id: Number(nuevaAutoridad.legajo_id),
       comision_id: Number(nuevaAutoridad.comision_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarAutoridad(payload);

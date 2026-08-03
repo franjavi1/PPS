@@ -108,7 +108,6 @@ function TiposSedes() {
 
     const payload = {
       descripcion,
-      usuario_accion: 1,
     };
 
     try {

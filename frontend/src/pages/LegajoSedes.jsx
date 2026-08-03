@@ -113,7 +113,6 @@ function LegajoSedes() {
       sede_id: Number(formulario.sede_id),
       es_autoridad: Boolean(formulario.es_autoridad),
       es_sede_base: Boolean(formulario.es_sede_base),
-      usuario_accion: 1,
     };
 
     try {

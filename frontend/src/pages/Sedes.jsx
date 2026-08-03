@@ -126,7 +126,6 @@ function Sedes() {
       tipo_sede_id: Number(formulario.tipo_sede_id),
       nombre: formulario.nombre.trim(),
       direccion: formulario.direccion.trim(),
-      usuario_accion: 1,
     };
 
     try {

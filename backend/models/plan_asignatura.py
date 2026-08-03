@@ -90,7 +90,7 @@ class PlanAsignatura(db.Model):
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
-        nullable=False
+        nullable=True
     )
 
     ts_creacion: Mapped[datetime] = mapped_column(

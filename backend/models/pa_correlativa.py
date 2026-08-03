@@ -42,7 +42,7 @@ class PACorrelativa(db.Model):
     usuario_accion: Mapped[int] = mapped_column(
         "usuarioAccion",
         Integer,
-        nullable=False
+        nullable=True
     )
 
     # Fecha y hora de creacion del registro
