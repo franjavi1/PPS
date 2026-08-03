@@ -480,6 +480,8 @@ function EditarComision() {
                       label="Cupo maximo"
                       name="cupo_maximo"
                       type="number"
+                      min="1"
+                      max="500"
                       value={nuevaComisionAsignatura.cupo_maximo}
                       onChange={cambiarNuevaComisionAsignatura}
                       placeholder="Ej: 30"
@@ -604,7 +606,8 @@ function EditarComision() {
                       opciones={comisionesAsignaturas}
                       getValue={(item) => item.id_comision_asignatura}
                       getLabel={(item) =>
-                        mapas.planesAsignaturas[item.plan_asignaturas_id] || `Comisión #${item.id_comision_asignatura}`
+                        mapas.planesAsignaturas[item.plan_asignaturas_id] ||
+                        `Comisión #${item.id_comision_asignatura}`
                       }
                     />
                   </div>
@@ -648,7 +651,7 @@ function EditarComision() {
                               {obtenerNombreComisionAsignatura(
                                 item.comision_id,
                                 comisionesAsignaturas,
-                                mapas.planesAsignaturas
+                                mapas.planesAsignaturas,
                               )}
                             </p>
                           </div>
@@ -735,6 +738,8 @@ function CampoTexto({
   icono,
   type = "text",
   maxLength,
+  min,
+  max,
 }) {
   return (
     <div>
@@ -754,8 +759,11 @@ function CampoTexto({
           onChange={onChange}
           placeholder={placeholder}
           maxLength={maxLength}
-          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"
-            }`}
+          min={min}
+          max={max}
+          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+            icono ? "pl-12" : "pl-4"
+          }`}
         />
       </div>
     </div>
@@ -897,7 +905,9 @@ function validarComisionAsignatura(payload) {
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {
     return "El cupo maximo debe ser mayor a cero";
   }
-
+  if (payload.cupo_maximo > 500) {
+    return "El cupo maximo no puede ser mayor a 500";
+  }
   if (!payload.estado) {
     return "El estado es obligatorio";
   }
@@ -922,14 +932,35 @@ function validarAutoridad(payload) {
 }
 
 function obtenerMensajeError(err) {
-  const errores = err.errors || {};
-  const primerCampo = Object.keys(errores)[0];
-
-  if (primerCampo && Array.isArray(errores[primerCampo])) {
-    return errores[primerCampo][0];
+  if (typeof err?.message === "string" && err.message.trim()) {
+    return err.message;
   }
 
-  return err.message || "No se pudo completar la operacion";
+  const errores = err?.errors;
+
+  if (typeof errores === "string" && errores.trim()) {
+    return errores;
+  }
+
+  if (errores && typeof errores === "object") {
+    const primerError = Object.values(errores)[0];
+
+    if (Array.isArray(primerError)) {
+      const mensaje = primerError.find(
+        (item) => typeof item === "string" && item.trim(),
+      );
+
+      if (mensaje) {
+        return mensaje;
+      }
+    }
+
+    if (typeof primerError === "string" && primerError.trim()) {
+      return primerError;
+    }
+  }
+
+  return "No se pudo completar la operación";
 }
 
 export default EditarComision;

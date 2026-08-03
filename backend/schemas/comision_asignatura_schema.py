@@ -86,7 +86,9 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
     def validar_cupo_maximo(self, value, **kwargs):
         if value <= 0:
             raise ValidationError("El cupo maximo debe ser mayor a cero")
-
+        if value > 500:
+            raise ValidationError("El cupo máximo no puede ser mayor a 500")
+        
     @validates("usuario_accion")
     def validar_usuario_accion(self, value, **kwargs):
         if value is not None and value <= 0:
