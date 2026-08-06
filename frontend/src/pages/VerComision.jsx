@@ -11,7 +11,7 @@ import {
   UserRound,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import {legajoService} from "../services/legajoService";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
@@ -69,7 +69,7 @@ function VerComision() {
         sedeService.obtenerTodas(),
         aulaService.obtenerTodas(),
         tipoAutoridadService.obtenerTodos(),
-        apiRequest("/legajos"),
+        legajoService.obtenerTodos(),
         modalidadService.obtenerTodas(),
       ]);
 

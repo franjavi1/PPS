@@ -15,7 +15,9 @@ import {
     Download,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { legajoService } from "../services/legajoService";
+import { planService } from "../services/planesService";
+import { comisionService } from "../services/comisionService";
 import useAuth from "../auth/hooks/useAuth";
 
 function Inicio() {
@@ -39,9 +41,9 @@ function Inicio() {
     async function cargarResumen() {
         try {
             const [legajos, planes, comisiones] = await Promise.all([
-                apiRequest("/legajos"),
-                apiRequest("/planes"),
-                apiRequest("/comisiones"),
+                legajoService.obtenerTodos(),
+                planService.obtenerTodos(),
+                comisionService.obtenerTodas(),
             ]);
 
             setResumen({

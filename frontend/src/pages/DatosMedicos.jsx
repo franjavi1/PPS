@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import {personasService} from "../services/personasService";
 import { datosMedicosService } from "../services/datosMedicosService";
 
 const gruposSanguineos = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -44,7 +44,7 @@ function DatosMedicos() {
 
       const [respuestaDatosMedicos, respuestaPersonas] = await Promise.all([
         datosMedicosService.obtenerTodos(),
-        apiRequest("/personas"),
+        personasService.obtenerTodas(),
       ]);
 
       setDatosMedicos(respuestaDatosMedicos.data || []);

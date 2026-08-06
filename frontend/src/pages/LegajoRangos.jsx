@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { legajoService } from "../services/legajoService";
 import { rangoService } from "../services/rangoService";
 import { legajoRangosService } from "../services/legajoRangosService";
 
@@ -42,7 +42,7 @@ function LegajoRangos() {
 
       const [respuestaLegajoRangos, respuestaLegajos, respuestaRangos] = await Promise.all([
         legajoRangosService.obtenerTodos(),
-        apiRequest("/legajos"),
+        legajoService.obtenerTodos(),
         rangoService.obtenerTodos(),
       ]);
 

@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import {legajoService} from "../services/legajoService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
 import { comisionAsignaturaService } from "../services/comisionAsignaturaService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
@@ -53,7 +53,7 @@ function AutoridadesComision() {
       ] = await Promise.all([
         autoridadComisionService.obtenerTodos(),
         tipoAutoridadService.obtenerTodos(),
-        apiRequest("/legajos"),
+        legajoService.obtenerTodos(),
         comisionAsignaturaService.obtenerTodos(),
       ]);
 
