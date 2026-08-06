@@ -109,8 +109,8 @@ function EditarPersona({ soloLectura = false }) {
       ] = await Promise.all([
         personasService.obtenerPorId(id),
         tipoDocumentoService.obtenerTodos(),
-        legajoService.obtenerTodos(),
-        datosAuthService.obtenerTodos(),
+        legajoService.obtenerPorId(id),
+        legajosRelacionesService.obtenerDatosMedicosPorIdPersona(id),
         legajoRangosService.obtenerTodos(),
         legajoSedesService.obtenerTodos(),
         contactosService.obtenerTodos(),
@@ -120,12 +120,8 @@ function EditarPersona({ soloLectura = false }) {
       ]);
 
       const personaData = respuestaPersona.data || {};
-      const legajoData = (respuestaLegajos.data || []).find(
-        (item) => Number(item.persona_id) === Number(id),
-      );
-      const datosMedicosData = (respuestaDatosMedicos.data || []).find(
-        (item) => Number(item.persona_id) === Number(id),
-      );
+      const legajoData = respuestaLegajos.data;
+      const datosMedicosData = respuestaDatosMedicos.data;
       const rangoData = legajoData
         ? (respuestaRangosAsignados.data || []).find(
           (item) => Number(item.legajo_id) === Number(legajoData.id),

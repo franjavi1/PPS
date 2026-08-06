@@ -24,6 +24,28 @@ from utils.errores import APIError
 
 personas_relaciones_bp = Blueprint("personas_relaciones_bp", __name__)
 
+@personas_relaciones_bp.route("/personas/<int:persona_id>/datos-medicos", methods=["GET"])
+@requires_permission("planes.personas.editar", "planes.personas.ver_propio", policy="ANY")
+def obtener_datos_medicos_de_persona(persona_id):
+    datos_medicos = DatosMedicos.query.filter_by(persona_id=persona_id).first()
+
+    if not datos_medicos:
+        return respuesta_api(
+            True,
+            None,
+            "La persona no tiene datos medicos cargados",
+            404
+        )
+
+    data = datos_medicos_schema.dump(datos_medicos)
+
+    return respuesta_api(
+        True,
+        data,
+        "Datos medicos obtenidos correctamente para la persona",
+        200
+    )
+
 
 @personas_relaciones_bp.route("/personas/<int:persona_id>/legajo", methods=["POST"])
 @requires_permission("legajos.crear")

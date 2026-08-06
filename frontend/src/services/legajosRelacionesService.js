@@ -5,6 +5,11 @@ import { apiRequest } from "../api";
  * del alta guiada de personas, legajos, datos médicos, rangos, sedes y usuarios.
  */
 export const legajosRelacionesService = {
+
+  obtenerDatosMedicosPorIdPersona(personaId) {
+    return apiRequest(`/personas/${personaId}/datos-medicos`);
+  },
+
   crearLegajoDePersona(personaId, datosLegajo) {
     return apiRequest(`/personas/${personaId}/legajo`, {
       method: "POST",
