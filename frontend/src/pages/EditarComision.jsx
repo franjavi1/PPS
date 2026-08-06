@@ -866,7 +866,16 @@ function obtenerEtiquetaPlanAsignatura(
 }
 
 function obtenerEtiquetaLegajo(legajo) {
-  return legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
+  const numero = legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
+  
+  let nombreCompleto = "";
+  if (legajo?.persona) {
+    nombreCompleto = `${legajo.persona.apellido || ""} ${legajo.persona.nombre || ""}`.trim();
+  } else if (legajo?.apellido || legajo?.nombre) {
+    nombreCompleto = `${legajo.apellido || ""} ${legajo.nombre || ""}`.trim();
+  }
+
+  return nombreCompleto ? `${numero} - ${nombreCompleto}` : numero;
 }
 
 function obtenerNombreComisionAsignatura(id, items, mapaPlanes) {
