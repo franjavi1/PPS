@@ -111,6 +111,15 @@ function Navbar() {
           <Menu size={22} />
         </button>
 
+        <button
+          type="button"
+          onClick={handleVolver}
+          className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
+        >
+          <SendToBack size={17} />
+          Menu Principal
+        </button>
+
         <nav ref={navRef} className="hidden lg:flex items-center gap-1">
           <NavLink
             to="/inicio"
@@ -322,14 +331,6 @@ function Navbar() {
               </NavLink>
             </Dropdown>
           )}
-          <button
-            type="button"
-            onClick={handleVolver}
-            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
-          >
-            <SendToBack size={17} />
-            Volver
-          </button>
 
           <button
             type="button"
