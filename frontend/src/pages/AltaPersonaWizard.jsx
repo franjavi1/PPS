@@ -17,7 +17,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
-import { apiRequest } from "../api";
 import { contactosService } from "../services/contactosService";
 import { personasService } from "../services/personasService";
 import { rangoService } from "../services/rangoService";
@@ -286,7 +285,7 @@ function AltaPersonaWizard() {
     if (contactos.email.trim()) {
       try {
         setGuardando(true);
-        const respuestaContactos = await contactosService.obtenerTodos?.() || await apiRequest("/contactos");
+        const respuestaContactos = await contactosService.obtenerTodos();
         const listaContactos = respuestaContactos.data || respuestaContactos || [];
 
         const emailExistente = listaContactos.some(

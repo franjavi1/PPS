@@ -10,7 +10,8 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { personasService } from "../services/personasService";
+import { tipoContactoService } from "../services/tipoContactoService";
 import { contactosService } from "../services/contactosService";
 
 const formularioInicial = {
@@ -43,8 +44,8 @@ function Contactos() {
       const [respuestaContactos, respuestaPersonas, respuestaTiposContacto] =
         await Promise.all([
           contactosService.obtenerTodos(),
-          apiRequest("/personas"),
-          apiRequest("/tipos-contacto"),
+          personasService.obtenerTodas(),
+          tipoContactoService.obtenerTodos(),
         ]);
 
       setContactos(respuestaContactos.data || []);

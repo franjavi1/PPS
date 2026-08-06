@@ -1,9 +1,9 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-function BotonVolver({ ruta, to, reemplazar = false }) {
+function BotonVolver({ ruta, reemplazar = false }) {
   const navigate = useNavigate();
-  const destino = to || ruta;
+  const destino = ruta;
 
   function volver() {
     if (destino) {
