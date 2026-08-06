@@ -257,7 +257,8 @@ function AltaPersonaWizard() {
     }
 
     if (
-      (!datosMedicos.grupo_sanguineo && !datosMedicos.seguro.trim()) 
+      (datosMedicos.grupo_sanguineo && !datosMedicos.seguro.trim()) ||
+      (!datosMedicos.grupo_sanguineo && datosMedicos.seguro.trim())
     ) {
       setError("Para guardar datos médicos complete grupo sanguíneo y seguro.");
       return;
