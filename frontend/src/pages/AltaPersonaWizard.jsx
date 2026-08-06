@@ -235,10 +235,7 @@ function AltaPersonaWizard() {
   function guardarLegajo(e) {
     e.preventDefault();
 
-    if (!contactos.email.trim() || !contactos.celular.trim()) {
-      setError("Los campos de contacto (Email y Celular) no pueden estar vacíos.");
-      return;
-    }
+
 
     if (!legajo.numero.trim() || legajo.numero.trim().length < 8) {
       setError("El número de legajo debe tener un mínimo de 8 dígitos/caracteres.");
@@ -253,6 +250,7 @@ function AltaPersonaWizard() {
     e.preventDefault();
 
     const mensajeContactos = validarContactos(contactos);
+    
 
     if (mensajeContactos) {
       setError(mensajeContactos);
@@ -260,8 +258,7 @@ function AltaPersonaWizard() {
     }
 
     if (
-      (datosMedicos.grupo_sanguineo && !datosMedicos.seguro.trim()) ||
-      (!datosMedicos.grupo_sanguineo && datosMedicos.seguro.trim())
+      (!datosMedicos.grupo_sanguineo && !datosMedicos.seguro.trim()) 
     ) {
       setError("Para guardar datos médicos complete grupo sanguíneo y seguro.");
       return;
@@ -280,6 +277,11 @@ function AltaPersonaWizard() {
       !obtenerTipoContacto(tiposContacto, "celular")
     ) {
       setError("No existe el tipo de contacto Celular en la base.");
+      return;
+    }
+
+    if (!contactos.email.trim() || !contactos.celular.trim()) {
+      setError("Los campos de contacto (Email y Celular) no pueden estar vacíos.");
       return;
     }
 
@@ -314,7 +316,7 @@ function AltaPersonaWizard() {
 
     if (!contactos.email.trim()) {
       setError(
-        "El email es obligatorio porque se utilizará para crear el usuario en Auth.",
+        "El email es obligatorio porque se utilizará para crear el usuario.",
       );
       return;
     }
