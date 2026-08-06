@@ -11,6 +11,7 @@ import {
     PlusCircle,
     ShieldCheck,
     Users,
+    User,
     Download,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -113,12 +114,12 @@ function Inicio() {
                                 </button>
                             )}
                             <a
-                               href={`${import.meta.env.BASE_URL}docs/manual-usuario-sigal.pdf`}
-                               download="Manual-De-Usuario-SIGAL.pdf"
-                               className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 text-red-700 rounded-lg font-bold hover:bg-red-50 transition cursor-pointer"
+                                href={`${import.meta.env.BASE_URL}docs/manual-usuario-sigal.pdf`}
+                                download="Manual-De-Usuario-SIGAL.pdf"
+                                className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 text-red-700 rounded-lg font-bold hover:bg-red-50 transition cursor-pointer"
                             >
-                               <Download size={22} />
-                               Descargar guía de uso
+                                <Download size={22} />
+                                Descargar guía de uso
                             </a>
                         </div>
                     </div>
@@ -149,28 +150,29 @@ function Inicio() {
                         </div>
 
                         <div className="space-y-3">
+
                             <AccesoRapido
-                                icono={<Users size={28} />}
-                                titulo={hasPermission("planes.personas.ver") ? "Personas" : "Mis Datos"}
-                                descripcion={
-                                    hasPermission("planes.personas.ver")
-                                        ? "Alta guiada, listado y edición de personas."
-                                        : "Consultar tu información personal."
-                                }
-                                onClick={() => {
-                                    if (hasPermission("planes.personas.ver")) {
-                                        navigate("/personas"); // Va al listado completo si tiene permiso global
-                                    } else if (user?.id_legajo) {
-                                        navigate(`/personas/${user.id_legajo}`); // Va a su propio perfil si no tiene permiso global pero sí autenticación propia
-                                    }
-                                }}
+                                icono={<User size={28} />}
+                                titulo="Mis Datos"
+                                descripcion="Consultá tu información personal."
+                                onClick={() => navigate(`/personas/${user.id_persona}`)}
                             />
+
+
+                            {hasPermission("planes.personas.ver") && (
+                                <AccesoRapido
+                                    icono={<Users size={28} />}
+                                    titulo="Personas"
+                                    descripcion="Alta guiada, listado y edición de personas."
+                                    onClick={() => navigate("/personas")}
+                                />
+                            )}
 
                             {hasPermission("planes.planes.ver") && (
                                 <AccesoRapido
                                     icono={<BookOpen size={28} />}
                                     titulo="Planes"
-                                    descripcion="Planes, asignaturas y correlativas."
+                                    descripcion="Alta guiada, consulta y edición de planes de estudio."
                                     onClick={() => navigate("/planes")}
                                 />
                             )}

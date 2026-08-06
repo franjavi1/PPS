@@ -42,7 +42,7 @@ function Navbar() {
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
   const { hasPermission, hasRole } = useAuth();
-  useEffect(()=>{console.log(currentUserRole)},[currentUserRole])
+  useEffect(() => { console.log(currentUserRole) }, [currentUserRole])
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
@@ -55,7 +55,7 @@ function Navbar() {
     logout();
     window.location.replace(LOGIN_ROUTE);
     //closeMenus();
-    
+
     //navigate(LOGIN_ROUTE);
   };
 
@@ -119,134 +119,134 @@ function Navbar() {
             <Home size={17} />
             Inicio
           </NavLink>
+          {hasPermission("planes.personas.ver") && (
+            <Dropdown
+              id="personal"
+              title="Personal"
+              icon={<SquareUserRound size={17} />}
+              openMenu={openMenu}
+              toggleMenu={toggleMenu}
+            >
+              {hasPermission("planes.personas.crear") && (
+                <NavLink
+                  to="/alta-persona"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <Plus size={18} />
 
-          <Dropdown
-            id="personal"
-            title="Personal"
-            icon={<SquareUserRound size={17} />}
-            openMenu={openMenu}
-            toggleMenu={toggleMenu}
-          >
-            {hasPermission("planes.personas.crear") && (
-              <NavLink
-                to="/alta-persona"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <Plus size={18} />
+                  <span>
+                    <strong>Nueva persona</strong>
 
-                <span>
-                  <strong>Nueva persona</strong>
-
-                  <small className="block text-slate-500">
-                    Alta guiada de persona
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.personas.editar") && (
-              <NavLink
-                to="/personas"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <User size={18} />
-                <span>
-                  <strong>Personas</strong>
-                  <small className="block text-slate-500">
-                    Buscar y editar personas
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.legajos.editar") && (
-              <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
-                <ClipboardList size={18} />
-                <span>
-                  <strong>Ver legajos</strong>
-                  <small className="block text-slate-500">
-                    Buscar y consultar legajos
-                  </small>
-                </span>
-              </NavLink>
-            )}
-          </Dropdown>
-
-          <Dropdown
-            id="planes"
-            title="Gestión educativa"
-            icon={<GraduationCap size={17} />}
-            openMenu={openMenu}
-            toggleMenu={toggleMenu}
-          >
-            {hasPermission("planes.planes.crear") && (
-              <NavLink
-                to="/planes/alta"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <Plus size={18} />
-                <span>
-                  <strong>Nuevo plan</strong>
-                  <small className="block text-slate-500">
-                    Alta guiada de plan
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.planes.ver") && (
-              <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
-                <BookOpen size={18} />
-                <span>
-                  <strong>Planes</strong>
-                  <small className="block text-slate-500">Ver planes</small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.asignaturas.ver") && (
-              <NavLink
-                to="/asignaturas"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <FileText size={18} />
-                <span>
-                  <strong>Asignaturas</strong>
-                  <small className="block text-slate-500">
-                    Materias del sistema
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.comisiones.crear") && (
-              <NavLink
-                to="/comisiones/alta"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <Plus size={18} />
-                <span>
-                  <strong>Nueva comisión</strong>
-                  <small className="block text-slate-500">
-                    Alta guiada de comisión
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.comisiones.ver") && (
-              <NavLink
-                to="/comisiones"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <Users size={18} />
-                <span>
-                  <strong>Comisiones</strong>
-                  <small className="block text-slate-500">Ver comisiones</small>
-                </span>
-              </NavLink>
-            )}
-          </Dropdown>
+                    <small className="block text-slate-500">
+                      Alta guiada de persona
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.personas.editar") && (
+                <NavLink
+                  to="/personas"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <User size={18} />
+                  <span>
+                    <strong>Personas</strong>
+                    <small className="block text-slate-500">
+                      Buscar y editar personas
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.legajos.editar") && (
+                <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
+                  <ClipboardList size={18} />
+                  <span>
+                    <strong>Ver legajos</strong>
+                    <small className="block text-slate-500">
+                      Buscar y consultar legajos
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+            </Dropdown>)}
+          {hasPermission("planes.planes.ver") && (
+            < Dropdown
+              id="planes"
+              title="Gestión educativa"
+              icon={<GraduationCap size={17} />}
+              openMenu={openMenu}
+              toggleMenu={toggleMenu}
+            >
+              {hasPermission("planes.planes.crear") && (
+                <NavLink
+                  to="/planes/alta"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <Plus size={18} />
+                  <span>
+                    <strong>Nuevo plan</strong>
+                    <small className="block text-slate-500">
+                      Alta guiada de plan
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.planes.ver") && (
+                <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
+                  <BookOpen size={18} />
+                  <span>
+                    <strong>Planes</strong>
+                    <small className="block text-slate-500">Ver planes</small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.asignaturas.ver") && (
+                <NavLink
+                  to="/asignaturas"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <FileText size={18} />
+                  <span>
+                    <strong>Asignaturas</strong>
+                    <small className="block text-slate-500">
+                      Materias del sistema
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.comisiones.crear") && (
+                <NavLink
+                  to="/comisiones/alta"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <Plus size={18} />
+                  <span>
+                    <strong>Nueva comisión</strong>
+                    <small className="block text-slate-500">
+                      Alta guiada de comisión
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.comisiones.ver") && (
+                <NavLink
+                  to="/comisiones"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <Users size={18} />
+                  <span>
+                    <strong>Comisiones</strong>
+                    <small className="block text-slate-500">Ver comisiones</small>
+                  </span>
+                </NavLink>
+              )}
+            </Dropdown>)}
           {hasPermission("planes.config.ver") && (
             <Dropdown
               id="config"
@@ -342,136 +342,138 @@ function Navbar() {
         </nav>
       </div>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 bg-slate-50 text-slate-800 z-[100] p-5 lg:hidden overflow-y-auto">
-          <button
-            onClick={closeMenus}
-            className="fixed top-4 right-4 w-11 h-11 rounded-full bg-white border border-slate-200 shadow flex items-center justify-center text-red-700 cursor-pointer"
-            aria-label="Cerrar menú"
-          >
-            <X size={22} />
-          </button>
-
-          <p className="text-xs font-bold uppercase text-slate-500 mb-4">
-            Menú principal
-          </p>
-
-          <div className="space-y-3 pt-12">
-            <MobileLink
-              to="/inicio"
-              icon={<Home size={20} />}
+      {
+        mobileOpen && (
+          <div className="fixed inset-0 bg-slate-50 text-slate-800 z-[100] p-5 lg:hidden overflow-y-auto">
+            <button
               onClick={closeMenus}
+              className="fixed top-4 right-4 w-11 h-11 rounded-full bg-white border border-slate-200 shadow flex items-center justify-center text-red-700 cursor-pointer"
+              aria-label="Cerrar menú"
             >
-              Inicio
-            </MobileLink>
-            {hasPermission("planes.personas.crear") && (
+              <X size={22} />
+            </button>
+
+            <p className="text-xs font-bold uppercase text-slate-500 mb-4">
+              Menú principal
+            </p>
+
+            <div className="space-y-3 pt-12">
               <MobileLink
-                to="/alta-persona"
-                icon={<Plus size={20} />}
+                to="/inicio"
+                icon={<Home size={20} />}
                 onClick={closeMenus}
               >
-                Nueva persona
+                Inicio
               </MobileLink>
-            )}
-            <MobileLink
-              to="/personas"
-              icon={<User size={20} />}
-              onClick={closeMenus}
-            >
-              Personas
-            </MobileLink>
-
-            <MobileLink
-              to="/legajos"
-              icon={<Folder size={20} />}
-              onClick={closeMenus}
-              iconoSinFondo
-            >
-              Legajos
-            </MobileLink>
-
-            {hasPermission("planes.planes.crear") && (
+              {hasPermission("planes.personas.crear") && (
+                <MobileLink
+                  to="/alta-persona"
+                  icon={<Plus size={20} />}
+                  onClick={closeMenus}
+                >
+                  Nueva persona
+                </MobileLink>
+              )}
               <MobileLink
-                to="/planes/alta"
-                icon={<Plus size={20} />}
+                to="/personas"
+                icon={<User size={20} />}
                 onClick={closeMenus}
               >
-                Nuevo plan
+                Personas
               </MobileLink>
-            )}
-            <MobileLink
-              to="/planes"
-              icon={<BookOpen size={20} />}
-              onClick={closeMenus}
-              iconoSinFondo
-            >
-              Planes
-            </MobileLink>
 
-            <MobileLink
-              to="/asignaturas"
-              icon={<FileText size={20} />}
-              onClick={closeMenus}
-            >
-              Asignaturas
-            </MobileLink>
-            {hasPermission("planes.comisiones.crear") && (
               <MobileLink
-                to="/comisiones/alta"
-                icon={<Plus size={20} />}
+                to="/legajos"
+                icon={<Folder size={20} />}
+                onClick={closeMenus}
+                iconoSinFondo
+              >
+                Legajos
+              </MobileLink>
+
+              {hasPermission("planes.planes.crear") && (
+                <MobileLink
+                  to="/planes/alta"
+                  icon={<Plus size={20} />}
+                  onClick={closeMenus}
+                >
+                  Nuevo plan
+                </MobileLink>
+              )}
+              <MobileLink
+                to="/planes"
+                icon={<BookOpen size={20} />}
+                onClick={closeMenus}
+                iconoSinFondo
+              >
+                Planes
+              </MobileLink>
+
+              <MobileLink
+                to="/asignaturas"
+                icon={<FileText size={20} />}
                 onClick={closeMenus}
               >
-                Nueva comisión
+                Asignaturas
               </MobileLink>
-            )}
-
-            <MobileLink
-              to="/comisiones"
-              icon={<Users size={20} />}
-              onClick={closeMenus}
-              iconoSinFondo
-            >
-              Comisiones
-            </MobileLink>
-            {hasPermission("planes.config.ver") && (
-              <>
+              {hasPermission("planes.comisiones.crear") && (
                 <MobileLink
-                  to="/sedes"
-                  icon={<Building2 size={20} />}
+                  to="/comisiones/alta"
+                  icon={<Plus size={20} />}
                   onClick={closeMenus}
                 >
-                  Sedes
+                  Nueva comisión
                 </MobileLink>
+              )}
 
-                <MobileLink
-                  to="/tipos-sedes"
-                  icon={<Building size={20} />}
-                  onClick={closeMenus}
-                >
-                  Tipo de sedes
-                </MobileLink>
+              <MobileLink
+                to="/comisiones"
+                icon={<Users size={20} />}
+                onClick={closeMenus}
+                iconoSinFondo
+              >
+                Comisiones
+              </MobileLink>
+              {hasPermission("planes.config.ver") && (
+                <>
+                  <MobileLink
+                    to="/sedes"
+                    icon={<Building2 size={20} />}
+                    onClick={closeMenus}
+                  >
+                    Sedes
+                  </MobileLink>
 
-                <MobileLink
-                  to="/tipos-documentos"
-                  icon={<IdCard size={20} />}
-                  onClick={closeMenus}
-                >
-                  Tipo de documentos
-                </MobileLink>
+                  <MobileLink
+                    to="/tipos-sedes"
+                    icon={<Building size={20} />}
+                    onClick={closeMenus}
+                  >
+                    Tipo de sedes
+                  </MobileLink>
 
-                <MobileLink
-                  to="/tipo-rangos"
-                  icon={<ChevronsUp size={20} />}
-                  onClick={closeMenus}
-                >
-                  Tipo de rangos
-                </MobileLink>
-              </>
-            )}
+                  <MobileLink
+                    to="/tipos-documentos"
+                    icon={<IdCard size={20} />}
+                    onClick={closeMenus}
+                  >
+                    Tipo de documentos
+                  </MobileLink>
+
+                  <MobileLink
+                    to="/tipo-rangos"
+                    icon={<ChevronsUp size={20} />}
+                    onClick={closeMenus}
+                  >
+                    Tipo de rangos
+                  </MobileLink>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-    </header>
+        )
+      }
+    </header >
   );
 }
 
@@ -506,9 +508,8 @@ function MobileLink({ to, icon, children, onClick, iconoSinFondo = false }) {
       className="flex items-center gap-4 rounded-2xl bg-white border border-slate-200 px-4 py-4 font-bold text-slate-700 shadow-sm cursor-pointer"
     >
       <span
-        className={`w-10 h-10 text-red-700 flex items-center justify-center ${
-          iconoSinFondo ? "" : "rounded-xl bg-red-50"
-        }`}
+        className={`w-10 h-10 text-red-700 flex items-center justify-center ${iconoSinFondo ? "" : "rounded-xl bg-red-50"
+          }`}
       >
         {icon}
       </span>
