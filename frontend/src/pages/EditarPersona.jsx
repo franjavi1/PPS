@@ -13,9 +13,18 @@ import {
   User,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
 import { contactosService } from "../services/contactosService";
 import { personasService } from "../services/personasService";
+import { rangoService } from "../services/rangoService";
+import { sedeService } from "../services/sedeService";
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
+import { tipoContactoService } from "../services/tipoContactoService";
+import { legajoService } from "../services/legajoService";
+import { datosAuthService } from "../services/datosAuthService";
+import { legajosRelacionesService } from "../services/legajosRelacionesService";
+import { legajoRangosService } from "../services/legajoRangosService";
+import { legajoSedesService } from "../services/legajoSedesService";
+import { datosMedicosService } from "../services/datosMedicosService";
 
 const personaInicial = {
   td_id: "",
@@ -99,15 +108,15 @@ function EditarPersona({ soloLectura = false }) {
         respuestaSedes,
       ] = await Promise.all([
         personasService.obtenerPorId(id),
-        apiRequest("/tipos-documentos"),
-        apiRequest("/legajos"),
-        apiRequest("/datos-medicos"),
-        apiRequest("/legajo-rangos"),
-        apiRequest("/legajo-sedes"),
+        tipoDocumentoService.obtenerTodos(),
+        legajoService.obtenerTodos(),
+        datosAuthService.obtenerTodos(),
+        legajoRangosService.obtenerTodos(),
+        legajoSedesService.obtenerTodos(),
         contactosService.obtenerTodos(),
-        apiRequest("/tipos-contacto"),
-        apiRequest("/rangos-institucionales"),
-        apiRequest("/sedes"),
+        tipoContactoService.obtenerTodos(),
+        rangoService.obtenerTodos(),
+        sedeService.obtenerTodas(),
       ]);
 
       const personaData = respuestaPersona.data || {};
@@ -119,15 +128,15 @@ function EditarPersona({ soloLectura = false }) {
       );
       const rangoData = legajoData
         ? (respuestaRangosAsignados.data || []).find(
-            (item) => Number(item.legajo_id) === Number(legajoData.id),
-          )
+          (item) => Number(item.legajo_id) === Number(legajoData.id),
+        )
         : null;
-      
+
       const listaSedesAsignadas = respuestaSedesAsignadas.data || [];
       const sedeData = legajoData
         ? listaSedesAsignadas.find(
-            (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
-          )
+          (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
+        )
         : null;
 
       const tiposContactoData = respuestaTiposContacto.data || [];
@@ -162,7 +171,7 @@ function EditarPersona({ soloLectura = false }) {
       setRango({
         rangos_institucionales_id: rangoData?.rangos_institucionales_id || "",
       });
-      
+
       setSede({
         sede_id: sedeData?.sede_id || sedeData?.sedesId || "",
         es_autoridad: sedeData ? Boolean(sedeData.es_autoridad) : false,
@@ -267,7 +276,7 @@ function EditarPersona({ soloLectura = false }) {
         numero_doc: persona.numero_doc.trim(),
         nombre: persona.nombre.trim(),
         apellido: persona.apellido.trim(),
-        
+
       });
 
       let legajoId = ids.legajoId;
@@ -275,19 +284,13 @@ function EditarPersona({ soloLectura = false }) {
       if (legajo.numero.trim()) {
         const payloadLegajo = {
           numero: legajo.numero.trim(),
-          
+
         };
 
         if (legajoId) {
-          await apiRequest(`/legajos/${legajoId}`, {
-            method: "PUT",
-            body: JSON.stringify(payloadLegajo),
-          });
+          await legajoService.actualizar(legajoId, payloadLegajo);
         } else {
-          const respuestaLegajo = await apiRequest(`/personas/${id}/legajo`, {
-            method: "POST",
-            body: JSON.stringify(payloadLegajo),
-          });
+          const respuestaLegajo = await legajosRelacionesService.crearLegajoDePersona(id, payloadLegajo);
           legajoId = obtenerIdRespuesta(respuestaLegajo);
         }
       }
@@ -298,38 +301,26 @@ function EditarPersona({ soloLectura = false }) {
           alergias: datosMedicos.alergias.trim() || null,
           aptitud_fisica: Boolean(datosMedicos.aptitud_fisica),
           seguro: datosMedicos.seguro.trim(),
-          
+
         };
 
         if (ids.datosMedicosId) {
-          await apiRequest(`/datos-medicos/${ids.datosMedicosId}`, {
-            method: "PUT",
-            body: JSON.stringify(payloadDatosMedicos),
-          });
+          await datosMedicosService.actualizar(ids.datosMedicosId, payloadDatosMedicos);
         } else {
-          await apiRequest(`/personas/${id}/datos-medicos`, {
-            method: "POST",
-            body: JSON.stringify(payloadDatosMedicos),
-          });
+          await legajosRelacionesService.crearDatosMedicos(id, payloadDatosMedicos);
         }
       }
 
       if (rango.rangos_institucionales_id && legajoId) {
         const payloadRango = {
           rangos_institucionales_id: Number(rango.rangos_institucionales_id),
-          
+
         };
 
         if (ids.rangoId) {
-          await apiRequest(`/legajo-rangos/${ids.rangoId}`, {
-            method: "PUT",
-            body: JSON.stringify(payloadRango),
-          });
+          await legajoRangosService.actualizar(ids.rangoId, payloadRango);
         } else {
-          await apiRequest(`/legajos/${legajoId}/rangos`, {
-            method: "POST",
-            body: JSON.stringify(payloadRango),
-          });
+          await legajoRangosService.crearRangoLegajo(legajoId, payloadRango);
         }
       }
 
@@ -338,19 +329,13 @@ function EditarPersona({ soloLectura = false }) {
           sede_id: Number(sede.sede_id),
           es_autoridad: Boolean(sede.es_autoridad),
           es_sede_base: Boolean(sede.es_sede_base),
-          
+
         };
 
         if (ids.sedeId) {
-          await apiRequest(`/legajo-sedes/${ids.sedeId}`, {
-            method: "PUT",
-            body: JSON.stringify(payloadSede),
-          });
+          await legajoSedesService.actualizar(ids.sedeId, payloadSede);
         } else {
-          await apiRequest(`/legajos/${legajoId}/sedes`, {
-            method: "POST",
-            body: JSON.stringify(payloadSede),
-          });
+          await legajosRelacionesService.crearSedeLegajo(legajoId, payloadSede);
         }
       }
 
@@ -688,9 +673,8 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
-            icono ? "pl-12" : "px-4"
-          }`}
+          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "px-4"
+            }`}
         />
       </div>
     </div>
@@ -792,7 +776,7 @@ async function guardarContactoPersona({
     tipo_contacto_id: Number(tipoContacto.id),
     principal: Boolean(tipoPrincipal),
     contacto,
-    
+
   };
 
   if (contactoId) {

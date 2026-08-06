@@ -3,7 +3,7 @@ import BotonVolver from "../components/BotonVolver";
 import ModalConfirmar from "../components/ModalConfirmar";
 import { FileText, Pencil, PlusCircle, Save, Trash2, X } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
 import useAuth from "../auth/hooks/useAuth";
 
 function TiposDocumentos() {
@@ -26,7 +26,7 @@ function TiposDocumentos() {
     try {
       setCargando(true);
       setError("");
-      const respuesta = await apiRequest("/tipos-documentos");
+      const respuesta = await tipoDocumentoService.obtenerTodos();
       setTipos(respuesta.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron obtener los tipos de documento");
@@ -62,15 +62,9 @@ function TiposDocumentos() {
       setError("");
 
       if (editandoId) {
-        await apiRequest(`/tipos-documentos/${editandoId}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
+        await tipoDocumentoService.actualizar(editandoId, payload);
       } else {
-        await apiRequest("/tipos-documentos", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        await tipoDocumentoService.crear(payload);
       }
 
       limpiarFormulario();
@@ -91,9 +85,7 @@ function TiposDocumentos() {
     try {
       setEliminando(true);
       setError("");
-      await apiRequest(`/tipos-documentos/${idAEliminar}`, {
-        method: "DELETE",
-      });
+      await tipoDocumentoService.eliminar(idAEliminar);
       setIdAEliminar(null);
       await cargarTipos();
     } catch (err) {

@@ -14,7 +14,9 @@ import {
     Download,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { legajoService } from "../services/legajoService";
+import { planService } from "../services/planesService";
+import { comisionService } from "../services/comisionService";
 import useAuth from "../auth/hooks/useAuth";
 
 function Inicio() {
@@ -38,9 +40,9 @@ function Inicio() {
     async function cargarResumen() {
         try {
             const [legajos, planes, comisiones] = await Promise.all([
-                apiRequest("/legajos"),
-                apiRequest("/planes"),
-                apiRequest("/comisiones"),
+                legajoService.obtenerTodos(),
+                planService.obtenerTodos(),
+                comisionService.obtenerTodas(),
             ]);
 
             setResumen({
@@ -113,12 +115,12 @@ function Inicio() {
                                 </button>
                             )}
                             <a
-                               href={`${import.meta.env.BASE_URL}docs/manual-usuario-sigal.pdf`}
-                               download="Manual-De-Usuario-SIGAL.pdf"
-                               className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 text-red-700 rounded-lg font-bold hover:bg-red-50 transition cursor-pointer"
+                                href={`${import.meta.env.BASE_URL}docs/manual-usuario-sigal.pdf`}
+                                download="Manual-De-Usuario-SIGAL.pdf"
+                                className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 text-red-700 rounded-lg font-bold hover:bg-red-50 transition cursor-pointer"
                             >
-                               <Download size={22} />
-                               Descargar guía de uso
+                                <Download size={22} />
+                                Descargar guía de uso
                             </a>
                         </div>
                     </div>

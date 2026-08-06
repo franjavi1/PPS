@@ -9,7 +9,8 @@ import {
   ClipboardList,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { legajoService } from "../services/legajoService";
+import { personasService } from "../services/personasService";
 import { obtenerMensajeError } from "../utils/notificaciones";
 
 function Legajos() {
@@ -29,8 +30,8 @@ function Legajos() {
       setCargando(true);
       setError("");
       const [respuestaLegajos, respuestaPersonas] = await Promise.all([
-        apiRequest("/legajos"),
-        apiRequest("/personas"),
+        legajoService.obtenerTodos(),
+        personasService.obtenerTodas(),
       ]);
       setLegajos(respuestaLegajos.data || []);
       setPersonas(respuestaPersonas.data || []);

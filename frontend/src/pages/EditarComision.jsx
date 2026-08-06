@@ -15,7 +15,6 @@ import {
   UserRound,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
@@ -23,6 +22,7 @@ import { comisionAsignaturaService } from "../services/comisionAsignaturaService
 import { comisionService } from "../services/comisionService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
+import {legajoService} from "../services/legajoService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
 import { modalidadService } from "../services/modalidadService";
@@ -102,7 +102,7 @@ function EditarComision() {
         sedeService.obtenerTodas(),
         aulaService.obtenerTodas(),
         tipoAutoridadService.obtenerTodos(),
-        apiRequest("/legajos"),
+        legajoService.obtenerTodos(),
         modalidadService.obtenerTodas(),
       ]);
 
