@@ -121,7 +121,7 @@ def get_legajos():
 
 
 @legajos_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("planes.legajos.ver")
+@requires_permission("planes.legajos.ver", "planes.legajos.ver_propio", policy="ANY")
 def get_legajo(id):
     legajo = obtener_por_id(id)
 
