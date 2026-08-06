@@ -41,9 +41,9 @@ function Inicio() {
     async function cargarResumen() {
         try {
             const [legajos, planes, comisiones] = await Promise.all([
-                legajoService.obtenerTodos(),
-                planService.obtenerTodos(),
-                comisionService.obtenerTodas(),
+                hasPermission("planes.legajos.ver") ? legajoService.obtenerTodos() : [],
+                hasPermission("planes.planes.ver") ? planService.obtenerTodos() : [],
+                hasPermission("planes.comisiones.ver") ? comisionService.obtenerTodas() : [],
             ]);
 
             setResumen({
@@ -128,7 +128,7 @@ function Inicio() {
                 </section>
 
                 <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
-                    {hasPermission("planes.legajos.editar") && (
+                    {hasPermission("planes.legajos.ver") && (
                         <TarjetaResumen icono={<FileText size={30} />} titulo="Legajos" valor={resumen.legajos} tono="blue" />
                     )}
 
