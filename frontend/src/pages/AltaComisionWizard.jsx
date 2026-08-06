@@ -240,7 +240,6 @@ function AltaComisionWizard() {
 
       const respuestaComision = await comisionService.crear({
         descripcion: comision.descripcion.trim(),
-        
       });
 
       const nuevaComisionId = obtenerIdRespuesta(respuestaComision);
@@ -261,7 +260,6 @@ function AltaComisionWizard() {
           modalidadesid: item.modalidadesid,
           cupo_maximo: item.cupo_maximo,
           estado: item.estado,
-          
         });
 
         const idReal = obtenerIdRespuesta(respuesta);
@@ -280,7 +278,6 @@ function AltaComisionWizard() {
           tipo_autoridad_id: item.tipo_autoridad_id,
           legajo_id: item.legajo_id,
           comision_id: idsReales[item.comision_id],
-          
         });
       }
 
@@ -589,25 +586,34 @@ function AltaComisionWizard() {
 function PasoIndicador({ paso, activo, completo, ultimo }) {
   const Icono = paso.icono;
   const resaltado = activo || completo;
+
   return (
-    <div className="flex flex-1 items-start">
-      <div className="flex flex-col items-center min-w-12">
-        <div
-          className={`w-11 h-11 rounded-full flex items-center justify-center border-2 ${resaltado ? "bg-red-700 border-red-700 text-white" : "bg-slate-100 border-slate-300 text-slate-400"}`}
-        >
-          <Icono size={20} />
-        </div>
-        <p
-          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"}`}
-        >
-          {paso.titulo}
-        </p>
-      </div>
+    <div className="relative flex min-w-0 flex-1 flex-col items-center">
       {!ultimo && (
         <div
-          className={`h-1 flex-1 rounded-full mt-5 ${completo ? "bg-red-700" : "bg-slate-200"}`}
+          className={`absolute left-1/2 right-[-50%] top-4 sm:top-5 h-1 transition-colors ${
+            completo ? "bg-red-700" : "bg-slate-200"
+          }`}
         />
       )}
+
+      <div
+        className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center border-2 ${
+          resaltado
+            ? "bg-red-700 border-red-700 text-white"
+            : "bg-slate-100 border-slate-300 text-slate-400"
+        }`}
+      >
+        <Icono size={20} />
+      </div>
+
+      <p
+        className={`hidden md:block w-full px-1 mt-2 text-xs font-extrabold text-center ${
+          resaltado ? "text-red-700" : "text-slate-400"
+        }`}
+      >
+        {paso.titulo}
+      </p>
     </div>
   );
 }
@@ -784,11 +790,14 @@ function obtenerEtiquetaPlanAsignatura(
 }
 
 function obtenerEtiquetaLegajo(legajo) {
-  const numero = legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
-  
+  const numero = legajo?.numero
+    ? `Nro. ${legajo.numero}`
+    : `Legajo #${legajo?.id}`;
+
   let nombreCompleto = "";
   if (legajo?.persona) {
-    nombreCompleto = `${legajo.persona.apellido || ""} ${legajo.persona.nombre || ""}`.trim();
+    nombreCompleto =
+      `${legajo.persona.apellido || ""} ${legajo.persona.nombre || ""}`.trim();
   } else if (legajo?.apellido || legajo?.nombre) {
     nombreCompleto = `${legajo.apellido || ""} ${legajo.nombre || ""}`.trim();
   }
@@ -826,7 +835,7 @@ function validarComisionAsignatura(payload) {
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
     return "El cupo maximo debe ser mayor a cero";
   if (payload.cupo_maximo > 500)
-  return "El cupo maximo no puede ser mayor a 500";
+    return "El cupo maximo no puede ser mayor a 500";
   return "";
 }
 
