@@ -279,13 +279,13 @@ function Comisiones() {
                       disabled={!hasPermission("planes.comisiones.eliminar")}
                       title={
                         hasPermission("planes.comisiones.eliminar")
-                          ? "Eliminar comision"
-                          : "No tenés permiso para eliminar comisiones"
+                          ? "Dar de baja comision"
+                          : "No tenés permiso para dar de baja comisiones"
                       }
                       className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
                     >
                       <Trash2 size={16} />
-                      Eliminar
+                      Dar de baja
                     </button>
                   </div>
                 </article>
@@ -372,13 +372,13 @@ function Comisiones() {
                             disabled={!hasPermission("planes.comisiones.eliminar")}
                             title={
                               hasPermission("planes.comisiones.eliminar")
-                                ? "Eliminar comision"
-                                : "No tenés permiso para edliminar comisiones"
+                                ? "Dar de baja comision"
+                                : "No tenés permiso para dar de baja comisiones"
                             }
                             className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
                             <Trash2 size={18} />
-                            Eliminar
+                            Dar de baja
                           </button>
                         </div>
                       </td>
@@ -413,10 +413,10 @@ function Comisiones() {
                 </button>
 
                 <h2 className="text-xl font-extrabold text-slate-800 mb-3">
-                  Eliminar comision
+                  Dar de baja comision
                 </h2>
                 <p className="text-slate-600 mb-6">
-                  ¿Seguro que querés eliminar esta comision?
+                  ¿Seguro que querés dar de baja esta comision?
                 </p>
 
                 <div className="flex flex-col sm:flex-row justify-end gap-3">
