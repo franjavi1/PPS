@@ -95,44 +95,64 @@ function EditarPersona({ soloLectura = false }) {
       setCargando(true);
       setError("");
 
+      // Hacemos las peticiones principales que SÍ o SÍ necesita la pantalla
       const [
         respuestaPersona,
         respuestaTipos,
-        respuestaLegajos,
-        respuestaDatosMedicos,
-        respuestaRangosAsignados,
-        respuestaSedesAsignadas,
-        respuestaContactos,
         respuestaTiposContacto,
         respuestaRangos,
         respuestaSedes,
       ] = await Promise.all([
         personasService.obtenerPorId(id),
         tipoDocumentoService.obtenerTodos(),
-        legajoService.obtenerPorId(id),
-        legajosRelacionesService.obtenerDatosMedicosPorIdPersona(id),
-        legajoRangosService.obtenerTodos(),
-        legajoSedesService.obtenerTodos(),
-        contactosService.obtenerTodos(),
         tipoContactoService.obtenerTodos(),
         rangoService.obtenerTodos(),
         sedeService.obtenerTodas(),
       ]);
 
+      // Para los servicios secundarios que pueden dar 403 (como legajos o datos médicos si no eres dueño/admin), los envolvemos en bloques seguros:
+      let respuestaLegajos = { data: null };
+      try {
+        respuestaLegajos = await legajoService.obtenerPorId(id);
+      } catch (e) {
+        // Si da 403 u otro error porque no tiene permiso al legajo, lo ignoramos de forma segura
+      }
+
+      let respuestaDatosMedicos = { data: null };
+      try {
+        respuestaDatosMedicos = await legajosRelacionesService.obtenerDatosMedicosPorIdPersona(id);
+      } catch (e) {}
+
+      let respuestaRangosAsignados = { data: [] };
+      try {
+        respuestaRangosAsignados = await legajoRangosService.obtenerTodos();
+      } catch (e) {}
+
+      let respuestaSedesAsignadas = { data: [] };
+      try {
+        respuestaSedesAsignadas = await legajoSedesService.obtenerTodos();
+      } catch (e) {}
+
+      let respuestaContactos = { data: [] };
+      try {
+        respuestaContactos = contactosService.obtenerTodos ? await contactosService.obtenerTodos() : { data: [] };
+      } catch (e) {}
+
       const personaData = respuestaPersona.data || {};
       const legajoData = respuestaLegajos.data;
       const datosMedicosData = respuestaDatosMedicos.data;
+      
       const rangoData = legajoData
         ? (respuestaRangosAsignados.data || []).find(
-          (item) => Number(item.legajo_id) === Number(legajoData.id),
-        )
+            (item) => Number(item.legajo_id) === Number(legajoData.id),
+          )
         : null;
 
       const listaSedesAsignadas = respuestaSedesAsignadas.data || [];
       const sedeData = legajoData
         ? listaSedesAsignadas.find(
-          (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
-        )
+            (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
+          )
         : null;
 
       const tiposContactoData = respuestaTiposContacto.data || [];

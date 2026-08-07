@@ -31,7 +31,6 @@ import TiposDocumentos from "./pages/TiposDocumentos";
 import ProtectedRoute from "./components/permisos/ProtectedRoute"
 import PublicRoute from "./components/permisos/PublicRoute"
 import PaginaNoEncontrada from "./pages/PaginaNoEncontrada";
-import AccesoDenegado from "./pages/AccesoDenegado";
 import { useContext } from "react";
 import { AuthContext } from "./auth/context/AuthContext";
 

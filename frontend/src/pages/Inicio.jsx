@@ -157,7 +157,7 @@ function Inicio() {
                                 icono={<User size={28} />}
                                 titulo="Mis Datos"
                                 descripcion="Consultá tu información personal."
-                                onClick={() => navigate(`/personas/${user.id}`)}
+                                onClick={() => navigate(`/personas/${user.id_persona}`)}
                             />
 
 
