@@ -4,36 +4,7 @@ import useAuth from "../auth/hooks/useAuth";
 //import { hasPermission } from "../auth/utils/permissions";
 import { MENU_ROUTE } from "../api";
 import { LOGIN_ROUTE } from "../auth/config";
-import {
-  BookOpen,
-  BookMarked,
-  BookOpenCheck,
-  Building,
-  Building2,
-  ChevronDown,
-  ChevronsUp,
-  ClipboardList,
-  ClipboardPlus,
-  DoorOpen,
-  FileText,
-  Folder,
-  GitBranch,
-  GraduationCap,
-  Home,
-  IdCard,
-  LogOut,
-  SendToBack,
-  MapPinned,
-  Menu,
-  Phone,
-  Plus,
-  Settings,
-  SquareUserRound,
-  User,
-  Users,
-  X,
-  ShieldUser,
-} from "lucide-react";
+import { BookOpen, BookMarked, BookOpenCheck, Building, Building2, ChevronDown, ChevronsUp, ClipboardList, ClipboardPlus, DoorOpen, FileText, Folder, GitBranch, GraduationCap, Home, IdCard, LogOut, SendToBack, MapPinned, Menu, Phone, Plus, Settings, SquareUserRound, User, Users, X, ShieldUser, } from "lucide-react";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -54,9 +25,6 @@ function Navbar() {
   const handleLogout = () => {
     logout();
     window.location.replace(LOGIN_ROUTE);
-    //closeMenus();
-
-    //navigate(LOGIN_ROUTE);
   };
 
   const handleVolver = () => {
@@ -79,6 +47,21 @@ function Navbar() {
 
   const linkClass =
     "flex items-start gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-red-50 hover:text-red-700 cursor-pointer";
+
+
+  const canShowPersonal =
+    hasPermission("planes.personas.crear") ||
+    hasPermission("planes.personas.editar") ||
+    hasPermission("planes.legajos.editar");
+
+  const canShowEducativa =
+    hasPermission("planes.planes.crear") ||
+    hasPermission("planes.planes.ver") ||
+    hasPermission("planes.asignaturas.ver") ||
+    hasPermission("planes.comisiones.crear") ||
+    hasPermission("planes.comisiones.ver");
+
+  const canShowConfig = hasPermission("planes.config.ver");
 
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md relative z-50">
@@ -111,16 +94,17 @@ function Navbar() {
           <Menu size={22} />
         </button>
 
-        <button
-          type="button"
-          onClick={handleVolver}
-          className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
-        >
-          <SendToBack size={17} />
-          Menu Principal
-        </button>
-
         <nav ref={navRef} className="hidden lg:flex items-center gap-1">
+
+          <button
+            type="button"
+            onClick={handleVolver}
+            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
+          >
+            <SendToBack size={17} />
+            Menu Principal
+          </button>
+
           <NavLink
             to="/inicio"
             className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
@@ -128,7 +112,8 @@ function Navbar() {
             <Home size={17} />
             Inicio
           </NavLink>
-          {hasPermission("planes.personas.ver") && (
+
+          {canShowPersonal && (
             <Dropdown
               id="personal"
               title="Personal"
@@ -143,10 +128,8 @@ function Navbar() {
                   onClick={closeMenus}
                 >
                   <Plus size={18} />
-
                   <span>
                     <strong>Nueva persona</strong>
-
                     <small className="block text-slate-500">
                       Alta guiada de persona
                     </small>
@@ -179,9 +162,11 @@ function Navbar() {
                   </span>
                 </NavLink>
               )}
-            </Dropdown>)}
-          {hasPermission("planes.planes.ver") && (
-            < Dropdown
+            </Dropdown>
+          )}
+
+          {canShowEducativa && (
+            <Dropdown
               id="planes"
               title="Gestión educativa"
               icon={<GraduationCap size={17} />}
@@ -255,8 +240,10 @@ function Navbar() {
                   </span>
                 </NavLink>
               )}
-            </Dropdown>)}
-          {hasPermission("planes.config.ver") && (
+            </Dropdown>
+          )}
+
+          {canShowConfig && (
             <Dropdown
               id="config"
               title="Configuración"
@@ -375,22 +362,26 @@ function Navbar() {
                   Nueva persona
                 </MobileLink>
               )}
-              <MobileLink
-                to="/personas"
-                icon={<User size={20} />}
-                onClick={closeMenus}
-              >
-                Personas
-              </MobileLink>
+              {hasPermission("planes.personas.ver") && (
+                <MobileLink
+                  to="/personas"
+                  icon={<User size={20} />}
+                  onClick={closeMenus}
+                >
+                  Personas
+                </MobileLink>
+              )}
 
-              <MobileLink
-                to="/legajos"
-                icon={<Folder size={20} />}
-                onClick={closeMenus}
-                iconoSinFondo
-              >
-                Legajos
-              </MobileLink>
+              {hasPermission("planes.legajos.editar") && (
+                <MobileLink
+                  to="/legajos"
+                  icon={<Folder size={20} />}
+                  onClick={closeMenus}
+                  iconoSinFondo
+                >
+                  Legajos
+                </MobileLink>
+              )}
 
               {hasPermission("planes.planes.crear") && (
                 <MobileLink
@@ -401,22 +392,26 @@ function Navbar() {
                   Nuevo plan
                 </MobileLink>
               )}
-              <MobileLink
-                to="/planes"
-                icon={<BookOpen size={20} />}
-                onClick={closeMenus}
-                iconoSinFondo
-              >
-                Planes
-              </MobileLink>
+              {hasPermission("planes.planes.ver") && (
+                <MobileLink
+                  to="/planes"
+                  icon={<BookOpen size={20} />}
+                  onClick={closeMenus}
+                  iconoSinFondo
+                >
+                  Planes
+                </MobileLink>
+              )}
 
-              <MobileLink
-                to="/asignaturas"
-                icon={<FileText size={20} />}
-                onClick={closeMenus}
-              >
-                Asignaturas
-              </MobileLink>
+              {hasPermission("planes.asignaturas.ver") && (
+                <MobileLink
+                  to="/asignaturas"
+                  icon={<FileText size={20} />}
+                  onClick={closeMenus}
+                >
+                  Asignaturas
+                </MobileLink>
+              )}
               {hasPermission("planes.comisiones.crear") && (
                 <MobileLink
                   to="/comisiones/alta"
@@ -427,15 +422,17 @@ function Navbar() {
                 </MobileLink>
               )}
 
-              <MobileLink
-                to="/comisiones"
-                icon={<Users size={20} />}
-                onClick={closeMenus}
-                iconoSinFondo
-              >
-                Comisiones
-              </MobileLink>
-              {hasPermission("planes.config.ver") && (
+              {hasPermission("planes.comisiones.ver") && (
+                <MobileLink
+                  to="/comisiones"
+                  icon={<Users size={20} />}
+                  onClick={closeMenus}
+                  iconoSinFondo
+                >
+                  Comisiones
+                </MobileLink>
+              )}
+              {canShowConfig && (
                 <>
                   <MobileLink
                     to="/sedes"
