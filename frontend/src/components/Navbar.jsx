@@ -170,7 +170,7 @@ function Navbar() {
               )}
             </Dropdown>
           )}
-          {hasPermission("planes.planes.ver") && (
+          {canShowEducativa && (
             <Dropdown
               id="planes"
               title="Gestión educativa"
