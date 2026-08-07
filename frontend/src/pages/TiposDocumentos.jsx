@@ -101,7 +101,7 @@ function TiposDocumentos() {
 
       <main className="max-w-5xl mx-auto px-6 py-10">
         {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
-        <BotonVolver ruta="/planes" />
+        <BotonVolver />
 
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex items-start gap-5 mb-8">

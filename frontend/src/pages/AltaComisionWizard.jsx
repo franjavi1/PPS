@@ -295,7 +295,7 @@ function AltaComisionWizard() {
     <div className="min-h-screen bg-slate-100">
       <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-10">
-        <BotonVolver ruta="/comisiones" />
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
             <div className="flex items-start gap-4">
@@ -371,7 +371,7 @@ function AltaComisionWizard() {
                     icono={<BookOpenCheck size={26} />}
                     titulo="Asignaturas de la comision"
                   />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <CampoSelect
                       label="Plan asignatura"
                       name="plan_asignaturas_id"
@@ -474,7 +474,7 @@ function AltaComisionWizard() {
                     icono={<ShieldUser size={26} />}
                     titulo="Autoridades"
                   />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <CampoSelect
                       label="Tipo autoridad"
                       name="tipo_autoridad_id"
@@ -598,9 +598,9 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
       )}
 
       <div
-        className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center border-2 ${
+        className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center border-2 transition ${
           resaltado
-            ? "bg-red-700 border-red-700 text-white"
+            ? "bg-red-700 border-red-700 text-white shadow-sm"
             : "bg-slate-100 border-slate-300 text-slate-400"
         }`}
       >

@@ -414,7 +414,7 @@ function AltaPlanWizard() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
-        <BotonVolver ruta="/planes" />
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
             <div className="flex items-start gap-4">
@@ -768,7 +768,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={agregarOtraAsignatura}
-                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50 transition cursor-pointer"
+                      className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar otra asignatura
@@ -866,7 +866,7 @@ function AltaPlanWizard() {
                     <button
                       type="button"
                       onClick={agregarOtraAsignatura}
-                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50 transition cursor-pointer"
+                      className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar otra asignatura

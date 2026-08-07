@@ -506,7 +506,7 @@ function AltaPersonaWizard() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
-        <BotonVolver ruta="/personas" />
+        <BotonVolver />
 
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
@@ -861,7 +861,7 @@ function AltaPersonaWizard() {
                   type="button"
                   onClick={() => setPasoActual(4)}
                   disabled={guardando}
-                  className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg font-bold hover:bg-slate-300 disabled:opacity-60 transition cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-100 disabled:opacity-60 disabled:cursor-not-allowed transition cursor-pointer"
                 >
                   Volver
                 </button>
@@ -869,7 +869,7 @@ function AltaPersonaWizard() {
                   type="button"
                   onClick={confirmarAltaPersona}
                   disabled={guardando || Boolean(personaId)}
-                  className="px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed transition cursor-pointer"
                 >
                   {guardando
                     ? "Guardando..."

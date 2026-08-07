@@ -9,6 +9,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import { legajoService } from "../services/legajoService";
 import { personasService } from "../services/personasService";
 import { obtenerMensajeError } from "../utils/notificaciones";
@@ -74,6 +75,7 @@ function Legajos() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
