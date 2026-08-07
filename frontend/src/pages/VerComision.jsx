@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  ArrowLeft,
   BookOpenCheck,
   DoorOpen,
   GraduationCap,
@@ -11,6 +10,7 @@ import {
   UserRound,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import {legajoService} from "../services/legajoService";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
@@ -137,6 +137,7 @@ function VerComision() {
     <div className="min-h-screen bg-slate-100">
       <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div className="flex items-start gap-4">
@@ -156,14 +157,6 @@ function VerComision() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                type="button"
-                onClick={() => navigate("/comisiones")}
-                className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
-              >
-                <ArrowLeft size={20} />
-                Volver
-              </button>
               <button
                 type="button"
                 onClick={() => navigate(`/comisiones/${id}/editar`)}
