@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
-  ArrowLeft,
   BookMarked,
   BookOpen,
   CalendarDays,
@@ -11,6 +10,7 @@ import {
   MapPinned,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import { asignaturaService } from "../services/asignaturaService";
 import { paCorrelativaService } from "../services/paCorrelativaService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
@@ -21,7 +21,6 @@ import { tipoPlanesService } from "../services/tipoPlanesService";
 
 function VerPlan() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [plan, setPlan] = useState(null);
   const [tiposPlanes, setTiposPlanes] = useState([]);
   const [planAsignaturas, setPlanAsignaturas] = useState([]);
@@ -98,6 +97,7 @@ function VerPlan() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div className="flex items-start gap-4">
@@ -117,14 +117,6 @@ function VerPlan() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => navigate("/planes")}
-              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
-            >
-              <ArrowLeft size={20} />
-              Volver
-            </button>
           </div>
 
           {error && (

@@ -127,7 +127,7 @@ function AltaPersonaWizard() {
 
       const respuestaRoles = await datosAuthService.obtenerRoles();
       const rolesActivos = (respuestaRoles.data || []).filter(
-        (rol) => rol.activo && rol.nombre.toUpperCase() !== "SUPERADMIN"
+        (rol) => rol.activo && rol.nombre.toUpperCase() !== "SUPERADMIN",
       );
 
       setRoles(rolesActivos);
@@ -215,7 +215,9 @@ function AltaPersonaWizard() {
       return;
     }
     if (!persona.numero_doc || persona.numero_doc.length < 6) {
-      setError("El número de documento/cuit/pasaporte debe tener al menos 6 caracteres.");
+      setError(
+        "El número de documento/cuit/pasaporte debe tener al menos 6 caracteres.",
+      );
       return;
     }
     if (!persona.nombre.trim() || persona.nombre.trim().length < 2) {
@@ -234,10 +236,10 @@ function AltaPersonaWizard() {
   function guardarLegajo(e) {
     e.preventDefault();
 
-
-
     if (!legajo.numero.trim() || legajo.numero.trim().length < 8) {
-      setError("El número de legajo debe tener un mínimo de 8 dígitos/caracteres.");
+      setError(
+        "El número de legajo debe tener un mínimo de 8 dígitos/caracteres.",
+      );
       return;
     }
 
@@ -249,7 +251,6 @@ function AltaPersonaWizard() {
     e.preventDefault();
 
     const mensajeContactos = validarContactos(contactos);
-    
 
     if (mensajeContactos) {
       setError(mensajeContactos);
@@ -281,7 +282,9 @@ function AltaPersonaWizard() {
     }
 
     if (!contactos.email.trim() || !contactos.celular.trim()) {
-      setError("Los campos de contacto (Email y Celular) no pueden estar vacíos.");
+      setError(
+        "Los campos de contacto (Email y Celular) no pueden estar vacíos.",
+      );
       return;
     }
 
@@ -289,14 +292,19 @@ function AltaPersonaWizard() {
       try {
         setGuardando(true);
         const respuestaContactos = await contactosService.obtenerTodos();
-        const listaContactos = respuestaContactos.data || respuestaContactos || [];
+        const listaContactos =
+          respuestaContactos.data || respuestaContactos || [];
 
         const emailExistente = listaContactos.some(
-          (c) => normalizarTexto(c.contacto || c.email) === normalizarTexto(contactos.email)
+          (c) =>
+            normalizarTexto(c.contacto || c.email) ===
+            normalizarTexto(contactos.email),
         );
 
         if (emailExistente) {
-          setError("El correo electrónico ya se encuentra registrado en el sistema.");
+          setError(
+            "El correo electrónico ya se encuentra registrado en el sistema.",
+          );
           setGuardando(false);
           return;
         }
@@ -327,7 +335,9 @@ function AltaPersonaWizard() {
     }
 
     if (errorRoles) {
-      setError("No se pudieron cargar los roles. Reintenta antes de continuar.");
+      setError(
+        "No se pudieron cargar los roles. Reintenta antes de continuar.",
+      );
       return;
     }
 
@@ -391,10 +401,12 @@ function AltaPersonaWizard() {
           alergias: datosMedicos.alergias.trim() || null,
           aptitud_fisica: Boolean(datosMedicos.aptitud_fisica),
           seguro: datosMedicos.seguro.trim(),
-
         };
 
-        await legajosRelacionesService.crearDatosMedicos(nuevaPersonaId, datosMedicosPayload);
+        await legajosRelacionesService.crearDatosMedicos(
+          nuevaPersonaId,
+          datosMedicosPayload,
+        );
       }
 
       if (datosLegajo.rangos_institucionales_id) {
@@ -402,10 +414,12 @@ function AltaPersonaWizard() {
           rangos_institucionales_id: Number(
             datosLegajo.rangos_institucionales_id,
           ),
-
         };
 
-        await legajosRelacionesService.crearRangoLegajo(nuevoLegajoId, datosRangosPayload);
+        await legajosRelacionesService.crearRangoLegajo(
+          nuevoLegajoId,
+          datosRangosPayload,
+        );
       }
 
       if (datosLegajo.sede_id) {
@@ -413,10 +427,12 @@ function AltaPersonaWizard() {
           sede_id: Number(datosLegajo.sede_id),
           es_autoridad: Boolean(datosLegajo.es_autoridad),
           es_sede_base: Boolean(datosLegajo.es_sede_base),
-
         };
 
-        await legajosRelacionesService.crearSedeLegajo(nuevoLegajoId, datosSedesPayload);
+        await legajosRelacionesService.crearSedeLegajo(
+          nuevoLegajoId,
+          datosSedesPayload,
+        );
       }
 
       if (contactos.email.trim()) {
@@ -427,7 +443,6 @@ function AltaPersonaWizard() {
             tipo_contacto_id: Number(tipoEmail.id),
             principal: true,
             contacto: contactos.email.trim(),
-
           });
         }
       }
@@ -440,7 +455,6 @@ function AltaPersonaWizard() {
             tipo_contacto_id: Number(tipoCelular.id),
             principal: false,
             contacto: contactos.celular.trim(),
-
           });
         }
       }
@@ -492,7 +506,7 @@ function AltaPersonaWizard() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
-        <BotonVolver ruta="/personas" />
+        <BotonVolver />
 
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
@@ -847,7 +861,7 @@ function AltaPersonaWizard() {
                   type="button"
                   onClick={() => setPasoActual(4)}
                   disabled={guardando}
-                  className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg font-bold hover:bg-slate-300 disabled:opacity-60 transition cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-bold hover:bg-slate-100 disabled:opacity-60 disabled:cursor-not-allowed transition cursor-pointer"
                 >
                   Volver
                 </button>
@@ -855,7 +869,7 @@ function AltaPersonaWizard() {
                   type="button"
                   onClick={confirmarAltaPersona}
                   disabled={guardando || Boolean(personaId)}
-                  className="px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 transition cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed transition cursor-pointer"
                 >
                   {guardando
                     ? "Guardando..."
@@ -876,30 +890,32 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
   const resaltado = activo || completo;
 
   return (
-    <div className="flex flex-1 items-start">
-      <div className="flex flex-col items-center min-w-12">
-        <div
-          className={`w-11 h-11 rounded-full flex items-center justify-center text-base font-extrabold border-2 transition ${resaltado
-              ? "bg-red-700 border-red-700 text-white shadow-sm"
-              : "bg-slate-100 border-slate-300 text-slate-400"
-            }`}
-        >
-          {paso.id}
-        </div>
-        <p
-          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"
-            }`}
-        >
-          {paso.titulo}
-        </p>
-      </div>
-
+    <div className="relative flex min-w-0 flex-1 flex-col items-center">
       {!ultimo && (
         <div
-          className={`h-1 flex-1 rounded-full mt-5 transition ${completo ? "bg-red-700" : "bg-slate-200"
-            }`}
+          className={`absolute left-1/2 right-[-50%] top-4 sm:top-5 h-1 transition-colors ${
+            completo ? "bg-red-700" : "bg-slate-200"
+          }`}
         />
       )}
+
+      <div
+        className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center text-base font-extrabold border-2 transition ${
+          resaltado
+            ? "bg-red-700 border-red-700 text-white shadow-sm"
+            : "bg-slate-100 border-slate-300 text-slate-400"
+        }`}
+      >
+        {paso.id}
+      </div>
+
+      <p
+        className={`hidden md:block w-full px-1 mt-2 text-xs font-extrabold text-center ${
+          resaltado ? "text-red-700" : "text-slate-400"
+        }`}
+      >
+        {paso.titulo}
+      </p>
     </div>
   );
 }
@@ -941,8 +957,9 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "px-4"
-            }`}
+          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+            icono ? "pl-12" : "px-4"
+          }`}
         />
       </div>
     </div>
@@ -1129,13 +1146,15 @@ function ListaRoles({
             return (
               <label
                 key={rol.id_rol}
-                className={`block rounded-xl border p-4 transition ${seleccionado
+                className={`block rounded-xl border p-4 transition ${
+                  seleccionado
                     ? "border-red-500 bg-red-50"
                     : "border-slate-200 bg-white hover:border-slate-300"
-                  } ${deshabilitado
+                } ${
+                  deshabilitado
                     ? "cursor-not-allowed opacity-70"
                     : "cursor-pointer"
-                  }`}
+                }`}
               >
                 <div className="flex items-start gap-3">
                   <input
