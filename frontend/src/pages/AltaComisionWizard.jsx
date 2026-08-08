@@ -37,7 +37,8 @@ const comisionAsignaturaInicial = {
   plan_asignaturas_id: "",
   aula_id: "",
   nombre: "",
-  modalidad: "",
+  vigencia_desde: "",
+  vigencia_hasta: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -175,7 +176,8 @@ function AltaComisionWizard() {
       plan_asignaturas_id: Number(comisionAsignatura.plan_asignaturas_id),
       aula_id: Number(comisionAsignatura.aula_id),
       nombre: comisionAsignatura.nombre.trim(),
-      modalidad: comisionAsignatura.modalidad.trim(),
+      vigencia_desde: comisionAsignatura.vigencia_desde,
+      vigencia_hasta: comisionAsignatura.vigencia_hasta,
       cupo_maximo: Number(comisionAsignatura.cupo_maximo),
       estado: Number(comisionAsignatura.estado),
       modalidadesid: Number(comisionAsignatura.modalidadesid),
@@ -256,7 +258,8 @@ function AltaComisionWizard() {
           aula_id: item.aula_id,
           comision_id: nuevaComisionId,
           nombre: item.nombre,
-          modalidad: item.modalidad,
+          vigencia_desde: item.vigencia_desde,
+          vigencia_hasta: item.vigencia_hasta,
           modalidadesid: item.modalidadesid,
           cupo_maximo: item.cupo_maximo,
           estado: item.estado,
@@ -408,12 +411,18 @@ function AltaComisionWizard() {
                       getLabel={(item) => item.descripcion}
                     />
                     <CampoTexto
-                      label="Horario"
-                      name="modalidad"
-                      value={comisionAsignatura.modalidad}
+                      label="Vigencia desde"
+                      name="vigencia_desde"
+                      value={comisionAsignatura.vigencia_desde}
                       onChange={cambiarComisionAsignatura}
-                      placeholder="Ej: 18:00 a 20:00"
-                      maxLength={45}
+                      type="datetime-local"
+                    />
+                    <CampoTexto
+                      label="Vigencia hasta"
+                      name="vigencia_hasta"
+                      value={comisionAsignatura.vigencia_hasta}
+                      onChange={cambiarComisionAsignatura}
+                      type="datetime-local"
                     />
                     <CampoTexto
                       label="Cupo maximo"
@@ -591,26 +600,23 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
     <div className="relative flex min-w-0 flex-1 flex-col items-center">
       {!ultimo && (
         <div
-          className={`absolute left-1/2 right-[-50%] top-4 sm:top-5 h-1 transition-colors ${
-            completo ? "bg-red-700" : "bg-slate-200"
-          }`}
+          className={`absolute left-1/2 right-[-50%] top-4 sm:top-5 h-1 transition-colors ${completo ? "bg-red-700" : "bg-slate-200"
+            }`}
         />
       )}
 
       <div
-        className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center border-2 transition ${
-          resaltado
+        className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center border-2 transition ${resaltado
             ? "bg-red-700 border-red-700 text-white shadow-sm"
             : "bg-slate-100 border-slate-300 text-slate-400"
-        }`}
+          }`}
       >
         <Icono size={20} />
       </div>
 
       <p
-        className={`hidden md:block w-full px-1 mt-2 text-xs font-extrabold text-center ${
-          resaltado ? "text-red-700" : "text-slate-400"
-        }`}
+        className={`hidden md:block w-full px-1 mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"
+          }`}
       >
         {paso.titulo}
       </p>
@@ -655,7 +661,8 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"}`}
+          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"
+            }`}
         />
       </div>
     </div>
@@ -831,7 +838,8 @@ function validarComisionAsignatura(payload) {
   if (!payload.aula_id) return "Debe seleccionar un aula";
   if (!payload.nombre) return "El nombre es obligatorio";
   if (!payload.modalidadesid) return "La modalidad es obligatoria";
-  if (!payload.modalidad) return "El horario es obligatorio";
+  if (!payload.vigencia_desde) return "La vigencia desde es obligatoria";
+  if (!payload.vigencia_hasta) return "La vigencia hasta es obligatoria";
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
     return "El cupo maximo debe ser mayor a cero";
   if (payload.cupo_maximo > 500)

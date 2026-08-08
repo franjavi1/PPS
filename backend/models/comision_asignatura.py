@@ -34,15 +34,22 @@ class ComisionAsignatura(db.Model):
         nullable=False
     )
 
-    modalidad: Mapped[str] = mapped_column(
-        String(45),
-        nullable=False
-    )
-
     modalidadesid: Mapped[int] = mapped_column(
         "modalidadesid",
         Integer,
         ForeignKey("Modalidades.modalidadesid"),
+        nullable=False
+    )
+    
+    vigencia_desde: Mapped[datetime] = mapped_column(
+        "vigenciaDesde",
+        DateTime,
+        nullable=False
+    )
+    
+    vigencia_hasta: Mapped[datetime] = mapped_column(
+        "vigenciaHasta",
+        DateTime,
         nullable=False
     )
 

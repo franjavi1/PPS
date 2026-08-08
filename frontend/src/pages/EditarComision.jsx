@@ -35,7 +35,8 @@ const nuevaComisionAsignaturaInicial = {
   plan_asignaturas_id: "",
   aula_id: "",
   nombre: "",
-  modalidad: "",
+  vigencia_desde: "",
+  vigencia_hasta: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -220,7 +221,8 @@ function EditarComision() {
       aula_id: Number(nuevaComisionAsignatura.aula_id),
       comision_id: Number(id),
       nombre: nuevaComisionAsignatura.nombre.trim(),
-      modalidad: nuevaComisionAsignatura.modalidad.trim(),
+      vigencia_desde: nuevaComisionAsignatura.vigencia_desde,
+      vigencia_hasta: nuevaComisionAsignatura.vigencia_hasta,
       modalidadesid: Number(nuevaComisionAsignatura.modalidadesid),
       cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo),
       estado: Number(nuevaComisionAsignatura.estado),
@@ -467,12 +469,18 @@ function EditarComision() {
                       getLabel={(item) => item.descripcion}
                     />
                     <CampoTexto
-                      label="Horario"
-                      name="modalidad"
-                      value={nuevaComisionAsignatura.modalidad}
+                      label="Vigencia desde"
+                      name="vigencia_desde"
+                      value={nuevaComisionAsignatura.vigencia_desde}
                       onChange={cambiarNuevaComisionAsignatura}
-                      placeholder="Ej: 18:00 a 20:00"
-                      maxLength={45}
+                      type="datetime-local"
+                    />
+                    <CampoTexto
+                      label="Vigencia hasta"
+                      name="vigencia_hasta"
+                      value={nuevaComisionAsignatura.vigencia_hasta}
+                      onChange={cambiarNuevaComisionAsignatura}
+                      type="datetime-local"
                     />
                     <CampoTexto
                       label="Cupo maximo"
@@ -535,8 +543,8 @@ function EditarComision() {
                               label="Modalidad"
                               value={mapas.modalidades[item.modalidadesid]}
                             />
-
-                            <Dato label="Horario" value={item.modalidad} />
+                            <Dato label="Vigencia desde" value={item.vigencia_desde} />
+                            <Dato label="Vigencia hasta" value={item.vigencia_hasta} />
                             <Dato label="Cupo" value={item.cupo_maximo} />
                             <Dato label="Estado" value={item.estado} />
                           </div>
@@ -761,7 +769,7 @@ function CampoTexto({
           max={max}
           className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
             icono ? "pl-12" : "pl-4"
-          }`}
+            }`}
         />
       </div>
     </div>
@@ -905,8 +913,12 @@ function validarComisionAsignatura(payload) {
     return "La modalidad es obligatoria";
   }
 
-  if (!payload.modalidad) {
-    return "El horario es obligatorio";
+  if (!payload.vigencia_desde) {
+    return "La vigencia desde es obligatoria";
+  }
+
+  if (!payload.vigencia_hasta) {
+    return "La vigencia hasta es obligatoria";
   }
 
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {
