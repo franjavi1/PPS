@@ -13,8 +13,9 @@ class Config:
     AUTH_COMMON_SESSION_TTL = int(os.getenv("AUTH_COMMON_SESSION_TTL", 900)) 
     
     # endpoints publicos que no requieren sesion
+    #Teniamos /health en lugar de health solo...
     AUTH_COMMON_ENDPOINTS_EXCEPTUADOS = [
-        "/health",
+        "health",
         "contactos_bp.get_persona_id_from_mail"
         ]
 

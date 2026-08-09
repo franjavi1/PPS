@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "auth-common"
-version = "0.3.0"
+version = "0.4.0"
 description = "Sesión en Redis, validación antes de cada request y autorización por endpoint, compartido entre microservicios"
 readme = "README.md"
 requires-python = ">=3.12"
