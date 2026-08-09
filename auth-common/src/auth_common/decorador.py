@@ -49,6 +49,8 @@ def validar_sesion():
         return respuesta_api(False, [], "Sesión inválida o expirada", 401)
 
     g.id_usuario = id_usuario
+    g.id_persona = int(sesion["id_persona"])
+    g.id_legajo = int(sesion["id_legajo"]) if sesion.get("id_legajo") else None
     g.acciones = set(sesion["acciones"])
     g.roles = sesion["roles"]
 

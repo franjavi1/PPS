@@ -22,18 +22,18 @@ comisiones_asignaturas_bp = Blueprint(
     url_prefix="/comisiones-asignaturas"
 )
 
-#Devuelve el detalle de comisiones asignaturas para el idlegajo indicado
+# Devuelve las comisiones asignaturas correspondientes al legajo del usuario
+# autenticado. AuthCommon carga g.id_legajo desde la sesion guardada en Redis.
 @comisiones_asignaturas_bp.route("/GetDetalleFromLegajoID", methods=["GET"])
 @requires_permission("planes.comisiones_asignaturas.ver")
 def get_detalle_comision_asignatura():
-    legajoid_param = request.args.get("id") or request.args.get("legajoid")
-    legajoid = None
+    legajoid = getattr(g, "id_legajo", None)
 
-    if legajoid_param:
-        try:
-            legajoid=int(legajoid_param)
-        except ValueError:
-            raise APIError("El ID del legajo debe ser un numero valido.", status=400)
+    if legajoid is None:
+        raise APIError(
+            "El usuario autenticado no tiene un legajo asociado.",
+            status=403,
+        )
     
     comisiones = obtener_comisiones_por_legajo(legajoid)
 
@@ -53,7 +53,6 @@ def get_detalle_comision_asignatura():
         message="Comisiones asignaturas habilitadas obtenidas correctamente",
         status=200
     )
-
 
 @comisiones_asignaturas_bp.route("", methods=["GET"])
 @requires_permission("planes.comisiones_asignaturas.ver")
