@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  ArrowLeft,
   BookMarked,
   BookOpen,
   CalendarDays,
@@ -15,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import { asignaturaService } from "../services/asignaturaService";
 import { modalidadService } from "../services/modalidadService";
 import { paCorrelativaService } from "../services/paCorrelativaService";
@@ -188,7 +188,6 @@ function EditarPlan() {
       duracion: nuevaAsignatura.duracion !== "" ? Number(nuevaAsignatura.duracion) : null,
       regimen: nuevaAsignatura.regimen.trim(),
       modalidad: nuevaAsignatura.modalidad.trim(),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarAsignatura(payload);
@@ -242,7 +241,6 @@ function EditarPlan() {
     const payload = {
       pa_id: Number(nuevaCorrelativa.pa_id),
       asignatura_id: Number(nuevaCorrelativa.asignatura_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarCorrelativa(
@@ -369,7 +367,7 @@ function EditarPlan() {
         descrip: descrip || null,
         vigencia_dde: `${plan.vigencia_dde}T00:00:00`,
         vigencia_hta: `${plan.vigencia_hta}T00:00:00`,
-        usuario_accion: 1,
+        
       });
 
       navigate("/planes");
@@ -385,6 +383,7 @@ function EditarPlan() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div className="flex items-start gap-4">
@@ -404,14 +403,6 @@ function EditarPlan() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => navigate("/planes")}
-              className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
-            >
-              <ArrowLeft size={20} />
-              Volver
-            </button>
           </div>
 
           {error && (

@@ -2,6 +2,7 @@ from models.contactos import Contactos
 from models.legajo import Legajo
 from schemas.contactos_schema import ContactosSchema, contacto_schema
 from db import db
+from utils.auditoria import Auditoria
 
 
 """
@@ -19,7 +20,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_contacto = contacto_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_contacto)
     db.session.add(nuevo_contacto)
     db.session.commit()
 
@@ -27,6 +28,7 @@ def crear(datos):
 
 
 def actualizar(contacto, datos):
+    Auditoria.preparar_modificacion(contacto)
     schema = ContactosSchema(partial=True)
 
     # Evita que la validacion de contacto unico tome como duplicado
@@ -41,6 +43,7 @@ def actualizar(contacto, datos):
 
 
 def eliminar(contacto):
+    Auditoria.preparar_baja(contacto)
     contacto.estado = 0
     db.session.commit()
 

@@ -125,7 +125,6 @@ function Aulas() {
       sedes_id: sedesId,
       aula: nombreAula,
       es_virtual: esVirtual,
-      usuario_accion: 1,
     };
 
     try {
@@ -165,8 +164,9 @@ function Aulas() {
     const sede = sedesPorId[aula.sedes_id] || "";
 
     return (
-      String(aula.aula || "").toLowerCase().includes(textoBusqueda) ||
-      sede.toLowerCase().includes(textoBusqueda)
+      String(aula.aula || "")
+        .toLowerCase()
+        .includes(textoBusqueda) || sede.toLowerCase().includes(textoBusqueda)
     );
   });
 
@@ -175,6 +175,9 @@ function Aulas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver ruta="/planes" />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -285,15 +288,18 @@ function Aulas() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="5" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="5"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       Cargando aulas...
                     </td>
                   </tr>
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
-                    <tr key={aula.id_aula} className="border-b border-slate-200 hover:bg-slate-50">
-                      <Td destacado>{aula.aula}</Td>
-                      <Td>{sedesPorId[aula.sedes_id] || "-"}</Td>
+                    <tr key={aula.id_aula}>
+                      <Td destacado className="border-b border-slate-200 hover:bg-slate-50 break-all">{aula.aula}</Td>
+                      <Td className="truncate max-w-full block">{sedesPorId[aula.sedes_id] || "-"}</Td>
                       <Td><TipoBadge esVirtual={aula.es_virtual} /></Td>
                       <Td><EstadoBadge estado={aula.estado} /></Td>
                       <Td>
@@ -306,7 +312,10 @@ function Aulas() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="5"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       No se encontraron aulas.
                     </td>
                   </tr>
@@ -441,7 +450,37 @@ function CampoSelect({ label, icon, children, ...props }) {
   );
 }
 
+function BotonAccion({ 
+  onClick, 
+  tipo, 
+  disabled = false, 
+  title, 
+  mensajeSinPermiso 
+}) {
+  const esEditar = tipo === "editar";
 
+  const tituloFinal = title || (
+    disabled 
+      ? (mensajeSinPermiso || `No tenés permiso para ${esEditar ? "editar" : "eliminar"}`) 
+      : (esEditar ? "Editar" : "Eliminar")
+  );
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={tituloFinal}
+      className={`h-10 flex items-center justify-center gap-1 font-semibold border rounded-lg transition ${
+        esEditar
+          ? "text-blue-600 border-blue-100 hover:bg-blue-50"
+          : "text-red-600 border-red-100 hover:bg-red-50"
+      } disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white cursor-pointer`}
+    >
+      {esEditar ? <Pencil size={16} /> : <Trash2 size={16} />}
+      {esEditar ? "Editar" : "Eliminar"}
+    </button>
+  );
+}
 
 function Dato({ label, value }) {
   return (
@@ -456,11 +495,13 @@ function TipoBadge({ esVirtual }) {
   const virtual = esVirtual === 1 || esVirtual === true;
 
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
-      virtual
-        ? "bg-blue-100 text-blue-700 border-blue-300"
-        : "bg-slate-100 text-slate-700 border-slate-300"
-    }`}>
+    <span
+      className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
+        virtual
+          ? "bg-blue-100 text-blue-700 border-blue-300"
+          : "bg-slate-100 text-slate-700 border-slate-300"
+      }`}
+    >
       {virtual ? "Virtual" : "Fisica"}
     </span>
   );
@@ -468,11 +509,13 @@ function TipoBadge({ esVirtual }) {
 
 function EstadoBadge({ estado }) {
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
-      estado === 1 || estado === true
-        ? "bg-green-100 text-green-700 border-green-300"
-        : "bg-red-100 text-red-700 border-red-300"
-    }`}>
+    <span
+      className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
+        estado === 1 || estado === true
+          ? "bg-green-100 text-green-700 border-green-300"
+          : "bg-red-100 text-red-700 border-red-300"
+      }`}
+    >
       {estado === 1 || estado === true ? "Activa" : "Inactiva"}
     </span>
   );
@@ -492,7 +535,9 @@ function Th({ children }) {
 
 function Td({ children, destacado }) {
   return (
-    <td className={`px-5 py-5 text-slate-700 ${destacado ? "font-semibold" : ""}`}>
+    <td
+      className={`px-5 py-5 text-slate-700 ${destacado ? "font-semibold" : ""}`}
+    >
       {children}
     </td>
   );

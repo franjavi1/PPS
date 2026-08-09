@@ -19,10 +19,15 @@ class AutoridadComisionSchema(ma.SQLAlchemySchema):
     tipo_autoridad_id = ma.auto_field(required=True, allow_none=False)
     legajo_id = ma.auto_field(required=True, allow_none=False)
     comision_id = ma.auto_field(required=True, allow_none=False)
-    usuario_accion = ma.auto_field(required=False, allow_none=True)
+
     estado = ma.auto_field(dump_only=True)
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
     
     tipo_autoridad = fields.Nested(TipoAutoridadSchema, dump_only=True)
     legajo = fields.Nested(LegajoSchema, dump_only=True)
@@ -48,10 +53,7 @@ class AutoridadComisionSchema(ma.SQLAlchemySchema):
         if ComisionAsignatura.query.filter_by(id_comision_asignatura=value).first() is None:
             raise ValidationError("La comision de asignatura indicada no existe")
 
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value is not None and value <= 0:
-            raise ValidationError("El usuario de accion debe ser un numero entero positivo")
+
 
     @validates_schema
     def validar_relacion_unica(self, data, **kwargs):

@@ -104,7 +104,7 @@ def get_legajo_por_numero():
     return respuesta_api(True, data, "Legajo y persona obtenidos correctamente")
 
 @legajos_bp.route("", methods=["GET"])
-@requires_permission("planes.legajos.ver")
+@requires_permission("planes.legajos.ver", "planes.personas.ver_propio", policy="ANY")
 def get_legajos():
     estado = request.args.get("estado", default=1, type=int)
 
@@ -121,7 +121,7 @@ def get_legajos():
 
 
 @legajos_bp.route("/<int:id>", methods=["GET"])
-@requires_permission("planes.legajos.ver")
+@requires_permission("planes.legajos.ver", "planes.legajos.ver_propio", policy="ANY")
 def get_legajo(id):
     legajo = obtener_por_id(id)
 

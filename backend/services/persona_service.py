@@ -2,6 +2,7 @@ from models.persona import Persona
 from models.legajo import Legajo
 from schemas.persona_schema import PersonaSchema, persona_schema
 from db import db
+from utils.auditoria import Auditoria
 
 
 """
@@ -23,7 +24,7 @@ def obtener_por_id_sin_filtrar_estado(id):
 
 def crear(datos):
     nueva_persona = persona_schema.load(datos)
-
+    Auditoria.preparar_alta(nueva_persona)
     db.session.add(nueva_persona)
     db.session.commit()
 
@@ -31,6 +32,7 @@ def crear(datos):
 
 
 def actualizar(persona, datos):
+    Auditoria.preparar_modificacion(persona)
     schema = PersonaSchema(partial=True)
 
     # Esto sirve para que la validación de documento único
@@ -47,11 +49,11 @@ def actualizar(persona, datos):
 def eliminar(persona):
     # La baja de la persona también deja inactivos sus legajos.
     # Los contactos y datos médicos se conservan como historial.
+    Auditoria.preparar_baja(persona)
     legajos_activos = Legajo.query.filter_by(
         persona_id=persona.id,
         estado=1
     ).all()
-
     for legajo in legajos_activos:
         legajo.estado = 0
 

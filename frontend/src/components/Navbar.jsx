@@ -4,36 +4,7 @@ import useAuth from "../auth/hooks/useAuth";
 //import { hasPermission } from "../auth/utils/permissions";
 import { MENU_ROUTE } from "../api";
 import { LOGIN_ROUTE } from "../auth/config";
-import {
-  BookOpen,
-  BookMarked,
-  BookOpenCheck,
-  Building,
-  Building2,
-  ChevronDown,
-  ChevronsUp,
-  ClipboardList,
-  ClipboardPlus,
-  DoorOpen,
-  FileText,
-  Folder,
-  GitBranch,
-  GraduationCap,
-  Home,
-  IdCard,
-  LogOut,
-  SendToBack,
-  MapPinned,
-  Menu,
-  Phone,
-  Plus,
-  Settings,
-  SquareUserRound,
-  User,
-  Users,
-  X,
-  ShieldUser,
-} from "lucide-react";
+import { BookOpen, BookMarked, BookOpenCheck, Building, Building2, ChevronDown, ChevronsUp, ClipboardList, ClipboardPlus, DoorOpen, FileText, Folder, GitBranch, GraduationCap, Home, IdCard, LogOut, SendToBack, MapPinned, Menu, Phone, Plus, Settings, SquareUserRound, User, Users, X, ShieldUser, } from "lucide-react";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -42,7 +13,9 @@ function Navbar() {
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
   const { hasPermission, hasRole } = useAuth();
-  useEffect(()=>{console.log(currentUserRole)},[currentUserRole])
+  useEffect(() => {
+    console.log(currentUserRole);
+  }, [currentUserRole]);
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
@@ -54,14 +27,11 @@ function Navbar() {
   const handleLogout = () => {
     logout();
     window.location.replace(LOGIN_ROUTE);
-    //closeMenus();
-    
-    //navigate(LOGIN_ROUTE);
   };
 
   const handleVolver = () => {
     window.location.href = MENU_ROUTE;
-  }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -80,12 +50,27 @@ function Navbar() {
   const linkClass =
     "flex items-start gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-red-50 hover:text-red-700 cursor-pointer";
 
+
+  const canShowPersonal =
+    hasPermission("planes.personas.crear") ||
+    hasPermission("planes.personas.editar") ||
+    hasPermission("planes.legajos.editar");
+
+  const canShowEducativa =
+    hasPermission("planes.planes.crear") ||
+    hasPermission("planes.planes.ver") ||
+    hasPermission("planes.asignaturas.ver") ||
+    hasPermission("planes.comisiones.crear") ||
+    hasPermission("planes.comisiones.ver");
+
+  const canShowConfig = hasPermission("planes.config.ver");
+
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md relative z-50">
       <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
         <button
           onClick={() => navigate("/inicio")}
-          className="flex items-center gap-3 text-left cursor-pointer"
+          className="flex min-w-0 items-center gap-3 text-left cursor-pointer"
         >
           <div className="w-20 h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
@@ -112,6 +97,16 @@ function Navbar() {
         </button>
 
         <nav ref={navRef} className="hidden lg:flex items-center gap-1">
+
+          <button
+            type="button"
+            onClick={handleVolver}
+            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
+          >
+            <SendToBack size={17} />
+            Menu Principal
+          </button>
+
           <NavLink
             to="/inicio"
             className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
@@ -120,133 +115,144 @@ function Navbar() {
             Inicio
           </NavLink>
 
-          <Dropdown
-            id="personal"
-            title="Personal"
-            icon={<SquareUserRound size={17} />}
-            openMenu={openMenu}
-            toggleMenu={toggleMenu}
-          >
-            {hasPermission("planes.personas.crear") && (
-              <NavLink
-                to="/alta-persona"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <Plus size={18} />
-
-                <span>
-                  <strong>Nueva persona</strong>
-
-                  <small className="block text-slate-500">
-                    Alta guiada de persona
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.personas.editar") && (
-              <NavLink
-                to="/personas"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <User size={18} />
-                <span>
-                  <strong>Personas</strong>
-                  <small className="block text-slate-500">
-                    Buscar y editar personas
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.legajos.editar") && (
-              <NavLink to="/legajos" className={linkClass} onClick={closeMenus}>
-                <ClipboardList size={18} />
-                <span>
-                  <strong>Ver legajos</strong>
-                  <small className="block text-slate-500">
-                    Buscar y consultar legajos
-                  </small>
-                </span>
-              </NavLink>
-            )}
-          </Dropdown>
-
-          <Dropdown
-            id="planes"
-            title="Gestión educativa"
-            icon={<GraduationCap size={17} />}
-            openMenu={openMenu}
-            toggleMenu={toggleMenu}
-          >
-            {hasPermission("planes.planes.crear") && (
-              <NavLink
-                to="/planes/alta"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <Plus size={18} />
-                <span>
-                  <strong>Nuevo plan</strong>
-                  <small className="block text-slate-500">
-                    Alta guiada de plan
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.planes.ver") && (
-              <NavLink to="/planes" className={linkClass} onClick={closeMenus}>
-                <BookOpen size={18} />
-                <span>
-                  <strong>Planes</strong>
-                  <small className="block text-slate-500">Ver planes</small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.asignaturas.ver") && (
-              <NavLink
-                to="/asignaturas"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <FileText size={18} />
-                <span>
-                  <strong>Asignaturas</strong>
-                  <small className="block text-slate-500">
-                    Materias del sistema
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.comisiones.crear") && (
-              <NavLink
-                to="/comisiones/alta"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <Plus size={18} />
-                <span>
-                  <strong>Nueva comisión</strong>
-                  <small className="block text-slate-500">
-                    Alta guiada de comisión
-                  </small>
-                </span>
-              </NavLink>
-            )}
-            {hasPermission("planes.comisiones.ver") && (
-              <NavLink
-                to="/comisiones"
-                className={linkClass}
-                onClick={closeMenus}
-              >
-                <Users size={18} />
-                <span>
-                  <strong>Comisiones</strong>
-                  <small className="block text-slate-500">Ver comisiones</small>
-                </span>
-              </NavLink>
-            )}
-          </Dropdown>
+          {canShowPersonal && (
+            <Dropdown
+              id="personal"
+              title="Personal"
+              icon={<SquareUserRound size={17} />}
+              openMenu={openMenu}
+              toggleMenu={toggleMenu}
+            >
+              {hasPermission("planes.personas.crear") && (
+                <NavLink
+                  to="/alta-persona"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <Plus size={18} />
+                  <span>
+                    <strong>Nueva persona</strong>
+                    <small className="block text-slate-500">
+                      Alta guiada de persona
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.personas.editar") && (
+                <NavLink
+                  to="/personas"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <User size={18} />
+                  <span>
+                    <strong>Personas</strong>
+                    <small className="block text-slate-500">
+                      Buscar y editar personas
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.legajos.editar") && (
+                <NavLink
+                  to="/legajos"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <ClipboardList size={18} />
+                  <span>
+                    <strong>Ver legajos</strong>
+                    <small className="block text-slate-500">
+                      Buscar y consultar legajos
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+            </Dropdown>
+          )}
+          {canShowEducativa && (
+            <Dropdown
+              id="planes"
+              title="Gestión educativa"
+              icon={<GraduationCap size={17} />}
+              openMenu={openMenu}
+              toggleMenu={toggleMenu}
+            >
+              {hasPermission("planes.planes.crear") && (
+                <NavLink
+                  to="/planes/alta"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <Plus size={18} />
+                  <span>
+                    <strong>Nuevo plan</strong>
+                    <small className="block text-slate-500">
+                      Alta guiada de plan
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.planes.ver") && (
+                <NavLink
+                  to="/planes"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <BookOpen size={18} />
+                  <span>
+                    <strong>Planes</strong>
+                    <small className="block text-slate-500">Ver planes</small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.asignaturas.ver") && (
+                <NavLink
+                  to="/asignaturas"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <FileText size={18} />
+                  <span>
+                    <strong>Asignaturas</strong>
+                    <small className="block text-slate-500">
+                      Materias del sistema
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.comisiones.crear") && (
+                <NavLink
+                  to="/comisiones/alta"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <Plus size={18} />
+                  <span>
+                    <strong>Nueva comisión</strong>
+                    <small className="block text-slate-500">
+                      Alta guiada de comisión
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+              {hasPermission("planes.comisiones.ver") && (
+                <NavLink
+                  to="/comisiones"
+                  className={linkClass}
+                  onClick={closeMenus}
+                >
+                  <Users size={18} />
+                  <span>
+                    <strong>Comisiones</strong>
+                    <small className="block text-slate-500">
+                      Ver comisiones
+                    </small>
+                  </span>
+                </NavLink>
+              )}
+            </Dropdown>
+          )}
           {hasPermission("planes.config.ver") && (
             <Dropdown
               id="config"
@@ -322,14 +328,6 @@ function Navbar() {
               </NavLink>
             </Dropdown>
           )}
-          <button
-            type="button"
-            onClick={handleVolver}
-            className="px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer"
-          >
-            <SendToBack size={17} />
-            Volver
-          </button>
 
           <button
             type="button"
@@ -442,7 +440,6 @@ function Navbar() {
                 >
                   Sedes
                 </MobileLink>
-
                 <MobileLink
                   to="/tipos-sedes"
                   icon={<Building size={20} />}
@@ -450,7 +447,6 @@ function Navbar() {
                 >
                   Tipo de sedes
                 </MobileLink>
-
                 <MobileLink
                   to="/tipos-documentos"
                   icon={<IdCard size={20} />}

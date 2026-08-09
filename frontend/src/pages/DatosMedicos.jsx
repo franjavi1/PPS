@@ -10,7 +10,8 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import BotonVolver from "../components/BotonVolver";
+import {personasService} from "../services/personasService";
 import { datosMedicosService } from "../services/datosMedicosService";
 
 const gruposSanguineos = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -44,7 +45,7 @@ function DatosMedicos() {
 
       const [respuestaDatosMedicos, respuestaPersonas] = await Promise.all([
         datosMedicosService.obtenerTodos(),
-        apiRequest("/personas"),
+        personasService.obtenerTodas(),
       ]);
 
       setDatosMedicos(respuestaDatosMedicos.data || []);
@@ -118,7 +119,6 @@ function DatosMedicos() {
       alergias: formulario.alergias.trim() || null,
       aptitud_fisica: formulario.aptitud_fisica,
       seguro: formulario.seguro,
-      usuario_accion: 1,
     };
 
     try {
@@ -186,6 +186,7 @@ function DatosMedicos() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">

@@ -534,8 +534,6 @@ rol_accion:
       - tipos_contacto.eliminar
   - rol: ALUMNO
     acciones:
-      - planes.ver
-      - comisiones.ver
       - personas.ver_propio
       - legajos.ver_propio
       - datos_medicos.ver_propio

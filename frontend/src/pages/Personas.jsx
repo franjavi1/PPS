@@ -13,9 +13,10 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
-import { apiRequest } from "../api";
 import { personasService } from "../services/personasService";
-import useAuth from "../auth/hooks/useAuth";  
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
+import { legajoService } from "../services/legajoService";
+import useAuth from "../auth/hooks/useAuth";
 //import { hasPermission } from "../auth/utils/permissions"; 
 import { LOGIN_ROUTE } from "../auth/config";
 
@@ -54,8 +55,8 @@ function Personas() {
 
       const [respuestaPersonas, respuestaTiposDocumento, respuestaLegajos] = await Promise.all([
         personasService.obtenerTodas(estadoListado),
-        apiRequest("/tipos-documentos"),
-        apiRequest(`/legajos?estado=${estadoListado}`),
+        tipoDocumentoService.obtenerTodos(),
+        legajoService.obtenerTodosEstado(estadoListado),
       ]);
 
       setPersonas(respuestaPersonas.data || []);
@@ -132,8 +133,7 @@ function Personas() {
       td_id: Number(formulario.td_id),
       nombre: formulario.nombre,
       apellido: formulario.apellido,
-      numero_doc: Number(formulario.numero_doc),
-      usuario_accion: 1,
+      numero_doc: formulario.numero_doc
     };
 
     try {
@@ -212,7 +212,7 @@ function Personas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
-          <BotonVolver ruta="/personas" />
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -262,22 +262,20 @@ function Personas() {
               <button
                 type="button"
                 onClick={() => setEstadoListado(1)}
-                className={`px-5 py-2 rounded-lg font-bold border transition ${
-                  estadoListado === 1
+                className={`px-5 py-2 rounded-lg font-bold border transition ${estadoListado === 1
                     ? "bg-red-700 text-white border-red-700 transition cursor-pointer"
                     : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 transition cursor-pointer"
-                }`}
+                  }`}
               >
                 Activas
               </button>
               <button
                 type="button"
                 onClick={() => setEstadoListado(0)}
-                className={`px-5 py-2 rounded-lg font-bold border transition ${
-                  estadoListado === 0
+                className={`px-5 py-2 rounded-lg font-bold border transition ${estadoListado === 0
                     ? "bg-red-700 text-white border-red-700 transition cursor-pointer"
                     : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 transition cursor-pointer"
-                }`}
+                  }`}
               >
                 Inactivas
               </button>
@@ -451,43 +449,43 @@ function Personas() {
                             Reactivar
                           </button>
                         ) : (
-                        <div className="flex items-center gap-4">
-                          {/* Todos los roles pueden consultar */}
-                          <button
-                            type="button"
-                            onClick={() => navigate(`/personas/${persona.id}`)}
-                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
-                          >
-                            <Eye size={18} />
-                            Ver
-                          </button>
+                          <div className="flex items-center gap-4">
+                            {/* Todos los roles pueden consultar */}
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/personas/${persona.id}`)}
+                              className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
+                            >
+                              <Eye size={18} />
+                              Ver
+                            </button>
 
-                          {/* Se habilita solamente con permiso de edición */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              navigate(`/personas/${persona.id}/editar`)
-                            }
-                            disabled={!hasPermission("planes.personas.editar")}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                          >
-                            <Pencil size={18} />
-                            Editar
-                          </button>
+                            {/* Se habilita solamente con permiso de edición */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                navigate(`/personas/${persona.id}/editar`)
+                              }
+                              disabled={!hasPermission("planes.personas.editar")}
+                              className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                            >
+                              <Pencil size={18} />
+                              Editar
+                            </button>
 
-                          {/* Se habilita solamente con permiso de eliminación */}
-                          <button
-                            type="button"
-                            onClick={() => solicitarConfirmacionPersona(persona, "baja")}
-                            disabled={
-                              !hasPermission("planes.personas.eliminar")
-                            }
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                          >
-                            <Trash2 size={18} />
-                            Dar de baja
-                          </button>
-                        </div>
+                            {/* Se habilita solamente con permiso de eliminación */}
+                            <button
+                              type="button"
+                              onClick={() => solicitarConfirmacionPersona(persona, "baja")}
+                              disabled={
+                                !hasPermission("planes.personas.eliminar")
+                              }
+                              className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                            >
+                              <Trash2 size={18} />
+                              Dar de baja
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>

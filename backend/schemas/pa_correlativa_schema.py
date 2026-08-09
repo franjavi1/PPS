@@ -31,19 +31,16 @@ class PACorrelativaSchema(ma.SQLAlchemySchema):
         }
     )
     estado = ma.auto_field(dump_only=True)
-    usuario_accion = ma.auto_field(
-        required=True,
-        allow_none=False,
-        error_messages={
-            "required": "El usuario de acción es obligatorio",
-            "null": "El usuario de acción no puede ser null",
-            "invalid": "El usuario de acción debe ser un número entero"
-        }
-    )
+
 
     # Fechas administradas por la base de datos.
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     @validates("asignatura_id")
     def validar_asignatura_id(self, value, **kwargs):
@@ -55,10 +52,7 @@ class PACorrelativaSchema(ma.SQLAlchemySchema):
         if value <= 0:
             raise ValidationError("El ID del plan de asignatura debe ser mayor a 0")
 
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError("El usuario de acción debe ser un número entero positivo")
+
 
 # Instancias usadas por las rutas y servicios.
 pa_correlativa_schema = PACorrelativaSchema()

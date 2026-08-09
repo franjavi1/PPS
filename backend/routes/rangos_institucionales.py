@@ -23,7 +23,7 @@ rangos_institucionales_bp = Blueprint(
 
 
 @rangos_institucionales_bp.route("", methods=["GET"])
-@requires_permission("planes.rangos_institucionales.ver")
+@requires_permission("planes.rangos_institucionales.ver", "planes.personas.ver_propio", policy="ANY")
 def get_rangos_institucionales():
     rangos = obtener_todos()
     data = rangos_institucionales_schema.dump(rangos)

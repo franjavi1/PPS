@@ -1,6 +1,8 @@
 from models.asignaturas import Asignaturas
 from schemas.asignaturas_schema import AsignaturasSchema, asignatura_schema
 from db import db
+from utils.auditoria import Auditoria
+
 
 """
 Este archivo contiene la logica de negocio del CRUD de Asignaturas
@@ -14,21 +16,23 @@ def obtener_por_id(id):
 
 def crear(datos):
     nueva_asignatura = asignatura_schema.load(datos)
-
+    Auditoria.preparar_alta(nueva_asignatura)
     db.session.add(nueva_asignatura)
     db.session.commit()
 
     return nueva_asignatura
 
 def actualizar(asignatura, datos):
+    Auditoria.preparar_modificacion(asignatura)
     schema = AsignaturasSchema(partial=True)
     schema.load(datos, instance=asignatura, partial=True)
-
+    
     db.session.commit()
 
     return asignatura
 
 def eliminar(asignatura):
+    Auditoria.preparar_baja(asignatura)
     asignatura.estado = 0
     db.session.commit()
 

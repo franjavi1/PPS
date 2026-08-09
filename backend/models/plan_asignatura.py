@@ -87,26 +87,7 @@ class PlanAsignatura(db.Model):
         default=1
     )
 
-    usuario_accion: Mapped[int] = mapped_column(
-        "usuarioAccion",
-        Integer,
-        nullable=False
-    )
 
-    ts_creacion: Mapped[datetime] = mapped_column(
-        "tsCreacion",
-        DateTime,
-        server_default=func.now(),
-        nullable=False
-    )
-
-    ts_modificacion: Mapped[datetime] = mapped_column(
-        "tsModificacion",
-        DateTime,
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False
-    )
     
     plan = relationship("Planes", backref="plan_asignaturas_items")
     
@@ -116,3 +97,11 @@ class PlanAsignatura(db.Model):
         primaryjoin="and_(PlanAsignatura.id == PACorrelativa.pa_id, PACorrelativa.estado == 1)",
         lazy="joined"
     )
+
+    # --- AUDITORIA ---
+    id_persona_alta: Mapped[int] = mapped_column(Integer, nullable=True)
+    id_persona_modificacion: Mapped[int] = mapped_column(Integer, nullable=True)
+    id_persona_baja: Mapped[int] = mapped_column(Integer, nullable=True)
+    ts_creacion: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(), nullable=True)
+    ts_modificacion: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    ts_baja: Mapped[datetime] = mapped_column(DateTime, nullable=True)

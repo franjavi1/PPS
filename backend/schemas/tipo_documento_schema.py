@@ -35,19 +35,16 @@ class TipoDocumentoSchema(ma.SQLAlchemySchema):
     )
 
     # Usuario que realiza la accion sobre el registro.
-    usuario_accion = ma.auto_field(
-        required=True,
-        allow_none=False,
-        error_messages={
-            "required": "El usuario de acción es obligatorio",
-            "null": "El usuario de acción no puede ser null",
-            "invalid": "El usuario de acción debe ser un número entero"
-        }
-    )
+
     estado = ma.auto_field(dump_only=True)
     # Fechas administradas por la base de datos.
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     # Evita cargar tipos de documento con descripciones repetidas.
     @validates_schema

@@ -10,7 +10,9 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import BotonVolver from "../components/BotonVolver";
+import { personasService } from "../services/personasService";
+import { tipoContactoService } from "../services/tipoContactoService";
 import { contactosService } from "../services/contactosService";
 
 const formularioInicial = {
@@ -43,8 +45,8 @@ function Contactos() {
       const [respuestaContactos, respuestaPersonas, respuestaTiposContacto] =
         await Promise.all([
           contactosService.obtenerTodos(),
-          apiRequest("/personas"),
-          apiRequest("/tipos-contacto"),
+          personasService.obtenerTodas(),
+          tipoContactoService.obtenerTodos(),
         ]);
 
       setContactos(respuestaContactos.data || []);
@@ -117,7 +119,6 @@ function Contactos() {
       tipo_contacto_id: Number(formulario.tipo_contacto_id),
       principal: formulario.principal,
       contacto: formulario.contacto,
-      usuario_accion: 1,
     };
 
     try {
@@ -196,6 +197,7 @@ function Contactos() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">

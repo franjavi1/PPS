@@ -107,7 +107,6 @@ function TipoRangos() {
     const payload = {
       descripcion,
       nivel_jerarquia: nivelJerarquia,
-      usuario_accion: 1,
     };
 
     try {
@@ -150,7 +149,9 @@ function TipoRangos() {
     const textoBusqueda = busqueda.toLowerCase();
 
     return (
-      String(rango.descripcion || "").toLowerCase().includes(textoBusqueda) ||
+      String(rango.descripcion || "")
+        .toLowerCase()
+        .includes(textoBusqueda) ||
       String(rango.nivel_jerarquia || "").includes(textoBusqueda)
     );
   });
@@ -161,7 +162,7 @@ function TipoRangos() {
 
       <main className="max-w-7xl mx-auto px-6 py-10">
         {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
-        <BotonVolver ruta="/planes" />
+        <BotonVolver />
 
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
@@ -248,57 +249,79 @@ function TipoRangos() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <th className="px-5 py-4 text-slate-700 font-bold">Descripcion</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">
+                    Descripcion
+                  </th>
                   <th className="px-5 py-4 text-slate-700 font-bold">Nivel</th>
-                  <th className="px-5 py-4 text-slate-700 font-bold">Acciones</th>
+                  <th className="px-5 py-4 text-slate-700 font-bold">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="3" className="px-5 py-8 text-center text-slate-500">
+                    <td
+                      colSpan="3"
+                      className="px-5 py-8 text-center text-slate-500"
+                    >
                       Cargando tipos de rango...
                     </td>
                   </tr>
                 ) : rangosFiltrados.length > 0 ? (
                   rangosFiltrados.map((rango) => (
-                    <tr key={rango.id} className="border-b border-slate-200 last:border-b-0">
-                      <td className="px-5 py-4 font-semibold text-slate-800">
+                    <tr
+                      key={rango.id}
+                      className="border-b border-slate-200 hover:bg-slate-50"
+                    >
+                      <td className="px-5 py-5 font-semibold text-slate-800">
                         {rango.descripcion}
                       </td>
                       <td className="px-5 py-4 text-slate-600">
                         Nivel {rango.nivel_jerarquia}
                       </td>
                       <td className="px-5 py-4">
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-4">
                           <button
                             type="button"
                             onClick={() => editarRango(rango)}
-                            disabled={!hasPermission("planes.rangos_institucionales.editar")}
+                            disabled={
+                              !hasPermission(
+                                "planes.rangos_institucionales.editar",
+                              )
+                            }
                             title={
-                              hasPermission("planes.rangos_institucionales.editar")
+                              hasPermission(
+                                "planes.rangos_institucionales.editar",
+                              )
                                 ? "Editar rango"
                                 : "No tenés permiso para editar rangos"
                             }
-                            className="h-10 px-3 flex items-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 transition cursor-pointer"
+                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
-                            <Pencil size={16} />
+                            <Pencil size={18} />
                             Editar
                           </button>
 
                           <button
                             type="button"
                             onClick={() => solicitarEliminacion(rango.id)}
-                            disabled={!hasPermission("planes.rangos_institucionales.eliminar")}
+                            disabled={
+                              !hasPermission(
+                                "planes.rangos_institucionales.eliminar",
+                              )
+                            }
                             title={
-                              hasPermission("planes.rangos_institucionales.eliminar")
+                              hasPermission(
+                                "planes.rangos_institucionales.eliminar",
+                              )
                                 ? "Eliminar rango"
                                 : "No tenés permiso para eliminar rangos"
                             }
-                            className="h-10 px-3 flex items-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 transition cursor-pointer"
+                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                           >
-                            <Trash2 size={16} />
+                            <Trash2 size={18} />
                             Eliminar
                           </button>
                         </div>
@@ -307,7 +330,10 @@ function TipoRangos() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="px-5 py-8 text-center text-slate-500">
+                    <td
+                      colSpan="3"
+                      className="px-5 py-8 text-center text-slate-500"
+                    >
                       No se encontraron tipos de rango.
                     </td>
                   </tr>
@@ -319,15 +345,15 @@ function TipoRangos() {
       </main>
 
       {mostrarModal && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-[200] px-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-xl relative">
             <button
               type="button"
               onClick={cerrarModal}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition cursor-pointer"
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
               aria-label="Cerrar modal"
             >
-              <X size={24} />
+              <X size={20} />
             </button>
 
             <h2 className="text-2xl font-extrabold text-slate-800 mb-5">
@@ -362,7 +388,7 @@ function TipoRangos() {
                 <button
                   type="button"
                   onClick={cerrarModal}
-                  className="px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -397,7 +423,9 @@ function TarjetaRango({ rango, onEdit, onDelete }) {
   const { currentUserRole, hasPermission } = useAuth();
   return (
     <article className="border border-slate-200 rounded-xl bg-white p-5 shadow-sm">
-      <p className="text-xs font-bold text-slate-400 uppercase">Tipo de rango</p>
+      <p className="text-xs font-bold text-slate-400 uppercase">
+        Tipo de rango
+      </p>
       <h2 className="text-xl font-extrabold text-slate-800 mt-1">
         {rango.descripcion}
       </h2>
@@ -440,7 +468,14 @@ function TarjetaRango({ rango, onEdit, onDelete }) {
   );
 }
 
-function CampoTexto({ label, name, value, onChange, placeholder, type = "text" }) {
+function CampoTexto({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}) {
   return (
     <div>
       <label className="block text-sm font-bold text-slate-700 mb-2">
