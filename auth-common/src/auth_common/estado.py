@@ -1,8 +1,8 @@
 """
 Acceso al estado que guarda AuthCommon.init_app() (cliente de Redis, TTL,
-endpoints exceptuados) en app.extensions["auth_common"].
+endpoints exceptuados, callback guardar_log) en app.extensions["auth_common"].
 
-Punto único de lectura para decorador.py y sesion_common.py.
+Punto único de lectura para decorador.py, sesion_common.py y auditoria.py.
 """
 
 from flask import current_app

@@ -38,6 +38,7 @@ from models.legajo import Legajo
 from models.rangos_institucionales import RangosInstitucionales
 from models.legajo_rangos import LegajoRangos
 from models.legajo_sedes import LegajoSedes
+from models.modelo_log_auditoria import LogAuditoria
 
 from routes.personas import personas_bp
 from routes.tipos_documentos import tipos_documentos_bp
@@ -69,9 +70,36 @@ app.config.from_object(Config)
 db.init_app(app)
 ma.init_app(app)
 
+def guardar_log(evento):
+    log = LogAuditoria(
+        request_id=evento["request_id"],
+        metodo_http=evento["metodo_http"],
+        endpoint=evento["endpoint"],
+        path=evento["path"],
+        query_params=evento["query_params"],
+        request_body=evento["request_body"],
+        response_body=evento["response_body"],
+        status_code=evento["status_code"],
+        duracion_ms=evento["duracion_ms"],
+        ip_origen=evento["ip_origen"],
+        user_agent=evento["user_agent"],
+        id_usuario=evento["id_usuario"],
+        roles=evento["roles"],
+        error_type=evento["error_type"],
+        error_message=evento["error_message"],
+    )
+    try:
+        db.session.add(log)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+    
 CORS(app)
 
-AuthCommon(app)
+# No mas AuthCommon(app), ahora guardamos el log
+AuthCommon(app, guardar_log=guardar_log)
+
 app.before_request(cargar_id_persona)
 
 @app.route("/health", methods=["GET"])
