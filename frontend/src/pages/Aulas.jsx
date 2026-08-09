@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import BotonVolver from "../components/BotonVolver";
-import ModalConfirmar from "../components/ModalConfirmar";
 import {
   Building2,
   DoorOpen,
@@ -14,9 +12,9 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import ActionButtons from "../components/ActionButtons";
 import { aulaService } from "../services/aulaService";
 import { sedeService } from "../services/sedeService";
-import useAuth from "../auth/hooks/useAuth";
 
 const formularioInicial = {
   sedes_id: "",
@@ -25,7 +23,6 @@ const formularioInicial = {
 };
 
 function Aulas() {
-  const { currentUserRole, hasPermission } = useAuth();
   const [aulas, setAulas] = useState([]);
   const [sedes, setSedes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -35,10 +32,6 @@ function Aulas() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
-
-  // Estado para el modal de borrado
-  const [idAEliminar, setIdAEliminar] = useState(null);
-  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -128,12 +121,6 @@ function Aulas() {
       return;
     }
 
-    const tieneLetras = /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(nombreAula);
-    if (!tieneLetras) {
-      setErrorFormulario("El nombre debe contener al menos una letra valida.");
-      return;
-    }
-
     const payload = {
       sedes_id: sedesId,
       aula: nombreAula,
@@ -157,23 +144,19 @@ function Aulas() {
     }
   }
 
-  function solicitarEliminacion(id) {
-    setIdAEliminar(id);
-  }
+  async function eliminarAula(id) {
+    const confirmar = confirm("Seguro que queres eliminar esta aula?");
 
-  async function confirmarEliminacion() {
-    if (!idAEliminar) return;
+    if (!confirmar) {
+      return;
+    }
 
     try {
-      setEliminando(true);
-      setError("");
-      await aulaService.eliminar(idAEliminar);
-      setIdAEliminar(null);
+      const respuesta = await aulaService.eliminar(id);
+      alert(respuesta.message || "Aula eliminada correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el aula");
-    } finally {
-      setEliminando(false);
     }
   }
 
@@ -192,9 +175,6 @@ function Aulas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
-        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
-        <BotonVolver ruta="/planes" />
-
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -224,12 +204,6 @@ function Aulas() {
 
               <button
                 onClick={abrirNuevaAula}
-                disabled={!hasPermission("planes.aulas.crear")}
-                title={
-                  hasPermission("planes.aulas.crear")
-                    ? "Crear aula"
-                    : "No tenés permiso para crear aulas"
-                }
                 className="flex items-center justify-center gap-2 bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
               >
                 <PlusCircle size={22} />
@@ -273,7 +247,7 @@ function Aulas() {
                       <p className="text-xs font-bold text-slate-400 uppercase">
                         Aula
                       </p>
-                      <h2 className="text-xl font-extrabold text-slate-800 mt-1 break-all">
+                      <h2 className="text-xl font-extrabold text-slate-800 mt-1">
                         {aula.aula}
                       </h2>
                     </div>
@@ -283,18 +257,10 @@ function Aulas() {
 
                   <Dato label="Sede" value={sedesPorId[aula.sedes_id]} />
 
-                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-200">
-                    <BotonAccion
-                      onClick={() => editarAula(aula)}
-                      tipo="editar"
-                      disabled={!hasPermission("planes.aulas.editar")}
-                      mensajeSinPermiso="No tenés permiso para editar aulas"
-                    />
-                    <BotonAccion
-                      onClick={() => solicitarEliminacion(aula.id_aula)}
-                      tipo="eliminar"
-                      disabled={!hasPermission("planes.aulas.eliminar")}
-                      mensajeSinPermiso="No tenés permiso para eliminar aulas"
+                  <div className="mt-5 pt-4 border-t border-slate-200">
+                    <ActionButtons
+                      onEdit={() => editarAula(aula)}
+                      onDelete={() => eliminarAula(aula.id_aula)}
                     />
                   </div>
                 </article>
@@ -325,26 +291,16 @@ function Aulas() {
                   </tr>
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
-                    <tr key={aula.id_aula}>
-                      <Td destacado className="border-b border-slate-200 hover:bg-slate-50 break-all">{aula.aula}</Td>
-                      <Td className="truncate max-w-full block">{sedesPorId[aula.sedes_id] || "-"}</Td>
+                    <tr key={aula.id_aula} className="border-b border-slate-200 hover:bg-slate-50">
+                      <Td destacado>{aula.aula}</Td>
+                      <Td>{sedesPorId[aula.sedes_id] || "-"}</Td>
                       <Td><TipoBadge esVirtual={aula.es_virtual} /></Td>
                       <Td><EstadoBadge estado={aula.estado} /></Td>
                       <Td>
-                        <div className="flex items-center gap-4">
-                          <BotonAccion
-                            onClick={() => editarAula(aula)}
-                            tipo="editar"
-                            disabled={!hasPermission("planes.aulas.editar")}
-                            mensajeSinPermiso="No tenés permiso para editar aulas"
-                          />
-                          <BotonAccion
-                            onClick={() => solicitarEliminacion(aula.id_aula)}
-                            tipo="eliminar"
-                            disabled={!hasPermission("planes.aulas.eliminar")}
-                            mensajeSinPermiso="No tenés permiso para eliminar aulas"
-                          />
-                        </div>
+                        <ActionButtons
+                          onEdit={() => editarAula(aula)}
+                          onDelete={() => eliminarAula(aula.id_aula)}
+                        />
                       </Td>
                     </tr>
                   ))
@@ -441,16 +397,6 @@ function Aulas() {
           )}
         </section>
       </main>
-
-      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
-      <ModalConfirmar
-        isOpen={Boolean(idAEliminar)}
-        titulo="Eliminar aula"
-        mensaje="¿Estás seguro de que querés eliminar esta aula? Esta acción no se puede deshacer."
-        onConfirm={confirmarEliminacion}
-        onCancel={() => setIdAEliminar(null)}
-        cargando={eliminando}
-      />
     </div>
   );
 }
@@ -495,37 +441,7 @@ function CampoSelect({ label, icon, children, ...props }) {
   );
 }
 
-function BotonAccion({ 
-  onClick, 
-  tipo, 
-  disabled = false, 
-  title, 
-  mensajeSinPermiso 
-}) {
-  const esEditar = tipo === "editar";
 
-  const tituloFinal = title || (
-    disabled 
-      ? (mensajeSinPermiso || `No tenés permiso para ${esEditar ? "editar" : "eliminar"}`) 
-      : (esEditar ? "Editar" : "Eliminar")
-  );
-
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      title={tituloFinal}
-      className={`h-10 flex items-center justify-center gap-1 font-semibold border rounded-lg transition ${
-        esEditar
-          ? "text-blue-600 border-blue-100 hover:bg-blue-50"
-          : "text-red-600 border-red-100 hover:bg-red-50"
-      } disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white cursor-pointer`}
-    >
-      {esEditar ? <Pencil size={16} /> : <Trash2 size={16} />}
-      {esEditar ? "Editar" : "Eliminar"}
-    </button>
-  );
-}
 
 function Dato({ label, value }) {
   return (

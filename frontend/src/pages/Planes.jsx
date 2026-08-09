@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import {
   BookOpen,
   CalendarDays,
@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
+import ActionButtons from "../components/ActionButtons";
 import { planService } from "../services/planesService";
 import { tipoPlanesService } from "../services/tipoPlanesService";
 import useAuth from "../auth/hooks/useAuth";
@@ -37,8 +38,6 @@ function Planes() {
   const [tiposPlanes, setTiposPlanes] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
-  const [mostrarModalConfirmacion, setMostrarModalConfirmacion] = useState(false);
-  const [planAEliminar, setPlanAEliminar] = useState(null);
   const [editandoId, setEditandoId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
@@ -158,25 +157,19 @@ function Planes() {
     }
   }
 
-  function solicitarEliminacionPlan(plan) {
-    setPlanAEliminar(plan);
-    setMostrarModalConfirmacion(true);
-  }
+  async function eliminarPlan(id) {
+    const confirmar = confirm("Seguro que queres dar de baja este plan y quitar sus asignaturas asociadas?");
 
-  async function confirmarEliminacionPlan() {
-    if (!planAEliminar) return;
+    if (!confirmar) {
+      return;
+    }
 
     try {
-      const respuesta = await planService.eliminar(planAEliminar.id);
-      setMostrarModalConfirmacion(false);
-      setPlanAEliminar(null);
-      setError("");
-      window.alert?.(respuesta.message || "Plan dado de baja correctamente");
+      const respuesta = await planService.eliminar(id);
+      alert(respuesta.message || "Plan dado de baja correctamente");
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo dar de baja el plan");
-      setMostrarModalConfirmacion(false);
-      setPlanAEliminar(null);
     }
   }
 
@@ -196,7 +189,7 @@ function Planes() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
-         <BotonVolver ruta="/inicio" />
+         <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -297,48 +290,16 @@ function Planes() {
                     </p>
                   )}
 
-                  <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
-                    <button
-                      onClick={() => navigate(`/planes/${plan.id}`)}
-                      disabled={!hasPermission("planes.planes.ver")}
-                      title={
-                        hasPermission("planes.planes.ver")
-                          ? "Ver plan"
-                          : "No tenés permiso para ver planes"
-                      }
-                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer"
-                    >
-                      <Eye size={16} />
-                      Ver
-                    </button>
-
-                    <button
-                      onClick={() => editarPlan(plan)}
-                      disabled={!hasPermission("planes.planes.editar")}
-                      title={
-                        hasPermission("planes.planes.editar")
-                          ? "Editar plan"
-                          : "No tenés permiso para editar planes"
-                      }
-                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
-                    >
-                      <Pencil size={16} />
-                      Editar
-                    </button>
-
-                    <button
-                      onClick={() => eliminarPlan(plan.id)}
-                      disabled={!hasPermission("planes.planes.eliminar")}
-                      title={
-                        hasPermission("planes.planes.eliminar")
-                          ? "Eliminar plan"
-                          : "No tenés permiso para eliminar planes"
-                      }
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
-                    >
-                      <Trash2 size={16} />
-                      Dar de baja
-                    </button>
+                  <div className="mt-5 pt-4 border-t border-slate-200">
+                    <ActionButtons
+                      onView={() => navigate(`/planes/${plan.id}`)}
+                      canView={hasPermission("planes.planes.ver")}
+                      onEdit={() => editarPlan(plan)}
+                      canEdit={hasPermission("planes.planes.editar")}
+                      onDelete={() => eliminarPlan(plan.id)}
+                      canDelete={hasPermission("planes.planes.eliminar")}
+                      titleDelete="Dar de baja"
+                    />
                   </div>
                 </article>
               ))
@@ -388,43 +349,15 @@ function Planes() {
                         <EstadoBadge estado={plan.estado} />
                       </td>
                       <td className="px-5 py-5">
-                        <div className="flex items-center gap-4">
-                          <button
-                            onClick={() => navigate(`/planes/${plan.id}`)}
-                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
-                          >
-                            <Eye size={18} />
-                            Ver
-                          </button>
-
-                          <button
-                            onClick={() => editarPlan(plan)}
-                            disabled={!hasPermission("planes.planes.editar")}
-                            title={
-                              hasPermission("planes.planes.editar")
-                                ? "Editar plan"
-                                : "No tenés permiso para editar planes"
-                            }
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                          >
-                            <Pencil size={18} />
-                            Editar
-                          </button>
-
-                          <button
-                            onClick={() => solicitarEliminacionPlan(plan)}
-                            disabled={!hasPermission("planes.planes.eliminar")}
-                            title={
-                              hasPermission("planes.planes.eliminar")
-                                ? "Eliminar plan"
-                                : "No tenés permiso para eliminar planes"
-                            }
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                          >
-                            <Trash2 size={18} />
-                            Dar de baja
-                          </button>
-                        </div>
+                        <ActionButtons
+                          onView={() => navigate(`/planes/${plan.id}`)}
+                          canView={hasPermission("planes.planes.ver")}
+                          onEdit={() => editarPlan(plan)}
+                          canEdit={hasPermission("planes.planes.editar")}
+                          onDelete={() => eliminarPlan(plan.id)}
+                          canDelete={hasPermission("planes.planes.eliminar")}
+                          titleDelete="Dar de baja"
+                        />
                       </td>
                     </tr>
                   ))
@@ -438,53 +371,6 @@ function Planes() {
               </tbody>
             </table>
           </div>
-
-          {mostrarModalConfirmacion && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative">
-                <button
-                  onClick={() => {
-                    setMostrarModalConfirmacion(false);
-                    setPlanAEliminar(null);
-                  }}
-                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
-                  title="Cerrar modal"
-                >
-                  <X size={20} />
-                </button>
-
-                <h2 className="text-xl font-extrabold text-slate-800 mb-3">
-                  Dar de baja plan
-                </h2>
-                <p className="text-slate-600 mb-6">
-                  ¿Seguro que querés dar de baja este plan y quitar sus asignaturas asociadas?
-                </p>
-
-                <div className="flex flex-col sm:flex-row justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMostrarModalConfirmacion(false);
-                      setPlanAEliminar(null);
-                    }}
-                    className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-                  >
-                    <X size={20} />
-                    Cancelar
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={confirmarEliminacionPlan}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
-                  >
-                    <Trash2 size={20} />
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {mostrarModal && (
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

@@ -13,7 +13,7 @@ from marshmallow import ValidationError
 from utils.utilidades import respuesta_api
 import traceback
 from utils.auth import registrar_acciones
-from utils.usuario_sesion import cargar_id_persona
+from utils.usuario_sesion import cargar_datos_sesion
 
 from models.persona import Persona
 from models.tipo_documento import TipoDocumento
@@ -72,7 +72,7 @@ ma.init_app(app)
 CORS(app)
 
 AuthCommon(app)
-app.before_request(cargar_id_persona)
+app.before_request(cargar_datos_sesion)
 
 @app.route("/health", methods=["GET"])
 def health():

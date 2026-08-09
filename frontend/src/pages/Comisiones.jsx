@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import {
   Eye,
   GraduationCap,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
+import ActionButtons from "../components/ActionButtons";
 import { comisionService } from "../services/comisionService";
 import useAuth from "../auth/hooks/useAuth";
 
@@ -27,8 +28,6 @@ function Comisiones() {
   const [comisiones, setComisiones] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
-  const [mostrarModalConfirmacion, setMostrarModalConfirmacion] = useState(false);
-  const [comisionAEliminar, setComisionAEliminar] = useState(null);
   const [editandoId, setEditandoId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
@@ -123,24 +122,19 @@ function Comisiones() {
     }
   }
 
-  function solicitarEliminacionComision(comision) {
-    setComisionAEliminar(comision);
-    setMostrarModalConfirmacion(true);
-  }
+  async function eliminarComision(id) {
+    const confirmar = confirm("Seguro que queres eliminar esta comision?");
 
-  async function confirmarEliminacionComision() {
-    if (!comisionAEliminar) return;
+    if (!confirmar) {
+      return;
+    }
 
     try {
-      const respuesta = await comisionService.eliminar(comisionAEliminar.id_comision);
-      setMostrarModalConfirmacion(false);
-      setComisionAEliminar(null);
-      window.alert?.(respuesta.message || "Comision eliminada correctamente");
+      const respuesta = await comisionService.eliminar(id);
+      alert(respuesta.message || "Comision eliminada correctamente");
       await cargarComisiones();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la comision");
-      setMostrarModalConfirmacion(false);
-      setComisionAEliminar(null);
     }
   }
 
@@ -157,7 +151,7 @@ function Comisiones() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
-        <BotonVolver ruta="/planes" />
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -242,52 +236,18 @@ function Comisiones() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-200">
-                    <button
-                      disabled={!hasPermission("planes.comisiones.ver")}
-                      title={
-                        hasPermission("planes.comisiones.ver")
-                          ? "Ver comision"
-                          : "No tenés permiso para ver comisiones"
-                      }
-                      onClick={() =>
-                        navigate(`/comisiones/${comision.id_comision}`)
-                      }
-                      className="h-10 flex items-center justify-center gap-1 text-slate-600 font-semibold border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer "
-                    >
-                      <Eye size={16} />
-                      Ver
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        navigate(`/comisiones/${comision.id_comision}/editar`)
-                      }
-                      disabled={!hasPermission("planes.comisiones.editar")}
-                      title={
-                        hasPermission("planes.comisiones.editar")
-                          ? "Editar comision"
-                          : "No tenés permiso para editar comisiones"
-                      }
-                      className="h-10 flex items-center justify-center gap-1 text-blue-600 font-semibold border border-blue-100 rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
-                    >
-                      <Pencil size={16} />
-                      Editar
-                    </button>
-
-                    <button
-                      onClick={() => solicitarEliminacionComision(comision)}
-                      disabled={!hasPermission("planes.comisiones.eliminar")}
-                      title={
-                        hasPermission("planes.comisiones.eliminar")
-                          ? "Eliminar comision"
-                          : "No tenés permiso para eliminar comisiones"
-                      }
-                      className="h-10 flex items-center justify-center gap-1 text-red-600 font-semibold border border-red-100 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition cursor-pointer"
-                    >
-                      <Trash2 size={16} />
-                      Eliminar
-                    </button>
+                  <div className="mt-5 pt-4 border-t border-slate-200">
+                    <ActionButtons
+                      onView={() => navigate(`/comisiones/${comision.id_comision}`)}
+                      canView={hasPermission("planes.comisiones.ver")}
+                      titleView={hasPermission("planes.comisiones.ver") ? "Ver comision" : "No tenés permiso para ver comisiones"}
+                      onEdit={() => navigate(`/comisiones/${comision.id_comision}/editar`)}
+                      canEdit={hasPermission("planes.comisiones.editar")}
+                      titleEdit={hasPermission("planes.comisiones.editar") ? "Editar comision" : "No tenés permiso para editar comisiones"}
+                      onDelete={() => eliminarComision(comision.id_comision)}
+                      canDelete={hasPermission("planes.comisiones.eliminar")}
+                      titleDelete={hasPermission("planes.comisiones.eliminar") ? "Eliminar comision" : "No tenés permiso para eliminar comisiones"}
+                    />
                   </div>
                 </article>
               ))
@@ -331,57 +291,17 @@ function Comisiones() {
                         {comision.descripcion}
                       </td>
                       <td className="px-5 py-5">
-                        <div className="flex items-center gap-4">
-                          <button
-                            disabled={!hasPermission("planes.comisiones.ver")}
-                            title={
-                              hasPermission("planes.comisiones.ver")
-                                ? "Ver comision"
-                                : "No tenés permiso para ver comisiones"
-                            }
-                            onClick={() =>
-                              navigate(`/comisiones/${comision.id_comision}`)
-                            }
-                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
-                          >
-                            <Eye size={18} />
-                            Ver
-                          </button>
-
-                          <button
-                            onClick={() =>
-                              navigate(
-                                `/comisiones/${comision.id_comision}/editar`,
-                              )
-                            }
-                            disabled={!hasPermission("planes.comisiones.editar")}
-                            title={
-                              hasPermission("planes.comisiones.editar")
-                                ? "Editar comision"
-                                : "No tenés permiso para editar comisiones"
-                            }
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                          >
-                            <Pencil size={18} />
-                            Editar
-                          </button>
-
-                          <button
-                            onClick={() =>
-                              solicitarEliminacionComision(comision)
-                            }
-                            disabled={!hasPermission("planes.comisiones.eliminar")}
-                            title={
-                              hasPermission("planes.comisiones.eliminar")
-                                ? "Eliminar comision"
-                                : "No tenés permiso para edliminar comisiones"
-                            }
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                          >
-                            <Trash2 size={18} />
-                            Eliminar
-                          </button>
-                        </div>
+                        <ActionButtons
+                          onView={() => navigate(`/comisiones/${comision.id_comision}`)}
+                          canView={hasPermission("planes.comisiones.ver")}
+                          titleView={hasPermission("planes.comisiones.ver") ? "Ver comision" : "No tenés permiso para ver comisiones"}
+                          onEdit={() => navigate(`/comisiones/${comision.id_comision}/editar`)}
+                          canEdit={hasPermission("planes.comisiones.editar")}
+                          titleEdit={hasPermission("planes.comisiones.editar") ? "Editar comision" : "No tenés permiso para editar comisiones"}
+                          onDelete={() => eliminarComision(comision.id_comision)}
+                          canDelete={hasPermission("planes.comisiones.eliminar")}
+                          titleDelete={hasPermission("planes.comisiones.eliminar") ? "Eliminar comision" : "No tenés permiso para eliminar comisiones"}
+                        />
                       </td>
                     </tr>
                   ))
@@ -398,53 +318,6 @@ function Comisiones() {
               </tbody>
             </table>
           </div>
-
-          {mostrarModalConfirmacion && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative">
-                <button
-                  onClick={() => {
-                    setMostrarModalConfirmacion(false);
-                    setComisionAEliminar(null);
-                  }}
-                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
-                  title="Cerrar modal"
-                >
-                  <X size={20} />
-                </button>
-
-                <h2 className="text-xl font-extrabold text-slate-800 mb-3">
-                  Eliminar comision
-                </h2>
-                <p className="text-slate-600 mb-6">
-                  ¿Seguro que querés eliminar esta comision?
-                </p>
-
-                <div className="flex flex-col sm:flex-row justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMostrarModalConfirmacion(false);
-                      setComisionAEliminar(null);
-                    }}
-                    className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-                  >
-                    <X size={20} />
-                    Cancelar
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={confirmarEliminacionComision}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition cursor-pointer"
-                  >
-                    <Trash2 size={20} />
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {mostrarModal && (
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

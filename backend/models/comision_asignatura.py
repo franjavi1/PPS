@@ -59,26 +59,11 @@ class ComisionAsignatura(db.Model):
     )
 
 
-    usuario_accion: Mapped[int | None] = mapped_column(
-        "usuarioAccion",
-        Integer,
-        nullable=True
-    )
 
-    ts_creacion: Mapped[datetime | None] = mapped_column(
-        "tsCreacion",
-        DateTime,
-        server_default=func.now(),
-        nullable=True
-    )
 
-    ts_modificacion: Mapped[datetime | None] = mapped_column(
-        "tsModificacion",
-        DateTime,
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=True
-    )
+
+
+
 
     comision_id: Mapped[int] = mapped_column(
         "idComision",
@@ -96,3 +81,11 @@ class ComisionAsignatura(db.Model):
 
     def __repr__(self):
         return f"<ComisionAsignatura {self.id_comision_asignatura}>"
+
+    # --- AUDITORIA ---
+    id_persona_alta: Mapped[int] = mapped_column(Integer, nullable=True)
+    id_persona_modificacion: Mapped[int] = mapped_column(Integer, nullable=True)
+    id_persona_baja: Mapped[int] = mapped_column(Integer, nullable=True)
+    ts_creacion: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(), nullable=True)
+    ts_modificacion: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    ts_baja: Mapped[datetime] = mapped_column(DateTime, nullable=True)
