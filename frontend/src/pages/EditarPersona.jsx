@@ -113,7 +113,7 @@ function EditarPersona({ soloLectura = false }) {
       // Para los servicios secundarios que pueden dar 403 (como legajos o datos médicos si no eres dueño/admin), los envolvemos en bloques seguros:
       let respuestaLegajos = { data: null };
       try {
-        respuestaLegajos = await legajoService.obtenerPorId(id);
+        respuestaLegajos = await legajoService.obtenerPorIdPersona(id);
       } catch (e) {
         // Si da 403 u otro error porque no tiene permiso al legajo, lo ignoramos de forma segura
       }
