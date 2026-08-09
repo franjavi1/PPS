@@ -17,7 +17,6 @@ from auth_common.estado import obtener_estado
 def clave_sesion(id_usuario):
     return f"session:{id_usuario}"
 
-
 def obtener_sesion(id_usuario):
     estado = obtener_estado()
     datos = estado["redis_client"].hgetall(clave_sesion(id_usuario))
@@ -30,4 +29,5 @@ def obtener_sesion(id_usuario):
         "acciones": json.loads(datos["acciones"]),
         "refresh_jti": datos["refresh_jti"],
         "id_persona": datos["id_persona"],
+        "id_legajo": datos.get("id_legajo") or None,
     }
