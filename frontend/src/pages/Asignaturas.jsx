@@ -14,6 +14,7 @@ import ActionButtons from "../components/ActionButtons";
 import { asignaturaService } from "../services/asignaturaService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import useAuth from "../auth/hooks/useAuth";
+import BotonVolver from "../components/BotonVolver";
 
 const formularioInicial = {
   nombre: "",

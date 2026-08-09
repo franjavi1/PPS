@@ -15,6 +15,7 @@ import Navbar from "../components/Navbar";
 import ActionButtons from "../components/ActionButtons";
 import { aulaService } from "../services/aulaService";
 import { sedeService } from "../services/sedeService";
+import BotonVolver from "../components/BotonVolver";
 
 const formularioInicial = {
   sedes_id: "",
