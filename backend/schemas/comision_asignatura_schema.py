@@ -53,11 +53,6 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
     )
 
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 1a07f7036415a3f67a3ffbbef1805f3fc9eaecb7
     id_persona_alta = ma.auto_field(dump_only=True)
     id_persona_modificacion = ma.auto_field(dump_only=True)
     id_persona_baja= ma.auto_field(dump_only=True)
@@ -93,9 +88,6 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         if value > 500:
             raise ValidationError("El cupo máximo no puede ser mayor a 500")
         
-<<<<<<< HEAD
-
-=======
     @validates_schema
     def validar_vigencias(self, data, **kwargs):
         vigencia_desde = data.get("vigencia_desde")
@@ -118,7 +110,6 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         if vigencia_desde and vigencia_hasta:
             if vigencia_desde >= vigencia_hasta:
                 raise ValueError("La vigencia desde debe ser anterior a la vigencia hasta")
->>>>>>> 1a07f7036415a3f67a3ffbbef1805f3fc9eaecb7
         
     @validates("modalidadesid")
     def validar_modalidad(self, value, **kwargs):
