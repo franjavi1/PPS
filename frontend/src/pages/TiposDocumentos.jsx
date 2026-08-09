@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar";
 import { FileText, Pencil, PlusCircle, Save, Trash2, X } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
 import useAuth from "../auth/hooks/useAuth";
 
 function TiposDocumentos() {
@@ -12,6 +14,10 @@ function TiposDocumentos() {
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
 
+  // Estado para el modal de borrado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
+
   useEffect(() => {
     cargarTipos();
   }, []);
@@ -20,7 +26,7 @@ function TiposDocumentos() {
     try {
       setCargando(true);
       setError("");
-      const respuesta = await apiRequest("/tipos-documentos");
+      const respuesta = await tipoDocumentoService.obtenerTodos();
       setTipos(respuesta.data || []);
     } catch (err) {
       setError(err.message || "No se pudieron obtener los tipos de documento");
@@ -50,22 +56,15 @@ function TiposDocumentos() {
 
     const payload = {
       descripcion: descripcion.trim().toUpperCase(),
-      usuario_accion: 1,
     };
 
     try {
       setError("");
 
       if (editandoId) {
-        await apiRequest(`/tipos-documentos/${editandoId}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
+        await tipoDocumentoService.actualizar(editandoId, payload);
       } else {
-        await apiRequest("/tipos-documentos", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        await tipoDocumentoService.crear(payload);
       }
 
       limpiarFormulario();
@@ -76,21 +75,23 @@ function TiposDocumentos() {
     }
   }
 
-  async function eliminarTipo(id) {
-    const confirmar = confirm("Seguro que queres eliminar este tipo de documento?");
+  function solicitarEliminacion(id) {
+    setIdAEliminar(id);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await apiRequest(`/tipos-documentos/${id}`, {
-        method: "DELETE",
-      });
-      alert(respuesta.message || "Tipo de documento eliminado correctamente");
+      setEliminando(true);
+      setError("");
+      await tipoDocumentoService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarTipos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el tipo de documento");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -99,6 +100,9 @@ function TiposDocumentos() {
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex items-start gap-5 mb-8">
             <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
@@ -205,7 +209,7 @@ function TiposDocumentos() {
                           </button>
 
                           <button
-                            onClick={() => eliminarTipo(tipo.id)}
+                            onClick={() => solicitarEliminacion(tipo.id)}
                             disabled={!hasPermission("planes.tipos_documentos.eliminar")}
                             title={
                               hasPermission("planes.tipos_documentos.eliminar")
@@ -223,7 +227,7 @@ function TiposDocumentos() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-center px-5 py-10 text-slate-500">
+                    <td colSpan="2" className="text-center px-5 py-10 text-slate-500">
                       No hay tipos de documento cargados.
                     </td>
                   </tr>
@@ -233,6 +237,16 @@ function TiposDocumentos() {
           </div>
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Eliminar tipo de documento"
+        mensaje="¿Estás seguro de que querés eliminar este tipo de documento? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }

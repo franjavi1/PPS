@@ -2,6 +2,7 @@ from models.planes import Planes
 from models.plan_asignatura import PlanAsignatura
 from schemas.planes_schema import PlanesSchema, plan_schema
 from db import db
+from utils.auditoria import Auditoria
 
 """
 Este archivo contiene la logica de negocio del CRUD de Planes
@@ -18,7 +19,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_plan = plan_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_plan)
     db.session.add(nuevo_plan)
     db.session.commit()
 
@@ -26,6 +27,7 @@ def crear(datos):
 
 
 def actualizar(plan, datos):
+    Auditoria.preparar_modificacion(plan)
     schema = PlanesSchema(partial=True)
 
     schema.load(datos, instance=plan, partial=True)
@@ -36,6 +38,7 @@ def actualizar(plan, datos):
 
 
 def eliminar(plan):
+    Auditoria.preparar_baja(plan)
     relaciones_activas = PlanAsignatura.query.filter_by(
         plan_id=plan.id,
         estado=1

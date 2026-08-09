@@ -13,9 +13,18 @@ import {
   User,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
 import { contactosService } from "../services/contactosService";
 import { personasService } from "../services/personasService";
+import { rangoService } from "../services/rangoService";
+import { sedeService } from "../services/sedeService";
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
+import { tipoContactoService } from "../services/tipoContactoService";
+import { legajoService } from "../services/legajoService";
+import { datosAuthService } from "../services/datosAuthService";
+import { legajosRelacionesService } from "../services/legajosRelacionesService";
+import { legajoRangosService } from "../services/legajoRangosService";
+import { legajoSedesService } from "../services/legajoSedesService";
+import { datosMedicosService } from "../services/datosMedicosService";
 
 const personaInicial = {
   td_id: "",
@@ -86,47 +95,66 @@ function EditarPersona({ soloLectura = false }) {
       setCargando(true);
       setError("");
 
+      // Hacemos las peticiones principales que SÍ o SÍ necesita la pantalla
       const [
         respuestaPersona,
         respuestaTipos,
-        respuestaLegajos,
-        respuestaDatosMedicos,
-        respuestaRangosAsignados,
-        respuestaSedesAsignadas,
-        respuestaContactos,
         respuestaTiposContacto,
         respuestaRangos,
         respuestaSedes,
       ] = await Promise.all([
         personasService.obtenerPorId(id),
-        apiRequest("/tipos-documentos"),
-        apiRequest("/legajos"),
-        apiRequest("/datos-medicos"),
-        apiRequest("/legajo-rangos"),
-        apiRequest("/legajo-sedes"),
-        contactosService.obtenerTodos(),
-        apiRequest("/tipos-contacto"),
-        apiRequest("/rangos-institucionales"),
-        apiRequest("/sedes"),
+        tipoDocumentoService.obtenerTodos(),
+        tipoContactoService.obtenerTodos(),
+        rangoService.obtenerTodos(),
+        sedeService.obtenerTodas(),
       ]);
 
+      // Para los servicios secundarios que pueden dar 403 (como legajos o datos médicos si no eres dueño/admin), los envolvemos en bloques seguros:
+      let respuestaLegajos = { data: null };
+      try {
+        respuestaLegajos = await legajoService.obtenerPorId(id);
+      } catch (e) {
+        // Si da 403 u otro error porque no tiene permiso al legajo, lo ignoramos de forma segura
+      }
+
+      let respuestaDatosMedicos = { data: null };
+      try {
+        respuestaDatosMedicos = await legajosRelacionesService.obtenerDatosMedicosPorIdPersona(id);
+      } catch (e) {}
+
+      let respuestaRangosAsignados = { data: [] };
+      try {
+        respuestaRangosAsignados = await legajoRangosService.obtenerTodos();
+      } catch (e) {}
+
+      let respuestaSedesAsignadas = { data: [] };
+      try {
+        respuestaSedesAsignadas = await legajoSedesService.obtenerTodos();
+      } catch (e) {}
+
+      let respuestaContactos = { data: [] };
+      try {
+        respuestaContactos = contactosService.obtenerTodos ? await contactosService.obtenerTodos() : { data: [] };
+      } catch (e) {}
+
       const personaData = respuestaPersona.data || {};
-      const legajoData = (respuestaLegajos.data || []).find(
-        (item) => Number(item.persona_id) === Number(id),
-      );
-      const datosMedicosData = (respuestaDatosMedicos.data || []).find(
-        (item) => Number(item.persona_id) === Number(id),
-      );
+      const legajoData = respuestaLegajos.data;
+      const datosMedicosData = respuestaDatosMedicos.data;
+      
       const rangoData = legajoData
         ? (respuestaRangosAsignados.data || []).find(
             (item) => Number(item.legajo_id) === Number(legajoData.id),
           )
         : null;
+
+      const listaSedesAsignadas = respuestaSedesAsignadas.data || [];
       const sedeData = legajoData
-        ? (respuestaSedesAsignadas.data || []).find(
-            (item) => Number(item.legajo_id) === Number(legajoData.id),
+        ? listaSedesAsignadas.find(
+            (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
           )
         : null;
+
       const tiposContactoData = respuestaTiposContacto.data || [];
       const tipoEmail = obtenerTipoContacto(tiposContactoData, "email");
       const tipoCelular = obtenerTipoContacto(tiposContactoData, "celular");
@@ -159,11 +187,13 @@ function EditarPersona({ soloLectura = false }) {
       setRango({
         rangos_institucionales_id: rangoData?.rangos_institucionales_id || "",
       });
+
       setSede({
-        sede_id: sedeData?.sede_id || "",
-        es_autoridad: Boolean(sedeData?.es_autoridad),
-        es_sede_base: sedeData?.es_sede_base ?? true,
+        sede_id: sedeData?.sede_id || sedeData?.sedesId || "",
+        es_autoridad: sedeData ? Boolean(sedeData.es_autoridad) : false,
+        es_sede_base: sedeData ? Boolean(sedeData.es_sede_base) : true,
       });
+
       setContactos({
         email: contactoEmailData?.contacto || "",
         celular: contactoCelularData?.contacto || "",
@@ -259,10 +289,10 @@ function EditarPersona({ soloLectura = false }) {
 
       await personasService.actualizar(id, {
         td_id: Number(persona.td_id),
-        numero_doc: Number(persona.numero_doc),
+        numero_doc: persona.numero_doc.trim(),
         nombre: persona.nombre.trim(),
         apellido: persona.apellido.trim(),
-        usuario_accion: 1,
+
       });
 
       let legajoId = ids.legajoId;
@@ -270,19 +300,13 @@ function EditarPersona({ soloLectura = false }) {
       if (legajo.numero.trim()) {
         const payloadLegajo = {
           numero: legajo.numero.trim(),
-          usuario_accion: 1,
+
         };
 
         if (legajoId) {
-          await apiRequest(`/legajos/${legajoId}`, {
-            method: "PUT",
-            body: JSON.stringify(payloadLegajo),
-          });
+          await legajoService.actualizar(legajoId, payloadLegajo);
         } else {
-          const respuestaLegajo = await apiRequest(`/personas/${id}/legajo`, {
-            method: "POST",
-            body: JSON.stringify(payloadLegajo),
-          });
+          const respuestaLegajo = await legajosRelacionesService.crearLegajoDePersona(id, payloadLegajo);
           legajoId = obtenerIdRespuesta(respuestaLegajo);
         }
       }
@@ -293,38 +317,26 @@ function EditarPersona({ soloLectura = false }) {
           alergias: datosMedicos.alergias.trim() || null,
           aptitud_fisica: Boolean(datosMedicos.aptitud_fisica),
           seguro: datosMedicos.seguro.trim(),
-          usuario_accion: 1,
+
         };
 
         if (ids.datosMedicosId) {
-          await apiRequest(`/datos-medicos/${ids.datosMedicosId}`, {
-            method: "PUT",
-            body: JSON.stringify(payloadDatosMedicos),
-          });
+          await datosMedicosService.actualizar(ids.datosMedicosId, payloadDatosMedicos);
         } else {
-          await apiRequest(`/personas/${id}/datos-medicos`, {
-            method: "POST",
-            body: JSON.stringify(payloadDatosMedicos),
-          });
+          await legajosRelacionesService.crearDatosMedicos(id, payloadDatosMedicos);
         }
       }
 
       if (rango.rangos_institucionales_id && legajoId) {
         const payloadRango = {
           rangos_institucionales_id: Number(rango.rangos_institucionales_id),
-          usuario_accion: 1,
+
         };
 
         if (ids.rangoId) {
-          await apiRequest(`/legajo-rangos/${ids.rangoId}`, {
-            method: "PUT",
-            body: JSON.stringify(payloadRango),
-          });
+          await legajoRangosService.actualizar(ids.rangoId, payloadRango);
         } else {
-          await apiRequest(`/legajos/${legajoId}/rangos`, {
-            method: "POST",
-            body: JSON.stringify(payloadRango),
-          });
+          await legajoRangosService.crearRangoLegajo(legajoId, payloadRango);
         }
       }
 
@@ -333,19 +345,13 @@ function EditarPersona({ soloLectura = false }) {
           sede_id: Number(sede.sede_id),
           es_autoridad: Boolean(sede.es_autoridad),
           es_sede_base: Boolean(sede.es_sede_base),
-          usuario_accion: 1,
+
         };
 
         if (ids.sedeId) {
-          await apiRequest(`/legajo-sedes/${ids.sedeId}`, {
-            method: "PUT",
-            body: JSON.stringify(payloadSede),
-          });
+          await legajoSedesService.actualizar(ids.sedeId, payloadSede);
         } else {
-          await apiRequest(`/legajos/${legajoId}/sedes`, {
-            method: "POST",
-            body: JSON.stringify(payloadSede),
-          });
+          await legajosRelacionesService.crearSedeLegajo(legajoId, payloadSede);
         }
       }
 
@@ -403,7 +409,7 @@ function EditarPersona({ soloLectura = false }) {
 
             <button
               type="button"
-              onClick={() => navigate("/personas")}
+              onClick={() => navigate("/inicio")}
               className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-5 py-3 rounded-lg font-bold hover:bg-slate-100 transition cursor-pointer"
             >
               <ArrowLeft size={20} />
@@ -448,7 +454,6 @@ function EditarPersona({ soloLectura = false }) {
                 <CampoTexto
                   label="Numero de documento"
                   name="numero_doc"
-                  type="number"
                   value={persona.numero_doc}
                   onChange={cambiarPersona}
                   placeholder="Ej: 30123456"
@@ -684,9 +689,8 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
-            icono ? "pl-12" : "px-4"
-          }`}
+          className={`w-full h-14 border border-slate-300 rounded-xl pr-4 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "px-4"
+            }`}
         />
       </div>
     </div>
@@ -741,7 +745,7 @@ function CampoSelectSimple({ label, name, value, onChange, opciones }) {
 
 function CampoCheckbox({ label, name, checked, onChange }) {
   return (
-    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold">
+    <label className="h-14 flex items-center gap-3 border border-slate-300 rounded-xl px-4 text-slate-700 font-bold cursor-pointer">
       <input
         type="checkbox"
         name={name}
@@ -788,7 +792,7 @@ async function guardarContactoPersona({
     tipo_contacto_id: Number(tipoContacto.id),
     principal: Boolean(tipoPrincipal),
     contacto,
-    usuario_accion: 1,
+
   };
 
   if (contactoId) {

@@ -15,7 +15,6 @@ import {
   UserRound,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
@@ -23,6 +22,7 @@ import { comisionAsignaturaService } from "../services/comisionAsignaturaService
 import { comisionService } from "../services/comisionService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
+import {legajoService} from "../services/legajoService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
 import { modalidadService } from "../services/modalidadService";
@@ -35,7 +35,8 @@ const nuevaComisionAsignaturaInicial = {
   plan_asignaturas_id: "",
   aula_id: "",
   nombre: "",
-  modalidad: "",
+  vigencia_desde: "",
+  vigencia_hasta: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -102,7 +103,7 @@ function EditarComision() {
         sedeService.obtenerTodas(),
         aulaService.obtenerTodas(),
         tipoAutoridadService.obtenerTodos(),
-        apiRequest("/legajos"),
+        legajoService.obtenerTodos(),
         modalidadService.obtenerTodas(),
       ]);
 
@@ -202,7 +203,7 @@ function EditarComision() {
 
       await comisionService.actualizar(id, {
         descripcion,
-        usuario_accion: 1,
+        
       });
 
       setMensaje("Comision actualizada correctamente");
@@ -220,11 +221,11 @@ function EditarComision() {
       aula_id: Number(nuevaComisionAsignatura.aula_id),
       comision_id: Number(id),
       nombre: nuevaComisionAsignatura.nombre.trim(),
-      modalidad: nuevaComisionAsignatura.modalidad.trim(),
+      vigencia_desde: nuevaComisionAsignatura.vigencia_desde,
+      vigencia_hasta: nuevaComisionAsignatura.vigencia_hasta,
       modalidadesid: Number(nuevaComisionAsignatura.modalidadesid),
       cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo),
       estado: Number(nuevaComisionAsignatura.estado),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarComisionAsignatura(payload);
@@ -281,7 +282,6 @@ function EditarComision() {
       tipo_autoridad_id: Number(nuevaAutoridad.tipo_autoridad_id),
       legajo_id: Number(nuevaAutoridad.legajo_id),
       comision_id: Number(nuevaAutoridad.comision_id),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarAutoridad(payload);
@@ -469,17 +469,25 @@ function EditarComision() {
                       getLabel={(item) => item.descripcion}
                     />
                     <CampoTexto
-                      label="Horario"
-                      name="modalidad"
-                      value={nuevaComisionAsignatura.modalidad}
+                      label="Vigencia desde"
+                      name="vigencia_desde"
+                      value={nuevaComisionAsignatura.vigencia_desde}
                       onChange={cambiarNuevaComisionAsignatura}
-                      placeholder="Ej: 18:00 a 20:00"
-                      maxLength={45}
+                      type="datetime-local"
+                    />
+                    <CampoTexto
+                      label="Vigencia hasta"
+                      name="vigencia_hasta"
+                      value={nuevaComisionAsignatura.vigencia_hasta}
+                      onChange={cambiarNuevaComisionAsignatura}
+                      type="datetime-local"
                     />
                     <CampoTexto
                       label="Cupo maximo"
                       name="cupo_maximo"
                       type="number"
+                      min="1"
+                      max="500"
                       value={nuevaComisionAsignatura.cupo_maximo}
                       onChange={cambiarNuevaComisionAsignatura}
                       placeholder="Ej: 30"
@@ -535,8 +543,8 @@ function EditarComision() {
                               label="Modalidad"
                               value={mapas.modalidades[item.modalidadesid]}
                             />
-
-                            <Dato label="Horario" value={item.modalidad} />
+                            <Dato label="Vigencia desde" value={item.vigencia_desde} />
+                            <Dato label="Vigencia hasta" value={item.vigencia_hasta} />
                             <Dato label="Cupo" value={item.cupo_maximo} />
                             <Dato label="Estado" value={item.estado} />
                           </div>
@@ -604,7 +612,8 @@ function EditarComision() {
                       opciones={comisionesAsignaturas}
                       getValue={(item) => item.id_comision_asignatura}
                       getLabel={(item) =>
-                        mapas.planesAsignaturas[item.plan_asignaturas_id] || `Comisión #${item.id_comision_asignatura}`
+                        mapas.planesAsignaturas[item.plan_asignaturas_id] ||
+                        `Comisión #${item.id_comision_asignatura}`
                       }
                     />
                   </div>
@@ -648,7 +657,7 @@ function EditarComision() {
                               {obtenerNombreComisionAsignatura(
                                 item.comision_id,
                                 comisionesAsignaturas,
-                                mapas.planesAsignaturas
+                                mapas.planesAsignaturas,
                               )}
                             </p>
                           </div>
@@ -735,6 +744,8 @@ function CampoTexto({
   icono,
   type = "text",
   maxLength,
+  min,
+  max,
 }) {
   return (
     <div>
@@ -754,7 +765,10 @@ function CampoTexto({
           onChange={onChange}
           placeholder={placeholder}
           maxLength={maxLength}
-          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"
+          min={min}
+          max={max}
+          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
+            icono ? "pl-12" : "pl-4"
             }`}
         />
       </div>
@@ -860,7 +874,16 @@ function obtenerEtiquetaPlanAsignatura(
 }
 
 function obtenerEtiquetaLegajo(legajo) {
-  return legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
+  const numero = legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
+  
+  let nombreCompleto = "";
+  if (legajo?.persona) {
+    nombreCompleto = `${legajo.persona.apellido || ""} ${legajo.persona.nombre || ""}`.trim();
+  } else if (legajo?.apellido || legajo?.nombre) {
+    nombreCompleto = `${legajo.apellido || ""} ${legajo.nombre || ""}`.trim();
+  }
+
+  return nombreCompleto ? `${numero} - ${nombreCompleto}` : numero;
 }
 
 function obtenerNombreComisionAsignatura(id, items, mapaPlanes) {
@@ -890,14 +913,20 @@ function validarComisionAsignatura(payload) {
     return "La modalidad es obligatoria";
   }
 
-  if (!payload.modalidad) {
-    return "El horario es obligatorio";
+  if (!payload.vigencia_desde) {
+    return "La vigencia desde es obligatoria";
+  }
+
+  if (!payload.vigencia_hasta) {
+    return "La vigencia hasta es obligatoria";
   }
 
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {
     return "El cupo maximo debe ser mayor a cero";
   }
-
+  if (payload.cupo_maximo > 500) {
+    return "El cupo maximo no puede ser mayor a 500";
+  }
   if (!payload.estado) {
     return "El estado es obligatorio";
   }
@@ -922,14 +951,35 @@ function validarAutoridad(payload) {
 }
 
 function obtenerMensajeError(err) {
-  const errores = err.errors || {};
-  const primerCampo = Object.keys(errores)[0];
-
-  if (primerCampo && Array.isArray(errores[primerCampo])) {
-    return errores[primerCampo][0];
+  if (typeof err?.message === "string" && err.message.trim()) {
+    return err.message;
   }
 
-  return err.message || "No se pudo completar la operacion";
+  const errores = err?.errors;
+
+  if (typeof errores === "string" && errores.trim()) {
+    return errores;
+  }
+
+  if (errores && typeof errores === "object") {
+    const primerError = Object.values(errores)[0];
+
+    if (Array.isArray(primerError)) {
+      const mensaje = primerError.find(
+        (item) => typeof item === "string" && item.trim(),
+      );
+
+      if (mensaje) {
+        return mensaje;
+      }
+    }
+
+    if (typeof primerError === "string" && primerError.trim()) {
+      return primerError;
+    }
+  }
+
+  return "No se pudo completar la operación";
 }
 
 export default EditarComision;

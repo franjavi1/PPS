@@ -60,19 +60,16 @@ class SedesSchema(ma.SQLAlchemySchema):
     estado = ma.auto_field(dump_only=True)
 
     # Usuario que realiza la accion sobre el registro.
-    usuario_accion = ma.auto_field(
-        required=True,
-        allow_none=False,
-        error_messages={
-            "required": "El usuario de accion es obligatorio",
-            "null": "El usuario de accion no puede ser null",
-            "invalid": "El usuario de accion debe ser un numero entero"
-        }
-    )
+
 
     # Fechas administradas por la base de datos.
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     # Verifica que el tipo de sede exista.
     @validates("tipo_sede_id")
@@ -83,10 +80,7 @@ class SedesSchema(ma.SQLAlchemySchema):
             raise ValidationError("El tipo de sede indicado no existe.")
 
     # Verifica que el usuario informado sea valido.
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError("El usuario de accion debe ser un numero entero positivo")
+
 
     # Limpia los textos recibidos antes de validar y guardar.
     @pre_load

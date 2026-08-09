@@ -5,6 +5,7 @@ from models.persona import Persona
 from schemas.legajo_schema import LegajoSchema, legajo_schema
 from schemas.persona_schema import PersonaSchema
 from db import db
+from utils.auditoria import Auditoria
 from utils.errores import APIError
 
 """
@@ -22,7 +23,7 @@ def obtener_por_id(id):
 
 def crear(datos):
     nuevo_legajo = legajo_schema.load(datos)
-
+    Auditoria.preparar_alta(nuevo_legajo)
     db.session.add(nuevo_legajo)
     db.session.commit()
 
@@ -30,6 +31,7 @@ def crear(datos):
 
 
 def actualizar(legajo, datos):
+    Auditoria.preparar_modificacion(legajo)
     schema = LegajoSchema(partial=True)
 
     # Evita que la validacion de numero unico tome como duplicado
@@ -44,6 +46,7 @@ def actualizar(legajo, datos):
 
 
 def eliminar(legajo):
+    Auditoria.preparar_baja(legajo)
     legajo.estado = 0
     db.session.commit()
 

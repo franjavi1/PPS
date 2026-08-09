@@ -38,7 +38,7 @@ def get_personas():
 @requires_permission("planes.personas.ver", "planes.personas.ver_propio", policy="ANY")
 def get_persona(id):
     tiene_acceso_total = "planes.personas.ver" in g.acciones
-    es_su_propia_persona = id == g.id_persona
+    es_su_propia_persona = id == getattr(g, "id_persona", None)
 
     if not tiene_acceso_total and not es_su_propia_persona:
         raise APIError("No tenes permiso para ver esta persona", status=403)

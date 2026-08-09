@@ -37,7 +37,8 @@ const comisionAsignaturaInicial = {
   plan_asignaturas_id: "",
   aula_id: "",
   nombre: "",
-  modalidad: "",
+  vigencia_desde: "",
+  vigencia_hasta: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -175,7 +176,8 @@ function AltaComisionWizard() {
       plan_asignaturas_id: Number(comisionAsignatura.plan_asignaturas_id),
       aula_id: Number(comisionAsignatura.aula_id),
       nombre: comisionAsignatura.nombre.trim(),
-      modalidad: comisionAsignatura.modalidad.trim(),
+      vigencia_desde: comisionAsignatura.vigencia_desde,
+      vigencia_hasta: comisionAsignatura.vigencia_hasta,
       cupo_maximo: Number(comisionAsignatura.cupo_maximo),
       estado: Number(comisionAsignatura.estado),
       modalidadesid: Number(comisionAsignatura.modalidadesid),
@@ -240,7 +242,6 @@ function AltaComisionWizard() {
 
       const respuestaComision = await comisionService.crear({
         descripcion: comision.descripcion.trim(),
-        usuario_accion: 1,
       });
 
       const nuevaComisionId = obtenerIdRespuesta(respuestaComision);
@@ -257,11 +258,11 @@ function AltaComisionWizard() {
           aula_id: item.aula_id,
           comision_id: nuevaComisionId,
           nombre: item.nombre,
-          modalidad: item.modalidad,
+          vigencia_desde: item.vigencia_desde,
+          vigencia_hasta: item.vigencia_hasta,
           modalidadesid: item.modalidadesid,
           cupo_maximo: item.cupo_maximo,
           estado: item.estado,
-          usuario_accion: 1,
         });
 
         const idReal = obtenerIdRespuesta(respuesta);
@@ -280,7 +281,6 @@ function AltaComisionWizard() {
           tipo_autoridad_id: item.tipo_autoridad_id,
           legajo_id: item.legajo_id,
           comision_id: idsReales[item.comision_id],
-          usuario_accion: 1,
         });
       }
 
@@ -374,7 +374,7 @@ function AltaComisionWizard() {
                     icono={<BookOpenCheck size={26} />}
                     titulo="Asignaturas de la comision"
                   />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <CampoSelect
                       label="Plan asignatura"
                       name="plan_asignaturas_id"
@@ -411,17 +411,25 @@ function AltaComisionWizard() {
                       getLabel={(item) => item.descripcion}
                     />
                     <CampoTexto
-                      label="Horario"
-                      name="modalidad"
-                      value={comisionAsignatura.modalidad}
+                      label="Vigencia desde"
+                      name="vigencia_desde"
+                      value={comisionAsignatura.vigencia_desde}
                       onChange={cambiarComisionAsignatura}
-                      placeholder="Ej: 18:00 a 20:00"
-                      maxLength={45}
+                      type="datetime-local"
+                    />
+                    <CampoTexto
+                      label="Vigencia hasta"
+                      name="vigencia_hasta"
+                      value={comisionAsignatura.vigencia_hasta}
+                      onChange={cambiarComisionAsignatura}
+                      type="datetime-local"
                     />
                     <CampoTexto
                       label="Cupo maximo"
                       name="cupo_maximo"
                       type="number"
+                      min="1"
+                      max="500"
                       value={comisionAsignatura.cupo_maximo}
                       onChange={cambiarComisionAsignatura}
                       placeholder="Ej: 30"
@@ -475,7 +483,7 @@ function AltaComisionWizard() {
                     icono={<ShieldUser size={26} />}
                     titulo="Autoridades"
                   />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <CampoSelect
                       label="Tipo autoridad"
                       name="tipo_autoridad_id"
@@ -587,25 +595,31 @@ function AltaComisionWizard() {
 function PasoIndicador({ paso, activo, completo, ultimo }) {
   const Icono = paso.icono;
   const resaltado = activo || completo;
+
   return (
-    <div className="flex flex-1 items-start">
-      <div className="flex flex-col items-center min-w-12">
-        <div
-          className={`w-11 h-11 rounded-full flex items-center justify-center border-2 ${resaltado ? "bg-red-700 border-red-700 text-white" : "bg-slate-100 border-slate-300 text-slate-400"}`}
-        >
-          <Icono size={20} />
-        </div>
-        <p
-          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"}`}
-        >
-          {paso.titulo}
-        </p>
-      </div>
+    <div className="relative flex min-w-0 flex-1 flex-col items-center">
       {!ultimo && (
         <div
-          className={`h-1 flex-1 rounded-full mt-5 ${completo ? "bg-red-700" : "bg-slate-200"}`}
+          className={`absolute left-1/2 right-[-50%] top-4 sm:top-5 h-1 transition-colors ${completo ? "bg-red-700" : "bg-slate-200"
+            }`}
         />
       )}
+
+      <div
+        className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center border-2 transition ${resaltado
+            ? "bg-red-700 border-red-700 text-white shadow-sm"
+            : "bg-slate-100 border-slate-300 text-slate-400"
+          }`}
+      >
+        <Icono size={20} />
+      </div>
+
+      <p
+        className={`hidden md:block w-full px-1 mt-2 text-xs font-extrabold text-center ${resaltado ? "text-red-700" : "text-slate-400"
+          }`}
+      >
+        {paso.titulo}
+      </p>
     </div>
   );
 }
@@ -647,7 +661,8 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"}`}
+          className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"
+            }`}
         />
       </div>
     </div>
@@ -782,7 +797,19 @@ function obtenerEtiquetaPlanAsignatura(
 }
 
 function obtenerEtiquetaLegajo(legajo) {
-  return legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
+  const numero = legajo?.numero
+    ? `Nro. ${legajo.numero}`
+    : `Legajo #${legajo?.id}`;
+
+  let nombreCompleto = "";
+  if (legajo?.persona) {
+    nombreCompleto =
+      `${legajo.persona.apellido || ""} ${legajo.persona.nombre || ""}`.trim();
+  } else if (legajo?.apellido || legajo?.nombre) {
+    nombreCompleto = `${legajo.apellido || ""} ${legajo.nombre || ""}`.trim();
+  }
+
+  return nombreCompleto ? `${numero} - ${nombreCompleto}` : numero;
 }
 
 function obtenerEtiquetaComisionAsignaturaCargada(id, items) {
@@ -811,9 +838,12 @@ function validarComisionAsignatura(payload) {
   if (!payload.aula_id) return "Debe seleccionar un aula";
   if (!payload.nombre) return "El nombre es obligatorio";
   if (!payload.modalidadesid) return "La modalidad es obligatoria";
-  if (!payload.modalidad) return "El horario es obligatorio";
+  if (!payload.vigencia_desde) return "La vigencia desde es obligatoria";
+  if (!payload.vigencia_hasta) return "La vigencia hasta es obligatoria";
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
     return "El cupo maximo debe ser mayor a cero";
+  if (payload.cupo_maximo > 500)
+    return "El cupo maximo no puede ser mayor a 500";
   return "";
 }
 
@@ -834,11 +864,34 @@ function obtenerIdRespuesta(respuesta) {
 }
 
 function obtenerMensajeError(err) {
-  const errores = err.errors || {};
-  const primerCampo = Object.keys(errores)[0];
-  if (primerCampo && Array.isArray(errores[primerCampo]))
-    return errores[primerCampo][0];
-  return err.message || "No se pudo completar la operacion";
-}
+  if (typeof err?.message === "string" && err.message.trim()) {
+    return err.message;
+  }
 
+  const errores = err?.errors;
+
+  if (typeof errores === "string" && errores.trim()) {
+    return errores;
+  }
+
+  if (errores && typeof errores === "object") {
+    const primerError = Object.values(errores)[0];
+
+    if (Array.isArray(primerError)) {
+      const mensaje = primerError.find(
+        (item) => typeof item === "string" && item.trim(),
+      );
+
+      if (mensaje) {
+        return mensaje;
+      }
+    }
+
+    if (typeof primerError === "string" && primerError.trim()) {
+      return primerError;
+    }
+  }
+
+  return "No se pudo completar la operación";
+}
 export default AltaComisionWizard;

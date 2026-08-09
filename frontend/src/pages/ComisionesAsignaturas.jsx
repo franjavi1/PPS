@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
+import BotonVolver from "../components/BotonVolver";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { comisionAsignaturaService } from "../services/comisionAsignaturaService";
@@ -28,7 +29,8 @@ const formularioInicial = {
   aula_id: "",
   comision_id: "",
   nombre: "",
-  modalidad: "",
+  vigencia_desde: "",
+  vigencia_hasta: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -162,7 +164,8 @@ function ComisionesAsignaturas() {
       aula_id: String(registro.aula_id || ""),
       comision_id: String(registro.comision_id || ""),
       nombre: registro.nombre || "",
-      modalidad: registro.modalidad || "",
+      vigencia_desde: registro.vigencia_desde || "",
+      vigencia_hasta: registro.vigencia_hasta || "",
       modalidadesid: String(registro.modalidadesid || ""),
       cupo_maximo: String(registro.cupo_maximo || ""),
       estado: String(registro.estado ?? 1),
@@ -180,11 +183,11 @@ function ComisionesAsignaturas() {
       aula_id: Number(formulario.aula_id),
       comision_id: Number(formulario.comision_id),
       nombre: formulario.nombre.trim(),
-      modalidad: formulario.modalidad.trim(),
+      vigencia_desde: formulario.vigencia_desde,
+      vigencia_hasta: formulario.vigencia_hasta,
       modalidadesid: Number(formulario.modalidadesid),
       cupo_maximo: Number(formulario.cupo_maximo),
       estado: Number(formulario.estado),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarPayload(payload);
@@ -239,7 +242,10 @@ function ComisionesAsignaturas() {
       String(registro.nombre || "")
         .toLowerCase()
         .includes(textoBusqueda) ||
-      String(registro.modalidad || "")
+      String(registro.vigencia_desde || "")
+        .toLowerCase()
+        .includes(textoBusqueda) ||
+      String(registro.vigencia_hasta || "")
         .toLowerCase()
         .includes(textoBusqueda) ||
       planAsignatura.toLowerCase().includes(textoBusqueda) ||
@@ -253,6 +259,7 @@ function ComisionesAsignaturas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -342,8 +349,8 @@ function ComisionesAsignaturas() {
                       label="Modalidad"
                       value={mapas.modalidades[registro.modalidadesid]}
                     />
-
-                    <Dato label="Horario" value={registro.modalidad} />
+                    <Dato label="Vigencia desde" value={registro.vigencia_desde} />
+                    <Dato label="Vigencia hasta" value={registro.vigencia_hasta} />
                     <Dato label="Cupo" value={registro.cupo_maximo} />
                   </div>
 
@@ -374,8 +381,8 @@ function ComisionesAsignaturas() {
                   <Th>Comision</Th>
                   <Th>Plan asignatura</Th>
                   <Th>Aula</Th>
-                  <Th>Modalidad</Th>
-                  <Th>Horario</Th>
+                  <Th>Vigencia desde</Th>
+                  <Th>Vigencia hasta</Th>
                   <Th>Cupo</Th>
                   <Th>Estado</Th>
                   <Th>Acciones</Th>
@@ -409,7 +416,8 @@ function ComisionesAsignaturas() {
                       <Td>
                         {mapas.modalidades[registro.modalidadesid] || "-"}
                       </Td>
-                      <Td>{registro.modalidad || "-"}</Td>
+                      <Td>{registro.vigencia_desde || "-"}</Td>
+                      <Td>{registro.vigencia_hasta || "-"}</Td>
                       <Td>{registro.cupo_maximo}</Td>
                       <Td>
                         <EstadoBadge estado={registro.estado} />
@@ -546,13 +554,21 @@ function ComisionesAsignaturas() {
                     </CampoSelect>
 
                     <CampoInput
-                      label="Horario"
-                      name="modalidad"
-                      value={formulario.modalidad}
+                      label="Vigencia desde"
+                      name="vigencia_desde"
+                      type="date"
+                      value={formulario.vigencia_desde}
                       onChange={manejarCambio}
-                      placeholder="Ej: 18:00 a 20:00"
-                      maxLength={45}
-                      icon={<BookOpenCheck size={20} />}
+                      icon={<Calendar size={20} />}
+                    />
+
+                    <CampoInput
+                      label="Vigencia hasta"
+                      name="vigencia_hasta"
+                      type="date"
+                      value={formulario.vigencia_hasta}
+                      onChange={manejarCambio}
+                      icon={<Calendar size={20} />}
                     />
 
                     <CampoInput
@@ -760,8 +776,12 @@ function validarPayload(payload) {
     return "La modalidad es obligatoria";
   }
 
-  if (!payload.modalidad) {
-    return "El horario es obligatorio";
+  if (!payload.vigencia_desde) {
+    return "La vigencia desde es obligatoria";
+  }
+
+  if (!payload.vigencia_hasta) {
+    return "La vigencia hasta es obligatoria";
   }
 
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {
@@ -776,14 +796,35 @@ function validarPayload(payload) {
 }
 
 function obtenerMensajeError(err) {
-  const errores = err.errors || {};
-  const primerCampo = Object.keys(errores)[0];
-
-  if (primerCampo && Array.isArray(errores[primerCampo])) {
-    return errores[primerCampo][0];
+  if (typeof err?.message === "string" && err.message.trim()) {
+    return err.message;
   }
 
-  return err.message || "No se pudo guardar la comision asignatura";
+  const errores = err?.errors;
+
+  if (typeof errores === "string" && errores.trim()) {
+    return errores;
+  }
+
+  if (errores && typeof errores === "object") {
+    const primerError = Object.values(errores)[0];
+
+    if (Array.isArray(primerError)) {
+      const mensaje = primerError.find(
+        (item) => typeof item === "string" && item.trim(),
+      );
+
+      if (mensaje) {
+        return mensaje;
+      }
+    }
+
+    if (typeof primerError === "string" && primerError.trim()) {
+      return primerError;
+    }
+  }
+
+  return "No se pudo completar la operación";
 }
 
 export default ComisionesAsignaturas;

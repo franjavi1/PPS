@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import BotonVolver from "../components/BotonVolver";
+import ModalConfirmar from "../components/ModalConfirmar";
 import {
   Building2,
   DoorOpen,
@@ -33,6 +35,10 @@ function Aulas() {
   const [error, setError] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  // Estado para el modal de borrado
+  const [idAEliminar, setIdAEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -132,7 +138,6 @@ function Aulas() {
       sedes_id: sedesId,
       aula: nombreAula,
       es_virtual: esVirtual,
-      usuario_accion: 1,
     };
 
     try {
@@ -151,19 +156,23 @@ function Aulas() {
     }
   }
 
-  async function eliminarAula(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta aula?");
+  function solicitarEliminacion(id) {
+    setIdAEliminar(id);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!idAEliminar) return;
 
     try {
-      const respuesta = await aulaService.eliminar(id);
-      alert(respuesta.message || "Aula eliminada correctamente");
+      setEliminando(true);
+      setError("");
+      await aulaService.eliminar(idAEliminar);
+      setIdAEliminar(null);
       await cargarDatos();
     } catch (err) {
       setError(err.message || "No se pudo eliminar el aula");
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -172,8 +181,9 @@ function Aulas() {
     const sede = sedesPorId[aula.sedes_id] || "";
 
     return (
-      String(aula.aula || "").toLowerCase().includes(textoBusqueda) ||
-      sede.toLowerCase().includes(textoBusqueda)
+      String(aula.aula || "")
+        .toLowerCase()
+        .includes(textoBusqueda) || sede.toLowerCase().includes(textoBusqueda)
     );
   });
 
@@ -182,6 +192,9 @@ function Aulas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* BOTÓN VOLVER INCLUIDO AQUÍ */}
+        <BotonVolver />
+
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -278,7 +291,7 @@ function Aulas() {
                       mensajeSinPermiso="No tenés permiso para editar aulas"
                     />
                     <BotonAccion
-                      onClick={() => eliminarAula(aula.id_aula)}
+                      onClick={() => solicitarEliminacion(aula.id_aula)}
                       tipo="eliminar"
                       disabled={!hasPermission("planes.aulas.eliminar")}
                       mensajeSinPermiso="No tenés permiso para eliminar aulas"
@@ -306,17 +319,28 @@ function Aulas() {
               <tbody>
                 {cargando ? (
                   <tr>
-                    <td colSpan="5" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="5"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       Cargando aulas...
                     </td>
                   </tr>
                 ) : aulasFiltradas.length > 0 ? (
                   aulasFiltradas.map((aula) => (
-                    <tr key={aula.id_aula}>
-                      <Td destacado className="border-b border-slate-200 hover:bg-slate-50 break-all">{aula.aula}</Td>
-                      <Td className="truncate max-w-full block">{sedesPorId[aula.sedes_id] || "-"}</Td>
-                      <Td><TipoBadge esVirtual={aula.es_virtual} /></Td>
-                      <Td><EstadoBadge estado={aula.estado} /></Td>
+                    <tr
+                      key={aula.id_aula}
+                      className="border-b border-slate-200 hover:bg-slate-50"
+                    >
+                      <Td destacado>{aula.aula}</Td>
+                      <Td>{sedesPorId[aula.sedes_id] || "-"}</Td>
+
+                      <Td>
+                        <TipoBadge esVirtual={aula.es_virtual} />
+                      </Td>
+                      <Td>
+                        <EstadoBadge estado={aula.estado} />
+                      </Td>
                       <Td>
                         <div className="flex items-center gap-4">
                           <BotonAccion
@@ -326,7 +350,7 @@ function Aulas() {
                             mensajeSinPermiso="No tenés permiso para editar aulas"
                           />
                           <BotonAccion
-                            onClick={() => eliminarAula(aula.id_aula)}
+                            onClick={() => solicitarEliminacion(aula.id_aula)}
                             tipo="eliminar"
                             disabled={!hasPermission("planes.aulas.eliminar")}
                             mensajeSinPermiso="No tenés permiso para eliminar aulas"
@@ -337,7 +361,10 @@ function Aulas() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center px-5 py-10 text-slate-500">
+                    <td
+                      colSpan="5"
+                      className="text-center px-5 py-10 text-slate-500"
+                    >
                       No se encontraron aulas.
                     </td>
                   </tr>
@@ -428,6 +455,16 @@ function Aulas() {
           )}
         </section>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      <ModalConfirmar
+        isOpen={Boolean(idAEliminar)}
+        titulo="Eliminar aula"
+        mensaje="¿Estás seguro de que querés eliminar esta aula? Esta acción no se puede deshacer."
+        onConfirm={confirmarEliminacion}
+        onCancel={() => setIdAEliminar(null)}
+        cargando={eliminando}
+      />
     </div>
   );
 }
@@ -472,20 +509,23 @@ function CampoSelect({ label, icon, children, ...props }) {
   );
 }
 
-function BotonAccion({ 
-  onClick, 
-  tipo, 
-  disabled = false, 
-  title, 
-  mensajeSinPermiso 
+function BotonAccion({
+  onClick,
+  tipo,
+  disabled = false,
+  title,
+  mensajeSinPermiso,
 }) {
   const esEditar = tipo === "editar";
 
-  const tituloFinal = title || (
-    disabled 
-      ? (mensajeSinPermiso || `No tenés permiso para ${esEditar ? "editar" : "eliminar"}`) 
-      : (esEditar ? "Editar" : "Eliminar")
-  );
+  const tituloFinal =
+    title ||
+    (disabled
+      ? mensajeSinPermiso ||
+        `No tenés permiso para ${esEditar ? "editar" : "eliminar"}`
+      : esEditar
+        ? "Editar"
+        : "Eliminar");
 
   return (
     <button
@@ -517,11 +557,13 @@ function TipoBadge({ esVirtual }) {
   const virtual = esVirtual === 1 || esVirtual === true;
 
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
-      virtual
-        ? "bg-blue-100 text-blue-700 border-blue-300"
-        : "bg-slate-100 text-slate-700 border-slate-300"
-    }`}>
+    <span
+      className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
+        virtual
+          ? "bg-blue-100 text-blue-700 border-blue-300"
+          : "bg-slate-100 text-slate-700 border-slate-300"
+      }`}
+    >
       {virtual ? "Virtual" : "Fisica"}
     </span>
   );
@@ -529,11 +571,13 @@ function TipoBadge({ esVirtual }) {
 
 function EstadoBadge({ estado }) {
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
-      estado === 1 || estado === true
-        ? "bg-green-100 text-green-700 border-green-300"
-        : "bg-red-100 text-red-700 border-red-300"
-    }`}>
+    <span
+      className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
+        estado === 1 || estado === true
+          ? "bg-green-100 text-green-700 border-green-300"
+          : "bg-red-100 text-red-700 border-red-300"
+      }`}
+    >
       {estado === 1 || estado === true ? "Activa" : "Inactiva"}
     </span>
   );
@@ -553,7 +597,9 @@ function Th({ children }) {
 
 function Td({ children, destacado }) {
   return (
-    <td className={`px-5 py-5 text-slate-700 ${destacado ? "font-semibold" : ""}`}>
+    <td
+      className={`px-5 py-5 text-slate-700 ${destacado ? "font-semibold" : ""}`}
+    >
       {children}
     </td>
   );

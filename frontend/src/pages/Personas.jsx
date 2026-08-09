@@ -13,9 +13,10 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
-import { apiRequest } from "../api";
 import { personasService } from "../services/personasService";
-import useAuth from "../auth/hooks/useAuth";  
+import { tipoDocumentoService } from "../services/tipoDocumentoService";
+import { legajoService } from "../services/legajoService";
+import useAuth from "../auth/hooks/useAuth";
 //import { hasPermission } from "../auth/utils/permissions"; 
 import { LOGIN_ROUTE } from "../auth/config";
 
@@ -32,6 +33,9 @@ function Personas() {
   const [tiposDocumento, setTiposDocumento] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModalConfirmacion, setMostrarModalConfirmacion] = useState(false);
+  const [personaAccion, setPersonaAccion] = useState(null);
+  const [tipoAccion, setTipoAccion] = useState("baja");
   const [editandoId, setEditandoId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
@@ -51,8 +55,8 @@ function Personas() {
 
       const [respuestaPersonas, respuestaTiposDocumento, respuestaLegajos] = await Promise.all([
         personasService.obtenerTodas(estadoListado),
-        apiRequest("/tipos-documentos"),
-        apiRequest(`/legajos?estado=${estadoListado}`),
+        tipoDocumentoService.obtenerTodos(),
+        legajoService.obtenerTodosEstado(estadoListado),
       ]);
 
       setPersonas(respuestaPersonas.data || []);
@@ -129,8 +133,7 @@ function Personas() {
       td_id: Number(formulario.td_id),
       nombre: formulario.nombre,
       apellido: formulario.apellido,
-      numero_doc: Number(formulario.numero_doc),
-      usuario_accion: 1,
+      numero_doc: formulario.numero_doc
     };
 
     try {
@@ -149,35 +152,30 @@ function Personas() {
     }
   }
 
-  async function eliminarPersona(id) {
-    const confirmar = confirm("Seguro que queres dar de baja esta persona?");
-
-    if (!confirmar) {
-      return;
-    }
-
-    try {
-      const respuesta = await personasService.eliminar(id);
-      alert(respuesta.message || "Persona dada de baja correctamente");
-      await cargarDatos();
-    } catch (err) {
-      setError(err.message || "No se pudo eliminar la persona");
-    }
+  function solicitarConfirmacionPersona(persona, accion) {
+    setPersonaAccion(persona);
+    setTipoAccion(accion);
+    setMostrarModalConfirmacion(true);
   }
 
-  async function reactivarPersona(id) {
-    const confirmar = confirm("Seguro que queres reactivar esta persona?");
-
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarAccionPersona() {
+    if (!personaAccion) return;
 
     try {
-      const respuesta = await personasService.reactivar(id);
-      alert(respuesta.message || "Persona reactivada correctamente");
+      const respuesta =
+        tipoAccion === "reactivar"
+          ? await personasService.reactivar(personaAccion.id)
+          : await personasService.eliminar(personaAccion.id);
+      setMostrarModalConfirmacion(false);
+      setPersonaAccion(null);
+      setTipoAccion("baja");
+      window.alert?.(respuesta.message || (tipoAccion === "reactivar" ? "Persona reactivada correctamente" : "Persona dada de baja correctamente"));
       await cargarDatos();
     } catch (err) {
-      setError(err.message || "No se pudo reactivar la persona");
+      setError(err.message || (tipoAccion === "reactivar" ? "No se pudo reactivar la persona" : "No se pudo eliminar la persona"));
+      setMostrarModalConfirmacion(false);
+      setPersonaAccion(null);
+      setTipoAccion("baja");
     }
   }
 
@@ -214,7 +212,7 @@ function Personas() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
-          <BotonVolver />
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">
@@ -264,22 +262,20 @@ function Personas() {
               <button
                 type="button"
                 onClick={() => setEstadoListado(1)}
-                className={`px-5 py-2 rounded-lg font-bold border transition ${
-                  estadoListado === 1
+                className={`px-5 py-2 rounded-lg font-bold border transition ${estadoListado === 1
                     ? "bg-red-700 text-white border-red-700 transition cursor-pointer"
                     : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 transition cursor-pointer"
-                }`}
+                  }`}
               >
                 Activas
               </button>
               <button
                 type="button"
                 onClick={() => setEstadoListado(0)}
-                className={`px-5 py-2 rounded-lg font-bold border transition ${
-                  estadoListado === 0
+                className={`px-5 py-2 rounded-lg font-bold border transition ${estadoListado === 0
                     ? "bg-red-700 text-white border-red-700 transition cursor-pointer"
                     : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 transition cursor-pointer"
-                }`}
+                  }`}
               >
                 Inactivas
               </button>
@@ -446,50 +442,50 @@ function Personas() {
                         {estadoListado === 0 ? (
                           <button
                             type="button"
-                            onClick={() => reactivarPersona(persona.id)}
+                            onClick={() => solicitarConfirmacionPersona(persona, "reactivar")}
                             className="flex items-center gap-1 text-green-700 font-semibold hover:text-green-900 transition cursor-pointer"
                           >
                             <RefreshCcw size={18} />
                             Reactivar
                           </button>
                         ) : (
-                        <div className="flex items-center gap-4">
-                          {/* Todos los roles pueden consultar */}
-                          <button
-                            type="button"
-                            onClick={() => navigate(`/personas/${persona.id}`)}
-                            className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
-                          >
-                            <Eye size={18} />
-                            Ver
-                          </button>
+                          <div className="flex items-center gap-4">
+                            {/* Todos los roles pueden consultar */}
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/personas/${persona.id}`)}
+                              className="flex items-center gap-1 text-slate-600 font-semibold hover:text-slate-800 transition cursor-pointer"
+                            >
+                              <Eye size={18} />
+                              Ver
+                            </button>
 
-                          {/* Se habilita solamente con permiso de edición */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              navigate(`/personas/${persona.id}/editar`)
-                            }
-                            disabled={!hasPermission("planes.personas.editar")}
-                            className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                          >
-                            <Pencil size={18} />
-                            Editar
-                          </button>
+                            {/* Se habilita solamente con permiso de edición */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                navigate(`/personas/${persona.id}/editar`)
+                              }
+                              disabled={!hasPermission("planes.personas.editar")}
+                              className="flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                            >
+                              <Pencil size={18} />
+                              Editar
+                            </button>
 
-                          {/* Se habilita solamente con permiso de eliminación */}
-                          <button
-                            type="button"
-                            onClick={() => eliminarPersona(persona.id)}
-                            disabled={
-                              !hasPermission("planes.personas.eliminar")
-                            }
-                            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                          >
-                            <Trash2 size={18} />
-                            Dar de baja
-                          </button>
-                        </div>
+                            {/* Se habilita solamente con permiso de eliminación */}
+                            <button
+                              type="button"
+                              onClick={() => solicitarConfirmacionPersona(persona, "baja")}
+                              disabled={
+                                !hasPermission("planes.personas.eliminar")
+                              }
+                              className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                            >
+                              <Trash2 size={18} />
+                              Dar de baja
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -507,6 +503,57 @@ function Personas() {
               </tbody>
             </table>
           </div>
+
+          {mostrarModalConfirmacion && (
+            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xl w-full max-w-md relative">
+                <button
+                  onClick={() => {
+                    setMostrarModalConfirmacion(false);
+                    setPersonaAccion(null);
+                    setTipoAccion("baja");
+                  }}
+                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                  title="Cerrar modal"
+                >
+                  <X size={20} />
+                </button>
+
+                <h2 className="text-xl font-extrabold text-slate-800 mb-3">
+                  {tipoAccion === "reactivar" ? "Reactivar persona" : "Dar de baja persona"}
+                </h2>
+                <p className="text-slate-600 mb-6">
+                  {tipoAccion === "reactivar"
+                    ? "¿Seguro que querés reactivar esta persona?"
+                    : "¿Seguro que querés dar de baja esta persona?"}
+                </p>
+
+                <div className="flex flex-col sm:flex-row justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMostrarModalConfirmacion(false);
+                      setPersonaAccion(null);
+                      setTipoAccion("baja");
+                    }}
+                    className="flex items-center justify-center gap-2 px-5 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                  >
+                    <X size={20} />
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={confirmarAccionPersona}
+                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-bold transition cursor-pointer ${tipoAccion === "reactivar" ? "bg-green-700 text-white hover:bg-green-800" : "bg-red-700 text-white hover:bg-red-800"}`}
+                  >
+                    {tipoAccion === "reactivar" ? <RefreshCcw size={20} /> : <Trash2 size={20} />}
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {mostrarModal && (
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

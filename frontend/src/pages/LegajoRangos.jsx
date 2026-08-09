@@ -10,7 +10,8 @@ import {
   X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import BotonVolver from "../components/BotonVolver";
+import { legajoService } from "../services/legajoService";
 import { rangoService } from "../services/rangoService";
 import { legajoRangosService } from "../services/legajoRangosService";
 
@@ -42,7 +43,7 @@ function LegajoRangos() {
 
       const [respuestaLegajoRangos, respuestaLegajos, respuestaRangos] = await Promise.all([
         legajoRangosService.obtenerTodos(),
-        apiRequest("/legajos"),
+        legajoService.obtenerTodos(),
         rangoService.obtenerTodos(),
       ]);
 
@@ -107,7 +108,6 @@ function LegajoRangos() {
     const payload = {
       legajo_id: Number(formulario.legajo_id),
       rangos_institucionales_id: Number(formulario.rangos_institucionales_id),
-      usuario_accion: 1,
     };
 
     try {
@@ -190,6 +190,7 @@ function LegajoRangos() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
             <div className="flex items-start gap-5">

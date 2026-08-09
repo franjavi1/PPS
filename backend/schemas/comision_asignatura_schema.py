@@ -35,18 +35,14 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
             Length(min=1, max=45, error="El nombre debe tener entre 1 y 45 caracteres")
         ]
     )
-
-    modalidad = ma.auto_field(
-        required=True,
-        allow_none=False,
-        validate=[
-            Length(min=1, max=45, error="El horario debe tener entre 1 y 45 caracteres")
-        ]
-    )
+    
     modalidadesid = ma.auto_field(
-    required=True,
-    allow_none=False
-)
+        required=True,
+        allow_none=False
+    )
+    
+    vigencia_desde = fields.DateTime(required=True, allow_none=False)
+    vigencia_hasta = fields.DateTime(required=True, allow_none=False)
 
     cupo_maximo = ma.auto_field(required=True, allow_none=False)
 
@@ -56,10 +52,13 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         validate=[OneOf([0, 1], error="El estado debe ser 0 o 1")]
     )
 
-    usuario_accion = ma.auto_field(required=False, allow_none=True)
 
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     @validates("plan_asignaturas_id")
     def validar_plan_asignaturas(self, value, **kwargs):
@@ -86,11 +85,31 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
     def validar_cupo_maximo(self, value, **kwargs):
         if value <= 0:
             raise ValidationError("El cupo maximo debe ser mayor a cero")
+        if value > 500:
+            raise ValidationError("El cupo máximo no puede ser mayor a 500")
+        
+    @validates_schema
+    def validar_vigencias(self, data, **kwargs):
+        vigencia_desde = data.get("vigencia_desde")
+        vigencia_hasta = data.get("vigencia_hasta")
 
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value is not None and value <= 0:
-            raise ValidationError("El usuario de accion debe ser un numero entero positivo")
+        if not vigencia_desde:
+            raise ValidationError({"vigencia_desde": ["La vigencia desde es obligatoria"]})
+        
+        if not vigencia_hasta:
+            raise ValidationError({"vigencia_hasta": ["La vigencia hasta es obligatoria"]})
+
+        if vigencia_desde >= vigencia_hasta:
+            raise ValidationError({
+                "vigencia_hasta": ["La vigencia desde debe ser anterior a la vigencia hasta"]
+            })
+
+    # Validación cruzada opcional a nivel de modelo o lógica de inserción
+    @classmethod
+    def validar_rango_fechas(cls, vigencia_desde, vigencia_hasta):
+        if vigencia_desde and vigencia_hasta:
+            if vigencia_desde >= vigencia_hasta:
+                raise ValueError("La vigencia desde debe ser anterior a la vigencia hasta")
         
     @validates("modalidadesid")
     def validar_modalidad(self, value, **kwargs):
@@ -101,10 +120,6 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         estado=1
     ).first()
 
-    if modalidad is None:
-        raise ValidationError(
-            "La modalidad indicada no existe o no esta activa"
-        )
 
     @validates_schema
     def validar_relacion_unica(self, data, **kwargs):
@@ -134,7 +149,7 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
 
     @pre_load
     def normalizar_entrada(self, data, **kwargs):
-        for campo in ["nombre", "modalidad", "estado"]:
+        for campo in ["nombre", "estado"]:
             if campo in data and isinstance(data[campo], str):
                 data[campo] = data[campo].strip()
 

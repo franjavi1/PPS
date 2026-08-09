@@ -84,19 +84,16 @@ class PlanesSchema(ma.SQLAlchemySchema):
     estado = ma.auto_field(dump_only=True)
 
     # Usuario que realiza la accion sobre el registro.
-    usuario_accion = ma.auto_field(
-        required=True,
-        allow_none=False,
-        error_messages={
-            "required": "El usuario de accion es obligatorio",
-            "null": "El usuario de accion no puede ser null",
-            "invalid": "El usuario de accion debe ser un numero entero"
-        }
-    )
+
 
     # Fechas administradas por la base de datos.
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     # Verifica que el tipo de plan exista.
     @validates("tipo_planes_id_tipo_planes")
@@ -106,17 +103,8 @@ class PlanesSchema(ma.SQLAlchemySchema):
         if TipoPlanes.query.get(value) is None:
             raise ValidationError("El tipo de plan indicado no existe.")
 
-    # Verifica que la resolucion ministerial sea valida.
-    @validates("resolucion_ministerial")
-    def validar_resolucion_ministerial(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError("La resolucion ministerial debe ser un numero entero positivo")
-
     # Verifica que el usuario informado sea valido.
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError("El usuario de accion debe ser un numero entero positivo")
+
 
     # Controla que el rango de vigencia sea correcto.
     @validates_schema

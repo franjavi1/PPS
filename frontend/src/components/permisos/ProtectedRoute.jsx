@@ -15,7 +15,7 @@ export default function ProtectedRoute({
     hasPermission,
   } = useAuth();
 
-  // Si esta cargando, mostramos texto visible
+  // Si está cargando, mostramos texto visible
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-slate-100 text-slate-700 font-bold">
@@ -24,23 +24,23 @@ export default function ProtectedRoute({
     );
   }
 
+  // Validamos directamente con el estado del contexto (evitamos lecturas inconsistentes de sessionStorage)
   if (!isAuthenticated) {
-    window.location.replace(LOGIN_ROUTE)
-    return null;
+    return <Navigate to={LOGIN_ROUTE} replace />;
   }
 
-  // Validacion de permisos
+  // Validación de permisos (permite el acceso si AL MENOS UNO coincide)
   if (permissions.length > 0 && !permissions.some((permiso) => hasPermission(permiso))) {
     console.warn("Acceso denegado por permisos. Redirigiendo a:", HOME_ROUTE);
     return <Navigate to={HOME_ROUTE} replace />;
   }
 
-  // Validacion de roles
+  // Validación de roles (permite el acceso si AL MENOS UNO coincide)
   if (roles.length > 0 && !roles.some((rol) => hasRole(rol))) {
     console.warn("Acceso denegado por roles. Redirigiendo a:", HOME_ROUTE);
     return <Navigate to={HOME_ROUTE} replace />;
   }
 
-  // Si todo esta OK, muestra la vista
+  // Si todo está OK, muestra la vista
   return children;
 }

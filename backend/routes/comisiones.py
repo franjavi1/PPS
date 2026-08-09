@@ -14,7 +14,7 @@ from services.comision_service import (
 comisiones_bp = Blueprint("comisiones_bp", __name__, url_prefix="/comisiones")
 
 @comisiones_bp.route("", methods=["GET"])
-@requires_permission("planes.comisiones.ver")
+@requires_permission("planes.comisiones.ver", "planes.personas.ver_propio", policy="ANY")
 def get_comisiones():
     comisiones = obtener_todos()
     data = comisiones_schema.dump(comisiones)

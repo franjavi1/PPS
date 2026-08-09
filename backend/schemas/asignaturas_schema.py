@@ -1,46 +1,38 @@
 from models.asignaturas import Asignaturas
-
-from db import ma
-
+from db import ma, db
 from marshmallow import ValidationError, validates, pre_load, post_dump
 from marshmallow.validate import Length
 
 
 class AsignaturasSchema(ma.SQLAlchemySchema):
-    # Configuracion del schema asociado al modelo.
     class Meta:
         model = Asignaturas
         load_instance = True
 
-    # Campo de solo lectura para las respuestas.
     id = ma.auto_field(dump_only=True)
 
-    # Nombre de la asignatura.
     nombre = ma.auto_field(
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=105,
-                   error="El nombre debe tener entre 1 y 105 caracteres")
+            Length(min=1, max=45,
+                   error="El nombre debe tener entre 1 y 20 caracteres")
         ],
         error_messages={
             "required": "El nombre es obligatorio",
             "null": "El nombre no puede ser null",
             "invalid": "El nombre debe ser un texto valido"
-
         }
     )
 
-    # Estado del registro.
     estado = ma.auto_field(dump_only=True)
 
-    # Formato de cursado de la asignatura.
     formato = ma.auto_field(
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=45,
-                   error="El formato debe tener entre 1 y 45 caracteres")
+            Length(min=1, max=15,
+                   error="El formato debe tener entre 1 y 15 caracteres")
         ],
         error_messages={
             "required": "El formato es obligatorio",
@@ -49,30 +41,23 @@ class AsignaturasSchema(ma.SQLAlchemySchema):
         }
     )
 
-    # Usuario que realiza la accion.
-    usuario_accion = ma.auto_field(
-        required=True,
-        allow_none=False,
-        error_messages={
-            "required": "El usuario de accion es obligatorio",
-            "null": "El usuario de accion no puede ser null",
-            "invalid": "El usuario de accion debe ser un numero entero"
-        }
-    )
-
-    # Fechas manejadas por la base de datos.
-
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
-    # Verifica que el usuario informado sea valido.
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError(
-                "El usuario de accion debe ser un numero entero positivo")
+    @validates("nombre")
+    def validar_nombre_unico(self, value, **kwargs):
+        query = db.session.query(Asignaturas).filter(Asignaturas.nombre == value)
+        
+        if self.instance and getattr(self.instance, 'id', None):
+            query = query.filter(Asignaturas.id != self.instance.id)
+            
+        if query.first():
+            raise ValidationError("Ya existe una asignatura con ese nombre")
 
-    # Limpia los datos recibidos antes de validar y guardar.
 
     @pre_load
     def normalizar_entrada(self, data, **kwargs):
@@ -84,7 +69,6 @@ class AsignaturasSchema(ma.SQLAlchemySchema):
 
         return data
 
-    # Mantiene el formato del nombre al devolver la respuesta.
     @post_dump
     def capitalizar_salida(self, data, **kwargs):
         if "nombre" in data and isinstance(data["nombre"], str):
@@ -96,6 +80,5 @@ class AsignaturasSchema(ma.SQLAlchemySchema):
         return data
 
 
-# Instancias usadas por las rutas y servicios.
 asignatura_schema = AsignaturasSchema()
 asignaturas_schema = AsignaturasSchema(many=True)

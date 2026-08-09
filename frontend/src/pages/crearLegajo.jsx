@@ -7,7 +7,8 @@ import {
   Hash,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { apiRequest } from "../api";
+import {personasService} from "../services/personasService";
+import {legajoService} from "../services/legajoService";
 
 function NuevoLegajo() {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ function NuevoLegajo() {
   const [formulario, setFormulario] = useState({
     persona_id: "",
     numero: "",
-    usuario_accion: 1,
+    
   });
 
   useEffect(() => {
@@ -35,15 +36,14 @@ function NuevoLegajo() {
     try {
       setErrorGeneral("");
 
-      const respuestaPersonas = await apiRequest("/personas");
+      const respuestaPersonas = await personasService.obtenerTodas();
       setPersonas(respuestaPersonas.data || []);
 
       if (editando) {
-        const legajo = await apiRequest(`/legajos/${id}`);
+        const legajo = await legajoService.obtenerPorId(id);
         setFormulario({
           persona_id: legajo.data.persona_id || "",
           numero: legajo.data.numero || "",
-          usuario_accion: legajo.data.usuario_accion || 1,
         });
       }
     } catch (err) {
@@ -96,7 +96,6 @@ function NuevoLegajo() {
     const payload = {
       persona_id: Number(formulario.persona_id),
       numero: String(formulario.numero).trim(),
-      usuario_accion: Number(formulario.usuario_accion) || 1,
     };
 
     try {
@@ -105,15 +104,9 @@ function NuevoLegajo() {
 
       let response;
       if (editando) {
-        await apiRequest(`/legajos/${id}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
+        await legajoService.actualizar(id, payload);
       } else {
-        await apiRequest("/legajos", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        await legajoService.crear(payload);
       }
 
       navigate("/legajos");

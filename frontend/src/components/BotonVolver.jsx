@@ -1,10 +1,16 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-function BotonVolver() {
+function BotonVolver({ ruta, reemplazar = false }) {
   const navigate = useNavigate();
+  const destino = ruta;
 
   function volver() {
+    if (destino) {
+      navigate(destino, { replace: reemplazar });
+      return;
+    }
+
     const posicionHistorial = window.history.state?.idx ?? 0;
 
     if (posicionHistorial > 0) {

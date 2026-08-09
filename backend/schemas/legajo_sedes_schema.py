@@ -50,17 +50,16 @@ class LegajoSedesSchema(ma.SQLAlchemySchema):
     )
     estado = ma.auto_field(dump_only=True)
     # Usuario que realiza la accion sobre el registro.
-    usuario_accion = ma.auto_field(
-        required=False,
-        allow_none=True,
-        error_messages={
-            "invalid": "El usuario de accion debe ser un numero entero"
-        }
-    )
+
 
     # Fechas administradas por la base de datos.
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
     # Indica si esta sede es la base principal del legajo.
     es_sede_base = ma.auto_field(
@@ -90,10 +89,7 @@ class LegajoSedesSchema(ma.SQLAlchemySchema):
             raise ValidationError("El legajo indicado no existe o no esta activo")
 
     # Verifica que el usuario informado sea valido.
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value is not None and value <= 0:
-            raise ValidationError("El usuario de accion debe ser un numero entero positivo")
+
 
     # Evita relaciones repetidas y mas de una sede base para el mismo legajo.
     @validates_schema

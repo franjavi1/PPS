@@ -21,8 +21,8 @@ class PlanAsignaturaSchema(ma.SQLAlchemySchema):
     sedes_id = ma.auto_field(required=True)
     
     presentismo_porc = ma.auto_field(required=True)
-    regularizacion_prom = ma.auto_field(required=True)
-    final_aprobacion = ma.auto_field(required=True)
+    regularizacion_prom = ma.auto_field(required=False)
+    final_aprobacion = ma.auto_field(required=False)
     duracion = ma.auto_field(required=True)
 
     regimen = ma.auto_field(
@@ -37,18 +37,16 @@ class PlanAsignaturaSchema(ma.SQLAlchemySchema):
 
     estado = ma.auto_field(dump_only=True)
 
-    usuario_accion = ma.auto_field(
-        required=True,
-        error_messages={"required": "El usuario de acción es obligatorio"}
-    )
 
+
+    id_persona_alta = ma.auto_field(dump_only=True)
+    id_persona_modificacion = ma.auto_field(dump_only=True)
+    id_persona_baja= ma.auto_field(dump_only=True)
     ts_creacion = ma.auto_field(dump_only=True)
     ts_modificacion = ma.auto_field(dump_only=True)
+    ts_baja = ma.auto_field(dump_only=True)
 
-    @validates("usuario_accion")
-    def validar_usuario_accion(self, value, **kwargs):
-        if value <= 0:
-            raise ValidationError("El usuario de acción debe ser un número entero positivo")
+
 
     @pre_load
     def normalizar_entrada(self, data, **kwargs):

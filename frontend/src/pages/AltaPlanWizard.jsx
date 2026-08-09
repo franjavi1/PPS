@@ -26,7 +26,6 @@ import { rangoService } from "../services/rangoService";
 import { sedeService } from "../services/sedeService";
 import { tipoPlanesService } from "../services/tipoPlanesService";
 
-
 const pasos = [
   { id: 1, titulo: "Plan", icono: BookOpen },
   { id: 2, titulo: "Asignatura", icono: BookMarked },
@@ -130,21 +129,46 @@ function AltaPlanWizard() {
         )?.nombre || "-",
       rango:
         rangos.find(
-          (rango) => Number(rango.id) === Number(asignaturaPlan.rango_minimo_id),
+          (rango) =>
+            Number(rango.id) === Number(asignaturaPlan.rango_minimo_id),
         )?.descripcion || "-",
       sede:
-        sedes.find((sede) => Number(sede.id) === Number(asignaturaPlan.sedes_id))
-          ?.nombre || "-",
+        sedes.find(
+          (sede) => Number(sede.id) === Number(asignaturaPlan.sedes_id),
+        )?.nombre || "-",
     };
   }, [asignaturaPlan, asignaturas, plan, rangos, sedes, tiposPlanes]);
 
   function cambiarPlan(e) {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    // Validación en tiempo real para Resolución Ministerial
+    if (name === "resolucion_ministerial") {
+      value = value.replace(/[^0-9/-]/g, "").slice(0, 14);
+    }
+
     setPlan({ ...plan, [name]: value });
   }
 
   function cambiarAsignaturaPlan(e) {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    // Validación en tiempo real para campos numéricos
+    if (
+      ["presentismo_porc", "regularizacion_prom", "final_aprobacion"].includes(
+        name,
+      )
+    ) {
+      value = value.replace(/[^0-9]/g, ""); // Sólo enteros
+      if (value !== "" && parseInt(value, 10) > 100) {
+        value = "100"; // Máximo 100
+      }
+    } else if (name === "duracion") {
+      value = value.replace(/[^0-9]/g, "").slice(0, 4); // Sólo enteros, máx 4 dígitos
+    } else if (name === "regimen") {
+      value = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "").slice(0, 20); // Sólo letras y espacios, máx 20 chars
+    }
+
     setAsignaturaPlan({ ...asignaturaPlan, [name]: value });
   }
 
@@ -157,7 +181,7 @@ function AltaPlanWizard() {
     e.preventDefault();
 
     const tipoPlanId = Number(plan.tipo_planes_id_tipo_planes);
-    const resolucionMinisterial = Number(plan.resolucion_ministerial);
+    const resolucionMinisterial = plan.resolucion_ministerial.trim();
     const nombre = plan.nombre.trim();
 
     if (!tipoPlanId) {
@@ -165,8 +189,8 @@ function AltaPlanWizard() {
       return;
     }
 
-    if (!resolucionMinisterial || resolucionMinisterial <= 0) {
-      setError("La resolucion ministerial debe ser un numero positivo");
+    if (!resolucionMinisterial) {
+      setError("La resolucion ministerial no puede estar vacía");
       return;
     }
 
@@ -218,13 +242,22 @@ function AltaPlanWizard() {
       asignatura_id: Number(asignaturaPlan.asignatura_id),
       rango_minimo_id: Number(asignaturaPlan.rango_minimo_id),
       sedes_id: Number(asignaturaPlan.sedes_id),
-      presentismo_porc: Number(asignaturaPlan.presentismo_porc),
-      regularizacion_prom: Number(asignaturaPlan.regularizacion_prom),
-      final_aprobacion: Number(asignaturaPlan.final_aprobacion),
-      duracion: Number(asignaturaPlan.duracion),
+      presentismo_porc:
+        asignaturaPlan.presentismo_porc !== ""
+          ? Number(asignaturaPlan.presentismo_porc)
+          : null,
+      regularizacion_prom:
+        asignaturaPlan.regularizacion_prom !== ""
+          ? Number(asignaturaPlan.regularizacion_prom)
+          : null,
+      final_aprobacion:
+        asignaturaPlan.final_aprobacion !== ""
+          ? Number(asignaturaPlan.final_aprobacion)
+          : null,
+      duracion:
+        asignaturaPlan.duracion !== "" ? Number(asignaturaPlan.duracion) : null,
       regimen: asignaturaPlan.regimen.trim(),
       modalidad: asignaturaPlan.modalidad.trim(),
-      usuario_accion: 1,
     };
 
     const mensajeValidacion = validarCondiciones(payload);
@@ -320,15 +353,12 @@ function AltaPlanWizard() {
       setError("");
 
       const respuestaPlan = await planService.crear({
-        tipo_planes_id_tipo_planes: Number(
-          plan.tipo_planes_id_tipo_planes,
-        ),
-        resolucion_ministerial: Number(plan.resolucion_ministerial),
+        tipo_planes_id_tipo_planes: Number(plan.tipo_planes_id_tipo_planes),
+        resolucion_ministerial: plan.resolucion_ministerial.trim(),
         nombre: plan.nombre.trim(),
         descrip: plan.descrip.trim() || null,
         vigencia_dde: `${plan.vigencia_dde}T00:00:00`,
         vigencia_hta: `${plan.vigencia_hta}T00:00:00`,
-        usuario_accion: 1,
       });
 
       const nuevoPlanId = obtenerIdRespuesta(respuestaPlan);
@@ -351,7 +381,6 @@ function AltaPlanWizard() {
           duracion: item.duracion,
           regimen: item.regimen,
           modalidad: item.modalidad,
-          usuario_accion: 1,
         });
 
         const idReal = obtenerIdRespuesta(respuesta);
@@ -367,7 +396,6 @@ function AltaPlanWizard() {
         await paCorrelativaService.crear({
           pa_id: idsReales[item.pa_id],
           asignatura_id: item.asignatura_id,
-          usuario_accion: 1,
         });
       }
 
@@ -386,7 +414,7 @@ function AltaPlanWizard() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-10">
-          <BotonVolver />
+        <BotonVolver />
         <section className="bg-white rounded-2xl shadow-md border border-slate-200 p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
             <div className="flex items-start gap-4">
@@ -475,11 +503,47 @@ function AltaPlanWizard() {
                       getValue={(tipo) => tipo.id_tipo_planes}
                       getLabel={(tipo) => tipo.descripcion}
                     />
-                    <CampoTexto label="Resolucion ministerial" name="resolucion_ministerial" type="number" value={plan.resolucion_ministerial} onChange={cambiarPlan} placeholder="Ej: 2026001" icono={<Hash size={20} />} />
-                    <CampoTexto label="Nombre" name="nombre" value={plan.nombre} onChange={cambiarPlan} placeholder="Ej: Plan de Formacion Inicial" icono={<FileText size={20} />} />
-                    <CampoTexto label="Descripcion" name="descrip" value={plan.descrip} onChange={cambiarPlan} placeholder="Breve descripcion" icono={<FileText size={20} />} />
-                    <CampoTexto label="Vigencia desde" name="vigencia_dde" type="date" value={plan.vigencia_dde} onChange={cambiarPlan} icono={<CalendarDays size={20} />} />
-                    <CampoTexto label="Vigencia hasta" name="vigencia_hta" type="date" value={plan.vigencia_hta} onChange={cambiarPlan} icono={<CalendarDays size={20} />} />
+                    <CampoTexto
+                      label="Resolucion ministerial"
+                      name="resolucion_ministerial"
+                      value={plan.resolucion_ministerial}
+                      onChange={cambiarPlan}
+                      placeholder="Ej: 12314/-2022"
+                      icono={<Hash size={20} />}
+                      maxLength={14}
+                    />
+                    <CampoTexto
+                      label="Nombre"
+                      name="nombre"
+                      value={plan.nombre}
+                      onChange={cambiarPlan}
+                      placeholder="Ej: Plan de Formacion Inicial"
+                      icono={<FileText size={20} />}
+                    />
+                    <CampoTexto
+                      label="Descripcion"
+                      name="descrip"
+                      value={plan.descrip}
+                      onChange={cambiarPlan}
+                      placeholder="Breve descripcion"
+                      icono={<FileText size={20} />}
+                    />
+                    <CampoTexto
+                      label="Vigencia desde"
+                      name="vigencia_dde"
+                      type="date"
+                      value={plan.vigencia_dde}
+                      onChange={cambiarPlan}
+                      icono={<CalendarDays size={20} />}
+                    />
+                    <CampoTexto
+                      label="Vigencia hasta"
+                      name="vigencia_hta"
+                      type="date"
+                      value={plan.vigencia_hta}
+                      onChange={cambiarPlan}
+                      icono={<CalendarDays size={20} />}
+                    />
                   </div>
 
                   <Acciones
@@ -502,9 +566,33 @@ function AltaPlanWizard() {
                       label="Plan cargado"
                       value={plan.nombre || "-"}
                     />
-                    <CampoSelect label="Asignatura" name="asignatura_id" value={asignaturaPlan.asignatura_id} onChange={cambiarAsignaturaPlan} opciones={asignaturas} getValue={(asignatura) => asignatura.id} getLabel={(asignatura) => asignatura.nombre} />
-                    <CampoSelect label="Rango minimo" name="rango_minimo_id" value={asignaturaPlan.rango_minimo_id} onChange={cambiarAsignaturaPlan} opciones={rangos} getValue={(rango) => rango.id} getLabel={(rango) => rango.descripcion} />
-                    <CampoSelect label="Sede" name="sedes_id" value={asignaturaPlan.sedes_id} onChange={cambiarAsignaturaPlan} opciones={sedes} getValue={(sede) => sede.id} getLabel={(sede) => sede.nombre} />
+                    <CampoSelect
+                      label="Asignatura"
+                      name="asignatura_id"
+                      value={asignaturaPlan.asignatura_id}
+                      onChange={cambiarAsignaturaPlan}
+                      opciones={asignaturas}
+                      getValue={(asignatura) => asignatura.id}
+                      getLabel={(asignatura) => asignatura.nombre}
+                    />
+                    <CampoSelect
+                      label="Rango minimo"
+                      name="rango_minimo_id"
+                      value={asignaturaPlan.rango_minimo_id}
+                      onChange={cambiarAsignaturaPlan}
+                      opciones={rangos}
+                      getValue={(rango) => rango.id}
+                      getLabel={(rango) => rango.descripcion}
+                    />
+                    <CampoSelect
+                      label="Sede"
+                      name="sedes_id"
+                      value={asignaturaPlan.sedes_id}
+                      onChange={cambiarAsignaturaPlan}
+                      opciones={sedes}
+                      getValue={(sede) => sede.id}
+                      getLabel={(sede) => sede.nombre}
+                    />
                   </div>
 
                   <Acciones
@@ -524,11 +612,52 @@ function AltaPlanWizard() {
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <CampoTexto label="Presentismo %" name="presentismo_porc" type="number" step="0.01" value={asignaturaPlan.presentismo_porc} onChange={cambiarAsignaturaPlan} placeholder="Ej: 75" icono={<Hash size={20} />} />
-                    <CampoTexto label="Regularizacion prom." name="regularizacion_prom" type="number" step="0.01" value={asignaturaPlan.regularizacion_prom} onChange={cambiarAsignaturaPlan} placeholder="Ej: 6" icono={<Hash size={20} />} />
-                    <CampoTexto label="Final aprobacion" name="final_aprobacion" type="number" value={asignaturaPlan.final_aprobacion} onChange={cambiarAsignaturaPlan} placeholder="Ej: 7" icono={<Hash size={20} />} />
-                    <CampoTexto label="Duracion" name="duracion" type="number" step="0.01" value={asignaturaPlan.duracion} onChange={cambiarAsignaturaPlan} placeholder="Ej: 120" icono={<Hash size={20} />} />
-                    <CampoTexto label="Regimen" name="regimen" value={asignaturaPlan.regimen} onChange={cambiarAsignaturaPlan} placeholder="Ej: Anual" icono={<BookMarked size={20} />} />
+                    <CampoTexto
+                      label="Presentismo requerido"
+                      name="presentismo_porc"
+                      value={asignaturaPlan.presentismo_porc}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: 75"
+                      icono={<Hash size={20} />}
+                      inputMode="numeric"
+                    />
+                    <CampoTexto
+                      label="Promedio requerido para regularizar"
+                      name="regularizacion_prom"
+                      value={asignaturaPlan.regularizacion_prom}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: 6"
+                      icono={<Hash size={20} />}
+                      inputMode="numeric"
+                    />
+                    <CampoTexto
+                      label="Nota final requerida para aprobar"
+                      name="final_aprobacion"
+                      value={asignaturaPlan.final_aprobacion}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: 7"
+                      icono={<Hash size={20} />}
+                      inputMode="numeric"
+                    />
+                    <CampoTexto
+                      label="Horas cátedra"
+                      name="duracion"
+                      value={asignaturaPlan.duracion}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: 120"
+                      icono={<Hash size={20} />}
+                      maxLength={4}
+                      inputMode="numeric"
+                    />
+                    <CampoTexto
+                      label="Régimen"
+                      name="regimen"
+                      value={asignaturaPlan.regimen}
+                      onChange={cambiarAsignaturaPlan}
+                      placeholder="Ej: Anual"
+                      icono={<BookMarked size={20} />}
+                      maxLength={20}
+                    />
                     <CampoSelect
                       label="Modalidad"
                       name="modalidad"
@@ -635,40 +764,11 @@ function AltaPlanWizard() {
                     )}
                   </div>
 
-                  <div>
-                    <h3 className="text-xl font-extrabold text-slate-800 mb-4">
-                      Correlativas cargadas
-                    </h3>
-
-                    {correlativasCargadas.length > 0 ? (
-                      <div className="space-y-3">
-                        {correlativasCargadas.map((item) => (
-                          <article
-                            key={item.id}
-                            className="border border-slate-200 rounded-xl p-5 bg-slate-50"
-                          >
-                            <p className="text-xs font-bold text-slate-400 uppercase">
-                              Para cursar
-                            </p>
-                            <h4 className="text-lg font-extrabold text-slate-800 mt-1">
-                              {item.asignaturaQueRequiere}
-                            </h4>
-                            <p className="text-slate-600 font-semibold mt-1">
-                              Requiere: {item.asignaturaRequerida}
-                            </p>
-                          </article>
-                        ))}
-                      </div>
-                    ) : (
-                      <EstadoVacio texto="No se cargaron correlativas para este plan." />
-                    )}
-                  </div>
-
                   <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                     <button
                       type="button"
                       onClick={agregarOtraAsignatura}
-                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50 transition cursor-pointer"
+                      className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar otra asignatura
@@ -697,7 +797,7 @@ function AltaPlanWizard() {
                     <ResumenItem
                       icono={<BookOpen size={24} />}
                       titulo="Plan"
-                      texto={`${plan.nombre || "-"} - ID ${planId || "pendiente de guardar"}`}
+                      texto={`${plan.nombre || "-"} - ${planId || "pendiente de guardar"}`}
                     />
                     <ResumenItem
                       icono={<FileText size={24} />}
@@ -731,12 +831,30 @@ function AltaPlanWizard() {
                             </div>
 
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-sm">
-                              <DatoResumen label="Regimen" value={item.regimen} />
-                              <DatoResumen label="Modalidad" value={item.modalidad} />
-                              <DatoResumen label="Presentismo" value={`${item.presentismo_porc}%`} />
-                              <DatoResumen label="Regularizacion" value={item.regularizacion_prom} />
-                              <DatoResumen label="Final" value={item.final_aprobacion} />
-                              <DatoResumen label="Duracion" value={item.duracion} />
+                              <DatoResumen
+                                label="Regimen"
+                                value={item.regimen}
+                              />
+                              <DatoResumen
+                                label="Modalidad"
+                                value={item.modalidad}
+                              />
+                              <DatoResumen
+                                label="Presentismo"
+                                value={`${item.presentismo_porc}%`}
+                              />
+                              <DatoResumen
+                                label="Regularizacion"
+                                value={item.regularizacion_prom}
+                              />
+                              <DatoResumen
+                                label="Final"
+                                value={item.final_aprobacion}
+                              />
+                              <DatoResumen
+                                label="Horas cátedra"
+                                value={item.duracion}
+                              />
                             </div>
                           </div>
                         </article>
@@ -747,16 +865,8 @@ function AltaPlanWizard() {
                   <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                     <button
                       type="button"
-                      onClick={() => navigate("/planes")}
-                      className="px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-                    >
-                      Volver a planes
-                    </button>
-
-                    <button
-                      type="button"
                       onClick={agregarOtraAsignatura}
-                      className="flex items-center justify-center gap-2 px-6 py-3 border border-red-200 rounded-lg font-bold text-red-700 hover:bg-red-50 transition cursor-pointer"
+                      className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 rounded-lg font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                     >
                       <PlusCircle size={22} />
                       Agregar otra asignatura
@@ -791,33 +901,32 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
   const Icono = paso.icono;
 
   return (
-    <div className="flex flex-1 items-start">
-      <div className="flex flex-col items-center min-w-12">
-        <div
-          className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition ${
-            resaltado
-              ? "bg-red-700 border-red-700 text-white shadow-sm"
-              : "bg-slate-100 border-slate-300 text-slate-400"
-          }`}
-        >
-          <Icono size={20} />
-        </div>
-        <p
-          className={`hidden md:block mt-2 text-xs font-extrabold text-center ${
-            resaltado ? "text-red-700" : "text-slate-400"
-          }`}
-        >
-          {paso.titulo}
-        </p>
-      </div>
-
+    <div className="relative flex min-w-0 flex-1 flex-col items-center">
       {!ultimo && (
         <div
-          className={`h-1 flex-1 rounded-full mt-5 transition ${
+          className={`absolute left-1/2 right-[-50%] top-4 sm:top-5 h-1 transition-colors ${
             completo ? "bg-red-700" : "bg-slate-200"
           }`}
         />
       )}
+
+      <div
+        className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center border-2 transition ${
+          resaltado
+            ? "bg-red-700 border-red-700 text-white shadow-sm"
+            : "bg-slate-100 border-slate-300 text-slate-400"
+        }`}
+      >
+        <Icono size={20} />
+      </div>
+
+      <p
+        className={`hidden md:block w-full px-1 mt-2 text-xs font-extrabold text-center ${
+          resaltado ? "text-red-700" : "text-slate-400"
+        }`}
+      >
+        {paso.titulo}
+      </p>
     </div>
   );
 }
@@ -842,6 +951,8 @@ function CampoTexto({
   icono,
   type = "text",
   step,
+  maxLength,
+  inputMode,
 }) {
   return (
     <div>
@@ -861,6 +972,8 @@ function CampoTexto({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          maxLength={maxLength}
+          inputMode={inputMode}
           className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
             icono ? "pl-12" : "pl-4"
           }`}
@@ -942,7 +1055,7 @@ function Acciones({ guardando, texto, onBack, onCancel }) {
       <button
         type="submit"
         disabled={guardando}
-         className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition-colors duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        className="flex items-center justify-center gap-2 px-8 py-3 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800 transition-colors duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
       >
         <Save size={22} />
         {guardando ? "Guardando..." : texto}
@@ -979,21 +1092,34 @@ function EstadoVacio({ texto }) {
 }
 
 function validarCondiciones(payload) {
-  const camposNumericos = [
-    ["presentismo_porc", "El presentismo debe ser un numero"],
-    ["regularizacion_prom", "La regularizacion debe ser un numero"],
-    ["final_aprobacion", "La nota final debe ser un numero"],
-    ["duracion", "La duracion debe ser un numero"],
-  ];
+  if (
+    payload.presentismo_porc === null ||
+    payload.presentismo_porc < 1 ||
+    payload.presentismo_porc > 100
+  ) {
+    return "El presentismo debe ser un número entre 1 y 100";
+  }
 
-  for (const [campo, mensaje] of camposNumericos) {
-    if (Number.isNaN(payload[campo])) {
-      return mensaje;
-    }
+  if (
+    payload.regularizacion_prom !== null &&
+    (payload.regularizacion_prom < 1 || payload.regularizacion_prom > 100)
+  ) {
+    return "La regularización debe ser un número entre 1 y 100, o estar vacía";
+  }
+
+  if (
+    payload.final_aprobacion !== null &&
+    (payload.final_aprobacion < 1 || payload.final_aprobacion > 100)
+  ) {
+    return "La nota final debe ser un número entre 1 y 100, o estar vacía";
+  }
+
+  if (payload.duracion === null || payload.duracion < 1) {
+    return "La duración debe ser de al menos 1 y no puede estar vacía";
   }
 
   if (!payload.regimen) {
-    return "El regimen es obligatorio";
+    return "El regimen es obligatorio y sólo debe contener letras";
   }
 
   if (!payload.modalidad) {
@@ -1003,7 +1129,11 @@ function validarCondiciones(payload) {
   return "";
 }
 
-function validarCorrelativa(payload, asignaturasCargadas, correlativasCargadas) {
+function validarCorrelativa(
+  payload,
+  asignaturasCargadas,
+  correlativasCargadas,
+) {
   if (!payload.pa_id) {
     return "Debe seleccionar la asignatura que requiere correlativa";
   }
