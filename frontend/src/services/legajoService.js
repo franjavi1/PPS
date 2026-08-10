@@ -21,6 +21,10 @@ export const legajoService = {
     return apiRequest(`${BASE_URL}/${id}`);
   },
 
+  obtenerPorIdPersona(personaId) {
+    return apiRequest(`${BASE_URL}/GetPersonaFromPersonaId?id=${personaId}`);
+  },
+
   crear(legajo) {
     return apiRequest(BASE_URL, {
       method: "POST",
