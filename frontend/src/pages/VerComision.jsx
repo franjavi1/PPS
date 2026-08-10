@@ -214,7 +214,9 @@ function VerComision() {
                               value={mapas.modalidades[item.modalidadesid]}
                             />
 
-                            <Dato label="Horario" value={item.modalidad} />
+                            <Dato label="Vigencia desde" value={item.vigencia_desde} />
+                            <Dato label="Vigencia hasta" value={item.vigencia_hasta} />
+
                             <Dato label="Cupo" value={item.cupo_maximo} />
                             <Dato label="Estado" value={item.estado} />
                           </div>
