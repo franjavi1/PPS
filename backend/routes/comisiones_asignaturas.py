@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, g, request
 from utils.utilidades import respuesta_api
 from utils.errores import APIError
 from auth_common.decorador import requires_permission
