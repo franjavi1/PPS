@@ -40,9 +40,6 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         required=True,
         allow_none=False
     )
-    
-    vigencia_desde = fields.DateTime(required=True, allow_none=False)
-    vigencia_hasta = fields.DateTime(required=True, allow_none=False)
 
     cupo_maximo = ma.auto_field(required=True, allow_none=False)
 
@@ -50,6 +47,14 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         required=True,
         allow_none=False,
         validate=[OneOf([0, 1], error="El estado debe ser 0 o 1")]
+    )
+    
+    modalidad = ma.auto_field(
+        required=True,
+        allow_none=False,
+        validate=[
+            Length(min=1, max=45, error="El horario debe tener entre 1 y 45 caracteres")
+        ]
     )
 
 
@@ -90,11 +95,10 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         
     @validates_schema
     def validar_vigencias(self, data, **kwargs):
-        vigencia_desde = data.get("vigencia_desde")
-        vigencia_hasta = data.get("vigencia_hasta")
+        modalidad = data.get("modalidad")
 
-        if not vigencia_desde:
-            raise ValidationError({"vigencia_desde": ["La vigencia desde es obligatoria"]})
+        if not modalidad:
+            raise ValidationError({"modalidad": ["El horario es obligatorio"]})
         
         if not vigencia_hasta:
             raise ValidationError({"vigencia_hasta": ["La vigencia hasta es obligatoria"]})

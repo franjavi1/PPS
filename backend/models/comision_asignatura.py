@@ -41,15 +41,8 @@ class ComisionAsignatura(db.Model):
         nullable=False
     )
     
-    vigencia_desde: Mapped[datetime] = mapped_column(
-        "vigenciaDesde",
-        DateTime,
-        nullable=False
-    )
-    
-    vigencia_hasta: Mapped[datetime] = mapped_column(
-        "vigenciaHasta",
-        DateTime,
+    modalidad: Mapped[str] = mapped_column(
+        String(45),
         nullable=False
     )
 

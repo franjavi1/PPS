@@ -22,7 +22,7 @@ import { comisionAsignaturaService } from "../services/comisionAsignaturaService
 import { comisionService } from "../services/comisionService";
 import { planAsignaturaService } from "../services/planAsignaturaService";
 import { planService } from "../services/planesService";
-import {legajoService} from "../services/legajoService";
+import { legajoService } from "../services/legajoService";
 import { sedeService } from "../services/sedeService";
 import { tipoAutoridadService } from "../services/tipoAutoridadService";
 import { modalidadService } from "../services/modalidadService";
@@ -35,8 +35,7 @@ const nuevaComisionAsignaturaInicial = {
   plan_asignaturas_id: "",
   aula_id: "",
   nombre: "",
-  vigencia_desde: "",
-  vigencia_hasta: "",
+  modalidad: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -203,7 +202,7 @@ function EditarComision() {
 
       await comisionService.actualizar(id, {
         descripcion,
-        
+
       });
 
       setMensaje("Comision actualizada correctamente");
@@ -221,8 +220,7 @@ function EditarComision() {
       aula_id: Number(nuevaComisionAsignatura.aula_id),
       comision_id: Number(id),
       nombre: nuevaComisionAsignatura.nombre.trim(),
-      vigencia_desde: nuevaComisionAsignatura.vigencia_desde,
-      vigencia_hasta: nuevaComisionAsignatura.vigencia_hasta,
+      modalidad: nuevaComisionAsignatura.modalidad.trim(),
       modalidadesid: Number(nuevaComisionAsignatura.modalidadesid),
       cupo_maximo: Number(nuevaComisionAsignatura.cupo_maximo),
       estado: Number(nuevaComisionAsignatura.estado),
@@ -469,18 +467,12 @@ function EditarComision() {
                       getLabel={(item) => item.descripcion}
                     />
                     <CampoTexto
-                      label="Vigencia desde"
-                      name="vigencia_desde"
-                      value={nuevaComisionAsignatura.vigencia_desde}
+                      label="Horario"
+                      name="modalidad"
+                      value={nuevaComisionAsignatura.modalidad}
                       onChange={cambiarNuevaComisionAsignatura}
-                      type="datetime-local"
-                    />
-                    <CampoTexto
-                      label="Vigencia hasta"
-                      name="vigencia_hasta"
-                      value={nuevaComisionAsignatura.vigencia_hasta}
-                      onChange={cambiarNuevaComisionAsignatura}
-                      type="datetime-local"
+                      placeholder="Ej: 18:00 a 20:00"
+                      maxLength={45}
                     />
                     <CampoTexto
                       label="Cupo maximo"
@@ -543,8 +535,7 @@ function EditarComision() {
                               label="Modalidad"
                               value={mapas.modalidades[item.modalidadesid]}
                             />
-                            <Dato label="Vigencia desde" value={item.vigencia_desde} />
-                            <Dato label="Vigencia hasta" value={item.vigencia_hasta} />
+                            <Dato label="Horario" value={item.modalidad} />
                             <Dato label="Cupo" value={item.cupo_maximo} />
                             <Dato label="Estado" value={item.estado} />
                           </div>
@@ -871,7 +862,7 @@ function obtenerEtiquetaPlanAsignatura(
 
 function obtenerEtiquetaLegajo(legajo) {
   const numero = legajo?.numero ? `Nro. ${legajo.numero}` : `Legajo #${legajo?.id}`;
-  
+
   let nombreCompleto = "";
   if (legajo?.persona) {
     nombreCompleto = `${legajo.persona.apellido || ""} ${legajo.persona.nombre || ""}`.trim();
@@ -907,12 +898,8 @@ function validarComisionAsignatura(payload) {
     return "La modalidad es obligatoria";
   }
 
-  if (!payload.vigencia_desde) {
-    return "La vigencia desde es obligatoria";
-  }
-
-  if (!payload.vigencia_hasta) {
-    return "La vigencia hasta es obligatoria";
+  if (!payload.modalidad) {
+    return "El horario es obligatorio";
   }
 
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {

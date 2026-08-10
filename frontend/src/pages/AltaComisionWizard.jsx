@@ -37,8 +37,7 @@ const comisionAsignaturaInicial = {
   plan_asignaturas_id: "",
   aula_id: "",
   nombre: "",
-  vigencia_desde: "",
-  vigencia_hasta: "",
+  modalidad: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -176,8 +175,7 @@ function AltaComisionWizard() {
       plan_asignaturas_id: Number(comisionAsignatura.plan_asignaturas_id),
       aula_id: Number(comisionAsignatura.aula_id),
       nombre: comisionAsignatura.nombre.trim(),
-      vigencia_desde: comisionAsignatura.vigencia_desde,
-      vigencia_hasta: comisionAsignatura.vigencia_hasta,
+      modalidad: comisionAsignatura.modalidad.trim(),
       cupo_maximo: Number(comisionAsignatura.cupo_maximo),
       estado: Number(comisionAsignatura.estado),
       modalidadesid: Number(comisionAsignatura.modalidadesid),
@@ -258,8 +256,7 @@ function AltaComisionWizard() {
           aula_id: item.aula_id,
           comision_id: nuevaComisionId,
           nombre: item.nombre,
-          vigencia_desde: item.vigencia_desde,
-          vigencia_hasta: item.vigencia_hasta,
+          modalidad: item.modalidad,
           modalidadesid: item.modalidadesid,
           cupo_maximo: item.cupo_maximo,
           estado: item.estado,
@@ -411,18 +408,12 @@ function AltaComisionWizard() {
                       getLabel={(item) => item.descripcion}
                     />
                     <CampoTexto
-                      label="Vigencia desde"
-                      name="vigencia_desde"
-                      value={comisionAsignatura.vigencia_desde}
+                      label="Horario"
+                      name="modalidad"
+                      value={comisionAsignatura.modalidad}
                       onChange={cambiarComisionAsignatura}
-                      type="datetime-local"
-                    />
-                    <CampoTexto
-                      label="Vigencia hasta"
-                      name="vigencia_hasta"
-                      value={comisionAsignatura.vigencia_hasta}
-                      onChange={cambiarComisionAsignatura}
-                      type="datetime-local"
+                      placeholder="Ej: 18:00 a 20:00"
+                      maxLength={45}
                     />
                     <CampoTexto
                       label="Cupo maximo"
@@ -838,8 +829,7 @@ function validarComisionAsignatura(payload) {
   if (!payload.aula_id) return "Debe seleccionar un aula";
   if (!payload.nombre) return "El nombre es obligatorio";
   if (!payload.modalidadesid) return "La modalidad es obligatoria";
-  if (!payload.vigencia_desde) return "La vigencia desde es obligatoria";
-  if (!payload.vigencia_hasta) return "La vigencia hasta es obligatoria";
+  if (!payload.modalidad) return "El horario es obligatorio";
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
     return "El cupo maximo debe ser mayor a cero";
   if (payload.cupo_maximo > 500)
