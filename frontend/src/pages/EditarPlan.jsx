@@ -674,7 +674,7 @@ function EditarPlan() {
                       onChange={cambiarNuevaCorrelativa}
                       opciones={planAsignaturas}
                       getValue={(item) => item.id}
-                      getLabel={(item) => mapas.asignaturas[item.asignatura_id] || `Plan asignatura #${item.id}`}
+                      getLabel={(item) => mapas.asignaturas[item.asignatura_id] || `Asignatura del plan #${item.id}`}
                     />
                     <CampoSelect
                       label="Asignatura requerida"

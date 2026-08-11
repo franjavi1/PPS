@@ -316,7 +316,7 @@ function obtenerEtiquetaPlanAsignatura(
   );
   return partes.length
     ? partes.join(" - ")
-    : `Plan asignatura #${planAsignatura.id}`;
+    : `Asignatura del plan #${planAsignatura.id}`;
 }
 
 function obtenerEtiquetaLegajo(legajo) {

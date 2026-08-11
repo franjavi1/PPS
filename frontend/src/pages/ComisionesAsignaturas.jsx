@@ -383,7 +383,7 @@ function ComisionesAsignaturas() {
                 <tr className="border-b border-slate-200">
                   <Th>Nombre</Th>
                   <Th>Comision</Th>
-                  <Th>Plan asignatura</Th>
+                  <Th>Asignatura del plan</Th>
                   <Th>Aula</Th>
                   <Th>Modalidad</Th>
                   <Th>Horario</Th>
@@ -479,7 +479,7 @@ function ComisionesAsignaturas() {
                 <form onSubmit={guardarRegistro} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <CampoSelect
-                      label="Plan asignatura"
+                      label="Asignatura del plan"
                       name="plan_asignaturas_id"
                       value={formulario.plan_asignaturas_id}
                       onChange={manejarCambio}
@@ -764,7 +764,7 @@ function obtenerEtiquetaPlanAsignatura(
   );
 
   if (partes.length === 0) {
-    return `Plan asignatura #${planAsignatura.id}`;
+    return `Asignatura del plan #${planAsignatura.id}`;
   }
 
   return partes.join(" - ");

@@ -379,7 +379,7 @@ function AltaComisionWizard() {
                   />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <CampoSelect
-                      label="Plan asignatura"
+                      label="Asignatura del plan"
                       name="plan_asignaturas_id"
                       value={comisionAsignatura.plan_asignaturas_id}
                       onChange={cambiarComisionAsignatura}
@@ -802,7 +802,7 @@ function obtenerEtiquetaPlanAsignatura(
   );
   return partes.length
     ? partes.join(" - ")
-    : `Plan asignatura #${planAsignatura.id}`;
+    : `Asignatura del plan #${planAsignatura.id}`;
 }
 
 function obtenerEtiquetaLegajo(legajo) {
