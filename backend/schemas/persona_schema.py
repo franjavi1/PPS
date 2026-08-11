@@ -69,6 +69,9 @@ class PersonaSchema(ma.SQLAlchemySchema):
     numero_doc = ma.auto_field(
         required=True,
         allow_none=False,
+        validate=[
+            Length(max=15, error="El número de documento no puede superar los 15 caracteres")
+        ],
         error_messages={
             "required": "El número de documento es obligatorio",
             "null": "El número de documento no puede ser null",

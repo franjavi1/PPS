@@ -6,10 +6,20 @@ from models.modalidades import Modalidades
 
 from db import ma
 from marshmallow import ValidationError, validates, validates_schema, pre_load, fields
-from marshmallow.validate import Length, OneOf
+from marshmallow.validate import Length, OneOf, Regexp
 from schemas.plan_asignatura_schema import PlanAsignaturaSchema
 from schemas.comision_schema import ComisionSchema 
 from schemas.autoridad_comision_schema import AutoridadComisionSchema
+
+
+HORARIO_REGEX = (
+    r"^(?:Lu|Ma|Mi|Ju|Vi|Sá|Do)"
+    r"(?:\s+(?:Lu|Ma|Mi|Ju|Vi|Sá|Do))*"
+    r"\s+\d{1,2}(?::\d{2})?"
+    r"\s+(?:a|-)\s*"
+    r"\d{1,2}(?::\d{2})?"
+    r"\s*hs$"
+)
 
 
 class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
@@ -57,7 +67,11 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         required=True,
         allow_none=False,
         validate=[
-            Length(min=1, max=45, error="El horario debe tener entre 1 y 45 caracteres")
+            Length(min=1, max=45, error="El horario debe tener entre 1 y 45 caracteres"),
+            Regexp(
+                HORARIO_REGEX,
+                error="El horario debe tener un formato como: Lu Mi 18:00 a 20:00 hs"
+            )
         ]
     )
 

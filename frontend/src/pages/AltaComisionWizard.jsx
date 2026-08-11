@@ -418,8 +418,11 @@ function AltaComisionWizard() {
                       name="modalidad"
                       value={comisionAsignatura.modalidad}
                       onChange={cambiarComisionAsignatura}
-                      placeholder="Ej: 18:00 a 20:00"
+                      placeholder="Ej: Lu Mi Vi 18 a 22hs"
                       maxLength={45}
+                      pattern={HORARIO_REGEX.source}
+                      title="Ingrese un horario valido. Ejemplo: Lu Mi 18:00 a 20:00 hs"
+                      required
                     />
                     <CampoTexto
                       label="Cupo maximo"
@@ -651,12 +654,8 @@ function TituloPaso({ icono, titulo }) {
 
 function CampoTexto({
   label,
-  name,
-  value,
-  onChange,
-  placeholder,
   icono,
-  type = "text",
+  ...inputProps
 }) {
   return (
     <div>
@@ -670,11 +669,7 @@ function CampoTexto({
           </span>
         )}
         <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
+          {...inputProps}
           className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"
             }`}
         />
@@ -846,6 +841,8 @@ function obtenerLista(respuesta) {
   return Array.isArray(respuesta?.data) ? respuesta.data : [];
 }
 
+const HORARIO_REGEX = /^(?:Lu|Ma|Mi|Ju|Vi|Sá|Do)(?:\s+(?:Lu|Ma|Mi|Ju|Vi|Sá|Do))*\s+\d{1,2}(?::\d{2})?\s+(?:a|-)\s*\d{1,2}(?::\d{2})?\s*hs$/;
+
 function validarComisionAsignatura(payload) {
   if (!payload.plan_asignaturas_id)
     return "Debe seleccionar un plan asignatura";
@@ -853,6 +850,8 @@ function validarComisionAsignatura(payload) {
   if (!payload.nombre) return "El nombre es obligatorio";
   if (!payload.modalidadesid) return "La modalidad es obligatoria";
   if (!payload.modalidad) return "El horario es obligatorio";
+  if (!HORARIO_REGEX.test(payload.modalidad.trim()))
+    return "El horario debe tener un formato como: Lu Mi 18:00 a 20:00 hs";
   if (!payload.vigencia_desde) return "La vigencia desde es obligatoria";
   if (!payload.vigencia_hasta) return "La vigencia hasta es obligatoria";
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
