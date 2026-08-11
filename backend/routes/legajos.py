@@ -182,3 +182,31 @@ def eliminar_legajo(id):
     eliminar(legajo)
 
     return respuesta_api(True, {"id": id}, "Legajo eliminado correctamente")
+
+@legajos_bp.route("/interno/contacto-principal", methods=["GET"])
+@requires_permission(only_services=True)
+def get_contacto_principal_interno():
+    """
+    Variante interna de GetPersonaFromPersonaId, pensada para llamadas
+    servicio a servicio.
+    Devuelve unicamente el contacto de tipo email marcado como principal, no el legajo completo.
+    """
+    persona_id_raw = request.args.get("id")
+
+    if not persona_id_raw:
+        raise APIError("Debe incluir el ID de la persona en el parametro 'id'", status=400)
+
+    try:
+        persona_id = int(persona_id_raw)
+    except ValueError:
+        raise APIError("El ID de la persona debe ser un numero entero valido", status=400)
+
+    legajo = obtener_legajo_completo_por_persona_id(persona_id)
+
+    email = None
+    for contacto in legajo.persona.contactos_items:
+        if contacto.tipo_contacto_id == 2 and contacto.principal and contacto.estado == 1:
+            email = contacto.contacto
+            break
+
+    return respuesta_api(True, {"email": email}, "Contacto principal obtenido")
