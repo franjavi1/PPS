@@ -489,8 +489,11 @@ function EditarComision() {
                       name="modalidad"
                       value={nuevaComisionAsignatura.modalidad}
                       onChange={cambiarNuevaComisionAsignatura}
-                      placeholder="Ej: 18:00 a 20:00"
+                      placeholder="Ej: Lu Mi Vi 18 a 22hs"
                       maxLength={45}
+                      pattern={HORARIO_REGEX.source}
+                      title="Ingrese un horario válido. Ejemplo: Lu Mi 18:00 a 20:00 hs"
+                      required
                     />
                     <CampoTexto
                       label="Cupo maximo"
@@ -747,15 +750,8 @@ function Seccion({ id, icono, titulo, abierta, onToggle, children }) {
 
 function CampoTexto({
   label,
-  name,
-  value,
-  onChange,
-  placeholder,
   icono,
-  type = "text",
-  maxLength,
-  min,
-  max,
+  ...inputProps
 }) {
   return (
     <div>
@@ -769,12 +765,7 @@ function CampoTexto({
           </span>
         )}
         <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          maxLength={maxLength}
+          {...inputProps}
           className={`w-full h-14 pr-4 border border-slate-300 rounded-xl text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${icono ? "pl-12" : "pl-4"
             }`}
         />
@@ -901,6 +892,8 @@ function obtenerNombreComisionAsignatura(id, items) {
   return item?.nombre || `Comision asignatura #${id}`;
 }
 
+const HORARIO_REGEX = /^(?:Lu|Ma|Mi|Ju|Vi|Sá|Do)(?:\s+(?:Lu|Ma|Mi|Ju|Vi|Sá|Do))*\s+\d{1,2}(?::\d{2})?\s+(?:a|-)\s*\d{1,2}(?::\d{2})?\s*hs$/;
+
 function validarComisionAsignatura(payload) {
   if (!payload.plan_asignaturas_id) {
     return "Debe seleccionar un plan asignatura";
@@ -920,6 +913,10 @@ function validarComisionAsignatura(payload) {
 
   if (!payload.modalidad) {
     return "El horario es obligatorio";
+  }
+
+  if (!HORARIO_REGEX.test(payload.modalidad.trim())) {
+    return "El horario debe tener un formato como: Lu Mi 18:00 a 20:00 hs";
   }
 
   if (!payload.vigencia_desde) {
