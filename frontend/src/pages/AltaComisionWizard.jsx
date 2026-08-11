@@ -36,6 +36,7 @@ const comisionInicial = { descripcion: "" };
 const comisionAsignaturaInicial = {
   plan_asignaturas_id: "",
   aula_id: "",
+  sede_id: "",
   nombre: "",
   modalidad: "",
   vigencia_desde: "",
@@ -77,6 +78,14 @@ function AltaComisionWizard() {
   useEffect(() => {
     cargarCombos();
   }, []);
+
+  const aulasFiltradas = useMemo(() => {
+    if (!comisionAsignatura.sede_id) return [];
+
+    return aulas.filter(
+      (aula) => Number(aula.sedes_id) === Number(comisionAsignatura.sede_id)
+    );
+  }, [aulas, comisionAsignatura.sede_id]);
 
   async function cargarCombos() {
     try {
@@ -149,9 +158,16 @@ function AltaComisionWizard() {
   }
 
   function cambiarComisionAsignatura(e) {
-    setComisionAsignatura({
-      ...comisionAsignatura,
-      [e.target.name]: e.target.value,
+    const { name, value } = e.target;
+
+    setComisionAsignatura((prev) => {
+      const nuevoEstado = { ...prev, [name]: value };
+
+      if (name === "sede_id") {
+        nuevoEstado.aula_id = "";
+      }
+
+      return nuevoEstado;
     });
   }
 
@@ -388,11 +404,20 @@ function AltaComisionWizard() {
                       getLabel={(item) => mapas.planesAsignaturas[item.id]}
                     />
                     <CampoSelect
+                      label="Sede"
+                      name="sede_id"
+                      value={comisionAsignatura.sede_id}
+                      onChange={cambiarComisionAsignatura}
+                      opciones={sedes}
+                      getValue={(item) => item.id}
+                      getLabel={(item) => item.nombre}
+                    />
+                    <CampoSelect
                       label="Aula"
                       name="aula_id"
                       value={comisionAsignatura.aula_id}
                       onChange={cambiarComisionAsignatura}
-                      opciones={aulas}
+                      opciones={aulasFiltradas}
                       getValue={(item) => item.id_aula}
                       getLabel={(item) => item.aula}
                     />

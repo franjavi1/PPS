@@ -33,6 +33,7 @@ const comisionInicial = {
 
 const nuevaComisionAsignaturaInicial = {
   plan_asignaturas_id: "",
+  sede_id: "",
   aula_id: "",
   nombre: "",
   modalidad: "",
@@ -76,6 +77,14 @@ function EditarComision() {
   useEffect(() => {
     cargarDatos();
   }, [id]);
+
+  const aulasFiltradas = useMemo(() => {
+    if (!nuevaComisionAsignatura.sede_id) return [];
+
+    return aulas.filter(
+      (aula) => Number(aula.sedes_id) === Number(nuevaComisionAsignatura.sede_id)
+    );
+  }, [aulas, nuevaComisionAsignatura.sede_id]);
 
   async function cargarDatos() {
     try {
@@ -176,9 +185,15 @@ function EditarComision() {
 
   function cambiarNuevaComisionAsignatura(e) {
     const { name, value } = e.target;
-    setNuevaComisionAsignatura({
-      ...nuevaComisionAsignatura,
-      [name]: value,
+
+    setNuevaComisionAsignatura((prev) => {
+      const nuevoEstado = { ...prev, [name]: value };
+
+      if (name === "sede_id") {
+        nuevoEstado.aula_id = "";
+      }
+
+      return nuevoEstado;
     });
   }
 
@@ -415,7 +430,7 @@ function EditarComision() {
                     Agregar asignatura
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <CampoSelect
                       label="Asignatura del plan"
                       name="plan_asignaturas_id"
@@ -429,11 +444,20 @@ function EditarComision() {
                       }
                     />
                     <CampoSelect
+                      label="Sede"
+                      name="sede_id"
+                      value={nuevaComisionAsignatura.sede_id}
+                      onChange={cambiarNuevaComisionAsignatura}
+                      opciones={sedes}
+                      getValue={(item) => item.id}
+                      getLabel={(item) => item.nombre}
+                    />
+                    <CampoSelect
                       label="Aula"
                       name="aula_id"
                       value={nuevaComisionAsignatura.aula_id}
                       onChange={cambiarNuevaComisionAsignatura}
-                      opciones={aulas}
+                      opciones={aulasFiltradas}
                       getValue={(item) => item.id_aula}
                       getLabel={(item) => item.aula}
                     />
