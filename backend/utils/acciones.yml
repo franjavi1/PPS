@@ -22,6 +22,9 @@ acciones:
   - nombre: personas.solicitar_usuario
     descripcion: Solicitar la creación de un usuario de acceso para una persona
     activo: true
+  - nobre: personas.reactivar
+    descripcion: Solicitar la reactivacion de un usuario
+    activo: true
 
   - nombre: datos_medicos.ver
     descripcion: Ver datos médicos de una persona
