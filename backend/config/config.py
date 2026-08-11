@@ -14,9 +14,16 @@ class Config:
     
     # endpoints publicos que no requieren sesion
     #Teniamos /health en lugar de health solo...
+    #AUTH_COMMON_ENDPOINTS_EXCEPTUADOS = [
+    #    "health",
+    #    "contactos_bp.get_persona_id_from_mail"
+    #    ]
     AUTH_COMMON_ENDPOINTS_EXCEPTUADOS = [
         "health",
-        "contactos_bp.get_persona_id_from_mail"
+        "contactos_bp.get_persona_id_from_mail",        
+        "legajos_bp.get_contacto_principal_interno",
+        "personas_bp.reactivar_persona_interno",
+        "personas_bp.eliminar_persona_interno"
         ]
 
     AUTH_COMMON_SERVICIOS_PERMITIDOS = [

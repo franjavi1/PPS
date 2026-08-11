@@ -101,3 +101,25 @@ def reactivar_persona(id):
     reactivar(persona)
 
     return respuesta_api(True, {"id": id}, "Persona reactivada correctamente")
+
+@personas_bp.route("/<int:id>/reactivar-interno", methods=["PATCH"])
+@requires_permission(only_services=True)
+def reactivar_persona_interno(id):
+    persona = obtener_por_id_sin_filtrar_estado(id)
+
+    if not persona or persona.estado != 0:
+        raise APIError("Persona inactiva no encontrada", status=404)
+
+    reactivar(persona)
+
+    return respuesta_api(True, {"id": id}, "Persona reactivada correctamente")
+
+@personas_bp.route("/<int:id>/eliminar-interno", methods=["DELETE"])
+@requires_permission(only_services=True)
+def eliminar_persona_interno(id):
+    persona = obtener_por_id(id)
+    if not persona:
+        raise APIError("Persona no encontrada", status=404)
+    eliminar(persona)
+    return respuesta_api(True, {"id": id}, "Persona dada de baja correctamente")
+
