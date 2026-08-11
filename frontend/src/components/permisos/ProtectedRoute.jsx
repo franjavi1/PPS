@@ -2,6 +2,8 @@ import { Navigate } from "react-router-dom";
 import useAuth from "../../auth/hooks/useAuth"; 
 import { HOME_ROUTE } from "../../auth/config"; 
 import { LOGIN_ROUTE } from "../../auth/config"; 
+import { useEffect } from "react";
+
 
 export default function ProtectedRoute({
   children,
@@ -15,6 +17,12 @@ export default function ProtectedRoute({
     hasPermission,
   } = useAuth();
 
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      window.location.replace(LOGIN_ROUTE);
+    }
+  }, [loading, isAuthenticated]);
+
   // Si está cargando, mostramos texto visible
   if (loading) {
     return (
@@ -26,7 +34,7 @@ export default function ProtectedRoute({
 
   // Validamos directamente con el estado del contexto (evitamos lecturas inconsistentes de sessionStorage)
   if (!isAuthenticated) {
-    return <Navigate to={LOGIN_ROUTE} replace />;
+    return null;
   }
 
   // Validación de permisos (permite el acceso si AL MENOS UNO coincide)

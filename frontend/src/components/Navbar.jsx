@@ -72,13 +72,11 @@ function Navbar() {
           onClick={() => navigate("/inicio")}
           className="flex min-w-0 items-center gap-3 text-left cursor-pointer"
         >
-          <div className="w-20 h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
-            <img
-              src={`${import.meta.env.BASE_URL}logo.jpeg`}
-              alt="Logo bomberos"
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <img
+            src={`${import.meta.env.BASE_URL}logo.png`}
+            alt="Logo Bomberos"
+            className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
+          />
 
           <div>
             <h1 className="text-base font-bold leading-tight">
@@ -355,6 +353,13 @@ function Navbar() {
           </p>
 
           <div className="space-y-3 pt-12">
+            <MobileAction
+              icon={<SendToBack size={20} />}
+              onClick={handleVolver}
+            >
+              Menú principal
+            </MobileAction>
+
             <MobileLink
               to="/inicio"
               icon={<Home size={20} />}
@@ -371,22 +376,26 @@ function Navbar() {
                 Nueva persona
               </MobileLink>
             )}
-            <MobileLink
-              to="/personas"
-              icon={<User size={20} />}
-              onClick={closeMenus}
-            >
-              Personas
-            </MobileLink>
+            {hasPermission("planes.personas.editar") && (
+              <MobileLink
+                to="/personas"
+                icon={<User size={20} />}
+                onClick={closeMenus}
+              >
+                Personas
+              </MobileLink>
+            )}
 
-            <MobileLink
-              to="/legajos"
-              icon={<Folder size={20} />}
-              onClick={closeMenus}
-              iconoSinFondo
-            >
-              Legajos
-            </MobileLink>
+            {hasPermission("planes.legajos.editar") && (
+              <MobileLink
+                to="/legajos"
+                icon={<Folder size={20} />}
+                onClick={closeMenus}
+                iconoSinFondo
+              >
+                Legajos
+              </MobileLink>
+            )}
 
             {hasPermission("planes.planes.crear") && (
               <MobileLink
@@ -397,22 +406,26 @@ function Navbar() {
                 Nuevo plan
               </MobileLink>
             )}
-            <MobileLink
-              to="/planes"
-              icon={<BookOpen size={20} />}
-              onClick={closeMenus}
-              iconoSinFondo
-            >
-              Planes
-            </MobileLink>
+            {hasPermission("planes.planes.ver") && (
+              <MobileLink
+                to="/planes"
+                icon={<BookOpen size={20} />}
+                onClick={closeMenus}
+                iconoSinFondo
+              >
+                Planes
+              </MobileLink>
+            )}
 
-            <MobileLink
-              to="/asignaturas"
-              icon={<FileText size={20} />}
-              onClick={closeMenus}
-            >
-              Asignaturas
-            </MobileLink>
+            {hasPermission("planes.asignaturas.ver") && (
+              <MobileLink
+                to="/asignaturas"
+                icon={<FileText size={20} />}
+                onClick={closeMenus}
+              >
+                Asignaturas
+              </MobileLink>
+            )}
             {hasPermission("planes.comisiones.crear") && (
               <MobileLink
                 to="/comisiones/alta"
@@ -423,14 +436,16 @@ function Navbar() {
               </MobileLink>
             )}
 
-            <MobileLink
-              to="/comisiones"
-              icon={<Users size={20} />}
-              onClick={closeMenus}
-              iconoSinFondo
-            >
-              Comisiones
-            </MobileLink>
+            {hasPermission("planes.comisiones.ver") && (
+              <MobileLink
+                to="/comisiones"
+                icon={<Users size={20} />}
+                onClick={closeMenus}
+                iconoSinFondo
+              >
+                Comisiones
+              </MobileLink>
+            )}
             {hasPermission("planes.config.ver") && (
               <>
                 <MobileLink
@@ -446,6 +461,13 @@ function Navbar() {
                   onClick={closeMenus}
                 >
                   Tipo de sedes
+                </MobileLink>
+                <MobileLink
+                  to="/aulas"
+                  icon={<DoorOpen size={20} />}
+                  onClick={closeMenus}
+                >
+                  Aulas
                 </MobileLink>
                 <MobileLink
                   to="/tipos-documentos"
@@ -464,6 +486,13 @@ function Navbar() {
                 </MobileLink>
               </>
             )}
+
+            <MobileAction
+              icon={<LogOut size={20} />}
+              onClick={handleLogout}
+            >
+              Cerrar sesión
+            </MobileAction>
           </div>
         </div>
       )}
@@ -510,6 +539,21 @@ function MobileLink({ to, icon, children, onClick, iconoSinFondo = false }) {
       </span>
       {children}
     </NavLink>
+  );
+}
+
+function MobileAction({ icon, children, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full flex items-center gap-4 rounded-2xl bg-white border border-slate-200 px-4 py-4 font-bold text-left text-slate-700 shadow-sm cursor-pointer"
+    >
+      <span className="w-10 h-10 rounded-xl bg-red-50 text-red-700 flex items-center justify-center">
+        {icon}
+      </span>
+      {children}
+    </button>
   );
 }
 

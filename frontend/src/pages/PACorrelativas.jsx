@@ -257,7 +257,7 @@ function PACorrelativas() {
                 >
                   <div className="mb-4">
                     <p className="text-xs font-bold text-slate-400 uppercase">
-                      Plan asignatura
+                      Asignatura del plan
                     </p>
                     <h2 className="text-xl font-extrabold text-slate-800 mt-1">
                       {mapas.planesAsignaturas[registro.pa_id] || "-"}
@@ -284,7 +284,7 @@ function PACorrelativas() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200">
-                  <Th>Plan asignatura</Th>
+                  <Th>Asignatura del plan</Th>
                   <Th>Correlativa</Th>
                   <Th>Acciones</Th>
                 </tr>
@@ -339,7 +339,7 @@ function PACorrelativas() {
                 <form onSubmit={guardarRegistro} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <CampoSelect
-                      label="Plan asignatura"
+                      label="Asignatura del plan"
                       name="pa_id"
                       value={formulario.pa_id}
                       onChange={manejarCambio}
@@ -481,7 +481,7 @@ function obtenerEtiquetaPlanAsignatura(planAsignatura, asignaturas, planes, sede
   const partes = [asignatura?.nombre, plan?.nombre, sede?.nombre].filter(Boolean);
 
   if (partes.length === 0) {
-    return `Plan asignatura #${planAsignatura.id}`;
+    return `Asignatura del plan #${planAsignatura.id}`;
   }
 
   return partes.join(" - ");

@@ -417,7 +417,7 @@ function EditarComision() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <CampoSelect
-                      label="Plan asignatura"
+                      label="Asignatura del plan"
                       name="plan_asignaturas_id"
                       value={nuevaComisionAsignatura.plan_asignaturas_id}
                       onChange={cambiarNuevaComisionAsignatura}
@@ -425,7 +425,7 @@ function EditarComision() {
                       getValue={(item) => item.id}
                       getLabel={(item) =>
                         mapas.planesAsignaturas[item.id] ||
-                        `Plan asignatura #${item.id}`
+                        `Asignatura del plan #${item.id}`
                       }
                     />
                     <CampoSelect
@@ -868,7 +868,7 @@ function obtenerEtiquetaPlanAsignatura(
 
   return partes.length
     ? partes.join(" - ")
-    : `Plan asignatura #${planAsignatura.id}`;
+    : `Asignatura del plan #${planAsignatura.id}`;
 }
 
 function obtenerEtiquetaLegajo(legajo) {

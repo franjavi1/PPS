@@ -453,7 +453,7 @@ function AltaPlanWizard() {
                   Plan ID: {planId || "pendiente"}
                 </p>
                 <p className="text-slate-800 font-bold mt-1">
-                  Plan asignatura ID: {planAsignaturaId || "pendiente"}
+                  Asignatura del plan ID: {planAsignaturaId || "pendiente"}
                 </p>
                 <p className="text-slate-800 font-bold mt-1">
                   Asignaturas: {asignaturasCargadas.length}

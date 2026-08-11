@@ -399,10 +399,10 @@ function EditarPersona({ soloLectura = false }) {
                 </p>
 
                 <h1 className="text-3xl font-extrabold text-slate-800 mt-1">
-                  {soloLectura ? "Ver persona" : "Editar persona"}
+                  {soloLectura ? "Mis datos" : "Editar persona"}
                 </h1>
                 <p className="text-slate-500 mt-2">
-                  Modifica persona, legajo, datos medicos, rango y sede.
+                  {soloLectura ? "Consultá tus datos personales" : "Modifica persona, legajo, datos medicos, rango y sede."}
                 </p>
               </div>
             </div>
