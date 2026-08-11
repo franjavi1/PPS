@@ -38,6 +38,8 @@ const comisionAsignaturaInicial = {
   aula_id: "",
   nombre: "",
   modalidad: "",
+  vigencia_desde: "",
+  vigencia_hasta: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -176,6 +178,8 @@ function AltaComisionWizard() {
       aula_id: Number(comisionAsignatura.aula_id),
       nombre: comisionAsignatura.nombre.trim(),
       modalidad: comisionAsignatura.modalidad.trim(),
+      vigencia_desde: comisionAsignatura.vigencia_desde,
+      vigencia_hasta: comisionAsignatura.vigencia_hasta,
       cupo_maximo: Number(comisionAsignatura.cupo_maximo),
       estado: Number(comisionAsignatura.estado),
       modalidadesid: Number(comisionAsignatura.modalidadesid),
@@ -257,6 +261,8 @@ function AltaComisionWizard() {
           comision_id: nuevaComisionId,
           nombre: item.nombre,
           modalidad: item.modalidad,
+          vigencia_desde: item.vigencia_desde,
+          vigencia_hasta: item.vigencia_hasta,
           modalidadesid: item.modalidadesid,
           cupo_maximo: item.cupo_maximo,
           estado: item.estado,
@@ -426,6 +432,22 @@ function AltaComisionWizard() {
                       placeholder="Ej: 30"
                       icono={<Hash size={20} />}
                     />
+
+                    <CampoTexto
+                      label="Vigencia desde"
+                      name="vigencia_desde"
+                      value={comisionAsignatura.vigencia_desde}
+                      onChange={cambiarComisionAsignatura}
+                      type="date"
+                    />
+                    <CampoTexto
+                      label="Vigencia hasta"
+                      name="vigencia_hasta"
+                      value={comisionAsignatura.vigencia_hasta}
+                      onChange={cambiarComisionAsignatura}
+                      type="date"
+                    />
+
                     <CampoSelect
                       label="Estado"
                       name="estado"
@@ -438,6 +460,7 @@ function AltaComisionWizard() {
                       getValue={(item) => item.id}
                       getLabel={(item) => item.label}
                     />
+
                   </div>
                   <div className="flex justify-end">
                     <button
@@ -598,8 +621,8 @@ function PasoIndicador({ paso, activo, completo, ultimo }) {
 
       <div
         className={`relative z-10 w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center border-2 transition ${resaltado
-            ? "bg-red-700 border-red-700 text-white shadow-sm"
-            : "bg-slate-100 border-slate-300 text-slate-400"
+          ? "bg-red-700 border-red-700 text-white shadow-sm"
+          : "bg-slate-100 border-slate-300 text-slate-400"
           }`}
       >
         <Icono size={20} />
@@ -830,6 +853,8 @@ function validarComisionAsignatura(payload) {
   if (!payload.nombre) return "El nombre es obligatorio";
   if (!payload.modalidadesid) return "La modalidad es obligatoria";
   if (!payload.modalidad) return "El horario es obligatorio";
+  if (!payload.vigencia_desde) return "La vigencia desde es obligatoria";
+  if (!payload.vigencia_hasta) return "La vigencia hasta es obligatoria";
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0)
     return "El cupo maximo debe ser mayor a cero";
   if (payload.cupo_maximo > 500)

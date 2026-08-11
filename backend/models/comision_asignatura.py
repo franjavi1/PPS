@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from db import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, ForeignKey, Integer, String, func
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, func
 
 
 class ComisionAsignatura(db.Model):
@@ -58,12 +58,17 @@ class ComisionAsignatura(db.Model):
         default=1
     )
 
-
-
-
-
-
-
+    vigencia_desde: Mapped[date] = mapped_column(
+        "vigenciaDesde",
+        Date,
+        nullable=False
+    )
+    
+    vigencia_hasta: Mapped[date] = mapped_column(
+        "vigenciaHasta",
+        Date,
+        nullable=False
+    )
 
     comision_id: Mapped[int] = mapped_column(
         "idComision",

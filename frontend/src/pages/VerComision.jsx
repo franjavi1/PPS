@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import BotonVolver from "../components/BotonVolver";
-import {legajoService} from "../services/legajoService";
+import { legajoService } from "../services/legajoService";
 import { asignaturaService } from "../services/asignaturaService";
 import { aulaService } from "../services/aulaService";
 import { autoridadComisionService } from "../services/autoridadComisionService";
@@ -215,6 +215,8 @@ function VerComision() {
                             />
 
                             <Dato label="Horario" value={item.modalidad} />
+                            <Dato label="Vigencia desde" value={item.vigencia_desde} />
+                            <Dato label="Vigencia hasta" value={item.vigencia_hasta} />
 
                             <Dato label="Cupo" value={item.cupo_maximo} />
                             <Dato label="Estado" value={item.estado} />

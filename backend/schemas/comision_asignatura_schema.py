@@ -36,6 +36,10 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         ]
     )
     
+    vigencia_desde = fields.Date(required=True, allow_none=False)
+    vigencia_hasta = fields.Date(required=True, allow_none=False)
+
+    
     modalidadesid = ma.auto_field(
         required=True,
         allow_none=False
@@ -72,6 +76,7 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
         if PlanAsignatura.query.filter_by(id=value).first() is None:
             raise ValidationError("El plan de asignatura indicado no existe")
 
+
     @validates("aula_id")
     def validar_aula(self, value, **kwargs):
         if value <= 0:
@@ -96,6 +101,8 @@ class ComisionAsignaturaSchema(ma.SQLAlchemySchema):
     @validates_schema
     def validar_vigencias(self, data, **kwargs):
         modalidad = data.get("modalidad")
+        vigencia_desde = data.get("vigencia_desde")
+        vigencia_hasta = data.get("vigencia_hasta")
 
         if not modalidad:
             raise ValidationError({"modalidad": ["El horario es obligatorio"]})

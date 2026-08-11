@@ -30,6 +30,8 @@ const formularioInicial = {
   comision_id: "",
   nombre: "",
   modalidad: "",
+  vigencia_desde: "",
+  vigencia_hasta: "",
   modalidadesid: "",
   cupo_maximo: "",
   estado: "1",
@@ -164,6 +166,8 @@ function ComisionesAsignaturas() {
       comision_id: String(registro.comision_id || ""),
       nombre: registro.nombre || "",
       modalidad: registro.modalidad || "",
+      vigencia_desde: registro.vigencia_desde || "",
+      vigencia_hasta: registro.vigencia_hasta || "",
       modalidadesid: String(registro.modalidadesid || ""),
       cupo_maximo: String(registro.cupo_maximo || ""),
       estado: String(registro.estado ?? 1),
@@ -238,6 +242,12 @@ function ComisionesAsignaturas() {
 
     return (
       String(registro.nombre || "")
+        .toLowerCase()
+        .includes(textoBusqueda) ||
+      String(registro.vigencia_desde || "")
+        .toLowerCase()
+        .includes(textoBusqueda) ||
+      String(registro.vigencia_hasta || "")
         .toLowerCase()
         .includes(textoBusqueda) ||
       String(registro.modalidad || "").toLowerCase().includes(textoBusqueda) ||
@@ -342,6 +352,8 @@ function ComisionesAsignaturas() {
                       label="Modalidad"
                       value={mapas.modalidades[registro.modalidadesid]}
                     />
+                    <Dato label="Vigencia desde" value={registro.vigencia_desde} />
+                    <Dato label="Vigencia hasta" value={registro.vigencia_hasta} />
                     <Dato label="Horario" value={registro.modalidad} />
                     <Dato label="Cupo" value={registro.cupo_maximo} />
                   </div>
@@ -375,6 +387,8 @@ function ComisionesAsignaturas() {
                   <Th>Aula</Th>
                   <Th>Modalidad</Th>
                   <Th>Horario</Th>
+                  <Th>Vigencia desde</Th>
+                  <Th>Vigencia hasta</Th>
                   <Th>Cupo</Th>
                   <Th>Estado</Th>
                   <Th>Acciones</Th>
@@ -409,6 +423,8 @@ function ComisionesAsignaturas() {
                         {mapas.modalidades[registro.modalidadesid] || "-"}
                       </Td>
                       <Td>{registro.modalidad || "-"}</Td>
+                      <Td>{registro.vigencia_desde || "-"}</Td>
+                      <Td>{registro.vigencia_hasta || "-"}</Td>
                       <Td>{registro.cupo_maximo}</Td>
                       <Td>
                         <EstadoBadge estado={registro.estado} />
@@ -555,6 +571,24 @@ function ComisionesAsignaturas() {
                     />
 
                     <CampoInput
+                      label="Vigencia desde"
+                      name="vigencia_desde"
+                      type="date"
+                      value={formulario.vigencia_desde}
+                      onChange={manejarCambio}
+                      icon={<Calendar size={20} />}
+                    />
+
+                    <CampoInput
+                      label="Vigencia hasta"
+                      name="vigencia_hasta"
+                      type="date"
+                      value={formulario.vigencia_hasta}
+                      onChange={manejarCambio}
+                      icon={<Calendar size={20} />}
+                    />
+
+                    <CampoInput
                       label="Cupo maximo"
                       name="cupo_maximo"
                       type="number"
@@ -656,11 +690,10 @@ function BotonAccion({ onClick, tipo }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1 font-semibold ${
-        esEditar
+      className={`flex items-center gap-1 font-semibold ${esEditar
           ? "text-blue-600 hover:text-blue-800"
           : "text-red-600 hover:text-red-800"
-      } transition cursor-pointer`}
+        } transition cursor-pointer`}
     >
       {esEditar ? <Pencil size={18} /> : <Trash2 size={18} />}
       {esEditar ? "Editar" : "Eliminar"}
@@ -682,11 +715,10 @@ function EstadoBadge({ estado }) {
 
   return (
     <span
-      className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${
-        activo
+      className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-bold border ${activo
           ? "bg-green-100 text-green-700 border-green-300"
           : "bg-red-100 text-red-700 border-red-300"
-      }`}
+        }`}
     >
       {activo ? "Activo" : "Inactivo"}
     </span>
@@ -762,6 +794,15 @@ function validarPayload(payload) {
   if (!payload.modalidad) {
     return "El horario es obligatorio";
   }
+
+  if (!payload.vigencia_desde) {
+    return "La vigencia desde es obligatoria";
+  }
+
+  if (!payload.vigencia_hasta) {
+    return "La vigencia hasta es obligatoria";
+  }
+
 
   if (!payload.cupo_maximo || payload.cupo_maximo <= 0) {
     return "El cupo maximo debe ser mayor a cero";
