@@ -91,6 +91,7 @@ def eliminar_persona(id):
 
 
 @personas_bp.route("/<int:id>/reactivar", methods=["PATCH"])
+@requires_permission("planes.personas.reactivar")
 def reactivar_persona(id):
     persona = obtener_por_id_sin_filtrar_estado(id)
 
