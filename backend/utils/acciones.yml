@@ -360,6 +360,7 @@ rol_accion:
       - personas.crear
       - personas.editar
       - personas.eliminar
+      - personas.reactivar
       - datos_medicos.ver
       - datos_medicos.crear
       - datos_medicos.editar
