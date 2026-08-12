@@ -34,6 +34,7 @@ function Comisiones() {
   const [errorFormulario, setErrorFormulario] = useState("");
   const [cargando, setCargando] = useState(true);
   const [mostrarModalConfirmacion, setMostrarModalConfirmacion] = useState(false);
+  const [comisionAEliminar, setComisionAEliminar] = useState(null);
 
   useEffect(() => {
     cargarComisiones();
@@ -122,19 +123,24 @@ function Comisiones() {
     }
   }
 
-  async function eliminarComision(id) {
-    const confirmar = confirm("Seguro que queres eliminar esta comision?");
+  function solicitarEliminacionComision(comision) {
+    setComisionAEliminar(comision);
+    setMostrarModalConfirmacion(true);
+  }
 
-    if (!confirmar) {
-      return;
-    }
+  async function confirmarEliminacionComision() {
+    if (!comisionAEliminar) return;
 
     try {
-      const respuesta = await comisionService.eliminar(id);
-      alert(respuesta.message || "Comision eliminada correctamente");
+      setCargando(true);
+      await comisionService.eliminar(comisionAEliminar.id_comision);
       await cargarComisiones();
     } catch (err) {
       setError(err.message || "No se pudo eliminar la comision");
+    } finally {
+      setMostrarModalConfirmacion(false);
+      setComisionAEliminar(null);
+      setCargando(false);
     }
   }
 
@@ -145,6 +151,8 @@ function Comisiones() {
       .toLowerCase()
       .includes(textoBusqueda);
   });
+
+
 
   return (
     <div className="min-h-screen bg-slate-100">
