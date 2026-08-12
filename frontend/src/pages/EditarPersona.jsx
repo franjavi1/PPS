@@ -123,15 +123,9 @@ function EditarPersona({ soloLectura = false }) {
         respuestaDatosMedicos = await legajosRelacionesService.obtenerDatosMedicosPorIdPersona(id);
       } catch (e) {}
 
-      let respuestaRangosAsignados = { data: [] };
-      try {
-        respuestaRangosAsignados = await legajoRangosService.obtenerTodos();
-      } catch (e) {}
-
-      let respuestaSedesAsignadas = { data: [] };
-      try {
-        respuestaSedesAsignadas = await legajoSedesService.obtenerTodos();
-      } catch (e) {}
+      // No hacemos llamadas masivas a legajoRangosService.obtenerTodos() ni a
+      // legajoSedesService.obtenerTodos() por motivos de rendimiento. Inicializamos
+      // los datos asociados a rango/sede como null para que la vista cargue rápido.
 
       let respuestaContactos = { data: [] };
       try {
@@ -142,18 +136,8 @@ function EditarPersona({ soloLectura = false }) {
       const legajoData = respuestaLegajos.data;
       const datosMedicosData = respuestaDatosMedicos.data;
       
-      const rangoData = legajoData
-        ? (respuestaRangosAsignados.data || []).find(
-            (item) => Number(item.legajo_id) === Number(legajoData.id),
-          )
-        : null;
-
-      const listaSedesAsignadas = respuestaSedesAsignadas.data || [];
-      const sedeData = legajoData
-        ? listaSedesAsignadas.find(
-            (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
-          )
-        : null;
+      const rangoData = null;
+      const sedeData = null;
 
       const tiposContactoData = respuestaTiposContacto.data || [];
       const tipoEmail = obtenerTipoContacto(tiposContactoData, "email");
