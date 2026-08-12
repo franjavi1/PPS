@@ -95,95 +95,83 @@ function EditarPersona({ soloLectura = false }) {
       setCargando(true);
       setError("");
 
-      // Hacemos las peticiones principales que SÍ o SÍ necesita la pantalla
+      // 1. Petición principal que trae Legajo, Persona y Contactos de una vez
+      // (Ajustá el nombre de este servicio según cómo lo hayas llamado en tu front)
+      const respuestaPrincipal = await legajoService.obtenerPorIdPersona(id);
+      const legajoData = respuestaPrincipal.data || {};
+      const personaData = legajoData.persona || {};
+      const contactosData = personaData.contactos_items || [];
+
+      // 2. Traer todos los catálogos siempre para que los select tengan el texto a mostrar
       const [
-        respuestaPersona,
         respuestaTipos,
         respuestaTiposContacto,
         respuestaRangos,
         respuestaSedes,
       ] = await Promise.all([
-        personasService.obtenerPorId(id),
         tipoDocumentoService.obtenerTodos(),
         tipoContactoService.obtenerTodos(),
         rangoService.obtenerTodos(),
         sedeService.obtenerTodas(),
       ]);
 
-      // Para los servicios secundarios que pueden dar 403 (como legajos o datos médicos si no eres dueño/admin), los envolvemos en bloques seguros:
-      let respuestaLegajos = { data: null };
+      // 3. Datos Médicos por ID
+      let datosMedicosData = null;
       try {
-        respuestaLegajos = await legajoService.obtenerPorIdPersona(id);
+        const resMedicos = await legajosRelacionesService.obtenerDatosMedicosPorIdPersona(id);
+        datosMedicosData = resMedicos.data;
       } catch (e) {
-        // Si da 403 u otro error porque no tiene permiso al legajo, lo ignoramos de forma segura
+        // Ignoramos errores si no tiene datos médicos o si hay un 403
       }
 
-      let respuestaDatosMedicos = { data: null };
-      try {
-        respuestaDatosMedicos = await legajosRelacionesService.obtenerDatosMedicosPorIdPersona(id);
-      } catch (e) {}
+      // 4. Rangos y Sedes por ID (Solo si existe un legajo asociado)
+      let rangoData = null;
+      let sedeData = null;
 
-      let respuestaRangosAsignados = { data: [] };
-      try {
-        respuestaRangosAsignados = await legajoRangosService.obtenerTodos();
-      } catch (e) {}
+      if (legajoData.id) {
+        const [resRangos, resSedes] = await Promise.allSettled([
+          legajoRangosService.obtenerPorLegajoId(legajoData.id),
+          legajoSedesService.obtenerPorLegajoId(legajoData.id)
+        ]);
 
-      let respuestaSedesAsignadas = { data: [] };
-      try {
-        respuestaSedesAsignadas = await legajoSedesService.obtenerTodos();
-      } catch (e) {}
+        if (resRangos.status === "fulfilled" && resRangos.value.data) {
+          const dataRango = resRangos.value.data;
+          rangoData = Array.isArray(dataRango) ? dataRango[0] : dataRango;
+        }
 
-      let respuestaContactos = { data: [] };
-      try {
-        respuestaContactos = contactosService.obtenerTodos ? await contactosService.obtenerTodos() : { data: [] };
-      } catch (e) {}
+        if (resSedes.status === "fulfilled" && resSedes.value.data) {
+          const dataSede = resSedes.value.data;
+          sedeData = Array.isArray(dataSede) ? dataSede[0] : dataSede;
+        }
+      }
 
-      const personaData = respuestaPersona.data || {};
-      const legajoData = respuestaLegajos.data;
-      const datosMedicosData = respuestaDatosMedicos.data;
-      
-      const rangoData = legajoData
-        ? (respuestaRangosAsignados.data || []).find(
-            (item) => Number(item.legajo_id) === Number(legajoData.id),
-          )
-        : null;
-
-      const listaSedesAsignadas = respuestaSedesAsignadas.data || [];
-      const sedeData = legajoData
-        ? listaSedesAsignadas.find(
-            (item) => Number(item.legajo_id || item.Legajo_id) === Number(legajoData.id),
-          )
-        : null;
-
-      const tiposContactoData = respuestaTiposContacto.data || [];
-      const tipoEmail = obtenerTipoContacto(tiposContactoData, "email");
-      const tipoCelular = obtenerTipoContacto(tiposContactoData, "celular");
-      const contactoEmailData = (respuestaContactos.data || []).find(
-        (item) =>
-          Number(item.persona_id) === Number(id) &&
-          Number(item.tipo_contacto_id) === Number(tipoEmail?.id),
+      // 5. Procesar contactos desde el JSON anidado
+      const contactoEmail = contactosData.find(
+        (c) => c.tipo_contacto?.tipo.toLowerCase() === "email"
       );
-      const contactoCelularData = (respuestaContactos.data || []).find(
-        (item) =>
-          Number(item.persona_id) === Number(id) &&
-          Number(item.tipo_contacto_id) === Number(tipoCelular?.id),
+      const contactoCelular = contactosData.find(
+        (c) => c.tipo_contacto?.tipo.toLowerCase() === "celular"
       );
 
+      // 6. Setear los estados
       setPersona({
         td_id: personaData.td_id || "",
         numero_doc: personaData.numero_doc || "",
         nombre: personaData.nombre || "",
         apellido: personaData.apellido || "",
       });
+
       setLegajo({
-        numero: legajoData?.numero || "",
+        numero: legajoData.numero || "",
       });
+
       setDatosMedicos({
         grupo_sanguineo: datosMedicosData?.grupo_sanguineo || "",
         alergias: datosMedicosData?.alergias || "",
         aptitud_fisica: Boolean(datosMedicosData?.aptitud_fisica),
         seguro: datosMedicosData?.seguro || "",
       });
+
       setRango({
         rangos_institucionales_id: rangoData?.rangos_institucionales_id || "",
       });
@@ -195,21 +183,24 @@ function EditarPersona({ soloLectura = false }) {
       });
 
       setContactos({
-        email: contactoEmailData?.contacto || "",
-        celular: contactoCelularData?.contacto || "",
+        email: contactoEmail?.contacto || "",
+        celular: contactoCelular?.contacto || "",
       });
+
       setIds({
-        legajoId: legajoData?.id || null,
+        legajoId: legajoData.id || null,
         datosMedicosId: datosMedicosData?.id || null,
         rangoId: rangoData?.id || null,
         sedeId: sedeData?.id || null,
-        emailContactoId: contactoEmailData?.id || null,
-        celularContactoId: contactoCelularData?.id || null,
+        emailContactoId: contactoEmail?.id || null,
+        celularContactoId: contactoCelular?.id || null,
       });
+
       setTiposDocumento(respuestaTipos.data || []);
-      setTiposContacto(tiposContactoData);
+      setTiposContacto(respuestaTiposContacto.data || []);
       setRangos(respuestaRangos.data || []);
       setSedes(respuestaSedes.data || []);
+
     } catch (err) {
       setError(obtenerMensajeError(err));
     } finally {

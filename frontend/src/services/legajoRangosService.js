@@ -16,6 +16,10 @@ export const legajoRangosService = {
     return apiRequest(`${BASE_URL}/${id}`);
   },
 
+  obtenerPorLegajoId(legajoId) {
+    return apiRequest(`/legajos/${legajoId}/rangos`);
+  },
+
   crear(legajoRangos) {
     return apiRequest(BASE_URL, {
       method: "POST",

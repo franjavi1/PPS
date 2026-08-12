@@ -15,6 +15,10 @@ export const legajoSedesService = {
   obtenerPorId(id) {
     return apiRequest(`${BASE_URL}/${id}`);
   },
+  
+  obtenerPorLegajoId(legajoId) {
+    return apiRequest(`/legajos/${legajoId}/sedes`);
+  },
 
   crear(legajoSedes) {
     return apiRequest(BASE_URL, {

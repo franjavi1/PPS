@@ -6,6 +6,7 @@ from urllib.request import Request, urlopen
 from flask import Blueprint, request, jsonify
 
 from db import db
+from models.legajo_sedes import LegajoSedes
 from models.datos_medicos import DatosMedicos
 from models.legajo import Legajo
 from models.legajo_rangos import LegajoRangos
@@ -207,3 +208,36 @@ def solicitar_usuario_de_persona(persona_id):
     except Exception as e:
         print(e)
         raise APIError("Ocurrio un error inesperado al solicitar usuario", status=500)
+
+@personas_relaciones_bp.route("/legajos/<int:legajo_id>/rangos", methods=["GET"])
+@requires_permission("planes.legajo_rangos.ver", "planes.personas.ver_propio", policy="ANY") 
+def obtener_rangos_de_legajo(legajo_id):
+    rangos = LegajoRangos.query.filter_by(legajo_id=legajo_id).all()
+    
+    if not rangos:
+        return respuesta_api(True, [], "El legajo no tiene rangos asignados")
+
+    data = [legajo_rangos_schema.dump(rango) for rango in rangos]
+
+    return respuesta_api(
+        True, 
+        data, 
+        "Rangos del legajo obtenidos correctamente"
+    )
+
+
+@personas_relaciones_bp.route("/legajos/<int:legajo_id>/sedes", methods=["GET"])
+@requires_permission("planes.legajo_sedes.ver", "planes.personas.ver_propio", policy="ANY")
+def obtener_sedes_de_legajo(legajo_id):
+    sedes = LegajoSedes.query.filter_by(legajo_id=legajo_id).all()
+    
+    if not sedes:
+        return respuesta_api(True, [], "El legajo no tiene sedes asignadas")
+
+    data = [legajo_sedes_schema.dump(sede) for sede in sedes]
+
+    return respuesta_api(
+        True, 
+        data, 
+        "Sedes del legajo obtenidas correctamente"
+    )
