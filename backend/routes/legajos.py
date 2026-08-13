@@ -53,7 +53,8 @@ def get_detalle_legajo_por_persona_id():
     return respuesta_api(True, data, "Legajo, persona y contactos obtenidos correctamente")
 
 @legajos_bp.route("/GetPersonaFromLegajoId", methods=["GET"])
-@requires_permission("planes.legajos.ver", "planes.legajos.ver_propio", policy="ANY")
+@requires_permission(only_services=True)
+#@requires_permission("planes.legajos.ver", "planes.legajos.ver_propio", policy="ANY")
 def get_detalle_legajo_persona():
     legajo_id_raw = request.args.get("id") or request.args.get("legajo_id")
 
