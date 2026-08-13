@@ -4,6 +4,7 @@ from utils.errores import APIError
 from auth_common.decorador import requires_permission
 from schemas.comision_schema import comision_schema, comisiones_schema
 from services.comision_service import (
+    obtener_count,
     obtener_todos,
     obtener_por_id,
     crear,
@@ -23,6 +24,17 @@ def get_comisiones():
         return respuesta_api(True, [], "No se encontraron resultados")
 
     return respuesta_api(True, data, "Lista de comisiones obtenida")
+
+@comisiones_bp.route("/count", methods=["GET"])
+@requires_permission("planes.comisiones.ver")
+def get_count():
+    count = obtener_count()
+    
+    data = {
+        "cantidad":count
+    }
+    
+    return respuesta_api(True, data, "Conteo de legajos obtenido correctamente")
 
 @comisiones_bp.route("/<int:id>", methods=["GET"])
 @requires_permission("planes.comisiones.ver")

@@ -12,6 +12,7 @@ from auth_common.decorador import requires_permission
 from services.legajo_service import (
     obtener_todos,
     obtener_por_id,
+    obtener_count,
     crear,
     actualizar,
     eliminar,
@@ -118,6 +119,17 @@ def get_legajos():
         return respuesta_api(True, [], "No se encontraron resultados")
 
     return respuesta_api(True, data, "Lista de legajos obtenida")
+
+@legajos_bp.route("/count", methods=["GET"])
+@requires_permission("planes.legajos.ver")
+def get_count():
+    count = obtener_count()
+    
+    data = {
+        "cantidad":count
+    }
+    
+    return respuesta_api(True, data, "Conteo de legajos obtenido correctamente")
 
 
 @legajos_bp.route("/<int:id>", methods=["GET"])

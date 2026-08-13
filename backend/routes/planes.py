@@ -6,6 +6,7 @@ from utils.utilidades import respuesta_api
 from auth_common.decorador import requires_permission
 from utils.errores import APIError
 from services.planes_service import (
+    obtener_count,
     obtener_todos,
     obtener_por_id,
     crear,
@@ -26,6 +27,17 @@ def get_planes():
         return respuesta_api(True, [], "No se encontraron resultados")
 
     return respuesta_api(True, data, "Lista de planes obtenida")
+
+@planes_bp.route("/count", methods=["GET"])
+@requires_permission("planes.planes.ver")
+def get_count():
+    count = obtener_count()
+    
+    data = {
+        "cantidad":count
+    }
+    
+    return respuesta_api(True, data, "Conteo de planes obtenido correctamente")
 
 
 @planes_bp.route("/<int:id>", methods=["GET"])

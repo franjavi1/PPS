@@ -15,6 +15,8 @@ Este archivo contiene la logica de negocio del CRUD de Legajo
 
 def obtener_todos(estado=1):
     return Legajo.query.filter_by(estado=estado).all()
+def obtener_count():
+    return Legajo.query.filter_by(estado=1).count()
 
 
 def obtener_por_id(id):
