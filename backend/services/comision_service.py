@@ -12,6 +12,9 @@ Este archivo contiene la lógica de negocio del CRUD de Comision
 def obtener_todos():
     return Comision.query.filter_by(estado=1).all()
 
+def obtener_count():
+    return Comision.query.filter_by(estado=1).count()
+
 def obtener_por_id(id_comision):
     return Comision.query.filter_by(id_comision=id_comision).first()
 

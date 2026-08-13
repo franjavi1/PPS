@@ -40,18 +40,20 @@ function Inicio() {
 
     async function cargarResumen() {
         try {
-            const [legajos, planes, comisiones] = await Promise.all([
-                hasPermission("planes.legajos.ver") ? legajoService.obtenerTodos() : [],
-                hasPermission("planes.planes.ver") ? planService.obtenerTodos() : [],
-                hasPermission("planes.comisiones.ver") ? comisionService.obtenerTodas() : [],
+            const [respLegajos, respPlanes, respComisiones] = await Promise.all([
+                hasPermission("planes.legajos.ver") ? legajoService.obtenerCount() : null,
+                hasPermission("planes.planes.ver") ? planService.obtenerCount() : null,
+                hasPermission("planes.comisiones.ver") ? comisionService.obtenerCount() : null,
             ]);
 
             setResumen({
-                legajos: obtenerLista(legajos).length,
-                planes: obtenerLista(planes).length,
-                comisiones: obtenerLista(comisiones).length,
+                legajos: respLegajos?.data?.cantidad ?? 0,
+                planes: respPlanes?.data?.cantidad ?? 0,
+                comisiones: respComisiones?.data?.cantidad ?? 0
             });
-        } catch {
+        } catch (error){
+
+
             setResumen({
                 legajos: 0,
                 planes: 0,
@@ -236,10 +238,6 @@ function AccesoRapido({ icono, titulo, descripcion, onClick }) {
             <ChevronRight className="text-slate-400 shrink-0" size={24} />
         </button>
     );
-}
-
-function obtenerLista(respuesta) {
-    return Array.isArray(respuesta?.data) ? respuesta.data : [];
 }
 
 export default Inicio;

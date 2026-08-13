@@ -11,7 +11,10 @@ export const planService = {
   obtenerTodos() {
     return apiRequest(BASE_URL);
   },
-
+  obtenerCount() {
+    return apiRequest(`${BASE_URL}/count`);
+  },
+  
   obtenerPorId(id) {
     return apiRequest(`${BASE_URL}/${id}`);
   },

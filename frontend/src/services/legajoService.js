@@ -11,7 +11,10 @@ export const legajoService = {
   obtenerTodos() {
     return apiRequest(BASE_URL);
   },
-
+  obtenerCount() {
+    return apiRequest(`${BASE_URL}/count`);
+  },
+  
   obtenerTodosEstado(estado = null) {
     const url = `${BASE_URL}?estado=${estado}`;
     return apiRequest(url);

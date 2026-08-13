@@ -12,6 +12,9 @@ Este archivo contiene la logica de negocio del CRUD de Planes
 def obtener_todos():
     return Planes.query.filter_by(estado=1).all()
 
+def obtener_count():
+    return Planes.query.filter_by(estado=1).count()
+
 
 def obtener_por_id(id):
     return Planes.query.filter_by(id=id, estado=1).first()
